@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Elite Sports Management — Athlete Representation</title>
+<meta name="description" content="Elite Sports Management — athlete representation & development across college, indy ball and Europe. Roster, events and athlete profiles. Founded by Samuele Bruno." />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#081a33" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="ESM" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{--navy:#081a33;--navy-2:#06142a;--navy-3:#0d2547;--gold:#d9b154;--gold-soft:#e7c878;--ink:#eaf0fa;--muted:#9fb1cc;--line:rgba(217,177,84,.22);--card:#0c2143}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--navy-2);color:var(--ink);line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  .display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em;line-height:.92;text-transform:uppercase}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+  .bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .bg-fx::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 500px at 78% -10%,rgba(217,177,84,.16),transparent 60%),radial-gradient(800px 600px at 8% 110%,rgba(20,70,140,.30),transparent 55%),linear-gradient(180deg,var(--navy),var(--navy-2))}
+  .bg-fx::after{content:"";position:absolute;inset:0;opacity:.04;background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 9px)}
+
+  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(6,20,42,.72);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px;gap:14px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800}
+  .logo{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#10305c,#06142a);font-family:'Anton';font-size:13px;color:var(--gold);position:relative}
+  .logo span{position:absolute;top:-3px;font-size:9px}
+  .brand b{font-size:14px}.brand small{display:block;font-size:8.5px;letter-spacing:.3em;color:var(--gold-soft);font-weight:700}
+  .nav-right{display:flex;align-items:center;gap:18px}
+  .nav-links{display:flex;gap:22px;font-size:14px;font-weight:600}
+  .nav-links a{color:var(--muted);transition:.2s}.nav-links a:hover{color:var(--gold-soft)}
+  .lang{display:flex;gap:2px;border:1px solid var(--line);border-radius:999px;padding:3px}
+  .lang button{background:transparent;border:0;color:var(--muted);font-weight:700;font-size:12px;padding:5px 9px;border-radius:999px;cursor:pointer}
+  .lang button.on{background:var(--gold);color:#05101f}
+  .nav-cta{border:1px solid var(--gold);color:var(--gold-soft);padding:9px 15px;border-radius:999px;font-size:13px;font-weight:700;transition:.2s;white-space:nowrap}
+  .nav-cta:hover{background:var(--gold);color:#05101f}
+  @media(max-width:860px){.nav-links{display:none}}
+
+  .hero{position:relative;z-index:1;padding:74px 0 56px}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--gold-soft);border:1px solid var(--line);padding:7px 14px;border-radius:999px;margin-bottom:26px}
+  .eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+  .hero h1{font-size:clamp(44px,9vw,104px);max-width:14ch}.hero h1 em{color:var(--gold);font-style:normal}
+  .hero p.lead{margin-top:24px;max-width:56ch;font-size:clamp(16px,2.2vw,20px);color:var(--muted)}
+  .hero-btns{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap}
+  .btn{padding:14px 26px;border-radius:999px;font-weight:700;font-size:15px;transition:.22s;cursor:pointer;border:0;display:inline-block}
+  .btn-gold{background:var(--gold);color:#05101f}.btn-gold:hover{background:var(--gold-soft);transform:translateY(-2px)}
+  .btn-ghost{border:1px solid var(--line);color:var(--ink)}.btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+
+  .stats{position:relative;z-index:1;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(8,26,51,.5)}
+  .stats-in{display:grid;grid-template-columns:repeat(3,1fr)}
+  .stat{padding:30px 18px;text-align:center;border-right:1px solid var(--line)}.stat:last-child{border-right:0}
+  .stat b{font-family:'Anton';font-size:clamp(34px,6vw,56px);color:var(--gold);display:block;line-height:1}
+  .stat span{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+  section{position:relative;z-index:1}.sec{padding:78px 0}
+  .sec-head{margin-bottom:42px}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-soft)}
+  .sec-head h2{font-size:clamp(32px,5.5vw,58px);margin-top:12px;max-width:20ch}
+  .sec-head p{color:var(--muted);max-width:62ch;margin-top:14px;font-size:16.5px}
+
+  .do-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
+  .do{padding:24px 20px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));transition:.25s}
+  .do:hover{transform:translateY(-4px);border-color:var(--gold)}
+  .do .ic{font-size:22px;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:rgba(217,177,84,.12);border:1px solid var(--line);margin-bottom:15px}
+  .do h3{font-size:17px;margin-bottom:7px}.do p{color:var(--muted);font-size:14px}
+
+  .founder{display:grid;grid-template-columns:200px 1fr;gap:34px;align-items:center;border:1px solid var(--line);border-radius:20px;padding:34px;background:radial-gradient(circle at 12% 20%,rgba(217,177,84,.10),transparent 55%),linear-gradient(180deg,var(--card),var(--navy-2))}
+  @media(max-width:640px){.founder{grid-template-columns:1fr;text-align:center}}
+  .founder .mono{font-family:'Anton';font-size:70px;color:var(--gold);width:180px;height:180px;border-radius:50%;border:2px solid rgba(217,177,84,.4);display:grid;place-items:center;background:rgba(6,20,42,.5);margin:0 auto;background-size:cover;background-position:center}
+  .founder h3{font-size:clamp(26px,5vw,40px)}
+  .founder .role{color:var(--gold-soft);font-weight:700;margin-top:4px}
+  .founder p{color:var(--muted);margin-top:14px;font-size:16px;max-width:62ch}
+  .creds{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+  @media(max-width:640px){.creds{justify-content:center}}
+  .cred{font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:999px;border:1px solid var(--line);color:#cdd9ec;background:rgba(8,26,51,.5)}
+
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px}
+  .chip{padding:9px 17px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;cursor:pointer;transition:.18s}
+  .chip:hover{color:var(--ink)}.chip.active{background:var(--gold);color:#05101f;border-color:var(--gold)}
+  .roster{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:900px){.roster{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.roster{grid-template-columns:1fr}}
+  .pcard{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;background:linear-gradient(180deg,var(--card),var(--navy-2));transition:.25s;text-align:left;width:100%}
+  .pcard:hover{transform:translateY(-5px);border-color:var(--gold);box-shadow:0 18px 40px -20px rgba(0,0,0,.8)}
+  .pcard .top{position:relative;height:150px;display:grid;place-items:center;background:radial-gradient(circle at 50% 22%,#16386a,#0a1f3c);overflow:hidden;background-size:cover;background-position:center}
+  .pcard .top::after{content:"";position:absolute;inset:0;opacity:.07;background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 8px)}
+  .mono{font-family:'Anton';font-size:46px;color:var(--gold);z-index:1;width:96px;height:96px;border-radius:50%;border:2px solid rgba(217,177,84,.4);display:grid;place-items:center;background:rgba(6,20,42,.45)}
+  .tier{position:absolute;top:12px;right:12px;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:rgba(6,20,42,.7);border:1px solid var(--line);color:var(--gold-soft);z-index:2}
+  .flag{position:absolute;top:12px;left:12px;font-size:19px;z-index:2;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+  .pcard .body{padding:17px 18px 20px}
+  .pcard .body h3{font-size:19px;line-height:1.15}
+  .pcard .pos{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:3px}
+  .pcard .team{color:var(--muted);font-size:13px;margin-top:11px;display:flex;align-items:center;gap:7px}
+  .pcard .team::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold);flex:none}
+  .pcard .view{margin-top:14px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
+
+  /* events */
+  .ev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+  .ev-card{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:linear-gradient(180deg,var(--card),var(--navy-2));transition:.25s}
+  .ev-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+  .ev-img{height:130px;background:radial-gradient(circle at 70% 20%,rgba(217,177,84,.25),#0a1f3c);display:grid;place-items:center;font-size:38px;background-size:cover;background-position:center;position:relative}
+  .ev-status{position:absolute;top:12px;left:12px;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border-radius:999px;border:1px solid var(--line)}
+  .ev-status.up{background:var(--gold);color:#05101f;border-color:var(--gold)}
+  .ev-status.past{background:rgba(6,20,42,.7);color:var(--muted)}
+  .ev-body{padding:18px}
+  .ev-body h3{font-size:19px}
+  .ev-meta{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
+  .ev-body p{color:var(--muted);font-size:14px;margin-top:10px}
+
+  /* testimonials */
+  .testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+  .testi{border:1px solid var(--line);border-radius:18px;padding:26px 24px;background:linear-gradient(180deg,var(--card),var(--navy-2));position:relative}
+  .testi .q{font-size:40px;font-family:'Anton';color:rgba(217,177,84,.4);line-height:.6}
+  .testi p{font-size:16px;color:#d6e1f2;margin:8px 0 18px}
+  .testi .who{display:flex;align-items:center;gap:12px}
+  .testi .av{width:42px;height:42px;border-radius:50%;border:1.5px solid rgba(217,177,84,.4);display:grid;place-items:center;font-family:'Anton';color:var(--gold);font-size:16px;background:rgba(6,20,42,.5)}
+  .testi .nm{font-weight:700;font-size:14.5px}.testi .rl{color:var(--muted);font-size:12.5px}
+
+  .join{border:1px solid var(--line);border-radius:20px;padding:34px;background:linear-gradient(180deg,var(--card),var(--navy-2))}
+  .join .tagline{font-family:'Anton';text-transform:uppercase;color:var(--gold);font-size:clamp(18px,3vw,26px);margin-bottom:24px;letter-spacing:.02em}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+  .field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+  .field label{font-size:13px;font-weight:700;color:var(--gold-soft);letter-spacing:.02em}
+  .field input,.field select,.field textarea{background:rgba(6,20,42,.6);border:1px solid var(--line);border-radius:11px;padding:13px 14px;color:var(--ink);font-family:inherit;font-size:15px;outline:none;transition:.18s}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+  .field textarea{resize:vertical;min-height:90px}.field select{appearance:none;cursor:pointer}
+  .form-msg{display:none;margin-top:14px;padding:14px 16px;border-radius:12px;background:rgba(217,177,84,.12);border:1px solid var(--gold);color:var(--gold-soft);font-weight:600}
+  .form-msg.show{display:block}
+
+  .band{position:relative;z-index:1;margin:30px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:linear-gradient(120deg,rgba(217,177,84,.10),transparent)}
+  .band-in{padding:58px 0;text-align:center}.band h2{font-size:clamp(28px,5vw,50px)}
+  .band p{color:var(--muted);margin:14px auto 26px;max-width:52ch}
+
+  footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:46px 0 70px}
+  .foot{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
+  .foot .muted{color:var(--muted);font-size:13.5px;margin-top:14px}
+  .foot-links{display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+  @media(max-width:560px){.foot-links{align-items:flex-start}}
+  .pill{display:inline-flex;align-items:center;gap:9px;color:var(--gold-soft);font-weight:700;border:1px solid var(--line);padding:10px 16px;border-radius:999px;transition:.2s}
+  .pill:hover{border-color:var(--gold);background:rgba(217,177,84,.08)}
+
+  .modal{position:fixed;inset:0;z-index:100;display:none;align-items:flex-end;justify-content:center}
+  .modal.open{display:flex}
+  .modal .scrim{position:absolute;inset:0;background:rgba(3,10,22,.78);backdrop-filter:blur(4px)}
+  .sheet{position:relative;z-index:2;width:100%;max-width:680px;max-height:90vh;overflow:auto;background:linear-gradient(180deg,var(--navy-3),var(--navy-2));border:1px solid var(--line);border-radius:22px 22px 0 0;animation:rise .3s ease}
+  @media(min-width:700px){.modal{align-items:center}.sheet{border-radius:22px}}
+  @keyframes rise{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .sh-top{padding:30px 28px;display:flex;gap:20px;align-items:center;border-bottom:1px solid var(--line);background:radial-gradient(circle at 80% 0%,rgba(217,177,84,.12),transparent 60%)}
+  .sh-mono{font-family:'Anton';font-size:40px;color:var(--gold);width:88px;height:88px;flex:none;border-radius:50%;border:2px solid rgba(217,177,84,.4);display:grid;place-items:center;background:rgba(6,20,42,.5);background-size:cover;background-position:center}
+  .sheet h3{font-size:clamp(24px,5vw,34px)}
+  .sh-pos{color:var(--gold-soft);font-weight:700;margin-top:4px}.sh-meta{color:var(--muted);font-size:14px;margin-top:8px}
+  .sh-body{padding:26px 28px 34px}.sh-body p.bio{font-size:16px;color:#d6e1f2;margin-bottom:24px}
+  .sh-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+  .sh-stat{flex:1;min-width:120px;border:1px solid var(--line);border-radius:13px;padding:14px 16px;background:rgba(8,26,51,.5)}
+  .sh-stat b{font-family:'Anton';font-size:22px;color:var(--gold);display:block;line-height:1.1}
+  .sh-stat span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .sh-label{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft);font-weight:700;margin-bottom:12px}
+  .team-chips{display:flex;gap:9px;flex-wrap:wrap}
+  .team-chip{font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid var(--line);color:#cdd9ec;background:rgba(8,26,51,.5)}
+  .close{position:absolute;top:16px;right:16px;z-index:3;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(6,20,42,.7);color:var(--ink);font-size:18px;cursor:pointer;display:grid;place-items:center}
+  .close:hover{border-color:var(--gold);color:var(--gold)}
+
+  .install{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;justify-content:center;padding:0 16px 16px}
+  .install.show{display:flex}
+  .install .box{display:flex;align-items:center;gap:14px;background:rgba(12,33,67,.96);border:1px solid var(--gold);border-radius:14px;padding:12px 14px;backdrop-filter:blur(8px);max-width:520px;width:100%}
+  .install .box b{font-size:14px}.install .box span{font-size:12.5px;color:var(--muted);display:block}
+  .install button{margin-left:auto;border:0;background:var(--gold);color:#05101f;font-weight:700;padding:9px 14px;border-radius:999px;cursor:pointer}
+  .install .x{margin-left:8px;background:transparent;color:var(--muted);border:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<header class="nav"><div class="wrap nav-in">
+  <a class="brand" href="#top"><span class="logo">E<span>★</span></span><span><b>ELITE</b><small>Sports Mgmt</small></span></a>
+  <div class="nav-right">
+    <nav class="nav-links">
+      <a href="#about" data-i18n="nav_about"></a>
+      <a href="#who" data-i18n="nav_who"></a>
+      <a href="#roster" data-i18n="nav_roster"></a>
+      <a href="#events" data-i18n="nav_events"></a>
+      <a href="#join" data-i18n="nav_join"></a>
+    </nav>
+    <div class="lang" id="lang"><button data-l="en" class="on">EN</button><button data-l="es">ES</button><button data-l="it">IT</button></div>
+    <a class="nav-cta" href="#join" data-i18n="nav_cta"></a>
+  </div>
+</div></header>
+
+<a id="top"></a>
+<section class="hero"><div class="wrap">
+  <span class="eyebrow"><i></i> <span data-i18n="hero_eyebrow"></span></span>
+  <h1 class="display" data-i18n-html="hero_h1"></h1>
+  <p class="lead" data-i18n="hero_lead"></p>
+  <div class="hero-btns">
+    <a class="btn btn-gold" href="#roster" data-i18n="hero_btn1"></a>
+    <a class="btn btn-ghost" href="#join" data-i18n="hero_btn2"></a>
+  </div>
+</div></section>
+
+<div class="stats"><div class="wrap stats-in">
+  <div class="stat"><b id="statAthletes">17</b><span data-i18n="stat1"></span></div>
+  <div class="stat"><b id="statCountries">6</b><span data-i18n="stat2"></span></div>
+  <div class="stat"><b>6</b><span data-i18n="stat3"></span></div>
+</div></div>
+
+<section class="sec" id="about"><div class="wrap">
+  <div class="sec-head"><div class="kicker" data-i18n="about_kicker"></div><h2 class="display" data-i18n="about_h2"></h2><p data-i18n="about_p"></p></div>
+  <div class="do-grid">
+    <div class="do"><div class="ic">🎓</div><h3 data-i18n="svc1_t"></h3><p data-i18n="svc1_d"></p></div>
+    <div class="do"><div class="ic">⚾</div><h3 data-i18n="svc2_t"></h3><p data-i18n="svc2_d"></p></div>
+    <div class="do"><div class="ic">🌍</div><h3 data-i18n="svc3_t"></h3><p data-i18n="svc3_d"></p></div>
+    <div class="do"><div class="ic">📣</div><h3 data-i18n="svc4_t"></h3><p data-i18n="svc4_d"></p></div>
+    <div class="do"><div class="ic">📈</div><h3 data-i18n="svc5_t"></h3><p data-i18n="svc5_d"></p></div>
+  </div>
+</div></section>
+
+<section class="sec" id="who" style="padding-top:10px"><div class="wrap">
+  <div class="sec-head"><div class="kicker" data-i18n="who_kicker"></div></div>
+  <div class="founder">
+    <div class="mono" id="founderPhoto">SB</div>
+    <div>
+      <h3 class="display">Samuele Bruno</h3>
+      <div class="role" data-i18n="who_role"></div>
+      <p data-i18n="who_bio"></p>
+      <p data-i18n="who_bio2"></p>
+      <div class="creds">
+        <span class="cred">Kitchener Panthers (CBL)</span>
+        <span class="cred" data-i18n="cred_italy"></span>
+        <span class="cred">Hastings College '27</span>
+        <span class="cred" data-i18n="cred_util"></span>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" id="roster" style="padding-top:10px"><div class="wrap">
+  <div class="sec-head"><div class="kicker" data-i18n="roster_kicker"></div><h2 class="display" data-i18n="roster_h2"></h2><p data-i18n="roster_p"></p></div>
+  <div class="filters" id="filters"></div>
+  <div class="roster" id="roster"></div>
+</div></section>
+
+<section class="sec" id="events" style="padding-top:10px"><div class="wrap">
+  <div class="sec-head"><div class="kicker" data-i18n="events_kicker"></div><h2 class="display" data-i18n="events_h2"></h2><p data-i18n="events_p"></p></div>
+  <div class="ev-grid" id="events"></div>
+</div></section>
+
+<section class="sec" id="testi" style="padding-top:10px"><div class="wrap">
+  <div class="sec-head"><div class="kicker" data-i18n="testi_kicker"></div><h2 class="display" data-i18n="testi_h2"></h2><p data-i18n="testi_p"></p></div>
+  <div class="testi-grid" id="testi"></div>
+</div></section>
+
+<section class="sec" id="join" style="padding-top:10px"><div class="wrap">
+  <div class="sec-head"><div class="kicker" data-i18n="join_kicker"></div><h2 class="display" data-i18n="join_h2"></h2><p data-i18n="join_p"></p></div>
+  <div class="join">
+    <div class="tagline" data-i18n="join_tagline"></div>
+    <form id="applyForm" novalidate>
+      <div class="grid2">
+        <div class="field"><label data-i18n="f_name"></label><input name="name" required /></div>
+        <div class="field"><label data-i18n="f_age"></label><input name="age" inputmode="numeric" /></div>
+        <div class="field"><label data-i18n="f_phone"></label><input name="phone" inputmode="tel" /></div>
+        <div class="field"><label data-i18n="f_email"></label><input name="email" type="email" /></div>
+        <div class="field"><label data-i18n="f_ig"></label><input name="ig" placeholder="@" /></div>
+        <div class="field"><label data-i18n="f_country"></label><input name="country" /></div>
+        <div class="field"><label data-i18n="f_position"></label>
+          <select name="position">
+            <option value="Pitcher" data-i18n="filter_pitcher"></option>
+            <option value="Catcher" data-i18n="filter_catcher"></option>
+            <option value="Infielder" data-i18n="filter_infielder"></option>
+            <option value="Two-Way" data-i18n="filter_twoway"></option>
+          </select></div>
+        <div class="field"><label data-i18n="f_applying"></label>
+          <select name="applying">
+            <option value="Representation" data-i18n="opt_rep"></option>
+            <option value="Coaching" data-i18n="opt_coach"></option>
+            <option value="Both" data-i18n="opt_both"></option>
+          </select></div>
+      </div>
+      <div class="field"><label data-i18n="f_why"></label><textarea name="why"></textarea></div>
+      <div class="field"><label data-i18n="f_other"></label><textarea name="other"></textarea></div>
+      <button class="btn btn-gold" type="submit" data-i18n="f_submit"></button>
+      <div class="form-msg" id="formMsg" data-i18n="f_success"></div>
+    </form>
+  </div>
+</div></section>
+
+<div class="band"><div class="wrap band-in">
+  <h2 class="display" data-i18n="band_h2"></h2><p data-i18n="band_p"></p>
+  <a class="btn btn-gold" href="#join" data-i18n="band_btn"></a>
+</div></div>
+
+<footer><div class="wrap foot">
+  <div>
+    <a class="brand" href="#top"><span class="logo">E<span>★</span></span><span><b>ELITE SPORTS MANAGEMENT</b><small data-i18n="foot_tagline"></small></span></a>
+    <p class="muted">© <span id="yr"></span> Elite Sports Management. <span data-i18n="foot_rights"></span></p>
+  </div>
+  <div class="foot-links">
+    <a class="pill" href="https://instagram.com/elite_sports_management__" target="_blank" rel="noopener">◎ @elite_sports_management__</a>
+    <a class="pill" href="mailto:elitesportsmanagement50@gmail.com">✉ elitesportsmanagement50@gmail.com</a>
+  </div>
+</div></footer>
+
+<div class="modal" id="modal"><div class="scrim" data-close></div><div class="sheet"><button class="close" data-close>✕</button><div id="sheetContent"></div></div></div>
+
+<div class="install" id="install"><div class="box"><div><b data-i18n="install_t"></b><span data-i18n="install_d"></span></div><button id="installBtn" data-i18n="install_btn"></button><button class="x" id="installX">✕</button></div></div>
+
+<script>
+/* ===== CONFIG: add Supabase keys to go live (optional) ===== */
+const SUPABASE_URL = "";
+const SUPABASE_ANON_KEY = "";
+
+/* ===== sample EVENTS & TESTIMONIALS — replace with real ones ===== */
+const EVENTS = [
+  { title:"Elite Winter Showcase", date:"2026-02-15", loc:"Arizona, USA", status:"upcoming", icon:"🏟️", blurb:"Showcase camp for prospects looking to get seen by college and pro scouts." },
+  { title:"All-Stars Tournament", date:"2026-01-10", loc:"Italy", status:"upcoming", icon:"🏆", blurb:"International tournament featuring ESM-represented athletes." },
+  { title:"Champions All-Stars 2025", date:"2025-08-20", loc:"Europe", status:"past", icon:"⭐", blurb:"A championship run with the ESM all-stars." }
+];
+const TESTIMONIALS = [
+  { q:"Elite Sports Management opened doors I didn't know existed. They believed in me from day one.", n:"ESM Athlete", r:"Pitcher" },
+  { q:"Professional, honest and always available. They treat the family like part of the team.", n:"Parent", r:"ESM Family" },
+  { q:"From the showcase to signing, every step was handled with care.", n:"ESM Athlete", r:"Infielder" }
+];
+
+const T = {
+  en:{nav_about:"What We Do",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_join:"Join Us",nav_cta:"Apply Now",
+    hero_eyebrow:"Athlete Representation · Worldwide",hero_h1:'Representing the <em>next generation</em> of baseball talent.',
+    hero_lead:"Elite Sports Management guides athletes from the academy to the pro ranks — across college, indy ball and Europe.",
+    hero_btn1:"View the Roster",hero_btn2:"Join the Team",
+    stat1:"Athletes Represented",stat2:"Countries",stat3:"MLB Organizations",
+    about_kicker:"What We Do",about_h2:"Full-service representation, built around the athlete.",
+    about_p:"Our mission is to support athletes as they work to reach their full potential — on the field, in their careers and beyond.",
+    svc1_t:"College Placement",svc1_d:"Connecting players with U.S. college programs that fit their game and goals.",
+    svc2_t:"Indy Ball",svc2_d:"Opening doors to professional independent leagues across North America.",
+    svc3_t:"Europe",svc3_d:"Placing athletes with clubs in Italy, Spain, Germany and beyond.",
+    svc4_t:"Social Media & Branding",svc4_d:"Building each athlete's profile and story to grow their visibility.",
+    svc5_t:"Representation & Development",svc5_d:"Day-to-day management and a plan tailored to each athlete.",
+    who_kicker:"Who I Am",who_role:"CEO & Founder · Professional Utility Player",
+    who_bio:"Elite Sports Management was founded by Samuele Bruno, a professional utility player who has competed for the Kitchener Panthers and Italy's National Team. He built ESM to give athletes the representation and development the game demands.",
+    who_bio2:"Beyond representation, Samuele runs camps, showcases and a coaching program built on one idea: train like an athlete, play like a pro.",
+    cred_italy:"Italy National Team",cred_util:"Pro Utility Player",
+    roster_kicker:"The Roster",roster_h2:"Our Athletes",
+    roster_p:"A growing family of ballplayers from the Dominican Republic, Venezuela, Spain, Colombia, Italy and the United States.",
+    filter_all:"All",filter_pitcher:"Pitchers",filter_catcher:"Catchers",filter_infielder:"Infielders",filter_twoway:"Two-Way",card_view:"View profile →",
+    events_kicker:"Events",events_h2:"Camps, Showcases & Tournaments",events_p:"Where Elite Sports Management athletes train, compete and get seen.",
+    ev_upcoming:"Upcoming",ev_past:"Past",
+    testi_kicker:"Testimonials",testi_h2:"What People Say",testi_p:"Voices from players, families and coaches in the ESM family.",
+    join_kicker:"Join Us",join_h2:"Apply to Elite Sports Management",join_p:"Players, families and clubs — tell us about yourself and we'll create your athlete profile.",
+    join_tagline:"Train like an athlete. Play like a pro.",
+    f_name:"Full name *",f_age:"Age",f_phone:"Phone number",f_email:"Email",f_ig:"Instagram profile",f_country:"Country",
+    f_position:"Position",f_applying:"I'm applying for",opt_rep:"Representation",opt_coach:"Coaching",opt_both:"Both",
+    f_why:"Why do you want to start? / Your goals",f_other:"Anything else?",f_submit:"Submit application",
+    f_success:"Thanks! Your profile has been created — we'll be in touch.",
+    modal_highlights:"Career Highlights",modal_teams:"Teams & Affiliations",
+    band_h2:"Are you the next great addition?",band_p:"Start the conversation with Elite Sports Management.",band_btn:"Apply Now",
+    foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",
+    install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install"},
+  es:{nav_about:"Qué Hacemos",nav_who:"Quién Soy",nav_roster:"Jugadores",nav_events:"Eventos",nav_join:"Únete",nav_cta:"Aplica Ahora",
+    hero_eyebrow:"Representación de Atletas · En Todo el Mundo",hero_h1:'Representando a la <em>nueva generación</em> del talento del béisbol.',
+    hero_lead:"Elite Sports Management guía a los atletas desde la academia hasta el profesionalismo — en el college, el indy ball y Europa.",
+    hero_btn1:"Ver los Jugadores",hero_btn2:"Únete al Equipo",
+    stat1:"Atletas Representados",stat2:"Países",stat3:"Organizaciones MLB",
+    about_kicker:"Qué Hacemos",about_h2:"Representación integral, centrada en el atleta.",
+    about_p:"Nuestra misión es apoyar a los atletas para que alcancen todo su potencial — dentro y fuera del terreno.",
+    svc1_t:"Colocación en College",svc1_d:"Conectamos a los jugadores con programas universitarios en EE. UU. ideales para ellos.",
+    svc2_t:"Indy Ball",svc2_d:"Abrimos puertas a las ligas profesionales independientes de Norteamérica.",
+    svc3_t:"Europa",svc3_d:"Ubicamos atletas en clubes de Italia, España, Alemania y más.",
+    svc4_t:"Redes Sociales y Marca",svc4_d:"Construimos el perfil y la historia de cada atleta para aumentar su visibilidad.",
+    svc5_t:"Representación y Desarrollo",svc5_d:"Gestión diaria y un plan a la medida de cada atleta.",
+    who_kicker:"Quién Soy",who_role:"CEO y Fundador · Jugador Utility Profesional",
+    who_bio:"Elite Sports Management fue fundada por Samuele Bruno, un jugador utility profesional que ha competido con los Kitchener Panthers y la Selección de Italia. Creó ESM para dar a los atletas la representación y el desarrollo que el juego exige.",
+    who_bio2:"Además de la representación, Samuele organiza camps, showcases y un programa de coaching con una sola idea: entrena como un atleta, juega como un profesional.",
+    cred_italy:"Selección de Italia",cred_util:"Jugador Utility Pro",
+    roster_kicker:"Los Jugadores",roster_h2:"Nuestros Atletas",
+    roster_p:"Una familia creciente de peloteros de República Dominicana, Venezuela, España, Colombia, Italia y Estados Unidos.",
+    filter_all:"Todos",filter_pitcher:"Lanzadores",filter_catcher:"Receptores",filter_infielder:"Infielders",filter_twoway:"Dos Vías",card_view:"Ver perfil →",
+    events_kicker:"Eventos",events_h2:"Camps, Showcases y Torneos",events_p:"Donde los atletas de Elite Sports Management entrenan, compiten y se hacen ver.",
+    ev_upcoming:"Próximo",ev_past:"Pasado",
+    testi_kicker:"Testimonios",testi_h2:"Lo Que Dicen",testi_p:"Voces de jugadores, familias y entrenadores de la familia ESM.",
+    join_kicker:"Únete",join_h2:"Aplica a Elite Sports Management",join_p:"Jugadores, familias y clubes — cuéntanos sobre ti y crearemos tu perfil de atleta.",
+    join_tagline:"Entrena como un atleta. Juega como un profesional.",
+    f_name:"Nombre y apellido *",f_age:"Edad",f_phone:"Número de teléfono",f_email:"Correo electrónico",f_ig:"Perfil de Instagram",f_country:"País",
+    f_position:"Posición",f_applying:"Aplico para",opt_rep:"Representación",opt_coach:"Coaching",opt_both:"Ambos",
+    f_why:"¿Por qué quieres empezar? / Tus objetivos",f_other:"¿Algo más?",f_submit:"Enviar solicitud",
+    f_success:"¡Gracias! Tu perfil ha sido creado — te contactaremos.",
+    modal_highlights:"Destacados de Carrera",modal_teams:"Equipos y Afiliaciones",
+    band_h2:"¿Eres la próxima gran incorporación?",band_p:"Inicia la conversación con Elite Sports Management.",band_btn:"Aplica Ahora",
+    foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",
+    install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar"},
+  it:{nav_about:"Cosa Facciamo",nav_who:"Chi Sono",nav_roster:"Roster",nav_events:"Eventi",nav_join:"Unisciti",nav_cta:"Candidati",
+    hero_eyebrow:"Rappresentanza Atleti · In Tutto il Mondo",hero_h1:'Rappresentiamo la <em>nuova generazione</em> del talento del baseball.',
+    hero_lead:"Elite Sports Management accompagna gli atleti dall'academy al professionismo — tra college, indy ball ed Europa.",
+    hero_btn1:"Vedi il Roster",hero_btn2:"Unisciti al Team",
+    stat1:"Atleti Rappresentati",stat2:"Paesi",stat3:"Organizzazioni MLB",
+    about_kicker:"Cosa Facciamo",about_h2:"Rappresentanza completa, costruita intorno all'atleta.",
+    about_p:"La nostra missione è supportare gli atleti nel raggiungere il loro pieno potenziale — dentro e fuori dal campo.",
+    svc1_t:"Collocamento College",svc1_d:"Mettiamo in contatto i giocatori con i programmi universitari USA più adatti.",
+    svc2_t:"Indy Ball",svc2_d:"Apriamo le porte alle leghe professionistiche indipendenti del Nord America.",
+    svc3_t:"Europa",svc3_d:"Collochiamo atleti in club di Italia, Spagna, Germania e oltre.",
+    svc4_t:"Social Media e Brand",svc4_d:"Costruiamo il profilo e la storia di ogni atleta per aumentarne la visibilità.",
+    svc5_t:"Rappresentanza e Sviluppo",svc5_d:"Gestione quotidiana e un piano su misura per ogni atleta.",
+    who_kicker:"Chi Sono",who_role:"CEO e Fondatore · Giocatore Utility Professionista",
+    who_bio:"Elite Sports Management è stata fondata da Samuele Bruno, giocatore utility professionista che ha vestito le maglie dei Kitchener Panthers e della Nazionale Italiana. Ha creato ESM per dare agli atleti la rappresentanza e lo sviluppo che il gioco richiede.",
+    who_bio2:"Oltre alla rappresentanza, Samuele organizza camp, showcase e un programma di coaching con un'unica idea: allenati come un atleta, gioca come un professionista.",
+    cred_italy:"Nazionale Italiana",cred_util:"Giocatore Utility Pro",
+    roster_kicker:"Il Roster",roster_h2:"I Nostri Atleti",
+    roster_p:"Una famiglia in crescita di giocatori da Repubblica Dominicana, Venezuela, Spagna, Colombia, Italia e Stati Uniti.",
+    filter_all:"Tutti",filter_pitcher:"Lanciatori",filter_catcher:"Ricevitori",filter_infielder:"Interni",filter_twoway:"Due Ruoli",card_view:"Vedi profilo →",
+    events_kicker:"Eventi",events_h2:"Camp, Showcase e Tornei",events_p:"Dove gli atleti di Elite Sports Management si allenano, competono e si fanno notare.",
+    ev_upcoming:"In arrivo",ev_past:"Passato",
+    testi_kicker:"Testimonianze",testi_h2:"Cosa Dicono",testi_p:"Le voci di giocatori, famiglie e coach della famiglia ESM.",
+    join_kicker:"Unisciti",join_h2:"Candidati a Elite Sports Management",join_p:"Giocatori, famiglie e club — raccontaci di te e creeremo il tuo profilo da atleta.",
+    join_tagline:"Allenati come un atleta. Gioca come un professionista.",
+    f_name:"Nome e cognome *",f_age:"Età",f_phone:"Numero di telefono",f_email:"Email",f_ig:"Profilo Instagram",f_country:"Paese",
+    f_position:"Ruolo",f_applying:"Mi candido per",opt_rep:"Rappresentanza",opt_coach:"Coaching",opt_both:"Entrambi",
+    f_why:"Perché vuoi iniziare? / I tuoi obiettivi",f_other:"Altro?",f_submit:"Invia candidatura",
+    f_success:"Grazie! Il tuo profilo è stato creato — ti contatteremo.",
+    modal_highlights:"Carriera in Evidenza",modal_teams:"Squadre e Affiliazioni",
+    band_h2:"Sei la prossima grande aggiunta?",band_p:"Inizia la conversazione con Elite Sports Management.",band_btn:"Candidati",
+    foot_tagline:"Unisciti a festeggiare",foot_rights:"Tutti i diritti riservati.",
+    install_t:"Installa l'app ESM",install_d:"Aggiungila alla schermata Home",install_btn:"Installa"}
+};
+
+const FLAGS={"Dominican Republic":"🇩🇴","República Dominicana":"🇩🇴","Repubblica Dominicana":"🇩🇴","Venezuela":"🇻🇪","Spain":"🇪🇸","España":"🇪🇸","Spagna":"🇪🇸","Colombia":"🇨🇴","Italy":"🇮🇹","Italia":"🇮🇹","United States":"🇺🇸","USA":"🇺🇸","Estados Unidos":"🇺🇸","Stati Uniti":"🇺🇸","Germany":"🇩🇪","Alemania":"🇩🇪","Germania":"🇩🇪","Portugal":"🇵🇹","Canada":"🇨🇦","Mexico":"🇲🇽","México":"🇲🇽"};
+
+let PLAYERS = [
+  {
+    "slug": "brayan-hernandez",
+    "name": "Brayan Hernández",
+    "group": "Two-Way",
+    "position": "Two-Way (C / 1B / OF)",
+    "country": "Dominican Republic",
+    "flag": "🇩🇴",
+    "heritage": null,
+    "born": "2001",
+    "birthplace": "La Vega, Dominican Republic",
+    "tier": "Pro",
+    "bats": "Left",
+    "bio": "A versatile two-way player out of La Vega known for his offensive power from the left side. Developed in the Baltimore Orioles organization, he can catch, play first base and patrol the outfield.",
+    "teams": ["Baltimore Orioles org.", "Delmarva Shorebirds", "Aberdeen IronBirds"],
+    "stats": []
+  },
+  {
+    "slug": "gianni-westphal",
+    "name": "Gianni Westphal",
+    "group": "Pitcher",
+    "position": "Pitcher (RHP)",
+    "country": "Venezuela",
+    "flag": "🇻🇪",
+    "heritage": "🇩🇪",
+    "born": "2001",
+    "birthplace": "Caracas, Venezuela",
+    "tier": "International",
+    "bats": null,
+    "bio": "A Venezuelan pitcher with German citizenship known for a 90 mph fastball and a deep repertoire of slider, sinker and changeup. Played in the German Bundesliga before signing in Italy's Serie B.",
+    "teams": ["Dortmund Wanderers (GER)", "Livorno Baseball 1948 (ITA · Serie B)"],
+    "stats": [{ "label": "Fastball", "value": "90 mph" }]
+  },
+  {
+    "slug": "jose-cedeno",
+    "name": "José Cedeño",
+    "group": "Catcher",
+    "position": "Catcher",
+    "country": "Venezuela",
+    "flag": "🇻🇪",
+    "heritage": null,
+    "born": null,
+    "birthplace": "Venezuela",
+    "tier": "Pro",
+    "bats": null,
+    "bio": "A talented catcher developed in the Cleveland Guardians organization after signing as an international prospect. Recognized for his defense behind the plate and a mature approach at a young age.",
+    "teams": ["Cleveland Guardians org.", "Dominican Summer League", "Arizona Complex League"],
+    "stats": []
+  },
+  {
+    "slug": "danyer-sanabria",
+    "name": "Danyer Sanabria",
+    "group": "Infielder",
+    "position": "Infielder",
+    "country": "Venezuela",
+    "flag": "🇻🇪",
+    "heritage": null,
+    "born": null,
+    "birthplace": "Venezuela",
+    "tier": "Pro",
+    "bats": null,
+    "bio": "A Venezuelan talent who has represented his country at the U23 level. Brings experience from affiliated ball plus winter leagues in Argentina and Venezuela and three seasons in Venezuela's Liga Mayor.",
+    "teams": ["Arizona Diamondbacks org.", "Venezuela U23", "Liga Mayor (VEN)"],
+    "stats": []
+  },
+  {
+    "slug": "francesco-mazzei",
+    "name": "Francesco Mazzei",
+    "group": "Two-Way",
+    "position": "Two-Way",
+    "country": "Spain",
+    "flag": "🇪🇸",
+    "heritage": null,
+    "born": null,
+    "birthplace": "Madrid, Spain",
+    "tier": "International",
+    "bats": null,
+    "bio": "A Spanish talent from Madrid who has represented Spain at both the U18 and U23 national-team levels. A standout in the Spanish baseball system pursuing the U.S. college route.",
+    "teams": ["Spain National Team (U18 / U23)"],
+    "stats": []
+  },
+  {
+    "slug": "anderson-pena",
+    "name": "Anderson Peña",
+    "group": "Infielder",
+    "position": "Infielder",
+    "country": "Spain",
+    "flag": "🇪🇸",
+    "heritage": null,
+    "born": "2006",
+    "birthplace": "Spain",
+    "tier": "International",
+    "bats": null,
+    "bio": "A Spanish infielder developed at the Regensburg Baseball Academy, known for strong defense and contact hitting. Has represented Spain internationally and is pursuing U.S. college baseball with pro potential.",
+    "teams": ["Spain National Team", "Regensburg Baseball Academy"],
+    "stats": []
+  },
+  {
+    "slug": "jesus-delgado",
+    "name": "Jesús Delgado",
+    "group": "Pitcher",
+    "position": "Pitcher (LHP)",
+    "country": "Venezuela",
+    "flag": "🇻🇪",
+    "heritage": null,
+    "born": "2003",
+    "birthplace": "Guanare, Venezuela",
+    "tier": "Pro",
+    "bats": null,
+    "bio": "A left-handed pitcher signed by the Texas Rangers in 2023 who has shown big projection in the minors. Shined as a 2024 DSL All-Star and continued his development in the Arizona Complex League.",
+    "teams": ["Texas Rangers org.", "Arizona Complex League"],
+    "stats": [
+      { "label": "2024 DSL", "value": "All-Star" },
+      { "label": "Strikeouts", "value": "83 in 64 IP" }
+    ]
+  },
+  {
+    "slug": "lorenzo-gonzalez",
+    "name": "Lorenzo González",
+    "group": "Catcher",
+    "position": "Catcher",
+    "country": "Venezuela",
+    "flag": "🇻🇪",
+    "heritage": null,
+    "born": null,
+    "birthplace": "Venezuela",
+    "tier": "College",
+    "bats": null,
+    "bio": "A catcher at Campbellsville University whose game is built on consistent receiving, strong blocking and a quick release. Brings leadership and reliable game-calling behind the plate.",
+    "teams": ["Campbellsville University (NAIA)"],
+    "stats": []
+  },
+  {
+    "slug": "jaider-morelos",
+    "name": "Jaider Morelos",
+    "group": "Infielder",
+    "position": "Infielder",
+    "country": "Colombia",
+    "flag": "🇨🇴",
+    "heritage": null,
+    "born": null,
+    "birthplace": "Colombia",
+    "tier": "College",
+    "bats": null,
+    "bio": "A Colombian collegiate player competing at the NAIA level with Montreat College. Known for defensive consistency, versatility and a strong work ethic against high-level college talent.",
+    "teams": ["Montreat College (NAIA)"],
+    "stats": []
+  },
+  {
+    "slug": "bret-bowers",
+    "name": "Bret Bowers",
+    "group": "Infielder",
+    "position": "Infielder",
+    "country": "United States",
+    "flag": "🇺🇸",
+    "heritage": null,
+    "born": null,
+    "birthplace": "United States",
+    "tier": "College",
+    "bats": null,
+    "bio": "A collegiate player developed within the Campbellsville University program at the NAIA level. A member of the Tigers known for his work ethic and coachability against high-level competition.",
+    "teams": ["Campbellsville University (NAIA)"],
+    "stats": []
+  },
+  {
+    "slug": "osiris-german",
+    "name": "Osiris Germán",
+    "group": "Pitcher",
+    "position": "Pitcher (RHP)",
+    "country": "Dominican Republic",
+    "flag": "🇩🇴",
+    "heritage": null,
+    "born": null,
+    "birthplace": "Dominican Republic",
+    "tier": "Pro",
+    "bats": null,
+    "bio": "A professional Dominican pitcher developed in the Minnesota Twins organization after signing as an international free agent in 2016. Advanced to Double-A and earned MLB Spring Training invites with the Twins.",
+    "teams": ["Minnesota Twins org.", "Wichita Wind Surge (AA)", "MLB Spring Training"],
+    "stats": []
+  },
+  {
+    "slug": "adam-moser",
+    "name": "Adam Moser",
+    "group": "Infielder",
+    "position": "Infielder / Utility",
+    "country": "United States",
+    "flag": "🇺🇸",
+    "heritage": null,
+    "born": null,
+    "birthplace": "Arizona, USA",
+    "tier": "College",
+    "bats": "Right",
+    "bio": "An Arizona native and former Sunrise Mountain High School standout who went on to play infield at College of the Desert. A versatile utility player with elite hitting and an exciting power-and-defense profile.",
+    "teams": ["Sunrise Mountain HS", "College of the Desert"],
+    "stats": [
+      { "label": "2024 AVG", "value": ".317" },
+      { "label": "Home Runs", "value": "6" },
+      { "label": "SLG", "value": ".545" }
+    ]
+  },
+  {
+    "slug": "yerardo-ciofani",
+    "name": "Yerardo Ciofani",
+    "group": "Pitcher",
+    "position": "Pitcher (LHP)",
+    "country": "Venezuela",
+    "flag": "🇻🇪",
+    "heritage": null,
+    "born": "2006",
+    "birthplace": "Maracaibo, Venezuela",
+    "tier": "Pro",
+    "bats": null,
+    "bio": "A left-handed pitcher born in Maracaibo who signed with the Chicago White Sox in December 2023. Played for the DSL White Sox in 2024, posting a strong rookie campaign.",
+    "teams": ["Chicago White Sox org.", "DSL White Sox"],
+    "stats": [
+      { "label": "2024 Record", "value": "5-1" },
+      { "label": "Strikeouts", "value": "25" },
+      { "label": "WHIP", "value": "2.16" }
+    ]
+  },
+  {
+    "slug": "javier-useche",
+    "name": "José Javier Useche",
+    "group": "Pitcher",
+    "position": "Pitcher (RHP)",
+    "country": "Venezuela",
+    "flag": "🇻🇪",
+    "heritage": "🇵🇹",
+    "born": null,
+    "birthplace": "Venezuela",
+    "tier": "International",
+    "bats": null,
+    "bio": "A young Venezuelan-Portuguese right-hander who has stood out in Italy's Serie B with Porto Sant'Elpidio. Recognized for discipline, precision and competitive maturity, combining power with control.",
+    "teams": ["Porto Sant'Elpidio (ITA · Serie B)"],
+    "stats": []
+  },
+  {
+    "slug": "david-chavez",
+    "name": "David Chávez",
+    "group": "Pitcher",
+    "position": "Pitcher (RHP)",
+    "country": "Venezuela",
+    "flag": "🇻🇪",
+    "heritage": null,
+    "born": null,
+    "birthplace": "Venezuela",
+    "tier": "International",
+    "bats": null,
+    "bio": "A young right-handed pitcher active on the roster of a Serie A team in Italy. His place at a higher level positions him as a player with real growth potential on the Italian league's visibility window.",
+    "teams": ["Serie A (Italy)"],
+    "stats": []
+  },
+  {
+    "slug": "matteo-colalucci",
+    "name": "Matteo Colalucci",
+    "group": "Two-Way",
+    "position": "Pitcher / Infielder",
+    "country": "Italy",
+    "flag": "🇮🇹",
+    "heritage": null,
+    "born": "2004",
+    "birthplace": "Anzio, Italy",
+    "tier": "International",
+    "bats": "Right",
+    "bio": "An Italian pitcher and infielder who has played in Serie A and helped earn promotion to Serie B in 2025. Won a silver medal with Italy's U15 national team at the European Championship.",
+    "teams": ["Serie A / Serie B (Italy)", "Italy U15 National Team"],
+    "stats": [{ "label": "U15 Euros", "value": "🥈 Silver" }]
+  },
+  {
+    "slug": "anthony-quattrocchi",
+    "name": "Anthony Quattrocchi",
+    "group": "Pitcher",
+    "position": "Pitcher (RHP)",
+    "country": "United States",
+    "flag": "🇺🇸",
+    "heritage": null,
+    "born": null,
+    "birthplace": "Surprise, Arizona, USA",
+    "tier": "Pro",
+    "bats": null,
+    "bio": "A right-handed pitcher recognized for velocity and precision. Set the school strikeout record at Ottawa University Arizona and earned NCCAA First Team All-American honors before advancing to the pro independent leagues.",
+    "teams": ["Ottawa University AZ", "Lake Erie (Frontier)", "Staten Island FerryHawks (Atlantic)", "Idaho Falls Chukars (Pioneer)"],
+    "stats": [
+      { "label": "College", "value": "7-2, 2.55 ERA" },
+      { "label": "Strikeouts", "value": "83 (school record)" },
+      { "label": "2021", "value": "NCCAA 1st Team A-A" }
+    ]
+  }
+];
+let lang="en", active="All", SB=null;
+
+const initials=n=>n.replace(/[^A-Za-zÀ-ÿ ]/g,"").split(" ").filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+const t=k=>(T[lang][k]??k);
+const groupKey=g=>({Pitcher:"pitcher",Catcher:"catcher",Infielder:"infielder","Two-Way":"twoway"}[g]||"infielder");
+const slugify=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const bgImg=u=>u?`background-image:url('${u}')`:"";
+
+function applyI18n(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.querySelectorAll("[data-i18n-html]").forEach(el=>el.innerHTML=t(el.dataset.i18nHtml));
+  document.querySelectorAll("#lang button").forEach(b=>b.classList.toggle("on",b.dataset.l===lang));
+}
+function setLang(l){lang=l;applyI18n();renderFilters();renderRoster();renderEvents();renderTesti();}
+
+const FILTERS=["All","Pitcher","Catcher","Infielder","Two-Way"];
+function renderFilters(){
+  const f=document.getElementById("filters");
+  f.innerHTML=FILTERS.map(x=>`<button class="chip ${x===active?'active':''}" data-f="${x}">${t("filter_"+(x==="All"?"all":groupKey(x)))}</button>`).join("");
+  f.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{active=c.dataset.f;renderFilters();renderRoster();});
+}
+function renderRoster(){
+  const list=active==="All"?PLAYERS:PLAYERS.filter(p=>p.group===active);
+  document.getElementById("roster").innerHTML=list.map(p=>`
+    <button class="pcard" data-slug="${p.slug}">
+      <div class="top" style="${bgImg(p.image)}"><span class="flag">${p.flag||"🌎"}${p.heritage?(" "+p.heritage):""}</span>
+        ${p.tier?`<span class="tier">${p.tier}</span>`:""}${p.image?"":`<span class="mono">${initials(p.name)}</span>`}</div>
+      <div class="body"><h3 class="display">${p.name}</h3><div class="pos">${p.position}</div>
+        ${p.teams&&p.teams[0]?`<div class="team">${p.teams[0]}</div>`:""}<div class="view">${t("card_view")}</div></div>
+    </button>`).join("");
+  document.querySelectorAll(".pcard").forEach(c=>c.onclick=()=>openModal(c.dataset.slug));
+  document.getElementById("statAthletes").textContent=PLAYERS.length;
+  document.getElementById("statCountries").textContent=new Set(PLAYERS.map(p=>p.country).filter(Boolean)).size;
+}
+function fmtDate(d){try{return new Date(d+"T00:00").toLocaleDateString(lang,{day:"numeric",month:"short",year:"numeric"})}catch(e){return d}}
+function renderEvents(){
+  const order={upcoming:0,past:1};
+  const list=[...EVENTS].sort((a,b)=>(order[a.status]-order[b.status])||a.date.localeCompare(b.date));
+  document.getElementById("events").innerHTML=list.map(e=>`
+    <div class="ev-card"><div class="ev-img" style="${bgImg(e.image)}">
+      <span class="ev-status ${e.status==='upcoming'?'up':'past'}">${e.status==='upcoming'?t("ev_upcoming"):t("ev_past")}</span>
+      ${e.image?"":(e.icon||"⚾")}</div>
+      <div class="ev-body"><h3 class="display">${e.title}</h3>
+        <div class="ev-meta"><span>📅 ${fmtDate(e.date)}</span><span>📍 ${e.loc}</span></div>
+        <p>${e.blurb}</p></div></div>`).join("");
+}
+function renderTesti(){
+  document.getElementById("testi").innerHTML=TESTIMONIALS.map(x=>`
+    <div class="testi"><div class="q">“</div><p>${x.q}</p>
+      <div class="who"><div class="av">${initials(x.n)}</div><div><div class="nm">${x.n}</div><div class="rl">${x.r}</div></div></div></div>`).join("");
+}
+function openModal(slug){
+  const p=PLAYERS.find(x=>x.slug===slug);if(!p)return;
+  const meta=[p.born?("Born "+p.born):null,p.birthplace,p.bats?("Bats "+p.bats):null].filter(Boolean).join("  ·  ");
+  document.getElementById("sheetContent").innerHTML=`
+    <div class="sh-top"><span class="sh-mono" style="${bgImg(p.image)}">${p.image?"":initials(p.name)}</span>
+      <div><h3 class="display">${p.name} <span style="font-size:.6em">${p.flag||""}${p.heritage||""}</span></h3>
+      <div class="sh-pos">${p.position}</div><div class="sh-meta">${meta}</div></div></div>
+    <div class="sh-body"><p class="bio">${p.bio||""}</p>
+      ${p.stats&&p.stats.length?`<div class="sh-label">${t("modal_highlights")}</div><div class="sh-stats">${p.stats.map(s=>`<div class="sh-stat"><b>${s.value}</b><span>${s.label}</span></div>`).join("")}</div>`:""}
+      ${p.teams&&p.teams.length?`<div class="sh-label">${t("modal_teams")}</div><div class="team-chips">${p.teams.map(x=>`<span class="team-chip">${x}</span>`).join("")}</div>`:""}
+    </div>`;
+  document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
+}
+function closeModal(){document.getElementById("modal").classList.remove("open");document.body.style.overflow="";}
+document.querySelectorAll("[data-close]").forEach(e=>e.onclick=closeModal);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
+document.getElementById("lang").querySelectorAll("button").forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+document.getElementById("yr").textContent=new Date().getFullYear();
+
+const form=document.getElementById("applyForm");
+form.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const fd=new FormData(form);
+  const name=(fd.get("name")||"").trim();if(!name){form.querySelector("[name=name]").focus();return;}
+  const group=fd.get("position")||"Infielder";
+  const country=(fd.get("country")||"").trim();
+  const player={slug:slugify(name)+"-"+Date.now().toString(36),name,group,position:t("filter_"+groupKey(group)),
+    country,flag:FLAGS[country]||"🌎",heritage:null,born:null,birthplace:country||null,tier:"New",bats:null,
+    bio:(fd.get("why")||"").trim()||"—",teams:[],stats:[],image:null,
+    meta:{age:fd.get("age"),phone:fd.get("phone"),email:fd.get("email"),instagram:fd.get("ig"),applying:fd.get("applying"),other:fd.get("other")}};
+  if(SB){try{await SB.from("players").insert({slug:player.slug,name,"group":group,position:player.position,country,
+    flag:player.flag,tier:"New",bio:player.bio,teams:[],stats:[],age:fd.get("age"),phone:fd.get("phone"),
+    email:fd.get("email"),instagram:fd.get("ig"),applying_for:fd.get("applying"),message:fd.get("other"),status:"approved"});
+  }catch(err){console.error(err);}}
+  PLAYERS.unshift(player);active="All";renderFilters();renderRoster();
+  form.reset();document.getElementById("formMsg").classList.add("show");
+  setTimeout(()=>openModal(player.slug),250);
+});
+
+/* install prompt */
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;document.getElementById("install").classList.add("show");});
+document.getElementById("installBtn").onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById("install").classList.remove("show");}};
+document.getElementById("installX").onclick=()=>document.getElementById("install").classList.remove("show");
+
+async function boot(){
+  if(SUPABASE_URL&&SUPABASE_ANON_KEY){
+    try{const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
+      SB=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+      const {data}=await SB.from("players").select("*").eq("status","approved").order("sort_order");
+      if(data&&data.length)PLAYERS=data;
+    }catch(err){console.warn("Supabase load failed; using local data",err);}
+  }
+  applyI18n();renderFilters();renderRoster();renderEvents();renderTesti();
+}
+boot();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
+</script>
+</body>
+</html>
