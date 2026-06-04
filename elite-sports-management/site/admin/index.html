@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>ESM — Admin</title>
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#081a33" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{--navy:#081a33;--navy-2:#06142a;--navy-3:#0d2547;--gold:#d9b154;--gold-soft:#e7c878;--teal:#2ec4b6;--ink:#eaf0fa;--muted:#9fb1cc;--line:rgba(217,177,84,.22);--card:#0c2143;--red:#e05d5d}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--navy-2);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(900px 500px at 78% -10%,rgba(217,177,84,.16),transparent 60%),radial-gradient(800px 600px at 8% 110%,rgba(20,70,140,.30),transparent 55%),linear-gradient(180deg,var(--navy),var(--navy-2))}
+  .display{font-family:'Anton',sans-serif;letter-spacing:.02em;text-transform:uppercase}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 16px 80px}
+  header{display:flex;align-items:center;gap:12px;padding:10px 0 18px}
+  .logo{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#10305c,#06142a);font-family:'Anton';font-size:13px;color:var(--gold)}
+  header b{font-size:15px}header small{display:block;font-size:8.5px;letter-spacing:.3em;color:var(--gold-soft);font-weight:700}
+  .spacer{flex:1}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:999px;padding:10px 18px;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;transition:.2s;text-decoration:none}
+  .btn-gold{background:var(--gold);color:#05101f}.btn-gold:hover{background:var(--gold-soft)}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .btn-teal{background:var(--teal);color:#04231f}.btn-teal:hover{filter:brightness(1.1)}
+  .btn-red{background:transparent;border:1px solid rgba(224,93,93,.5);color:var(--red)}.btn-red:hover{background:rgba(224,93,93,.12)}
+  .btn:disabled{opacity:.5;cursor:wait}
+  .card{border:1px solid var(--line);border-radius:18px;padding:18px;background:linear-gradient(180deg,var(--card),var(--navy-2));margin-bottom:14px}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-soft);margin:26px 0 12px}
+  .field{display:grid;gap:6px;margin-bottom:14px}
+  .field label{font-size:13px;font-weight:700;color:var(--gold-soft)}
+  input,textarea{width:100%;background:rgba(6,20,42,.6);border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--ink);font-family:inherit;font-size:15px;outline:none}
+  input:focus,textarea:focus{border-color:var(--gold)}
+  .msg{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;font-weight:600;font-size:14px}
+  .msg.show{display:block}
+  .msg.ok{background:rgba(46,196,182,.12);border:1px solid var(--teal);color:var(--teal)}
+  .msg.err{background:rgba(224,93,93,.12);border:1px solid var(--red);color:var(--red)}
+  .p-head{display:flex;align-items:center;gap:12px}
+  .avatar{width:52px;height:52px;flex:none;border-radius:50%;border:1.5px solid rgba(217,177,84,.4);display:grid;place-items:center;font-family:'Anton';font-size:18px;color:var(--gold);background:rgba(6,20,42,.5);background-size:cover;background-position:center}
+  .p-head h3{font-size:16px}
+  .p-head .pos{color:var(--gold-soft);font-size:13px;font-weight:700}
+  .chip{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
+  .chip.pending{color:var(--gold-soft)}
+  .chip.approved{color:var(--teal);border-color:rgba(46,196,182,.4)}
+  .chip.rejected{color:var(--red);border-color:rgba(224,93,93,.4)}
+  .p-meta{color:var(--muted);font-size:13.5px;margin-top:10px;word-break:break-word}
+  .p-meta b{color:var(--ink)}
+  .row-btns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .row-btns .btn{flex:1;min-width:120px}
+  .editor{display:none;margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+  .editor.open{display:block}
+  .stat-row{display:grid;grid-template-columns:1fr 1fr 40px;gap:8px;margin-bottom:8px}
+  .stat-row button{border:1px solid rgba(224,93,93,.5);background:transparent;color:var(--red);border-radius:10px;font-size:16px;cursor:pointer}
+  .editor .sub{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft);font-weight:700;margin:14px 0 8px}
+  .empty{color:var(--muted);font-size:14px;padding:6px 2px}
+  #adminApp{display:none}
+  .count{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--gold);color:#05101f;font-size:12px;font-weight:800;margin-left:8px;vertical-align:2px;font-family:'Hanken Grotesk'}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:rgba(12,33,67,.97);border:1px solid var(--gold);color:var(--ink);padding:12px 20px;border-radius:999px;font-weight:600;font-size:14px;transition:.3s;z-index:50;max-width:90vw;text-align:center}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast.err{border-color:var(--red);color:var(--red)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">ESM</div>
+    <div><b>Elite Sports Management</b><small>ADMIN PANEL</small></div>
+    <div class="spacer"></div>
+    <button class="btn btn-ghost" id="signOut" style="display:none">Sign out</button>
+  </header>
+
+  <!-- LOGIN -->
+  <div id="loginBox" class="card" style="max-width:420px;margin:8vh auto">
+    <h2 class="display" style="font-size:22px;margin-bottom:16px">Admin <em style="color:var(--gold);font-style:normal">Login</em></h2>
+    <form id="loginForm">
+      <div class="field"><label>Email</label><input type="email" id="email" autocomplete="username" required /></div>
+      <div class="field"><label>Password</label><input type="password" id="password" autocomplete="current-password" required /></div>
+      <button class="btn btn-gold" style="width:100%" type="submit">Sign in</button>
+      <div class="msg err" id="loginMsg"></div>
+    </form>
+  </div>
+
+  <!-- APP -->
+  <div id="adminApp">
+    <div class="kicker">Pending applications<span class="count" id="pendingCount">0</span></div>
+    <div id="pendingList"></div>
+
+    <div class="kicker">All players</div>
+    <div id="playerList"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
+const PHOTO_BUCKET = "player-photos";
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const initials = n => (n||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
+
+let toastTimer;
+function toast(text, isErr){
+  const t = $("toast");
+  t.textContent = text; t.classList.toggle("err", !!isErr); t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove("show"), 3000);
+}
+
+/* ---------- auth ---------- */
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const m = $("loginMsg"); m.classList.remove("show");
+  const btn = e.target.querySelector("button"); btn.disabled = true;
+  const { error } = await SB.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
+  btn.disabled = false;
+  if (error){ m.textContent = error.message; m.classList.add("show"); return; }
+});
+$("signOut").onclick = async () => { await SB.auth.signOut(); };
+
+SB.auth.onAuthStateChange((_evt, session) => {
+  const inApp = !!session;
+  $("loginBox").style.display = inApp ? "none" : "";
+  $("adminApp").style.display = inApp ? "block" : "none";
+  $("signOut").style.display = inApp ? "" : "none";
+  if (inApp) load();
+});
+
+/* ---------- data ---------- */
+let PLAYERS = [];
+async function load(){
+  const { data, error } = await SB.from("players").select("*").order("status").order("sort_order");
+  if (error){ toast("Load failed: " + error.message, true); return; }
+  PLAYERS = data || [];
+  render();
+}
+
+function render(){
+  const pending = PLAYERS.filter(p => p.status === "pending");
+  $("pendingCount").textContent = pending.length;
+  $("pendingList").innerHTML = pending.length ? pending.map(cardPending).join("") :
+    `<div class="card empty">No pending applications. 🎉</div>`;
+  $("playerList").innerHTML = PLAYERS.map(cardPlayer).join("");
+  bindActions();
+}
+
+function avatar(p){
+  return p.image_url
+    ? `<span class="avatar" style="background-image:url('${esc(p.image_url)}')"></span>`
+    : `<span class="avatar">${esc(initials(p.name))}</span>`;
+}
+
+function cardPending(p){
+  const contact = [
+    p.age ? `<b>Age:</b> ${esc(p.age)}` : null,
+    p.email ? `<b>Email:</b> ${esc(p.email)}` : null,
+    p.phone ? `<b>Phone:</b> ${esc(p.phone)}` : null,
+    p.instagram ? `<b>IG:</b> ${esc(p.instagram)}` : null,
+    p.applying_for ? `<b>Applying for:</b> ${esc(p.applying_for)}` : null,
+  ].filter(Boolean).join(" &nbsp;·&nbsp; ");
+  return `<div class="card" data-id="${p.id}">
+    <div class="p-head">${avatar(p)}
+      <div><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position||p.group||"")} ${p.flag||""}</div></div>
+    </div>
+    ${contact ? `<div class="p-meta">${contact}</div>` : ""}
+    ${p.bio ? `<div class="p-meta">${esc(p.bio)}</div>` : ""}
+    ${p.message ? `<div class="p-meta"><b>Message:</b> ${esc(p.message)}</div>` : ""}
+    <div class="row-btns">
+      <button class="btn btn-teal" data-approve="${p.id}">✓ Approve</button>
+      <button class="btn btn-red" data-reject="${p.id}">✕ Reject</button>
+    </div>
+  </div>`;
+}
+
+function cardPlayer(p){
+  const stats = Array.isArray(p.stats) ? p.stats : [];
+  return `<div class="card" data-id="${p.id}">
+    <div class="p-head">${avatar(p)}
+      <div style="flex:1"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position||p.group||"")} ${p.flag||""}</div></div>
+      <span class="chip ${esc(p.status)}">${esc(p.status)}</span>
+    </div>
+    <div class="row-btns">
+      <button class="btn btn-ghost" data-edit="${p.id}">✎ Edit stats &amp; photo</button>
+      ${p.status === "rejected" ? `<button class="btn btn-teal" data-approve="${p.id}">✓ Approve</button>` : ""}
+      ${p.status === "approved" ? `<button class="btn btn-red" data-reject="${p.id}">Hide</button>` : ""}
+    </div>
+    <div class="editor" id="ed-${p.id}">
+      <div class="sub">Photo</div>
+      <input type="file" accept="image/*" data-photo="${p.id}" />
+      <div class="sub">Stats</div>
+      <div id="stats-${p.id}">${stats.map(statRow).join("")}</div>
+      <div class="row-btns">
+        <button class="btn btn-ghost" data-addstat="${p.id}">+ Add stat</button>
+        <button class="btn btn-gold" data-save="${p.id}">Save stats</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+const statRow = s => `<div class="stat-row">
+  <input placeholder="Label (e.g. Fastball)" class="st-label" value="${esc(s?.label||"")}" />
+  <input placeholder="Value (e.g. 90 mph)" class="st-value" value="${esc(s?.value||"")}" />
+  <button type="button" onclick="this.parentElement.remove()" title="Remove">✕</button>
+</div>`;
+
+/* ---------- actions ---------- */
+async function setStatus(id, status, btn){
+  btn.disabled = true;
+  const { error } = await SB.from("players").update({ status }).eq("id", id);
+  btn.disabled = false;
+  if (error){ toast("Update failed: " + error.message, true); return; }
+  toast(status === "approved" ? "Approved ✓" : "Rejected");
+  await load();
+}
+
+function bindActions(){
+  document.querySelectorAll("[data-approve]").forEach(b => b.onclick = () => setStatus(+b.dataset.approve, "approved", b));
+  document.querySelectorAll("[data-reject]").forEach(b => b.onclick = () => setStatus(+b.dataset.reject, "rejected", b));
+  document.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => $("ed-" + b.dataset.edit).classList.toggle("open"));
+  document.querySelectorAll("[data-addstat]").forEach(b => b.onclick = () => $("stats-" + b.dataset.addstat).insertAdjacentHTML("beforeend", statRow()));
+  document.querySelectorAll("[data-save]").forEach(b => b.onclick = async () => {
+    const id = +b.dataset.save;
+    const stats = [...$("stats-" + id).querySelectorAll(".stat-row")].map(r => ({
+      label: r.querySelector(".st-label").value.trim(),
+      value: r.querySelector(".st-value").value.trim(),
+    })).filter(s => s.label || s.value);
+    b.disabled = true;
+    const { error } = await SB.from("players").update({ stats }).eq("id", id);
+    b.disabled = false;
+    if (error){ toast("Save failed: " + error.message, true); return; }
+    toast("Stats saved ✓");
+    await load();
+    $("ed-" + id)?.classList.add("open");
+  });
+  document.querySelectorAll("[data-photo]").forEach(inp => inp.onchange = async () => {
+    const file = inp.files?.[0]; if (!file) return;
+    const id = +inp.dataset.photo;
+    const p = PLAYERS.find(x => x.id === id); if (!p) return;
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+    const path = `${p.slug}-${Date.now()}.${ext}`;
+    inp.disabled = true; toast("Uploading photo…");
+    const { error: upErr } = await SB.storage.from(PHOTO_BUCKET).upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
+    if (upErr){ inp.disabled = false; toast("Upload failed: " + upErr.message, true); return; }
+    const { data: pub } = SB.storage.from(PHOTO_BUCKET).getPublicUrl(path);
+    const { error: dbErr } = await SB.from("players").update({ image_url: pub.publicUrl }).eq("id", id);
+    inp.disabled = false;
+    if (dbErr){ toast("Photo saved to storage but DB update failed: " + dbErr.message, true); return; }
+    toast("Photo uploaded ✓");
+    await load();
+    $("ed-" + id)?.classList.add("open");
+  });
+}
+</script>
+</body>
+</html>

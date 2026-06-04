@@ -801,7 +801,7 @@ form.addEventListener("submit",async e=>{
     meta:{age:fd.get("age"),phone:fd.get("phone"),email:fd.get("email"),instagram:fd.get("ig"),applying:fd.get("applying"),other:fd.get("other")}};
   if(SB){try{await SB.from("players").insert({slug:player.slug,name,"group":group,position:player.position,country,
     flag:player.flag,tier:"New",bio:player.bio,teams:[],stats:[],age:fd.get("age"),phone:fd.get("phone"),
-    email:fd.get("email"),instagram:fd.get("ig"),applying_for:fd.get("applying"),message:fd.get("other"),status:"approved"});
+    email:fd.get("email"),instagram:fd.get("ig"),applying_for:fd.get("applying"),message:fd.get("other"),status:"pending"});
   }catch(err){console.error(err);}}
   PLAYERS.unshift(player);active="All";renderFilters();renderRoster();
   form.reset();document.getElementById("formMsg").classList.add("show");
@@ -819,7 +819,7 @@ async function boot(){
     try{const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
       SB=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
       const {data}=await SB.from("players").select("*").eq("status","approved").order("sort_order");
-      if(data&&data.length)PLAYERS=data;
+      if(data&&data.length)PLAYERS=data.map(r=>({...r,image:r.image||r.image_url||null}));
     }catch(err){console.warn("Supabase load failed; using local data",err);}
   }
   applyI18n();renderFilters();renderRoster();renderEvents();renderTesti();
