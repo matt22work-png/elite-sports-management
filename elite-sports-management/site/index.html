@@ -176,52 +176,26 @@
   .install button{margin-left:auto;border:0;background:var(--gold);color:#05101f;font-weight:700;padding:9px 14px;border-radius:999px;cursor:pointer}
   .install .x{margin-left:8px;background:transparent;color:var(--muted);border:1px solid var(--line)}
 
-  /* ===== ADMIN ===== */
-  .foot-admin{margin-top:12px;font-size:12px;color:var(--muted);opacity:.6;cursor:pointer;background:none;border:0;font-family:inherit}
+  /* Footer link through to the admin panel (/admin/) */
+  .foot-admin{display:inline-block;margin-top:12px;font-size:12px;color:var(--muted);opacity:.6;cursor:pointer;background:none;border:0;font-family:inherit;text-decoration:none}
   .foot-admin:hover{opacity:1;color:var(--gold-soft)}
-  .adminbar{position:sticky;top:64px;z-index:49;display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 22px;background:linear-gradient(90deg,rgba(217,177,84,.16),rgba(8,26,51,.95));border-bottom:1px solid var(--gold)}
-  body.admin .adminbar{display:flex}
-  .adminbar .ab-tag{font-family:'Anton';color:var(--gold);font-size:15px;letter-spacing:.04em;margin-right:4px}
-  .ab-btn{border:1px solid var(--line);background:rgba(6,20,42,.6);color:var(--ink);font-weight:700;font-size:12.5px;padding:7px 13px;border-radius:999px;cursor:pointer;font-family:inherit}
-  .ab-btn:hover{border-color:var(--gold);color:var(--gold-soft)}
-  .ab-btn.out{margin-left:auto;color:#ffb4b4;border-color:rgba(255,120,120,.4)}
-  .admin-edit{position:absolute;top:12px;right:12px;z-index:5;width:34px;height:34px;border-radius:10px;border:1px solid var(--gold);background:rgba(217,177,84,.92);color:#05101f;font-size:15px;display:none;place-items:center;cursor:pointer}
-  body.admin .pcard .tier{right:54px}
-  body.admin .admin-edit{display:grid}
-  .alist{display:flex;flex-direction:column;gap:10px}
-  .arow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:13px;padding:12px 14px;background:rgba(8,26,51,.5)}
-  .arow .ai{width:46px;height:46px;border-radius:10px;flex:none;background-size:cover;background-position:center;background-color:rgba(6,20,42,.6);display:grid;place-items:center;font-family:'Anton';color:var(--gold);font-size:18px;border:1px solid var(--line)}
-  .arow .an{font-weight:700;font-size:15px}.arow .as{color:var(--muted);font-size:12.5px;margin-top:2px}
-  .arow .aacts{margin-left:auto;display:flex;gap:7px}
-  .mini{border:1px solid var(--line);background:rgba(6,20,42,.6);color:var(--ink);font-weight:700;font-size:12px;padding:7px 11px;border-radius:9px;cursor:pointer;font-family:inherit}
-  .mini:hover{border-color:var(--gold);color:var(--gold-soft)}
-  .mini.del:hover{border-color:#ff8080;color:#ff9b9b}
-  .tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:22px}
-  .tab{border:1px solid var(--line);background:transparent;color:var(--muted);font-weight:700;font-size:13px;padding:9px 15px;border-radius:999px;cursor:pointer;font-family:inherit}
-  .tab.on{background:var(--gold);color:#05101f;border-color:var(--gold)}
-  .photo-pick{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-  .photo-prev{width:88px;height:88px;border-radius:14px;flex:none;background-size:cover;background-position:center;background-color:rgba(6,20,42,.6);border:1px solid var(--line);display:grid;place-items:center;font-family:'Anton';color:var(--gold);font-size:26px;overflow:hidden}
-  .stat-rows{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
-  .stat-row{display:flex;gap:10px;align-items:center}
-  .stat-row input{flex:1;background:rgba(6,20,42,.6);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);font-family:inherit;font-size:14px;outline:none}
-  .stat-row input:focus{border-color:var(--gold)}
-  .stat-row .rm{flex:none;width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:rgba(6,20,42,.6);color:#ff9b9b;cursor:pointer;font-size:15px}
-  .admin-note{font-size:13px;color:var(--gold-soft);background:rgba(217,177,84,.1);border:1px solid var(--line);border-radius:11px;padding:11px 14px;margin-bottom:18px}
-  .admin-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
-  .saving{opacity:.6;pointer-events:none}
+
+  /* form error state (applications) */
+  .form-msg.err{background:rgba(224,93,93,.12);border-color:#e05d5d;color:#ffb4b4}
+
+  /* ===== mobile / PWA polish ===== */
+  *{-webkit-tap-highlight-color:transparent}
+  .install{padding-bottom:calc(16px + env(safe-area-inset-bottom))}      /* clear the iOS home indicator */
+  footer{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+  @media(max-width:560px){
+    .wrap{padding:0 16px}
+    /* 16px form controls stop iOS from auto-zooming on focus */
+    .field input,.field select,.field textarea{font-size:16px}
+  }
 </style>
 </head>
 <body>
 <div class="bg-fx"></div>
-
-<div class="adminbar" id="adminbar">
-  <span class="ab-tag">ESM ADMIN</span>
-  <button class="ab-btn" data-tab="roster">Athletes &amp; Stats</button>
-  <button class="ab-btn" data-tab="events">Events</button>
-  <button class="ab-btn" data-tab="testi">Testimonials</button>
-  <button class="ab-btn" data-tab="about">My Photo</button>
-  <button class="ab-btn out" id="logoutBtn">Log out</button>
-</div>
 
 <header class="nav"><div class="wrap nav-in">
   <a class="brand" href="#top"><img class="logo-img" src="logo.png" alt="Elite Sports Management" /></a>
@@ -330,7 +304,7 @@
       <div class="field"><label data-i18n="f_why"></label><textarea name="why"></textarea></div>
       <div class="field"><label data-i18n="f_other"></label><textarea name="other"></textarea></div>
       <button class="btn btn-gold" type="submit" data-i18n="f_submit"></button>
-      <div class="form-msg" id="formMsg" data-i18n="f_success"></div>
+      <div class="form-msg" id="formMsg"></div>
     </form>
   </div>
 </div></section>
@@ -344,7 +318,7 @@
   <div>
     <a class="brand" href="#top"><img class="logo-img foot-logo" src="logo.png" alt="Elite Sports Management" /></a>
     <p class="muted">© <span id="yr"></span> Elite Sports Management. <span data-i18n="foot_rights"></span></p>
-    <button class="foot-admin" id="adminLink" data-i18n="admin_link"></button>
+    <a class="foot-admin" href="admin/" data-i18n="admin_link"></a>
   </div>
   <div class="foot-links">
     <a class="pill" href="https://instagram.com/elite_sports_management__" target="_blank" rel="noopener">◎ @elite_sports_management__</a>
@@ -354,24 +328,15 @@
 
 <div class="modal" id="modal"><div class="scrim" data-close></div><div class="sheet"><button class="close" data-close>✕</button><div id="sheetContent"></div></div></div>
 
-<div class="modal" id="loginModal"><div class="scrim" data-lclose></div><div class="sheet" style="max-width:440px"><button class="close" data-lclose>✕</button>
-  <div class="sh-top"><span class="sh-mono">🔒</span><div><h3 class="display" data-i18n="login_h"></h3><div class="sh-meta" data-i18n="login_sub"></div></div></div>
-  <div class="sh-body">
-    <div class="field"><label data-i18n="login_email"></label><input id="liEmail" type="email" autocomplete="username" /></div>
-    <div class="field"><label data-i18n="login_pass"></label><input id="liPass" type="password" autocomplete="current-password" /></div>
-    <div class="form-msg" id="loginMsg" style="background:rgba(255,120,120,.1);border-color:rgba(255,120,120,.5);color:#ffb4b4"></div>
-    <div class="admin-actions"><button class="btn btn-gold" id="loginBtn" data-i18n="login_btn"></button></div>
-  </div>
-</div></div>
-
-<div class="modal" id="adminModal"><div class="scrim" data-aclose></div><div class="sheet"><button class="close" data-aclose>✕</button><div id="adminContent" class="sh-body"></div></div></div>
-
 <div class="install" id="install"><div class="box"><div><b data-i18n="install_t"></b><span data-i18n="install_d"></span></div><button id="installBtn" data-i18n="install_btn"></button><button class="x" id="installX">✕</button></div></div>
 
 <script>
-/* ===== CONFIG: add Supabase keys to go live (optional) ===== */
-const SUPABASE_URL = "";
-const SUPABASE_ANON_KEY = "";
+/* ===== CONFIG: Supabase (live roster + applications) =====
+   The anon key is browser-safe: RLS only allows reading approved players and
+   inserting applications as `pending`. If Supabase is unreachable the site
+   falls back to the embedded PLAYERS list below so it still renders offline. */
+const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
 
 /* ===== sample EVENTS & TESTIMONIALS — replace with real ones ===== */
 const EVENTS = [
@@ -413,7 +378,8 @@ const T = {
     f_name:"Full name *",f_age:"Age",f_phone:"Phone number",f_email:"Email",f_ig:"Instagram profile",f_country:"Country",
     f_position:"Position",f_applying:"I'm applying for",opt_rep:"Representation",opt_coach:"Coaching",opt_both:"Both",
     f_why:"Why do you want to start? / Your goals",f_other:"Anything else?",f_submit:"Submit application",
-    f_success:"Thanks! Your profile has been created — we'll be in touch.",
+    f_success:"Thanks! Your application has been received — we'll review it and be in touch.",
+    f_error:"Sorry, something went wrong sending your application. Please try again.",
     modal_highlights:"Career Highlights",modal_teams:"Teams & Affiliations",
     band_h2:"Are you the next great addition?",band_p:"Start the conversation with Elite Sports Management.",band_btn:"Apply Now",
     foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",
@@ -446,7 +412,8 @@ const T = {
     f_name:"Nombre y apellido *",f_age:"Edad",f_phone:"Número de teléfono",f_email:"Correo electrónico",f_ig:"Perfil de Instagram",f_country:"País",
     f_position:"Posición",f_applying:"Aplico para",opt_rep:"Representación",opt_coach:"Coaching",opt_both:"Ambos",
     f_why:"¿Por qué quieres empezar? / Tus objetivos",f_other:"¿Algo más?",f_submit:"Enviar solicitud",
-    f_success:"¡Gracias! Tu perfil ha sido creado — te contactaremos.",
+    f_success:"¡Gracias! Hemos recibido tu solicitud — la revisaremos y te contactaremos.",
+    f_error:"Lo sentimos, hubo un problema al enviar tu solicitud. Inténtalo de nuevo.",
     modal_highlights:"Destacados de Carrera",modal_teams:"Equipos y Afiliaciones",
     band_h2:"¿Eres la próxima gran incorporación?",band_p:"Inicia la conversación con Elite Sports Management.",band_btn:"Aplica Ahora",
     foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",
@@ -479,7 +446,8 @@ const T = {
     f_name:"Nome e cognome *",f_age:"Età",f_phone:"Numero di telefono",f_email:"Email",f_ig:"Profilo Instagram",f_country:"Paese",
     f_position:"Ruolo",f_applying:"Mi candido per",opt_rep:"Rappresentanza",opt_coach:"Coaching",opt_both:"Entrambi",
     f_why:"Perché vuoi iniziare? / I tuoi obiettivi",f_other:"Altro?",f_submit:"Invia candidatura",
-    f_success:"Grazie! Il tuo profilo è stato creato — ti contatteremo.",
+    f_success:"Grazie! Abbiamo ricevuto la tua candidatura — la esamineremo e ti contatteremo.",
+    f_error:"Spiacenti, qualcosa è andato storto nell'invio della candidatura. Riprova.",
     modal_highlights:"Carriera in Evidenza",modal_teams:"Squadre e Affiliazioni",
     band_h2:"Sei la prossima grande aggiunta?",band_p:"Inizia la conversazione con Elite Sports Management.",band_btn:"Candidati",
     foot_tagline:"Unisciti a festeggiare",foot_rights:"Tutti i diritti riservati.",
@@ -805,16 +773,11 @@ function renderRoster(){
   document.getElementById("roster").innerHTML=list.map(p=>`
     <button class="pcard" data-slug="${p.slug}">
       <div class="top" style="${bgImg(p.image)}"><span class="flag">${p.flag||"🌎"}${p.heritage?(" "+p.heritage):""}</span>
-        <span class="admin-edit" data-edit="${p.slug}">✏️</span>
         ${p.tier?`<span class="tier">${p.tier}</span>`:""}${p.image?"":`<span class="mono">${initials(p.name)}</span>`}</div>
       <div class="body"><h3 class="display">${p.name}</h3><div class="pos">${p.position}</div>
         ${p.teams&&p.teams[0]?`<div class="team">${p.teams[0]}</div>`:""}<div class="view">${t("card_view")}</div></div>
     </button>`).join("");
-  document.querySelectorAll(".pcard").forEach(c=>c.onclick=(e)=>{
-    const ed=e.target.closest(".admin-edit");
-    if(ed){e.preventDefault();e.stopPropagation();editPlayer(ed.dataset.edit);return;}
-    openModal(c.dataset.slug);
-  });
+  document.querySelectorAll(".pcard").forEach(c=>c.onclick=()=>openModal(c.dataset.slug));
   document.getElementById("statAthletes").textContent=PLAYERS.length;
   document.getElementById("statCountries").textContent=new Set(PLAYERS.map(p=>p.country).filter(Boolean)).size;
 }
@@ -858,20 +821,32 @@ const form=document.getElementById("applyForm");
 form.addEventListener("submit",async e=>{
   e.preventDefault();
   const fd=new FormData(form);
-  const name=(fd.get("name")||"").trim();if(!name){form.querySelector("[name=name]").focus();return;}
-  const group=fd.get("position")||"Infielder";
+  const name=(fd.get("name")||"").trim();
+  if(!name){form.querySelector("[name=name]").focus();return;}
+  const role=fd.get("position")||"Infielder";   // Pitcher | Catcher | Infielder | Two-Way
   const country=(fd.get("country")||"").trim();
-  const player={slug:slugify(name)+"-"+Date.now().toString(36),name,group,position:t("filter_"+groupKey(group)),
-    country,flag:FLAGS[country]||"🌎",heritage:null,born:null,birthplace:country||null,tier:"New",bats:null,
-    bio:(fd.get("why")||"").trim()||"—",teams:[],stats:[],image:null,
-    meta:{age:fd.get("age"),phone:fd.get("phone"),email:fd.get("email"),instagram:fd.get("ig"),applying:fd.get("applying"),other:fd.get("other")}};
-  if(SB){try{await SB.from("players").insert({slug:player.slug,name,"group":group,position:player.position,country,
-    flag:player.flag,tier:"New",bio:player.bio,teams:[],stats:[],age:fd.get("age"),phone:fd.get("phone"),
-    email:fd.get("email"),instagram:fd.get("ig"),applying_for:fd.get("applying"),message:fd.get("other"),status:"approved"});
-  }catch(err){console.error(err);}}
-  PLAYERS.unshift(player);active="All";renderFilters();renderRoster();
-  form.reset();document.getElementById("formMsg").classList.add("show");
-  setTimeout(()=>openModal(player.slug),250);
+  const btn=form.querySelector("button[type=submit]");
+  const msg=document.getElementById("formMsg");
+  msg.classList.remove("show","err");
+
+  // Applications require the live database; without it we can't save them.
+  if(!SB){msg.textContent=t("f_error");msg.classList.add("show","err");msg.scrollIntoView({behavior:"smooth",block:"center"});return;}
+
+  btn.disabled=true;
+  // Saved as `pending` so an admin reviews it before it appears on the public roster.
+  const {error}=await SB.from("players").insert({
+    slug:slugify(name)+"-"+Date.now().toString(36),
+    name,"group":role,position:role,country,flag:FLAGS[country]||"🌎",tier:"New",
+    bio:(fd.get("why")||"").trim()||"—",teams:[],stats:[],
+    age:fd.get("age"),phone:fd.get("phone"),email:fd.get("email"),
+    instagram:fd.get("ig"),applying_for:fd.get("applying"),message:fd.get("other"),
+    status:"pending",
+  });
+  btn.disabled=false;
+  if(error){console.error("Application failed",error);msg.textContent=t("f_error");msg.classList.add("show","err");msg.scrollIntoView({behavior:"smooth",block:"center"});return;}
+  form.reset();
+  msg.textContent=t("f_success");msg.classList.add("show");
+  msg.scrollIntoView({behavior:"smooth",block:"center"});
 });
 
 /* install prompt */
@@ -884,9 +859,12 @@ async function boot(){
   if(SUPABASE_URL&&SUPABASE_ANON_KEY){
     try{const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
       SB=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-      const {data}=await SB.from("players").select("*").eq("status","approved").order("sort_order");
-      if(data&&data.length)PLAYERS=data;
-    }catch(err){console.warn("Supabase load failed; using local data",err);}
+      // Only approved players are publicly readable (enforced by RLS too).
+      const {data,error}=await SB.from("players").select("*").eq("status","approved").order("sort_order");
+      if(error)throw error;
+      // Supabase stores the photo in `image_url`; the renderer reads `image`.
+      if(data&&data.length)PLAYERS=data.map(p=>({...p,image:p.image_url||p.image||null}));
+    }catch(err){console.warn("Supabase load failed; using embedded roster.",err);}
   }
   applyI18n();renderFilters();renderRoster();renderEvents();renderTesti();
 }

@@ -59,6 +59,9 @@
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:rgba(12,33,67,.97);border:1px solid var(--gold);color:var(--ink);padding:12px 20px;border-radius:999px;font-weight:600;font-size:14px;transition:.3s;z-index:50;max-width:90vw;text-align:center}
   .toast.show{transform:translateX(-50%) translateY(0)}
   .toast.err{border-color:var(--red);color:var(--red)}
+  /* mobile polish: cleaner taps + no iOS zoom-on-focus (inputs ≥16px) */
+  *{-webkit-tap-highlight-color:transparent}
+  @media(max-width:560px){ input,textarea{font-size:16px} .wrap{padding:18px 14px 80px} }
 </style>
 </head>
 <body>
@@ -70,8 +73,11 @@
     <button class="btn btn-ghost" id="signOut" style="display:none">Sign out</button>
   </header>
 
-  <!-- LOGIN -->
-  <div id="loginBox" class="card" style="max-width:420px;margin:8vh auto">
+  <!-- Checking session — shown briefly on load so the login form doesn't flash for already-signed-in admins -->
+  <div id="booting" class="card" style="max-width:420px;margin:8vh auto;text-align:center;color:var(--muted)">Checking session…</div>
+
+  <!-- LOGIN (hidden until the session check decides it's needed) -->
+  <div id="loginBox" class="card" style="max-width:420px;margin:8vh auto;display:none">
     <h2 class="display" style="font-size:22px;margin-bottom:16px">Admin <em style="color:var(--gold);font-style:normal">Login</em></h2>
     <form id="loginForm">
       <div class="field"><label>Email</label><input type="email" id="email" autocomplete="username" required /></div>
@@ -111,24 +117,49 @@ function toast(text, isErr){
   clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove("show"), 3000);
 }
 
-/* ---------- auth ---------- */
+/* ---------- auth & route protection ----------
+   The page has three exclusive views: "booting" (checking the session),
+   "login" (no session — this is the protection: the panel + its data are never
+   shown to an unauthenticated visitor, and RLS blocks them server-side too),
+   and "app" (signed-in admin). */
+function showView(state){
+  $("booting").style.display  = state === "booting" ? ""      : "none";
+  $("loginBox").style.display = state === "login"   ? ""      : "none";
+  $("adminApp").style.display = state === "app"     ? "block" : "none";
+  $("signOut").style.display  = state === "app"     ? ""      : "none";
+}
+
 $("loginForm").addEventListener("submit", async e => {
   e.preventDefault();
   const m = $("loginMsg"); m.classList.remove("show");
   const btn = e.target.querySelector("button"); btn.disabled = true;
-  const { error } = await SB.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
+  const { error } = await SB.auth.signInWithPassword({
+    email: $("email").value.trim(),
+    password: $("password").value,
+  });
   btn.disabled = false;
-  if (error){ m.textContent = error.message; m.classList.add("show"); return; }
+  if (error){ m.textContent = error.message; m.classList.add("show"); $("password").value = ""; return; }
+  // On success, onAuthStateChange("SIGNED_IN") swaps to the app view.
 });
 $("signOut").onclick = async () => { await SB.auth.signOut(); };
 
-SB.auth.onAuthStateChange((_evt, session) => {
-  const inApp = !!session;
-  $("loginBox").style.display = inApp ? "none" : "";
-  $("adminApp").style.display = inApp ? "block" : "none";
-  $("signOut").style.display = inApp ? "" : "none";
-  if (inApp) load();
+// React to explicit transitions only; guard() below owns the initial view, so we
+// ignore INITIAL_SESSION here to avoid loading the roster twice on first paint.
+SB.auth.onAuthStateChange((evt, session) => {
+  if (evt === "SIGNED_IN" && session) { showView("app"); load(); }
+  else if (evt === "SIGNED_OUT") { showView("login"); }
 });
+
+// Decide the initial view from the persisted session (no login-form flash).
+(async function guard(){
+  try {
+    const { data: { session } } = await SB.auth.getSession();
+    if (session){ showView("app"); load(); } else { showView("login"); }
+  } catch (err) {
+    console.error("Session check failed", err);
+    showView("login");
+  }
+})();
 
 /* ---------- data ---------- */
 let PLAYERS = [];
