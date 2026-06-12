@@ -15,13 +15,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  :root{--navy:#081a33;--navy-2:#06142a;--navy-3:#0d2547;--gold:#d9b154;--gold-soft:#e7c878;--ink:#eaf0fa;--muted:#9fb1cc;--line:rgba(217,177,84,.22);--card:#0c2143}
+  :root{--navy:#081a33;--navy-2:#06142a;--navy-3:#0d2547;--gold:#d9b154;--gold-soft:#e7c878;--teal:#3a9aa6;--teal-soft:#5fb8c2;--ink:#eaf0fa;--muted:#9fb1cc;--line:rgba(217,177,84,.22);--card:#0c2143}
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--navy-2);color:var(--ink);line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
   .display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em;line-height:.92;text-transform:uppercase}
   a{color:inherit;text-decoration:none}
-  .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
   .bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none}
   .bg-fx::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 500px at 78% -10%,rgba(217,177,84,.16),transparent 60%),radial-gradient(800px 600px at 8% 110%,rgba(20,70,140,.30),transparent 55%),linear-gradient(180deg,var(--navy),var(--navy-2))}
   .bg-fx::after{content:"";position:absolute;inset:0;opacity:.04;background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 9px)}
@@ -31,6 +31,8 @@
   .brand{display:flex;align-items:center;gap:11px;font-weight:800}
   .logo{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#10305c,#06142a);font-family:'Anton';font-size:13px;color:var(--gold);position:relative}
   .logo span{position:absolute;top:-3px;font-size:9px}
+  .logo-img{height:40px;width:auto;display:block}
+  .foot-logo{height:64px;width:auto;display:block;margin-bottom:8px}
   .brand b{font-size:14px}.brand small{display:block;font-size:8.5px;letter-spacing:.3em;color:var(--gold-soft);font-weight:700}
   .nav-right{display:flex;align-items:center;gap:18px}
   .nav-links{display:flex;gap:22px;font-size:14px;font-weight:600}
@@ -42,10 +44,10 @@
   .nav-cta:hover{background:var(--gold);color:#05101f}
   @media(max-width:860px){.nav-links{display:none}}
 
-  .hero{position:relative;z-index:1;padding:74px 0 56px}
+  .hero{position:relative;z-index:1;padding:58px 0 46px}
   .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--gold-soft);border:1px solid var(--line);padding:7px 14px;border-radius:999px;margin-bottom:26px}
-  .eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
-  .hero h1{font-size:clamp(44px,9vw,104px);max-width:14ch}.hero h1 em{color:var(--gold);font-style:normal}
+  .eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--teal-soft);box-shadow:0 0 12px var(--teal)}
+  .hero h1{font-size:clamp(40px,8vw,86px);max-width:14ch}.hero h1 em{color:var(--gold);font-style:normal}
   .hero p.lead{margin-top:24px;max-width:56ch;font-size:clamp(16px,2.2vw,20px);color:var(--muted)}
   .hero-btns{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap}
   .btn{padding:14px 26px;border-radius:999px;font-weight:700;font-size:15px;transition:.22s;cursor:pointer;border:0;display:inline-block}
@@ -58,9 +60,9 @@
   .stat b{font-family:'Anton';font-size:clamp(34px,6vw,56px);color:var(--gold);display:block;line-height:1}
   .stat span{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
 
-  section{position:relative;z-index:1}.sec{padding:78px 0}
+  section{position:relative;z-index:1}.sec{padding:64px 0}
   .sec-head{margin-bottom:42px}
-  .kicker{font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-soft)}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--teal-soft)}
   .sec-head h2{font-size:clamp(32px,5.5vw,58px);margin-top:12px;max-width:20ch}
   .sec-head p{color:var(--muted);max-width:62ch;margin-top:14px;font-size:16.5px}
 
@@ -97,7 +99,7 @@
   .pcard .body h3{font-size:19px;line-height:1.15}
   .pcard .pos{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:3px}
   .pcard .team{color:var(--muted);font-size:13px;margin-top:11px;display:flex;align-items:center;gap:7px}
-  .pcard .team::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold);flex:none}
+  .pcard .team::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--teal-soft);flex:none}
   .pcard .view{margin-top:14px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
 
   /* events */
@@ -173,13 +175,56 @@
   .install .box b{font-size:14px}.install .box span{font-size:12.5px;color:var(--muted);display:block}
   .install button{margin-left:auto;border:0;background:var(--gold);color:#05101f;font-weight:700;padding:9px 14px;border-radius:999px;cursor:pointer}
   .install .x{margin-left:8px;background:transparent;color:var(--muted);border:1px solid var(--line)}
+
+  /* ===== ADMIN ===== */
+  .foot-admin{margin-top:12px;font-size:12px;color:var(--muted);opacity:.6;cursor:pointer;background:none;border:0;font-family:inherit}
+  .foot-admin:hover{opacity:1;color:var(--gold-soft)}
+  .adminbar{position:sticky;top:64px;z-index:49;display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 22px;background:linear-gradient(90deg,rgba(217,177,84,.16),rgba(8,26,51,.95));border-bottom:1px solid var(--gold)}
+  body.admin .adminbar{display:flex}
+  .adminbar .ab-tag{font-family:'Anton';color:var(--gold);font-size:15px;letter-spacing:.04em;margin-right:4px}
+  .ab-btn{border:1px solid var(--line);background:rgba(6,20,42,.6);color:var(--ink);font-weight:700;font-size:12.5px;padding:7px 13px;border-radius:999px;cursor:pointer;font-family:inherit}
+  .ab-btn:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .ab-btn.out{margin-left:auto;color:#ffb4b4;border-color:rgba(255,120,120,.4)}
+  .admin-edit{position:absolute;top:12px;right:12px;z-index:5;width:34px;height:34px;border-radius:10px;border:1px solid var(--gold);background:rgba(217,177,84,.92);color:#05101f;font-size:15px;display:none;place-items:center;cursor:pointer}
+  body.admin .pcard .tier{right:54px}
+  body.admin .admin-edit{display:grid}
+  .alist{display:flex;flex-direction:column;gap:10px}
+  .arow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:13px;padding:12px 14px;background:rgba(8,26,51,.5)}
+  .arow .ai{width:46px;height:46px;border-radius:10px;flex:none;background-size:cover;background-position:center;background-color:rgba(6,20,42,.6);display:grid;place-items:center;font-family:'Anton';color:var(--gold);font-size:18px;border:1px solid var(--line)}
+  .arow .an{font-weight:700;font-size:15px}.arow .as{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .arow .aacts{margin-left:auto;display:flex;gap:7px}
+  .mini{border:1px solid var(--line);background:rgba(6,20,42,.6);color:var(--ink);font-weight:700;font-size:12px;padding:7px 11px;border-radius:9px;cursor:pointer;font-family:inherit}
+  .mini:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .mini.del:hover{border-color:#ff8080;color:#ff9b9b}
+  .tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:22px}
+  .tab{border:1px solid var(--line);background:transparent;color:var(--muted);font-weight:700;font-size:13px;padding:9px 15px;border-radius:999px;cursor:pointer;font-family:inherit}
+  .tab.on{background:var(--gold);color:#05101f;border-color:var(--gold)}
+  .photo-pick{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+  .photo-prev{width:88px;height:88px;border-radius:14px;flex:none;background-size:cover;background-position:center;background-color:rgba(6,20,42,.6);border:1px solid var(--line);display:grid;place-items:center;font-family:'Anton';color:var(--gold);font-size:26px;overflow:hidden}
+  .stat-rows{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+  .stat-row{display:flex;gap:10px;align-items:center}
+  .stat-row input{flex:1;background:rgba(6,20,42,.6);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);font-family:inherit;font-size:14px;outline:none}
+  .stat-row input:focus{border-color:var(--gold)}
+  .stat-row .rm{flex:none;width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:rgba(6,20,42,.6);color:#ff9b9b;cursor:pointer;font-size:15px}
+  .admin-note{font-size:13px;color:var(--gold-soft);background:rgba(217,177,84,.1);border:1px solid var(--line);border-radius:11px;padding:11px 14px;margin-bottom:18px}
+  .admin-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .saving{opacity:.6;pointer-events:none}
 </style>
 </head>
 <body>
 <div class="bg-fx"></div>
 
+<div class="adminbar" id="adminbar">
+  <span class="ab-tag">ESM ADMIN</span>
+  <button class="ab-btn" data-tab="roster">Athletes &amp; Stats</button>
+  <button class="ab-btn" data-tab="events">Events</button>
+  <button class="ab-btn" data-tab="testi">Testimonials</button>
+  <button class="ab-btn" data-tab="about">My Photo</button>
+  <button class="ab-btn out" id="logoutBtn">Log out</button>
+</div>
+
 <header class="nav"><div class="wrap nav-in">
-  <a class="brand" href="#top"><span class="logo">E<span>★</span></span><span><b>ELITE</b><small>Sports Mgmt</small></span></a>
+  <a class="brand" href="#top"><img class="logo-img" src="logo.png" alt="Elite Sports Management" /></a>
   <div class="nav-right">
     <nav class="nav-links">
       <a href="#about" data-i18n="nav_about"></a>
@@ -224,7 +269,7 @@
 <section class="sec" id="who" style="padding-top:10px"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="who_kicker"></div></div>
   <div class="founder">
-    <div class="mono" id="founderPhoto">SB</div>
+    <div class="mono" id="founderPhoto" style="background-image:url('https://sbexwyvsgqayxrsrlrpm.supabase.co/storage/v1/object/public/player-photos/founder/sam.jpeg');background-size:cover;background-position:center top;font-size:0"></div>
     <div>
       <h3 class="display">Samuele Bruno</h3>
       <div class="role" data-i18n="who_role"></div>
@@ -297,8 +342,9 @@
 
 <footer><div class="wrap foot">
   <div>
-    <a class="brand" href="#top"><span class="logo">E<span>★</span></span><span><b>ELITE SPORTS MANAGEMENT</b><small data-i18n="foot_tagline"></small></span></a>
+    <a class="brand" href="#top"><img class="logo-img foot-logo" src="logo.png" alt="Elite Sports Management" /></a>
     <p class="muted">© <span id="yr"></span> Elite Sports Management. <span data-i18n="foot_rights"></span></p>
+    <button class="foot-admin" id="adminLink" data-i18n="admin_link"></button>
   </div>
   <div class="foot-links">
     <a class="pill" href="https://instagram.com/elite_sports_management__" target="_blank" rel="noopener">◎ @elite_sports_management__</a>
@@ -308,12 +354,24 @@
 
 <div class="modal" id="modal"><div class="scrim" data-close></div><div class="sheet"><button class="close" data-close>✕</button><div id="sheetContent"></div></div></div>
 
+<div class="modal" id="loginModal"><div class="scrim" data-lclose></div><div class="sheet" style="max-width:440px"><button class="close" data-lclose>✕</button>
+  <div class="sh-top"><span class="sh-mono">🔒</span><div><h3 class="display" data-i18n="login_h"></h3><div class="sh-meta" data-i18n="login_sub"></div></div></div>
+  <div class="sh-body">
+    <div class="field"><label data-i18n="login_email"></label><input id="liEmail" type="email" autocomplete="username" /></div>
+    <div class="field"><label data-i18n="login_pass"></label><input id="liPass" type="password" autocomplete="current-password" /></div>
+    <div class="form-msg" id="loginMsg" style="background:rgba(255,120,120,.1);border-color:rgba(255,120,120,.5);color:#ffb4b4"></div>
+    <div class="admin-actions"><button class="btn btn-gold" id="loginBtn" data-i18n="login_btn"></button></div>
+  </div>
+</div></div>
+
+<div class="modal" id="adminModal"><div class="scrim" data-aclose></div><div class="sheet"><button class="close" data-aclose>✕</button><div id="adminContent" class="sh-body"></div></div></div>
+
 <div class="install" id="install"><div class="box"><div><b data-i18n="install_t"></b><span data-i18n="install_d"></span></div><button id="installBtn" data-i18n="install_btn"></button><button class="x" id="installX">✕</button></div></div>
 
 <script>
 /* ===== CONFIG: add Supabase keys to go live (optional) ===== */
-const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
+const SUPABASE_URL = "";
+const SUPABASE_ANON_KEY = "";
 
 /* ===== sample EVENTS & TESTIMONIALS — replace with real ones ===== */
 const EVENTS = [
@@ -359,7 +417,8 @@ const T = {
     modal_highlights:"Career Highlights",modal_teams:"Teams & Affiliations",
     band_h2:"Are you the next great addition?",band_p:"Start the conversation with Elite Sports Management.",band_btn:"Apply Now",
     foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",
-    install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install"},
+    install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install",
+    admin_link:"Admin",login_h:"Admin Login",login_sub:"Manage athletes, stats & photos",login_email:"Email",login_pass:"Password",login_btn:"Log in"},
   es:{nav_about:"Qué Hacemos",nav_who:"Quién Soy",nav_roster:"Jugadores",nav_events:"Eventos",nav_join:"Únete",nav_cta:"Aplica Ahora",
     hero_eyebrow:"Representación de Atletas · En Todo el Mundo",hero_h1:'Representando a la <em>nueva generación</em> del talento del béisbol.',
     hero_lead:"Elite Sports Management guía a los atletas desde la academia hasta el profesionalismo — en el college, el indy ball y Europa.",
@@ -391,7 +450,8 @@ const T = {
     modal_highlights:"Destacados de Carrera",modal_teams:"Equipos y Afiliaciones",
     band_h2:"¿Eres la próxima gran incorporación?",band_p:"Inicia la conversación con Elite Sports Management.",band_btn:"Aplica Ahora",
     foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",
-    install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar"},
+    install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar",
+    admin_link:"Admin",login_h:"Acceso Admin",login_sub:"Gestiona atletas, estadísticas y fotos",login_email:"Correo",login_pass:"Contraseña",login_btn:"Entrar"},
   it:{nav_about:"Cosa Facciamo",nav_who:"Chi Sono",nav_roster:"Roster",nav_events:"Eventi",nav_join:"Unisciti",nav_cta:"Candidati",
     hero_eyebrow:"Rappresentanza Atleti · In Tutto il Mondo",hero_h1:'Rappresentiamo la <em>nuova generazione</em> del talento del baseball.',
     hero_lead:"Elite Sports Management accompagna gli atleti dall'academy al professionismo — tra college, indy ball ed Europa.",
@@ -423,7 +483,8 @@ const T = {
     modal_highlights:"Carriera in Evidenza",modal_teams:"Squadre e Affiliazioni",
     band_h2:"Sei la prossima grande aggiunta?",band_p:"Inizia la conversazione con Elite Sports Management.",band_btn:"Candidati",
     foot_tagline:"Unisciti a festeggiare",foot_rights:"Tutti i diritti riservati.",
-    install_t:"Installa l'app ESM",install_d:"Aggiungila alla schermata Home",install_btn:"Installa"}
+    install_t:"Installa l'app ESM",install_d:"Aggiungila alla schermata Home",install_btn:"Installa",
+    admin_link:"Admin",login_h:"Accesso Admin",login_sub:"Gestisci atleti, statistiche e foto",login_email:"Email",login_pass:"Password",login_btn:"Accedi"}
 };
 
 const FLAGS={"Dominican Republic":"🇩🇴","República Dominicana":"🇩🇴","Repubblica Dominicana":"🇩🇴","Venezuela":"🇻🇪","Spain":"🇪🇸","España":"🇪🇸","Spagna":"🇪🇸","Colombia":"🇨🇴","Italy":"🇮🇹","Italia":"🇮🇹","United States":"🇺🇸","USA":"🇺🇸","Estados Unidos":"🇺🇸","Stati Uniti":"🇺🇸","Germany":"🇩🇪","Alemania":"🇩🇪","Germania":"🇩🇪","Portugal":"🇵🇹","Canada":"🇨🇦","Mexico":"🇲🇽","México":"🇲🇽"};
@@ -744,11 +805,16 @@ function renderRoster(){
   document.getElementById("roster").innerHTML=list.map(p=>`
     <button class="pcard" data-slug="${p.slug}">
       <div class="top" style="${bgImg(p.image)}"><span class="flag">${p.flag||"🌎"}${p.heritage?(" "+p.heritage):""}</span>
+        <span class="admin-edit" data-edit="${p.slug}">✏️</span>
         ${p.tier?`<span class="tier">${p.tier}</span>`:""}${p.image?"":`<span class="mono">${initials(p.name)}</span>`}</div>
       <div class="body"><h3 class="display">${p.name}</h3><div class="pos">${p.position}</div>
         ${p.teams&&p.teams[0]?`<div class="team">${p.teams[0]}</div>`:""}<div class="view">${t("card_view")}</div></div>
     </button>`).join("");
-  document.querySelectorAll(".pcard").forEach(c=>c.onclick=()=>openModal(c.dataset.slug));
+  document.querySelectorAll(".pcard").forEach(c=>c.onclick=(e)=>{
+    const ed=e.target.closest(".admin-edit");
+    if(ed){e.preventDefault();e.stopPropagation();editPlayer(ed.dataset.edit);return;}
+    openModal(c.dataset.slug);
+  });
   document.getElementById("statAthletes").textContent=PLAYERS.length;
   document.getElementById("statCountries").textContent=new Set(PLAYERS.map(p=>p.country).filter(Boolean)).size;
 }
@@ -801,7 +867,7 @@ form.addEventListener("submit",async e=>{
     meta:{age:fd.get("age"),phone:fd.get("phone"),email:fd.get("email"),instagram:fd.get("ig"),applying:fd.get("applying"),other:fd.get("other")}};
   if(SB){try{await SB.from("players").insert({slug:player.slug,name,"group":group,position:player.position,country,
     flag:player.flag,tier:"New",bio:player.bio,teams:[],stats:[],age:fd.get("age"),phone:fd.get("phone"),
-    email:fd.get("email"),instagram:fd.get("ig"),applying_for:fd.get("applying"),message:fd.get("other"),status:"pending"});
+    email:fd.get("email"),instagram:fd.get("ig"),applying_for:fd.get("applying"),message:fd.get("other"),status:"approved"});
   }catch(err){console.error(err);}}
   PLAYERS.unshift(player);active="All";renderFilters();renderRoster();
   form.reset();document.getElementById("formMsg").classList.add("show");
@@ -819,7 +885,7 @@ async function boot(){
     try{const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
       SB=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
       const {data}=await SB.from("players").select("*").eq("status","approved").order("sort_order");
-      if(data&&data.length)PLAYERS=data.map(r=>({...r,image:r.image||r.image_url||null}));
+      if(data&&data.length)PLAYERS=data;
     }catch(err){console.warn("Supabase load failed; using local data",err);}
   }
   applyI18n();renderFilters();renderRoster();renderEvents();renderTesti();
