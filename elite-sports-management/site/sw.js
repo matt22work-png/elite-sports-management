@@ -1,5 +1,5 @@
-const CACHE = "esm-v2";
-const ASSETS = ["./", "./index.html", "./manifest.json",
+const CACHE = "esm-v3";
+const ASSETS = ["./manifest.json",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
@@ -13,16 +13,36 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   const { request } = e;
   if (request.method !== "GET") return;
-  // Network-first for Supabase/API calls, cache-first for the app shell.
+
+  // Network-first for Supabase/API calls, falling back to cache only if offline.
   if (request.url.includes("supabase.co") || request.url.includes("esm.sh")) {
     e.respondWith(fetch(request).catch(() => caches.match(request)));
     return;
   }
+
+  // Network-first for HTML/navigation requests (index.html, players/*.html, admin/)
+  // so a new deploy is visible immediately to returning visitors. Cache is only a
+  // fallback for genuinely offline use, not the primary source of truth.
+  const isNavigation = request.mode === "navigate" ||
+    (request.headers.get("accept") || "").includes("text/html");
+  if (isNavigation) {
+    e.respondWith(
+      fetch(request).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(request, copy)).catch(() => {});
+        return res;
+      }).catch(() => caches.match(request).then(hit => hit || caches.match("./index.html")))
+    );
+    return;
+  }
+
+  // Cache-first for static assets (icons, manifest) — these rarely change and
+  // benefit from instant offline-capable loading.
   e.respondWith(
     caches.match(request).then(hit => hit || fetch(request).then(res => {
       const copy = res.clone();
-      caches.open(CACHE).then(c => c.put(request, copy)).catch(()=>{});
+      caches.open(CACHE).then(c => c.put(request, copy)).catch(() => {});
       return res;
-    }).catch(() => caches.match("./index.html")))
+    }))
   );
 });

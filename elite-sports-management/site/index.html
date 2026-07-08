@@ -267,17 +267,17 @@
 <section class="sec" id="roster" style="padding-top:10px"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="roster_kicker"></div><h2 class="display" data-i18n="roster_h2"></h2><p data-i18n="roster_p"></p></div>
   <div class="filters" id="filters"></div>
-  <div class="roster" id="roster"></div>
+  <div class="roster" id="rosterList"></div>
 </div></section>
 
 <section class="sec" id="events" style="padding-top:10px"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="events_kicker"></div><h2 class="display" data-i18n="events_h2"></h2><p data-i18n="events_p"></p></div>
-  <div class="ev-grid" id="events"></div>
+  <div class="ev-grid" id="eventsList"></div>
 </div></section>
 
 <section class="sec" id="testi" style="padding-top:10px"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="testi_kicker"></div><h2 class="display" data-i18n="testi_h2"></h2><p data-i18n="testi_p"></p></div>
-  <div class="testi-grid" id="testi"></div>
+  <div class="testi-grid" id="testiList"></div>
 </div></section>
 
 <section class="sec" id="join" style="padding-top:10px"><div class="wrap">
@@ -789,7 +789,7 @@ function renderFilters(){
 }
 function renderRoster(){
   const list=active==="All"?PLAYERS:PLAYERS.filter(p=>p.group===active);
-  document.getElementById("roster").innerHTML=list.map(p=>{
+  document.getElementById("rosterList").innerHTML=list.map(p=>{
     const hasPage=STATIC_PLAYER_PAGES.has(p.slug);
     const tag=hasPage?"a":"button";
     const linkAttr=hasPage?`href="players/${p.slug}.html"`:`data-slug="${p.slug}"`;
@@ -809,7 +809,7 @@ function fmtDate(d){try{return new Date(d+"T00:00").toLocaleDateString(lang,{day
 function renderEvents(){
   const order={upcoming:0,past:1};
   const list=[...EVENTS].sort((a,b)=>(order[a.status]-order[b.status])||a.date.localeCompare(b.date));
-  document.getElementById("events").innerHTML=list.map(e=>`
+  document.getElementById("eventsList").innerHTML=list.map(e=>`
     <div class="ev-card"><div class="ev-img" style="${bgImg(e.image)}">
       <span class="ev-status ${e.status==='upcoming'?'up':'past'}">${e.status==='upcoming'?t("ev_upcoming"):t("ev_past")}</span>
       ${e.image?"":(e.icon||"⚾")}</div>
@@ -818,7 +818,7 @@ function renderEvents(){
         <p>${e.blurb}</p></div></div>`).join("");
 }
 function renderTesti(){
-  document.getElementById("testi").innerHTML=TESTIMONIALS.map(x=>`
+  document.getElementById("testiList").innerHTML=TESTIMONIALS.map(x=>`
     <div class="testi"><div class="q">“</div><p>${x.q}</p>
       <div class="who"><div class="av">${initials(x.n)}</div><div><div class="nm">${x.n}</div><div class="rl">${x.r}</div></div></div></div>`).join("");
 }
