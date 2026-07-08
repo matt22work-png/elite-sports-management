@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Jesús Delgado — Elite Sports Management</title>
+<meta name="description" content="A left-handed pitcher signed by the Texas Rangers in 2023 who has shown big projection in the minors. Shined as a 2024 DSL All-Star and continued his devel" />
+<link rel="manifest" href="../manifest.json" />
+<meta name="theme-color" content="#081a33" />
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+
+  :root{--navy:#081a33;--navy-2:#06142a;--navy-3:#0d2547;--gold:#d9b154;--gold-soft:#e7c878;--teal:#3a9aa6;--teal-soft:#5fb8c2;--ink:#eaf0fa;--muted:#9fb1cc;--line:rgba(217,177,84,.22);--card:#0c2143}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--navy-2);color:var(--ink);line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  .display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em;line-height:.92;text-transform:uppercase}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  .bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .bg-fx::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 500px at 78% -10%,rgba(217,177,84,.16),transparent 60%),radial-gradient(800px 600px at 8% 110%,rgba(20,70,140,.30),transparent 55%),linear-gradient(180deg,var(--navy),var(--navy-2))}
+  .bg-fx::after{content:"";position:absolute;inset:0;opacity:.04;background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 9px)}
+
+  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(6,20,42,.72);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px;gap:14px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800}
+  .logo{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#10305c,#06142a);font-family:'Anton';font-size:13px;color:var(--gold);position:relative}
+  .logo span{position:absolute;top:-3px;font-size:9px}
+  .logo-img{height:40px;width:auto;display:block}
+  .foot-logo{height:64px;width:auto;display:block;margin-bottom:8px}
+  .brand b{font-size:14px}.brand small{display:block;font-size:8.5px;letter-spacing:.3em;color:var(--gold-soft);font-weight:700}
+  .nav-right{display:flex;align-items:center;gap:18px}
+  .nav-links{display:flex;gap:22px;font-size:14px;font-weight:600}
+  .nav-links a{color:var(--muted);transition:.2s}.nav-links a:hover{color:var(--gold-soft)}
+  .lang{display:flex;gap:2px;border:1px solid var(--line);border-radius:999px;padding:3px}
+  .lang button{background:transparent;border:0;color:var(--muted);font-weight:700;font-size:12px;padding:5px 9px;border-radius:999px;cursor:pointer}
+  .lang button.on{background:var(--gold);color:#05101f}
+  .nav-cta{border:1px solid var(--gold);color:var(--gold-soft);padding:9px 15px;border-radius:999px;font-size:13px;font-weight:700;transition:.2s;white-space:nowrap}
+  .nav-cta:hover{background:var(--gold);color:#05101f}
+  @media(max-width:860px){.nav-links{display:none}}
+
+  .hero{position:relative;z-index:1;padding:58px 0 46px}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--gold-soft);border:1px solid var(--line);padding:7px 14px;border-radius:999px;margin-bottom:26px}
+  .eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--teal-soft);box-shadow:0 0 12px var(--teal)}
+  .hero h1{font-size:clamp(40px,8vw,86px);max-width:14ch}.hero h1 em{color:var(--gold);font-style:normal}
+  .hero p.lead{margin-top:24px;max-width:56ch;font-size:clamp(16px,2.2vw,20px);color:var(--muted)}
+  .hero-btns{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap}
+  .btn{padding:14px 26px;border-radius:999px;font-weight:700;font-size:15px;transition:.22s;cursor:pointer;border:0;display:inline-block}
+  .btn-gold{background:var(--gold);color:#05101f}.btn-gold:hover{background:var(--gold-soft);transform:translateY(-2px)}
+  .btn-ghost{border:1px solid var(--line);color:var(--ink)}.btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+
+  .stats{position:relative;z-index:1;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(8,26,51,.5)}
+  .stats-in{display:grid;grid-template-columns:repeat(3,1fr)}
+  .stat{padding:30px 18px;text-align:center;border-right:1px solid var(--line)}.stat:last-child{border-right:0}
+  .stat b{font-family:'Anton';font-size:clamp(34px,6vw,56px);color:var(--gold);display:block;line-height:1}
+  .stat span{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+  section{position:relative;z-index:1}.sec{padding:64px 0}
+  .sec-head{margin-bottom:42px}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--teal-soft)}
+  .sec-head h2{font-size:clamp(32px,5.5vw,58px);margin-top:12px;max-width:20ch}
+  .sec-head p{color:var(--muted);max-width:62ch;margin-top:14px;font-size:16.5px}
+
+  .do-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
+  .do{padding:24px 20px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));transition:.25s}
+  .do:hover{transform:translateY(-4px);border-color:var(--gold)}
+  .do .ic{font-size:22px;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:rgba(217,177,84,.12);border:1px solid var(--line);margin-bottom:15px}
+  .do h3{font-size:17px;margin-bottom:7px}.do p{color:var(--muted);font-size:14px}
+  .svc-pay{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.03em}
+  .svc-pay:hover{color:var(--gold-soft)}
+
+  .founder{display:grid;grid-template-columns:200px 1fr;gap:34px;align-items:center;border:1px solid var(--line);border-radius:20px;padding:34px;background:radial-gradient(circle at 12% 20%,rgba(217,177,84,.10),transparent 55%),linear-gradient(180deg,var(--card),var(--navy-2))}
+  @media(max-width:640px){.founder{grid-template-columns:1fr;text-align:center}}
+  .founder .mono{font-family:'Anton';font-size:70px;color:var(--gold);width:180px;height:180px;border-radius:50%;border:2px solid rgba(217,177,84,.4);display:grid;place-items:center;background:rgba(6,20,42,.5);margin:0 auto;background-size:cover;background-position:center}
+  .founder h3{font-size:clamp(26px,5vw,40px)}
+  .founder .role{color:var(--gold-soft);font-weight:700;margin-top:4px}
+  .founder p{color:var(--muted);margin-top:14px;font-size:16px;max-width:62ch}
+  .creds{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+  @media(max-width:640px){.creds{justify-content:center}}
+  .cred{font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:999px;border:1px solid var(--line);color:#cdd9ec;background:rgba(8,26,51,.5)}
+
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px}
+  .chip{padding:9px 17px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;cursor:pointer;transition:.18s}
+  .chip:hover{color:var(--ink)}.chip.active{background:var(--gold);color:#05101f;border-color:var(--gold)}
+  .roster{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:900px){.roster{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.roster{grid-template-columns:1fr}}
+  .pcard{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;background:linear-gradient(180deg,var(--card),var(--navy-2));transition:.25s;text-align:left;width:100%}
+  .pcard:hover{transform:translateY(-5px);border-color:var(--gold);box-shadow:0 18px 40px -20px rgba(0,0,0,.8)}
+  .pcard .top{position:relative;height:150px;display:grid;place-items:center;background:radial-gradient(circle at 50% 22%,#16386a,#0a1f3c);overflow:hidden;background-size:cover;background-position:center}
+  .pcard .top::after{content:"";position:absolute;inset:0;opacity:.07;background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 8px)}
+  .mono{font-family:'Anton';font-size:46px;color:var(--gold);z-index:1;width:96px;height:96px;border-radius:50%;border:2px solid rgba(217,177,84,.4);display:grid;place-items:center;background:rgba(6,20,42,.45)}
+  .tier{position:absolute;top:12px;right:12px;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:rgba(6,20,42,.7);border:1px solid var(--line);color:var(--gold-soft);z-index:2}
+  .flag{position:absolute;top:12px;left:12px;font-size:19px;z-index:2;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+  .pcard .body{padding:17px 18px 20px}
+  .pcard .body h3{font-size:19px;line-height:1.15}
+  .pcard .pos{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:3px}
+  .pcard .team{color:var(--muted);font-size:13px;margin-top:11px;display:flex;align-items:center;gap:7px}
+  .pcard .team::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--teal-soft);flex:none}
+  .pcard .view{margin-top:14px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
+
+  /* events */
+  .ev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+  .ev-card{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:linear-gradient(180deg,var(--card),var(--navy-2));transition:.25s}
+  .ev-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+  .ev-img{height:130px;background:radial-gradient(circle at 70% 20%,rgba(217,177,84,.25),#0a1f3c);display:grid;place-items:center;font-size:38px;background-size:cover;background-position:center;position:relative}
+  .ev-status{position:absolute;top:12px;left:12px;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border-radius:999px;border:1px solid var(--line)}
+  .ev-status.up{background:var(--gold);color:#05101f;border-color:var(--gold)}
+  .ev-status.past{background:rgba(6,20,42,.7);color:var(--muted)}
+  .ev-body{padding:18px}
+  .ev-body h3{font-size:19px}
+  .ev-meta{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
+  .ev-body p{color:var(--muted);font-size:14px;margin-top:10px}
+
+  /* testimonials */
+  .testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+  .testi{border:1px solid var(--line);border-radius:18px;padding:26px 24px;background:linear-gradient(180deg,var(--card),var(--navy-2));position:relative}
+  .testi .q{font-size:40px;font-family:'Anton';color:rgba(217,177,84,.4);line-height:.6}
+  .testi p{font-size:16px;color:#d6e1f2;margin:8px 0 18px}
+  .testi .who{display:flex;align-items:center;gap:12px}
+  .testi .av{width:42px;height:42px;border-radius:50%;border:1.5px solid rgba(217,177,84,.4);display:grid;place-items:center;font-family:'Anton';color:var(--gold);font-size:16px;background:rgba(6,20,42,.5)}
+  .testi .nm{font-weight:700;font-size:14.5px}.testi .rl{color:var(--muted);font-size:12.5px}
+
+  .join{border:1px solid var(--line);border-radius:20px;padding:34px;background:linear-gradient(180deg,var(--card),var(--navy-2))}
+  .join .tagline{font-family:'Anton';text-transform:uppercase;color:var(--gold);font-size:clamp(18px,3vw,26px);margin-bottom:24px;letter-spacing:.02em}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+  .field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+  .field label{font-size:13px;font-weight:700;color:var(--gold-soft);letter-spacing:.02em}
+  .field input,.field select,.field textarea{background:rgba(6,20,42,.6);border:1px solid var(--line);border-radius:11px;padding:13px 14px;color:var(--ink);font-family:inherit;font-size:15px;outline:none;transition:.18s}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+  .field textarea{resize:vertical;min-height:90px}.field select{appearance:none;cursor:pointer}
+  .form-msg{display:none;margin-top:14px;padding:14px 16px;border-radius:12px;background:rgba(217,177,84,.12);border:1px solid var(--gold);color:var(--gold-soft);font-weight:600}
+  .form-msg.show{display:block}
+
+  .band{position:relative;z-index:1;margin:30px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:linear-gradient(120deg,rgba(217,177,84,.10),transparent)}
+  .band-in{padding:58px 0;text-align:center}.band h2{font-size:clamp(28px,5vw,50px)}
+  .band p{color:var(--muted);margin:14px auto 26px;max-width:52ch}
+
+  footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:46px 0 70px}
+  .foot{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
+  .foot .muted{color:var(--muted);font-size:13.5px;margin-top:14px}
+  .foot-links{display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+  @media(max-width:560px){.foot-links{align-items:flex-start}}
+  .pill{display:inline-flex;align-items:center;gap:9px;color:var(--gold-soft);font-weight:700;border:1px solid var(--line);padding:10px 16px;border-radius:999px;transition:.2s}
+  .pill:hover{border-color:var(--gold);background:rgba(217,177,84,.08)}
+
+  .modal{position:fixed;inset:0;z-index:100;display:none;align-items:flex-end;justify-content:center}
+  .modal.open{display:flex}
+  .modal .scrim{position:absolute;inset:0;background:rgba(3,10,22,.78);backdrop-filter:blur(4px)}
+  .sheet{position:relative;z-index:2;width:100%;max-width:680px;max-height:90vh;overflow:auto;background:linear-gradient(180deg,var(--navy-3),var(--navy-2));border:1px solid var(--line);border-radius:22px 22px 0 0;animation:rise .3s ease}
+  @media(min-width:700px){.modal{align-items:center}.sheet{border-radius:22px}}
+  @keyframes rise{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .sh-top{padding:30px 28px;display:flex;gap:20px;align-items:center;border-bottom:1px solid var(--line);background:radial-gradient(circle at 80% 0%,rgba(217,177,84,.12),transparent 60%)}
+  .sh-mono{font-family:'Anton';font-size:40px;color:var(--gold);width:88px;height:88px;flex:none;border-radius:50%;border:2px solid rgba(217,177,84,.4);display:grid;place-items:center;background:rgba(6,20,42,.5);background-size:cover;background-position:center}
+  .sheet h3{font-size:clamp(24px,5vw,34px)}
+  .sh-pos{color:var(--gold-soft);font-weight:700;margin-top:4px}.sh-meta{color:var(--muted);font-size:14px;margin-top:8px}
+  .sh-body{padding:26px 28px 34px}.sh-body p.bio{font-size:16px;color:#d6e1f2;margin-bottom:24px}
+  .sh-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+  .sh-stat{flex:1;min-width:120px;border:1px solid var(--line);border-radius:13px;padding:14px 16px;background:rgba(8,26,51,.5)}
+  .sh-stat b{font-family:'Anton';font-size:22px;color:var(--gold);display:block;line-height:1.1}
+  .sh-stat span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .sh-label{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft);font-weight:700;margin-bottom:12px}
+  .team-chips{display:flex;gap:9px;flex-wrap:wrap}
+  .sh-contact{margin-top:28px;padding-top:24px;border-top:1px solid var(--line)}
+  .sh-contact-p{color:var(--muted);font-size:14px;margin:6px 0 16px}
+  .team-chip{font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid var(--line);color:#cdd9ec;background:rgba(8,26,51,.5)}
+  .close{position:absolute;top:16px;right:16px;z-index:3;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(6,20,42,.7);color:var(--ink);font-size:18px;cursor:pointer;display:grid;place-items:center}
+  .close:hover{border-color:var(--gold);color:var(--gold)}
+
+  .install{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;justify-content:center;padding:0 16px 16px}
+  .install.show{display:flex}
+  .install .box{display:flex;align-items:center;gap:14px;background:rgba(12,33,67,.96);border:1px solid var(--gold);border-radius:14px;padding:12px 14px;backdrop-filter:blur(8px);max-width:520px;width:100%}
+  .install .box b{font-size:14px}.install .box span{font-size:12.5px;color:var(--muted);display:block}
+  .install button{margin-left:auto;border:0;background:var(--gold);color:#05101f;font-weight:700;padding:9px 14px;border-radius:999px;cursor:pointer}
+  .install .x{margin-left:8px;background:transparent;color:var(--muted);border:1px solid var(--line)}
+
+  /* Footer link through to the admin panel (/admin/) */
+  .foot-admin{display:inline-block;margin-top:12px;font-size:12px;color:var(--muted);opacity:.6;cursor:pointer;background:none;border:0;font-family:inherit;text-decoration:none}
+  .foot-admin:hover{opacity:1;color:var(--gold-soft)}
+
+  /* form error state (applications) */
+  .form-msg.err{background:rgba(224,93,93,.12);border-color:#e05d5d;color:#ffb4b4}
+
+  /* ===== mobile / PWA polish ===== */
+  *{-webkit-tap-highlight-color:transparent}
+  .install{padding-bottom:calc(16px + env(safe-area-inset-bottom))}      /* clear the iOS home indicator */
+  footer{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+  @media(max-width:560px){
+    .wrap{padding:0 16px}
+    /* 16px form controls stop iOS from auto-zooming on focus */
+    .field input,.field select,.field textarea{font-size:16px}
+  }
+
+
+  .pp-wrap{max-width:900px;margin:0 auto;padding:40px 22px 90px}
+  .pp-back{display:inline-flex;align-items:center;gap:8px;color:var(--gold-soft);font-weight:700;font-size:13.5px;margin-bottom:26px}
+  .pp-back:hover{color:var(--gold)}
+  .pp-hero{display:grid;grid-template-columns:180px 1fr;gap:30px;align-items:center;border:1px solid var(--line);border-radius:20px;padding:32px;background:radial-gradient(circle at 12% 20%,rgba(217,177,84,.10),transparent 55%),linear-gradient(180deg,var(--card),var(--navy-2));margin-bottom:30px;position:relative}
+  @media(max-width:640px){.pp-hero{grid-template-columns:1fr;text-align:center}}
+  .pp-photo{font-family:'Anton';font-size:62px;color:var(--gold);width:160px;height:160px;border-radius:50%;border:2px solid rgba(217,177,84,.4);display:grid;place-items:center;background:rgba(6,20,42,.5);margin:0 auto;background-size:cover;background-position:center}
+  .pp-tier{position:absolute;top:22px;right:22px;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:rgba(6,20,42,.7);border:1px solid var(--line);color:var(--gold-soft)}
+  .pp-flag{font-size:26px;margin-right:8px}
+  .pp-name{font-size:clamp(28px,5vw,44px)}
+  .pp-pos{color:var(--gold-soft);font-weight:700;margin-top:6px;font-size:15px}
+  .pp-meta{color:var(--muted);margin-top:10px;font-size:14px}
+  .pp-section{margin-top:30px}
+  .pp-section h2{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-soft);margin-bottom:14px}
+  .pp-bio{font-size:16.5px;color:#d6e1f2;line-height:1.65}
+  .pp-stats{display:flex;gap:12px;flex-wrap:wrap}
+  .pp-stat{border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-align:center;background:rgba(8,26,51,.4);min-width:110px}
+  .pp-stat b{font-family:'Anton';font-size:22px;color:var(--gold);display:block}
+  .pp-stat span{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .pp-teams{display:flex;gap:9px;flex-wrap:wrap}
+  .pp-contact{margin-top:38px;padding:26px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));text-align:center}
+  .pp-contact h2{font-size:19px;margin-bottom:8px;color:var(--ink);font-family:'Anton';text-transform:none;letter-spacing:0}
+  .pp-contact p{color:var(--muted);font-size:14.5px;margin-bottom:18px;max-width:48ch;margin-left:auto;margin-right:auto}
+
+</style>
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<header class="nav"><div class="wrap nav-in">
+  <a class="brand" href="../index.html#top"><img class="logo-img" src="../logo.png" alt="Elite Sports Management" /></a>
+  <div class="nav-right">
+    <nav class="nav-links">
+      <a href="../index.html#about">What We Do</a>
+      <a href="../index.html#who">Who I Am</a>
+      <a href="../index.html#roster">Roster</a>
+      <a href="../index.html#events">Events</a>
+      <a href="../index.html#join">Join Us</a>
+    </nav>
+    <a class="nav-cta" href="../index.html#join">Apply Now</a>
+  </div>
+</div></header>
+
+<main class="pp-wrap">
+  <a class="pp-back" href="../index.html#roster">&larr; Back to Roster</a>
+
+  <div class="pp-hero">
+    <span class="pp-tier">Pro</span>
+    <div class="pp-photo" style="">JD</div>
+    <div>
+      <h1 class="display pp-name">Jesús Delgado <span style="font-size:.55em">🇻🇪</span></h1>
+      <div class="pp-pos">Pitcher (LHP)</div>
+      <div class="pp-meta">Born 2003  ·  Guanare, Venezuela</div>
+    </div>
+  </div>
+
+  <div class="pp-section">
+    <h2>Bio</h2>
+    <p class="pp-bio">A left-handed pitcher signed by the Texas Rangers in 2023 who has shown big projection in the minors. Shined as a 2024 DSL All-Star and continued his development in the Arizona Complex League.</p>
+  </div>
+
+  <div class="pp-section"><h2>Career Highlights</h2><div class="pp-stats"><div class="pp-stat"><b>All-Star</b><span>2024 DSL</span></div><div class="pp-stat"><b>83 in 64 IP</b><span>Strikeouts</span></div></div></div>
+
+  <div class="pp-section"><h2>Teams &amp; Affiliations</h2><div class="pp-teams"><span class="team-chip">Texas Rangers org.</span><span class="team-chip">Arizona Complex League</span></div></div>
+
+  <div class="pp-contact">
+    <h2>Interested in Jesús Delgado?</h2>
+    <p>Recruiters and coaches: pay the contact fee to unlock this athlete's direct contact info.</p>
+    <a class="btn btn-gold" href="https://paypal.me/elitesportsmanagement" target="_blank" rel="noopener">Pay to contact this player</a>
+  </div>
+</main>
+
+<footer><div class="wrap foot">
+  <div>
+    <a class="brand" href="../index.html#top"><img class="logo-img foot-logo" src="../logo.png" alt="Elite Sports Management" /></a>
+    <p class="muted">&copy; <span id="yr"></span> Elite Sports Management. All rights reserved.</p>
+    <a class="foot-admin" href="../admin/">Admin</a>
+  </div>
+  <div class="foot-links">
+    <a class="pill" href="https://instagram.com/elite_sports_management__" target="_blank" rel="noopener">&#9678; @elite_sports_management__</a>
+    <a class="pill" href="mailto:elitesportsmanagement50@gmail.com">&#9993; elitesportsmanagement50@gmail.com</a>
+  </div>
+</div></footer>
+
+<script>document.getElementById("yr").textContent=new Date().getFullYear();</script>
+</body>
+</html>
