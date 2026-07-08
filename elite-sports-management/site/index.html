@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Elite Sports Management — Athlete Representation</title>
-<meta name="description" content="Elite Sports Management — athlete representation & development across college, indy ball and Europe. Roster, events and athlete profiles. Founded by Samuele Bruno." />
+<meta name="description" content="Elite Sports Management — athlete representation and development across college recruiting, independent pro ball and Europe. Founded by professional baseball player Samuele Bruno (Hastings College NAIA, scholarship athlete, class of 2027). Browse the roster, upcoming events and individual athlete profiles." />
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#081a33" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -71,6 +71,8 @@
   .do:hover{transform:translateY(-4px);border-color:var(--gold)}
   .do .ic{font-size:22px;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:rgba(217,177,84,.12);border:1px solid var(--line);margin-bottom:15px}
   .do h3{font-size:17px;margin-bottom:7px}.do p{color:var(--muted);font-size:14px}
+  .svc-pay{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.03em}
+  .svc-pay:hover{color:var(--gold-soft)}
 
   .founder{display:grid;grid-template-columns:200px 1fr;gap:34px;align-items:center;border:1px solid var(--line);border-radius:20px;padding:34px;background:radial-gradient(circle at 12% 20%,rgba(217,177,84,.10),transparent 55%),linear-gradient(180deg,var(--card),var(--navy-2))}
   @media(max-width:640px){.founder{grid-template-columns:1fr;text-align:center}}
@@ -165,6 +167,8 @@
   .sh-stat span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
   .sh-label{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft);font-weight:700;margin-bottom:12px}
   .team-chips{display:flex;gap:9px;flex-wrap:wrap}
+  .sh-contact{margin-top:28px;padding-top:24px;border-top:1px solid var(--line)}
+  .sh-contact-p{color:var(--muted);font-size:14px;margin:6px 0 16px}
   .team-chip{font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid var(--line);color:#cdd9ec;background:rgba(8,26,51,.5)}
   .close{position:absolute;top:16px;right:16px;z-index:3;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(6,20,42,.7);color:var(--ink);font-size:18px;cursor:pointer;display:grid;place-items:center}
   .close:hover{border-color:var(--gold);color:var(--gold)}
@@ -232,8 +236,9 @@
 <section class="sec" id="about"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="about_kicker"></div><h2 class="display" data-i18n="about_h2"></h2><p data-i18n="about_p"></p></div>
   <div class="do-grid">
-    <div class="do"><div class="ic">🎓</div><h3 data-i18n="svc1_t"></h3><p data-i18n="svc1_d"></p></div>
+    <div class="do"><div class="ic">🎓</div><h3 data-i18n="svc1_t"></h3><p data-i18n="svc1_d"></p><a class="svc-pay" href="https://paypal.me/elitesportsmanagement" target="_blank" rel="noopener" data-i18n="svc1_pay"></a></div>
     <div class="do"><div class="ic">⚾</div><h3 data-i18n="svc2_t"></h3><p data-i18n="svc2_d"></p></div>
+    <div class="do"><div class="ic">🏝️</div><h3 data-i18n="svc6_t"></h3><p data-i18n="svc6_d"></p></div>
     <div class="do"><div class="ic">🌍</div><h3 data-i18n="svc3_t"></h3><p data-i18n="svc3_d"></p></div>
     <div class="do"><div class="ic">📣</div><h3 data-i18n="svc4_t"></h3><p data-i18n="svc4_d"></p></div>
     <div class="do"><div class="ic">📈</div><h3 data-i18n="svc5_t"></h3><p data-i18n="svc5_d"></p></div>
@@ -338,17 +343,25 @@
 const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
 
+/* Contact-gate: recruiters/coaches pay this link before ESM shares a player's
+   direct contact info. TODO: replace with Samuele's real PayPal.me link. */
+const CONTACT_PAYPAL_URL = "https://paypal.me/elitesportsmanagement";
+
 /* ===== sample EVENTS & TESTIMONIALS — replace with real ones ===== */
 const EVENTS = [
-  { title:"Elite Winter Showcase", date:"2026-02-15", loc:"Arizona, USA", status:"upcoming", icon:"🏟️", blurb:"Showcase camp for prospects looking to get seen by college and pro scouts." },
-  { title:"All-Stars Tournament", date:"2026-01-10", loc:"Italy", status:"upcoming", icon:"🏆", blurb:"International tournament featuring ESM-represented athletes." },
-  { title:"Champions All-Stars 2025", date:"2025-08-20", loc:"Europe", status:"past", icon:"⭐", blurb:"A championship run with the ESM all-stars." }
+  { title:"Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", icon:"🏝️", blurb:"ESM athletes compete in winter league play in Tenerife, Spain — Dec 8–15, 2026. Photos coming soon." },
+  { title:"All-Stars Tournament", date:"2026-01-10", loc:"Italy", status:"upcoming", icon:"🏆", blurb:"International tournament featuring ESM-represented athletes." }
 ];
 const TESTIMONIALS = [
   { q:"Elite Sports Management opened doors I didn't know existed. They believed in me from day one.", n:"ESM Athlete", r:"Pitcher" },
   { q:"Professional, honest and always available. They treat the family like part of the team.", n:"Parent", r:"ESM Family" },
   { q:"From the showcase to signing, every step was handled with care.", n:"ESM Athlete", r:"Infielder" }
 ];
+
+/* Players with a real static profile page at players/<slug>.html (built via
+   gen_player_pages.py). Anyone not in this set falls back to the in-page modal
+   -- e.g. new applicants approved via the Join form before pages are regenerated. */
+const STATIC_PLAYER_PAGES = new Set(["brayan-hernandez", "gianni-westphal", "jose-cedeno", "danyer-sanabria", "francesco-mazzei", "anderson-pena", "jesus-delgado", "lorenzo-gonzalez", "jaider-morelos", "bret-bowers", "osiris-german", "adam-moser", "yerardo-ciofani", "javier-useche", "david-chavez", "matteo-colalucci", "anthony-quattrocchi"]);
 
 const T = {
   en:{nav_about:"What We Do",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_join:"Join Us",nav_cta:"Apply Now",
@@ -358,15 +371,16 @@ const T = {
     stat1:"Athletes Represented",stat2:"Countries",stat3:"MLB Organizations",
     about_kicker:"What We Do",about_h2:"Full-service representation, built around the athlete.",
     about_p:"Our mission is to support athletes as they work to reach their full potential — on the field, in their careers and beyond.",
-    svc1_t:"College Placement",svc1_d:"Connecting players with U.S. college programs that fit their game and goals.",
+    svc1_t:"College Placement",svc1_d:"Connecting players with U.S. college programs and helping them earn athletic scholarships that fit their game, goals and budget.",svc1_pay:"Enroll in College Placement →",
     svc2_t:"Indy Ball",svc2_d:"Opening doors to professional independent leagues across North America.",
+    svc6_t:"Winter League",svc6_d:"Placing athletes in winter league play abroad for extra reps and exposure during the offseason.",
     svc3_t:"Europe",svc3_d:"Placing athletes with clubs in Italy, Spain, Germany and beyond.",
     svc4_t:"Social Media & Branding",svc4_d:"Building each athlete's profile and story to grow their visibility.",
     svc5_t:"Representation & Development",svc5_d:"Day-to-day management and a plan tailored to each athlete.",
-    who_kicker:"Who I Am",who_role:"CEO & Founder · Professional Utility Player",
-    who_bio:"Elite Sports Management was founded by Samuele Bruno, a professional utility player who has competed for the Kitchener Panthers and Italy's National Team. He built ESM to give athletes the representation and development the game demands.",
+    who_kicker:"Who I Am",who_role:"CEO & Founder · Professional Baseball Player",
+    who_bio:"Elite Sports Management was founded by Samuele Bruno, a professional baseball player who has competed for the Kitchener Panthers (Canadian Baseball League) and Italy's National Team. Samuele himself earned a college scholarship to play at Hastings College (NAIA), where he is set to graduate in 2027 — an experience that now shapes how ESM guides its own athletes through the college recruiting and scholarship process.",
     who_bio2:"Beyond representation, Samuele runs camps, showcases and a coaching program built on one idea: train like an athlete, play like a pro.",
-    cred_italy:"Italy National Team",cred_util:"Pro Utility Player",
+    cred_italy:"Italy National Team",cred_util:"Professional Baseball Player",
     roster_kicker:"The Roster",roster_h2:"Our Athletes",
     roster_p:"A growing family of ballplayers from the Dominican Republic, Venezuela, Spain, Colombia, Italy and the United States.",
     filter_all:"All",filter_pitcher:"Pitchers",filter_catcher:"Catchers",filter_infielder:"Infielders",filter_twoway:"Two-Way",card_view:"View profile →",
@@ -381,6 +395,7 @@ const T = {
     f_success:"Thanks! Your application has been received — we'll review it and be in touch.",
     f_error:"Sorry, something went wrong sending your application. Please try again.",
     modal_highlights:"Career Highlights",modal_teams:"Teams & Affiliations",
+    modal_contact_h:"Interested in this player?",modal_contact_p:"Recruiters and coaches: pay the contact fee to unlock this athlete's direct contact info.",modal_contact_btn:"Pay to contact this player",
     band_h2:"Are you the next great addition?",band_p:"Start the conversation with Elite Sports Management.",band_btn:"Apply Now",
     foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",
     install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install",
@@ -392,15 +407,16 @@ const T = {
     stat1:"Atletas Representados",stat2:"Países",stat3:"Organizaciones MLB",
     about_kicker:"Qué Hacemos",about_h2:"Representación integral, centrada en el atleta.",
     about_p:"Nuestra misión es apoyar a los atletas para que alcancen todo su potencial — dentro y fuera del terreno.",
-    svc1_t:"Colocación en College",svc1_d:"Conectamos a los jugadores con programas universitarios en EE. UU. ideales para ellos.",
+    svc1_t:"Colocación en College",svc1_d:"Conectamos a los jugadores con programas universitarios en EE. UU. y les ayudamos a conseguir becas deportivas según su nivel, metas y presupuesto.",svc1_pay:"Inscribirse en Colocación en College →",
     svc2_t:"Indy Ball",svc2_d:"Abrimos puertas a las ligas profesionales independientes de Norteamérica.",
+    svc6_t:"Liga de Invierno",svc6_d:"Ubicamos atletas en ligas de invierno en el extranjero para sumar experiencia y visibilidad fuera de temporada.",
     svc3_t:"Europa",svc3_d:"Ubicamos atletas en clubes de Italia, España, Alemania y más.",
     svc4_t:"Redes Sociales y Marca",svc4_d:"Construimos el perfil y la historia de cada atleta para aumentar su visibilidad.",
     svc5_t:"Representación y Desarrollo",svc5_d:"Gestión diaria y un plan a la medida de cada atleta.",
-    who_kicker:"Quién Soy",who_role:"CEO y Fundador · Jugador Utility Profesional",
-    who_bio:"Elite Sports Management fue fundada por Samuele Bruno, un jugador utility profesional que ha competido con los Kitchener Panthers y la Selección de Italia. Creó ESM para dar a los atletas la representación y el desarrollo que el juego exige.",
+    who_kicker:"Quién Soy",who_role:"CEO y Fundador · Jugador de Béisbol Profesional",
+    who_bio:"Elite Sports Management fue fundada por Samuele Bruno, un jugador de béisbol profesional que ha competido con los Kitchener Panthers (Canadian Baseball League) y la Selección de Italia. El propio Samuele obtuvo una beca universitaria para jugar en Hastings College (NAIA), donde se graduará en 2027 — una experiencia que hoy guía la forma en que ESM acompaña a sus atletas en el proceso de reclutamiento y becas universitarias.",
     who_bio2:"Además de la representación, Samuele organiza camps, showcases y un programa de coaching con una sola idea: entrena como un atleta, juega como un profesional.",
-    cred_italy:"Selección de Italia",cred_util:"Jugador Utility Pro",
+    cred_italy:"Selección de Italia",cred_util:"Jugador de Béisbol Profesional",
     roster_kicker:"Los Jugadores",roster_h2:"Nuestros Atletas",
     roster_p:"Una familia creciente de peloteros de República Dominicana, Venezuela, España, Colombia, Italia y Estados Unidos.",
     filter_all:"Todos",filter_pitcher:"Lanzadores",filter_catcher:"Receptores",filter_infielder:"Infielders",filter_twoway:"Dos Vías",card_view:"Ver perfil →",
@@ -415,6 +431,7 @@ const T = {
     f_success:"¡Gracias! Hemos recibido tu solicitud — la revisaremos y te contactaremos.",
     f_error:"Lo sentimos, hubo un problema al enviar tu solicitud. Inténtalo de nuevo.",
     modal_highlights:"Destacados de Carrera",modal_teams:"Equipos y Afiliaciones",
+    modal_contact_h:"¿Interesado en este jugador?",modal_contact_p:"Reclutadores y entrenadores: paguen la tarifa de contacto para desbloquear la información directa de este atleta.",modal_contact_btn:"Pagar para contactar a este jugador",
     band_h2:"¿Eres la próxima gran incorporación?",band_p:"Inicia la conversación con Elite Sports Management.",band_btn:"Aplica Ahora",
     foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",
     install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar",
@@ -426,15 +443,16 @@ const T = {
     stat1:"Atleti Rappresentati",stat2:"Paesi",stat3:"Organizzazioni MLB",
     about_kicker:"Cosa Facciamo",about_h2:"Rappresentanza completa, costruita intorno all'atleta.",
     about_p:"La nostra missione è supportare gli atleti nel raggiungere il loro pieno potenziale — dentro e fuori dal campo.",
-    svc1_t:"Collocamento College",svc1_d:"Mettiamo in contatto i giocatori con i programmi universitari USA più adatti.",
+    svc1_t:"Collocamento College",svc1_d:"Mettiamo in contatto i giocatori con i programmi universitari USA e li aiutiamo a ottenere borse di studio sportive su misura per il loro livello, obiettivi e budget.",svc1_pay:"Iscriviti al Collocamento College →",
     svc2_t:"Indy Ball",svc2_d:"Apriamo le porte alle leghe professionistiche indipendenti del Nord America.",
+    svc6_t:"Winter League",svc6_d:"Inseriamo gli atleti in campionati invernali all'estero per accumulare esperienza e visibilità durante la bassa stagione.",
     svc3_t:"Europa",svc3_d:"Collochiamo atleti in club di Italia, Spagna, Germania e oltre.",
     svc4_t:"Social Media e Brand",svc4_d:"Costruiamo il profilo e la storia di ogni atleta per aumentarne la visibilità.",
     svc5_t:"Rappresentanza e Sviluppo",svc5_d:"Gestione quotidiana e un piano su misura per ogni atleta.",
-    who_kicker:"Chi Sono",who_role:"CEO e Fondatore · Giocatore Utility Professionista",
-    who_bio:"Elite Sports Management è stata fondata da Samuele Bruno, giocatore utility professionista che ha vestito le maglie dei Kitchener Panthers e della Nazionale Italiana. Ha creato ESM per dare agli atleti la rappresentanza e lo sviluppo che il gioco richiede.",
+    who_kicker:"Chi Sono",who_role:"CEO e Fondatore · Giocatore di Baseball Professionista",
+    who_bio:"Elite Sports Management è stata fondata da Samuele Bruno, giocatore di baseball professionista che ha vestito le maglie dei Kitchener Panthers (Canadian Baseball League) e della Nazionale Italiana. Lo stesso Samuele ha ottenuto una borsa di studio universitaria per giocare a Hastings College (NAIA), dove si laureerà nel 2027 — un'esperienza che oggi guida il modo in cui ESM accompagna i propri atleti nel processo di reclutamento e borse di studio universitarie.",
     who_bio2:"Oltre alla rappresentanza, Samuele organizza camp, showcase e un programma di coaching con un'unica idea: allenati come un atleta, gioca come un professionista.",
-    cred_italy:"Nazionale Italiana",cred_util:"Giocatore Utility Pro",
+    cred_italy:"Nazionale Italiana",cred_util:"Giocatore di Baseball Professionista",
     roster_kicker:"Il Roster",roster_h2:"I Nostri Atleti",
     roster_p:"Una famiglia in crescita di giocatori da Repubblica Dominicana, Venezuela, Spagna, Colombia, Italia e Stati Uniti.",
     filter_all:"Tutti",filter_pitcher:"Lanciatori",filter_catcher:"Ricevitori",filter_infielder:"Interni",filter_twoway:"Due Ruoli",card_view:"Vedi profilo →",
@@ -449,6 +467,7 @@ const T = {
     f_success:"Grazie! Abbiamo ricevuto la tua candidatura — la esamineremo e ti contatteremo.",
     f_error:"Spiacenti, qualcosa è andato storto nell'invio della candidatura. Riprova.",
     modal_highlights:"Carriera in Evidenza",modal_teams:"Squadre e Affiliazioni",
+    modal_contact_h:"Interessato a questo giocatore?",modal_contact_p:"Recruiter e allenatori: pagate la fee di contatto per sbloccare i contatti diretti di questo atleta.",modal_contact_btn:"Paga per contattare questo giocatore",
     band_h2:"Sei la prossima grande aggiunta?",band_p:"Inizia la conversazione con Elite Sports Management.",band_btn:"Candidati",
     foot_tagline:"Unisciti a festeggiare",foot_rights:"Tutti i diritti riservati.",
     install_t:"Installa l'app ESM",install_d:"Aggiungila alla schermata Home",install_btn:"Installa",
@@ -770,14 +789,19 @@ function renderFilters(){
 }
 function renderRoster(){
   const list=active==="All"?PLAYERS:PLAYERS.filter(p=>p.group===active);
-  document.getElementById("roster").innerHTML=list.map(p=>`
-    <button class="pcard" data-slug="${p.slug}">
+  document.getElementById("roster").innerHTML=list.map(p=>{
+    const hasPage=STATIC_PLAYER_PAGES.has(p.slug);
+    const tag=hasPage?"a":"button";
+    const linkAttr=hasPage?`href="players/${p.slug}.html"`:`data-slug="${p.slug}"`;
+    return `
+    <${tag} class="pcard" ${linkAttr}>
       <div class="top" style="${bgImg(p.image)}"><span class="flag">${p.flag||"🌎"}${p.heritage?(" "+p.heritage):""}</span>
         ${p.tier?`<span class="tier">${p.tier}</span>`:""}${p.image?"":`<span class="mono">${initials(p.name)}</span>`}</div>
       <div class="body"><h3 class="display">${p.name}</h3><div class="pos">${p.position}</div>
         ${p.teams&&p.teams[0]?`<div class="team">${p.teams[0]}</div>`:""}<div class="view">${t("card_view")}</div></div>
-    </button>`).join("");
-  document.querySelectorAll(".pcard").forEach(c=>c.onclick=()=>openModal(c.dataset.slug));
+    </${tag}>`;
+  }).join("");
+  document.querySelectorAll(".pcard[data-slug]").forEach(c=>c.onclick=()=>openModal(c.dataset.slug));
   document.getElementById("statAthletes").textContent=PLAYERS.length;
   document.getElementById("statCountries").textContent=new Set(PLAYERS.map(p=>p.country).filter(Boolean)).size;
 }
@@ -808,6 +832,11 @@ function openModal(slug){
     <div class="sh-body"><p class="bio">${p.bio||""}</p>
       ${p.stats&&p.stats.length?`<div class="sh-label">${t("modal_highlights")}</div><div class="sh-stats">${p.stats.map(s=>`<div class="sh-stat"><b>${s.value}</b><span>${s.label}</span></div>`).join("")}</div>`:""}
       ${p.teams&&p.teams.length?`<div class="sh-label">${t("modal_teams")}</div><div class="team-chips">${p.teams.map(x=>`<span class="team-chip">${x}</span>`).join("")}</div>`:""}
+      <div class="sh-contact">
+        <div class="sh-label">${t("modal_contact_h")}</div>
+        <p class="sh-contact-p">${t("modal_contact_p")}</p>
+        <a class="btn btn-gold" href="${CONTACT_PAYPAL_URL}" target="_blank" rel="noopener">${t("modal_contact_btn")}</a>
+      </div>
     </div>`;
   document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
 }
