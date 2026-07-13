@@ -1,4 +1,5 @@
 import json, re, os, html
+from urllib.parse import quote
 
 SITE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.join(SITE_DIR, "players")
@@ -13,7 +14,7 @@ SHARED_CSS = style_match.group(1)
 with open(os.path.join(SITE_DIR, "players.json"), encoding="utf-8") as f:
     players = json.load(f)
 
-CONTACT_PAYPAL_URL = "https://paypal.me/elitesportsmanagement"
+CONTACT_EMAIL = "elitesportsmanagement50@gmail.com"
 
 def esc(s):
     return html.escape(s or "", quote=True)
@@ -114,6 +115,15 @@ def render_page(p):
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>{name} — Elite Sports Management</title>
 <meta name="description" content="{esc(desc)}" />
+<meta name="robots" content="noindex,nofollow" />
+<script>
+/* Roster paywall. Player profiles are part of the paid roster, so bounce anyone
+   who hasn't unlocked it back to the gate. Runs in <head>, before first paint.
+   Keep the localStorage key in sync with UNLOCK_KEY in index.html. */
+(function(){{try{{
+  if(localStorage.getItem("esm_roster_unlock_v1")!=="1"){{location.replace("../index.html#roster");}}
+}}catch(e){{}}}})();
+</script>
 <link rel="manifest" href="../manifest.json" />
 <link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
 <link rel="icon" type="image/png" sizes="512x512" href="../icons/icon-512.png" />
@@ -169,8 +179,8 @@ def render_page(p):
 
   <div class="pp-contact">
     <h2>Interested in {name}?</h2>
-    <p>Recruiters and coaches: pay the contact fee to unlock this athlete's direct contact info.</p>
-    <a class="btn btn-gold" href="{CONTACT_PAYPAL_URL}" target="_blank" rel="noopener">Pay to contact this player</a>
+    <p>You have full roster access. Get in touch and we'll connect you with this athlete directly.</p>
+    <a class="btn btn-gold" href="mailto:{CONTACT_EMAIL}?subject=Enquiry:%20{quote(p["name"])}%20%E2%80%94%20ESM%20Roster">Contact ESM about this player</a>
   </div>
 </main>
 

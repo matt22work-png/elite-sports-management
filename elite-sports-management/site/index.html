@@ -201,6 +201,80 @@
     /* 16px form controls stop iOS from auto-zooming on focus */
     .field input,.field select,.field textarea{font-size:16px}
   }
+
+  /* ===== contracts band (layout ref: baseballjobsoverseas.com) ===== */
+  .contracts{position:relative;z-index:1;padding:66px 0 8px;text-align:center}
+  .contracts h2{font-size:clamp(27px,5.3vw,56px);letter-spacing:.055em;color:var(--ink)}
+  .contracts h2 em{font-style:normal;color:var(--gold)}
+  .contracts .sub{margin-top:15px;color:var(--muted);font-size:clamp(14px,1.9vw,17px)}
+  .contracts .sub b{color:var(--gold-soft);font-weight:700}
+  .contracts .rule{width:110px;height:2px;background:var(--gold);margin:26px auto 0;opacity:.75}
+  .feature-grid{display:grid;grid-template-columns:1fr;gap:22px;margin:38px auto 0;text-align:left;max-width:640px}
+  .stats-in{grid-template-columns:repeat(2,1fr) !important}
+
+  .tcard{display:flex;gap:18px;align-items:flex-start;border:1px solid var(--line);border-radius:18px;padding:24px;background:linear-gradient(180deg,var(--card),var(--navy-2))}
+  .tcard .shot{width:96px;min-width:96px;height:128px;border-radius:12px;background-size:cover;background-position:center 22%;border:1px solid var(--line)}
+  .tcard .qt{font-size:15.5px;line-height:1.65;color:#d6e1f2;font-style:italic}
+  .tcard .nm{margin-top:14px;font-family:'Anton';letter-spacing:.09em;font-size:15px;color:var(--gold-soft);text-transform:uppercase}
+  .tcard .rl{font-size:12.5px;color:var(--muted);margin-top:3px}
+  @media(max-width:480px){.tcard{flex-direction:column}.tcard .shot{width:100%;height:210px}}
+
+  /* ===== media / gallery ===== */
+  .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:12px}
+  .gal button{padding:0;cursor:pointer;border-radius:14px;overflow:hidden;border:1px solid var(--line);transition:.25s;background:var(--card);display:block;line-height:0}
+  .gal button:hover{transform:translateY(-3px);border-color:var(--gold)}
+  .gal img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+  .reel{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 14px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+  .reel::-webkit-scrollbar{height:6px}
+  .reel::-webkit-scrollbar-thumb{background:rgba(217,177,84,.35);border-radius:9px}
+  /* Uniform 16:9 cards. Two clips are portrait, so without a fixed ratio + object-fit
+     the strip renders with ragged, mismatched card heights. */
+  .reel video{flex:0 0 auto;width:250px;aspect-ratio:16/9;object-fit:cover;border-radius:14px;border:1px solid var(--line);background:#04101f;scroll-snap-align:start}
+  .sub-label{font-size:11.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-soft);margin:32px 0 14px}
+  .lightbox img{width:100%;border-radius:12px;display:block}
+
+  /* ===== roster paywall ===== */
+  .roster-wrap{position:relative}
+  .roster-wrap.is-locked .roster{filter:blur(9px) saturate(.55);pointer-events:none;user-select:none;max-height:600px;overflow:hidden}
+  .roster-wrap.is-locked::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,20,42,.3),rgba(6,20,42,.93));pointer-events:none;border-radius:18px}
+  .gate{display:none}
+  .roster-wrap.is-locked .gate{display:flex;position:absolute;inset:0;align-items:center;justify-content:center;z-index:3;padding:18px}
+  .gate-in{max-width:520px;width:100%;text-align:center;border:1px solid var(--gold);border-radius:20px;padding:32px 28px;background:linear-gradient(180deg,rgba(12,33,67,.97),rgba(6,20,42,.99));box-shadow:0 26px 60px rgba(0,0,0,.55)}
+  .gate-lock{font-size:25px;margin-bottom:10px}
+  .gate-in h3{font-family:'Anton';font-size:23px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px}
+  .gate-in p{color:var(--muted);font-size:14.5px;margin-bottom:20px}
+  .gate-price{font-family:'Anton';font-size:42px;color:var(--gold);line-height:1}
+  .gate-price small{display:block;font-family:'Hanken Grotesk';font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:8px;font-weight:700}
+  .gate-or{margin:20px 0 11px;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .gate-code{display:flex;gap:8px}
+  .gate-code input{flex:1;min-width:0;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--ink);font-size:15px;font-weight:600;letter-spacing:.05em}
+  .gate-code input:focus{outline:0;border-color:var(--gold)}
+  .gate-code button{background:transparent;border:1px solid var(--gold);color:var(--gold-soft);border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer;font-size:14px;white-space:nowrap}
+  .gate-code button:hover{background:var(--gold);color:#05101f}
+  .gate-err{margin-top:11px;font-size:13px;color:#ff9c9c;display:none}
+  .gate-err.show{display:block}
+  .unlocked-note{display:none;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--teal-soft);margin-bottom:16px;font-weight:700;letter-spacing:.03em}
+  .unlocked-note.show{display:flex}
+
+  /* ===== pay panel (join) ===== */
+  .paypanel{margin-top:22px;border:1px solid var(--gold);border-radius:18px;padding:28px 24px;background:linear-gradient(180deg,rgba(217,177,84,.10),rgba(6,20,42,.6));text-align:center;display:none}
+  .paypanel.show{display:block}
+  .paypanel h3{font-family:'Anton';text-transform:uppercase;letter-spacing:.05em;font-size:21px;margin-bottom:8px}
+  .paypanel p{color:var(--muted);font-size:14.5px;margin-bottom:16px}
+  .paypanel .amt{font-family:'Anton';font-size:38px;color:var(--gold);line-height:1;margin-bottom:14px}
+  .paypanel .fine{font-size:12.5px;color:var(--muted);margin:14px 0 0}
+
+  /* ===== college ===== */
+  .col-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:start}
+  @media(max-width:820px){.col-grid{grid-template-columns:1fr}}
+  .col-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .col-row{display:flex;gap:13px;padding:15px 18px;background:rgba(8,26,51,.3);font-size:14.7px;color:#d6e1f2;align-items:flex-start}
+  .col-row:nth-child(even){background:rgba(8,26,51,.55)}
+  .col-row i{font-style:normal;color:var(--gold);font-weight:800}
+  .col-cta{border:1px solid var(--gold);border-radius:18px;padding:28px 24px;text-align:center;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.5))}
+  .col-cta h3{font-family:'Anton';text-transform:uppercase;letter-spacing:.05em;font-size:20px;margin-bottom:8px}
+  .col-cta p{color:var(--muted);font-size:14px;margin-bottom:16px}
+  .col-price{font-family:'Anton';font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:16px}
 </style>
 </head>
 <body>
@@ -211,9 +285,11 @@
   <div class="nav-right">
     <nav class="nav-links">
       <a href="#about" data-i18n="nav_about"></a>
+      <a href="#college" data-i18n="nav_college"></a>
       <a href="#who" data-i18n="nav_who"></a>
       <a href="#roster" data-i18n="nav_roster"></a>
       <a href="#events" data-i18n="nav_events"></a>
+      <a href="#media" data-i18n="nav_media"></a>
       <a href="#join" data-i18n="nav_join"></a>
     </nav>
     <div class="lang" id="lang"><button data-l="en" class="on">EN</button><button data-l="es">ES</button><button data-l="it">IT</button></div>
@@ -232,21 +308,57 @@
   </div>
 </div></section>
 
+<section class="contracts"><div class="wrap">
+  <h2 class="display" data-i18n-html="contracts_h2"></h2>
+  <p class="sub" data-i18n-html="contracts_sub"></p>
+  <div class="rule"></div>
+
+  <div class="feature-grid">
+    <div class="tcard">
+      <div class="shot" style="background-image:url('media/photos/jose-cedeno-thumb.jpg')"></div>
+      <div>
+        <div class="qt" id="featQuote"></div>
+        <div class="nm">José Cedeño</div>
+        <div class="rl" data-i18n="feat_role"></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
 <div class="stats"><div class="wrap stats-in">
-  <div class="stat"><b id="statAthletes">17</b><span data-i18n="stat1"></span></div>
+  <div class="stat"><b id="statAthletes">19</b><span data-i18n="stat1"></span></div>
   <div class="stat"><b id="statCountries">6</b><span data-i18n="stat2"></span></div>
-  <div class="stat"><b>6</b><span data-i18n="stat3"></span></div>
 </div></div>
 
 <section class="sec" id="about"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="about_kicker"></div><h2 class="display" data-i18n="about_h2"></h2><p data-i18n="about_p"></p></div>
   <div class="do-grid">
-    <div class="do"><div class="ic">🎓</div><h3 data-i18n="svc1_t"></h3><p data-i18n="svc1_d"></p><a class="svc-pay" href="https://paypal.me/elitesportsmanagement" target="_blank" rel="noopener" data-i18n="svc1_pay"></a></div>
-    <div class="do"><div class="ic">⚾</div><h3 data-i18n="svc2_t"></h3><p data-i18n="svc2_d"></p></div>
-    <div class="do"><div class="ic">🏝️</div><h3 data-i18n="svc6_t"></h3><p data-i18n="svc6_d"></p></div>
+    <div class="do"><div class="ic">🎓</div><h3 data-i18n="svc1_t"></h3><p data-i18n="svc1_d"></p><a class="svc-pay" href="#college" data-i18n="svc1_pay"></a></div>
+    <div class="do"><div class="ic">⚾</div><h3 data-i18n="svc2_t"></h3><p data-i18n="svc2_d"></p><a class="svc-pay svc-signup" href="#join" data-svc="Indy Ball" data-i18n="svc2_pay"></a></div>
+    <div class="do"><div class="ic">🏝️</div><h3 data-i18n="svc6_t"></h3><p data-i18n="svc6_d"></p><a class="svc-pay svc-signup" href="#join" data-svc="Winter League" data-i18n="svc6_pay"></a></div>
     <div class="do"><div class="ic">🌍</div><h3 data-i18n="svc3_t"></h3><p data-i18n="svc3_d"></p></div>
     <div class="do"><div class="ic">📣</div><h3 data-i18n="svc4_t"></h3><p data-i18n="svc4_d"></p></div>
-    <div class="do"><div class="ic">📈</div><h3 data-i18n="svc5_t"></h3><p data-i18n="svc5_d"></p></div>
+    <div class="do"><div class="ic">📈</div><h3 data-i18n="svc5_t"></h3><p data-i18n="svc5_d"></p><a class="svc-pay svc-signup" href="#join" data-svc="Representation" data-i18n="svc5_pay"></a></div>
+  </div>
+</div></section>
+
+<section class="sec" id="college" style="padding-top:10px"><div class="wrap">
+  <div class="sec-head"><div class="kicker" data-i18n="col_kicker"></div><h2 class="display" data-i18n="col_h2"></h2><p data-i18n="col_p"></p></div>
+  <div class="col-grid">
+    <div class="col-list">
+      <div class="col-row"><i>01</i><span data-i18n="col_1"></span></div>
+      <div class="col-row"><i>02</i><span data-i18n="col_2"></span></div>
+      <div class="col-row"><i>03</i><span data-i18n="col_3"></span></div>
+      <div class="col-row"><i>04</i><span data-i18n="col_4"></span></div>
+      <div class="col-row"><i>05</i><span data-i18n="col_5"></span></div>
+      <div class="col-row"><i>06</i><span data-i18n="col_6"></span></div>
+    </div>
+    <div class="col-cta">
+      <h3 data-i18n="col_cta_h"></h3>
+      <p data-i18n="col_cta_p"></p>
+      <div class="col-price" data-i18n="col_price"></div>
+      <a class="btn btn-gold svc-signup" id="collegePayBtn" href="#join" data-svc="College Placement" data-i18n="col_cta_btn"></a>
+    </div>
   </div>
 </div></section>
 
@@ -260,10 +372,11 @@
       <p data-i18n="who_bio"></p>
       <p data-i18n="who_bio2"></p>
       <div class="creds">
-        <span class="cred">Kitchener Panthers (CBL)</span>
         <span class="cred" data-i18n="cred_italy"></span>
-        <span class="cred">Hastings College '27</span>
-        <span class="cred" data-i18n="cred_util"></span>
+        <span class="cred" data-i18n="cred_u18"></span>
+        <span class="cred" data-i18n="cred_cbl"></span>
+        <span class="cred" data-i18n="cred_pro"></span>
+        <span class="cred" data-i18n="cred_college"></span>
       </div>
     </div>
   </div>
@@ -271,14 +384,41 @@
 
 <section class="sec" id="roster" style="padding-top:10px"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="roster_kicker"></div><h2 class="display" data-i18n="roster_h2"></h2><p data-i18n="roster_p"></p></div>
+  <div class="unlocked-note" id="unlockedNote">✓ <span data-i18n="gate_unlocked"></span></div>
   <div class="filters" id="sportFilters"></div>
   <div class="filters" id="filters"></div>
-  <div class="roster" id="rosterList"></div>
+
+  <div class="roster-wrap is-locked" id="rosterWrap">
+    <div class="roster" id="rosterList"></div>
+    <div class="gate">
+      <div class="gate-in">
+        <div class="gate-lock">🔒</div>
+        <h3 data-i18n="gate_h"></h3>
+        <p data-i18n="gate_p"></p>
+        <div class="gate-price">$49.99<small data-i18n="gate_price_note"></small></div>
+        <a class="btn btn-gold" id="rosterPayBtn" href="#" target="_blank" rel="noopener" style="margin-top:18px" data-i18n="gate_btn"></a>
+        <div class="gate-or" data-i18n="gate_or"></div>
+        <form class="gate-code" id="gateForm">
+          <input id="gateInput" type="text" autocomplete="off" spellcheck="false" placeholder="ACCESS CODE" aria-label="Access code" />
+          <button type="submit" data-i18n="gate_unlock"></button>
+        </form>
+        <div class="gate-err" id="gateErr" data-i18n="gate_err"></div>
+      </div>
+    </div>
+  </div>
 </div></section>
 
 <section class="sec" id="events" style="padding-top:10px"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="events_kicker"></div><h2 class="display" data-i18n="events_h2"></h2><p data-i18n="events_p"></p></div>
   <div class="ev-grid" id="eventsList"></div>
+</div></section>
+
+<section class="sec" id="media" style="padding-top:10px"><div class="wrap">
+  <div class="sec-head"><div class="kicker" data-i18n="media_kicker"></div><h2 class="display" data-i18n="media_h2"></h2><p data-i18n="media_p"></p></div>
+  <div class="sub-label" data-i18n="media_video_label"></div>
+  <div class="reel" id="reel"></div>
+  <div class="sub-label" data-i18n="media_photo_label"></div>
+  <div class="gal" id="gallery"></div>
 </div></section>
 
 <section class="sec" id="testi" style="padding-top:10px"><div class="wrap">
@@ -311,8 +451,11 @@
             <option value="Two-Way" data-i18n="filter_twoway"></option>
           </select></div>
         <div class="field"><label data-i18n="f_applying"></label>
-          <select name="applying">
+          <select name="applying" id="applyingSelect">
             <option value="Representation" data-i18n="opt_rep"></option>
+            <option value="College Placement" data-i18n="opt_college"></option>
+            <option value="Indy Ball" data-i18n="opt_indy"></option>
+            <option value="Winter League" data-i18n="opt_winter"></option>
             <option value="Coaching" data-i18n="opt_coach"></option>
             <option value="Both" data-i18n="opt_both"></option>
           </select></div>
@@ -322,6 +465,14 @@
       <button class="btn btn-gold" type="submit" data-i18n="f_submit"></button>
       <div class="form-msg" id="formMsg"></div>
     </form>
+
+    <div class="paypanel" id="payPanel">
+      <h3 data-i18n="pay_h"></h3>
+      <p data-i18n="pay_p"></p>
+      <div class="amt">$125</div>
+      <a class="btn btn-gold" id="joinPayBtn" href="#" target="_blank" rel="noopener" data-i18n="pay_btn"></a>
+      <p class="fine" data-i18n="pay_fine"></p>
+    </div>
   </div>
 </div></section>
 
@@ -354,19 +505,68 @@
 const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
 
-/* Contact-gate: recruiters/coaches pay this link before ESM shares a player's
-   direct contact info. TODO: replace with Samuele's real PayPal.me link. */
-const CONTACT_PAYPAL_URL = "https://paypal.me/elitesportsmanagement";
+/* ===== CONFIG: Stripe Payment Links =====
+   Create these in the Stripe Dashboard (see STRIPE-SETUP.md) and paste the URLs
+   here. Until they're filled in, the pay buttons fall back to emailing ESM, so
+   nothing on the site is a dead end. */
+const STRIPE_ROSTER_URL   = "";   // $49.99 — lifetime roster access (scouts & teams)
+const STRIPE_REGISTER_URL = "";   // $125   — athlete registration
+const STRIPE_COLLEGE_URL  = "";   // college placement — price TBD
+const FALLBACK_EMAIL      = "mailto:elitesportsmanagement50@gmail.com";
 
-/* ===== sample EVENTS & TESTIMONIALS — replace with real ones ===== */
-const EVENTS = [
-  { title:"Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", icon:"🏝️", blurb:"Adult division winter league on the coast of Tenerife, Spain — Dec 8–15, 2026. Includes tournament entry, hotel with meals, transport to the seaside field, official jersey and cap, laundry service, and a showcase in front of MLB and college scouts. Registration is open; the first 20 players to sign up get a bonus surprise.", tags:"⚾ Adult Division  ·  🔭 MLB & College Scouts  ·  🎁 First 20 get a bonus", email:"elitesportsmanagement50@gmail.com" },
-  { title:"All-Stars Tournament", date:"2026-01-10", loc:"Italy", status:"upcoming", icon:"🏆", blurb:"International tournament featuring ESM-represented athletes." }
+/* Contact: a scout who bought roster access already paid, so the profile just
+   puts them in touch. If you ever want a separate per-player contact fee, put a
+   Stripe link in STRIPE_CONTACT_URL and the button starts charging again. */
+const STRIPE_CONTACT_URL = "";
+
+/* ===== Roster access code =====
+   The roster is gated client-side. We store the SHA-256 of each valid code, so
+   the code itself isn't sitting in plain sight in the page source.
+   Current code: ESM-SCOUT-2026   (to change it, see STRIPE-SETUP.md)
+   Honest limits: this stops casual sharing, not a determined person. The player
+   HTML still ships to the browser. Move to real logins when revenue justifies it. */
+const ROSTER_CODE_HASHES = ["99b2bfb3a4ac35e32491d22207e082500404dbbd30f0cd8a5152cd6185c3cc58"];
+const UNLOCK_KEY = "esm_roster_unlock_v1";
+
+/* ===== Media (Tenerife Winter League) ===== */
+const GALLERY = [
+  {f:"twl-field-aerial",  c:"The seaside field — Tenerife"},
+  {f:"twl-champions",     c:"Champions — Tenerife Winter League"},
+  {f:"twl-allstars-team", c:"All-Stars — Tenerife"},
+  {f:"twl-trophy-pair",   c:"Trophy night"},
+  {f:"twl-medal",         c:"Medal ceremony"},
+  {f:"twl-huddle-2",      c:"Pregame huddle"},
+  {f:"twl-mound-visit",   c:"Mound visit"},
+  {f:"twl-on-deck",       c:"On deck"},
+  {f:"twl-teammates",     c:"Teammates"},
+  {f:"twl-infield",       c:"Infield talk"},
+  {f:"twl-batter-13",     c:"At the plate"},
+  {f:"twl-huddle-1",      c:"Team meeting"}
 ];
+const CLIPS = [1,2,3,4,5,6,7,8,9];
+
+/* Player photos committed to the repo. A Supabase `image_url` always wins. */
+const LOCAL_PHOTOS = { "jose-cedeno":"media/photos/jose-cedeno.jpg" };
+
+/* ===== EVENTS ===== */
+const EVENTS = [
+  { title:"Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", icon:"🏝️", image:"media/photos/twl-field-aerial-thumb.jpg", blurb:"Adult division winter league on the coast of Tenerife, Spain — Dec 8–15, 2026. Includes tournament entry, hotel with meals, transport to the seaside field, official jersey and cap, laundry service, and a showcase in front of MLB and college scouts. Registration is open; the first 20 players to sign up get a bonus surprise.", tags:"⚾ Adult Division  ·  🔭 MLB & College Scouts  ·  🎁 First 20 get a bonus", email:"elitesportsmanagement50@gmail.com" }
+];
+
+/* ===== TESTIMONIALS =====
+   José's words are quoted in his own Spanish under q.es; q.en / q.it are
+   translations so the card reads naturally in every language. */
 const TESTIMONIALS = [
-  { q:"Elite Sports Management opened doors I didn't know existed. They believed in me from day one.", n:"ESM Athlete", r:"Pitcher" },
-  { q:"Professional, honest and always available. They treat the family like part of the team.", n:"Parent", r:"ESM Family" },
-  { q:"From the showcase to signing, every step was handled with care.", n:"ESM Athlete", r:"Infielder" }
+  {
+    q:{
+      es:"Agradezco mucho a la agencia Elite Sports Management y a Samuele Bruno por ayudarme a conseguir oportunidades y por hacerme creer en mi talento. 100% recomendado — excelente agencia y excelente persona, todo un profesional en lo que haces. Dios te bendiga grandemente, hermano. Bendiciones.",
+      en:"I'm deeply grateful to Elite Sports Management and to Samuele Bruno for helping me find opportunities and for making me believe in my talent. 100% recommended — an excellent agency and an excellent person, a true professional in what you do. God bless you greatly, brother. Blessings.",
+      it:"Ringrazio moltissimo l'agenzia Elite Sports Management e Samuele Bruno per avermi aiutato a trovare opportunità e per avermi fatto credere nel mio talento. 100% raccomandato — ottima agenzia e ottima persona, un vero professionista in quello che fai. Dio ti benedica, fratello. Benedizioni."
+    },
+    n:"José Cedeño",
+    r:{ en:"Former Cleveland Indians organization", es:"Ex organización de los Cleveland Indians", it:"Ex organizzazione Cleveland Indians" },
+    photo:"media/photos/jose-cedeno-thumb.jpg"
+  }
 ];
 
 /* Players with a real static profile page at players/<slug>.html (built via
@@ -375,23 +575,51 @@ const TESTIMONIALS = [
 const STATIC_PLAYER_PAGES = new Set(["brayan-hernandez", "gianni-westphal", "jose-cedeno", "danyer-sanabria", "francesco-mazzei", "anderson-pena", "jesus-delgado", "lorenzo-gonzalez", "jaider-morelos", "bret-bowers", "osiris-german", "adam-moser", "yerardo-ciofani", "javier-useche", "david-chavez", "matteo-colalucci", "anthony-quattrocchi"]);
 
 const T = {
-  en:{nav_about:"What We Do",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_join:"Join Us",nav_cta:"Apply Now",
+  en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_cta:"Apply Now",
+    contracts_h2:'50+ contracts signed <em>since 2025</em>',
+    contracts_sub:'Our athletes have signed contracts in <b>6 different countries</b> to date.',
+    feat_role:"Former Cleveland Indians organization",
+    col_kicker:"College Placement",col_h2:"Get recruited. Get a scholarship.",
+    col_p:"We guide baseball and softball athletes through the U.S. college recruiting process from first evaluation to signed offer — NCAA, NAIA and JUCO.",
+    col_1:"An honest evaluation of where your game realistically fits — Division I through JUCO.",
+    col_2:"A recruiting profile and highlight reel built around what college coaches actually watch for.",
+    col_3:"Direct outreach to coaches, with the follow-up handled for you.",
+    col_4:"Eligibility and academics — NCAA/NAIA registration, transcripts, test requirements.",
+    col_5:"Offer and scholarship guidance, so you can compare deals instead of guessing.",
+    col_6:"For international athletes: visa, transition and arrival support once you commit.",
+    col_cta_h:"Start your college recruiting",
+    col_cta_p:"Tell us about your game and we'll come back with an honest read on your options.",
+    col_price:"Pricing on request",col_cta_btn:"Get started →",
+    gate_h:"The roster is for scouts & teams",
+    gate_p:"Unlock every ESM athlete — full profiles, career history and playing experience.",
+    gate_price_note:"One-time · Lifetime access",
+    gate_btn:"Unlock the roster — $49.99",
+    gate_or:"Already paid?",gate_unlock:"Unlock",
+    gate_err:"That code isn't right. Check the email from your purchase, or contact us.",
+    gate_unlocked:"Roster unlocked — thanks for your support.",
+    pay_h:"One last step",
+    pay_p:"We've got your application. Complete your $125 registration and Samuele will review your profile.",
+    pay_btn:"Complete registration — $125",
+    pay_fine:"Your application is already saved. You can pay now or from the confirmation email.",
+    media_kicker:"Media",media_h2:"On the field",
+    media_p:"Clips and photos from the Tenerife Winter League and ESM events.",
+    media_video_label:"Video",media_photo_label:"Photos",
     hero_eyebrow:"Athlete Representation · Worldwide",hero_h1:'Representing the <em>next generation</em> of baseball and softball talent.',
     hero_lead:"Elite Sports Management guides baseball and softball athletes from the academy to the pro ranks — across college, indy ball and Europe.",
-    hero_btn1:"View the Roster",hero_btn2:"Join the Team",
+    hero_btn1:"View the Roster",hero_btn2:"Register Here",
     stat1:"Athletes Represented",stat2:"Countries",stat3:"MLB Organizations",
     about_kicker:"What We Do",about_h2:"Full-service representation, built around the athlete.",
     about_p:"Our mission is to support baseball and softball athletes as they work to reach their full potential — on the field, in their careers and beyond.",
-    svc1_t:"College Placement",svc1_d:"Connecting players with U.S. college programs and helping them earn athletic scholarships that fit their game, goals and budget.",svc1_pay:"Enroll in College Placement →",
-    svc2_t:"Indy Ball",svc2_d:"Opening doors to professional independent leagues across North America.",
-    svc6_t:"Winter League",svc6_d:"Placing athletes in winter league play abroad for extra reps and exposure during the offseason.",
+    svc1_t:"College Placement",svc1_d:"Connecting players with U.S. college programs and helping them earn athletic scholarships that fit their game, goals and budget.",svc1_pay:"Explore College Placement →",
+    svc2_t:"Indy Ball",svc2_d:"Opening doors to professional independent leagues across North America.",svc2_pay:"Sign up for Indy Ball →",
+    svc6_t:"Winter League",svc6_d:"Placing athletes in winter league play abroad for extra reps and exposure during the offseason.",svc6_pay:"Sign up for Winter League →",
     svc3_t:"Europe",svc3_d:"Placing athletes with clubs in Italy, Spain, Germany and beyond.",
     svc4_t:"Social Media & Branding",svc4_d:"Building each athlete's profile and story to grow their visibility.",
-    svc5_t:"Representation & Development",svc5_d:"Day-to-day management and a plan tailored to each athlete.",
+    svc5_t:"Representation & Development",svc5_d:"Day-to-day management and a plan tailored to each athlete.",svc5_pay:"Sign up for Representation →",
     who_kicker:"Who I Am",who_role:"CEO & Founder · Professional Baseball Player",
-    who_bio:"Elite Sports Management was founded by Samuele Bruno, a professional baseball player who has competed for the Kitchener Panthers (Canadian Baseball League) and Italy's National Team. Samuele himself earned a college scholarship to play at Hastings College (NAIA), where he is set to graduate in 2027 — an experience that now shapes how ESM guides its own athletes through the college recruiting and scholarship process.",
-    who_bio2:"Beyond representation, Samuele runs camps, showcases and a coaching program built on one idea: train like an athlete, play like a pro.",
-    cred_italy:"Italy National Team",cred_util:"Professional Baseball Player",
+    who_bio:"Elite Sports Management was founded by Samuele Bruno — born and raised in Italy, and the first player born and raised in Italy to go on and play in the Canadian Baseball League. He came up through the Italian system, took silver with Italy at the U18 European Championship, and went on to wear the shirt of the Italian National Team. He played six seasons professionally in Italy, and earned a scholarship to play three years of college baseball in the United States.",
+    who_bio2:"His own career ran through indy ball and winter leagues across North and South America, Australia, Dubai and Asia — the same routes he now opens for ESM athletes. Beyond representation, Samuele runs camps, showcases and a coaching program built on one idea: train like an athlete, play like a pro.",
+    cred_italy:"Italy National Team",cred_u18:"U18 European Championship · Silver",cred_cbl:"First Italian-raised player in the CBL",cred_pro:"6 Seasons Pro in Italy",cred_college:"U.S. College Scholarship",cred_util:"Professional Baseball Player",
     roster_kicker:"The Roster",roster_h2:"Our Athletes",
     roster_p:"A growing family of ballplayers from the Dominican Republic, Venezuela, Spain, Colombia, Italy and the United States.",
     filter_all:"All",filter_pitcher:"Pitchers",filter_catcher:"Catchers",filter_infielder:"Infielders",filter_twoway:"Two-Way",card_view:"View profile →",
@@ -401,33 +629,61 @@ const T = {
     join_kicker:"Join Us",join_h2:"Apply to Elite Sports Management",join_p:"Players, families and clubs — tell us about yourself and we'll create your athlete profile.",
     join_tagline:"Train like an athlete. Play like a pro.",
     f_name:"Full name *",f_age:"Age",f_phone:"Phone number",f_email:"Email",f_ig:"Instagram profile",f_country:"Country",
-    f_sport:"Sport",opt_baseball:"Baseball",opt_softball:"Softball",f_position:"Position",f_applying:"I'm applying for",opt_rep:"Representation",opt_coach:"Coaching",opt_both:"Both",
+    f_sport:"Sport",opt_baseball:"Baseball",opt_softball:"Softball",f_position:"Position",f_applying:"I'm applying for",opt_rep:"Representation",opt_college:"College Placement",opt_indy:"Indy Ball",opt_winter:"Winter League",opt_coach:"Coaching",opt_both:"Both",
     f_why:"Why do you want to start? / Your goals",f_other:"Anything else?",f_submit:"Submit application",
     f_success:"Thanks! Your application has been received — we'll review it and be in touch.",
     f_error:"Sorry, something went wrong sending your application. Please try again.",
     modal_highlights:"Career Highlights",modal_teams:"Teams & Affiliations",
-    modal_contact_h:"Interested in this player?",modal_contact_p:"Recruiters and coaches: pay the contact fee to unlock this athlete's direct contact info.",modal_contact_btn:"Pay to contact this player",
+    modal_contact_h:"Interested in this player?",modal_contact_p:"You have full roster access. Get in touch and we'll connect you with this athlete directly.",modal_contact_btn:"Contact ESM about this player",
     band_h2:"Are you the next great addition?",band_p:"Start the conversation with Elite Sports Management.",band_btn:"Apply Now",
     foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",
     install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install",
     admin_link:"Admin",login_h:"Admin Login",login_sub:"Manage athletes, stats & photos",login_email:"Email",login_pass:"Password",login_btn:"Log in"},
-  es:{nav_about:"Qué Hacemos",nav_who:"Quién Soy",nav_roster:"Jugadores",nav_events:"Eventos",nav_join:"Únete",nav_cta:"Aplica Ahora",
+  es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_cta:"Aplica Ahora",
+    contracts_h2:'Más de 50 contratos firmados <em>desde 2025</em>',
+    contracts_sub:'Nuestros atletas han firmado contratos en <b>6 países diferentes</b> hasta la fecha.',
+    feat_role:"Ex organización de los Cleveland Indians",
+    col_kicker:"Colocación en College",col_h2:"Que te recluten. Consigue tu beca.",
+    col_p:"Acompañamos a atletas de béisbol y sóftbol en todo el proceso de reclutamiento universitario en EE. UU. — desde la primera evaluación hasta la oferta firmada. NCAA, NAIA y JUCO.",
+    col_1:"Una evaluación honesta de dónde encaja tu nivel de verdad — de División I a JUCO.",
+    col_2:"Un perfil de reclutamiento y un video de highlights hechos para lo que los coaches realmente miran.",
+    col_3:"Contacto directo con los entrenadores, y el seguimiento lo hacemos nosotros.",
+    col_4:"Elegibilidad y parte académica — registro NCAA/NAIA, expedientes, exámenes requeridos.",
+    col_5:"Asesoría sobre ofertas y becas, para que compares y no adivines.",
+    col_6:"Para atletas internacionales: visa, transición y apoyo a la llegada.",
+    col_cta_h:"Empieza tu reclutamiento",
+    col_cta_p:"Cuéntanos sobre tu juego y te damos una lectura honesta de tus opciones.",
+    col_price:"Precio a consultar",col_cta_btn:"Empezar →",
+    gate_h:"El roster es para scouts y equipos",
+    gate_p:"Desbloquea a todos los atletas de ESM — perfiles completos, trayectoria y experiencia.",
+    gate_price_note:"Pago único · Acceso de por vida",
+    gate_btn:"Desbloquear el roster — $49.99",
+    gate_or:"¿Ya pagaste?",gate_unlock:"Desbloquear",
+    gate_err:"Ese código no es correcto. Revisa el correo de tu compra o contáctanos.",
+    gate_unlocked:"Roster desbloqueado — gracias por tu apoyo.",
+    pay_h:"Un último paso",
+    pay_p:"Ya tenemos tu solicitud. Completa tu registro de $125 y Samuele revisará tu perfil.",
+    pay_btn:"Completar registro — $125",
+    pay_fine:"Tu solicitud ya está guardada. Puedes pagar ahora o desde el correo de confirmación.",
+    media_kicker:"Media",media_h2:"En el terreno",
+    media_p:"Videos y fotos de la Liga de Invierno de Tenerife y los eventos de ESM.",
+    media_video_label:"Video",media_photo_label:"Fotos",
     hero_eyebrow:"Representación de Atletas · En Todo el Mundo",hero_h1:'Representando a la <em>nueva generación</em> del talento del béisbol y sóftbol.',
     hero_lead:"Elite Sports Management guía a los atletas de béisbol y sóftbol desde la academia hasta el profesionalismo — en el college, el indy ball y Europa.",
-    hero_btn1:"Ver los Jugadores",hero_btn2:"Únete al Equipo",
+    hero_btn1:"Ver los Jugadores",hero_btn2:"Regístrate Aquí",
     stat1:"Atletas Representados",stat2:"Países",stat3:"Organizaciones MLB",
     about_kicker:"Qué Hacemos",about_h2:"Representación integral, centrada en el atleta.",
     about_p:"Nuestra misión es apoyar a los atletas de béisbol y sóftbol para que alcancen todo su potencial — dentro y fuera del terreno.",
-    svc1_t:"Colocación en College",svc1_d:"Conectamos a los jugadores con programas universitarios en EE. UU. y les ayudamos a conseguir becas deportivas según su nivel, metas y presupuesto.",svc1_pay:"Inscribirse en Colocación en College →",
-    svc2_t:"Indy Ball",svc2_d:"Abrimos puertas a las ligas profesionales independientes de Norteamérica.",
-    svc6_t:"Liga de Invierno",svc6_d:"Ubicamos atletas en ligas de invierno en el extranjero para sumar experiencia y visibilidad fuera de temporada.",
+    svc1_t:"Colocación en College",svc1_d:"Conectamos a los jugadores con programas universitarios en EE. UU. y les ayudamos a conseguir becas deportivas según su nivel, metas y presupuesto.",svc1_pay:"Ver Colocación en College →",
+    svc2_t:"Indy Ball",svc2_d:"Abrimos puertas a las ligas profesionales independientes de Norteamérica.",svc2_pay:"Inscríbete en Indy Ball →",
+    svc6_t:"Liga de Invierno",svc6_d:"Ubicamos atletas en ligas de invierno en el extranjero para sumar experiencia y visibilidad fuera de temporada.",svc6_pay:"Inscríbete en la Liga de Invierno →",
     svc3_t:"Europa",svc3_d:"Ubicamos atletas en clubes de Italia, España, Alemania y más.",
     svc4_t:"Redes Sociales y Marca",svc4_d:"Construimos el perfil y la historia de cada atleta para aumentar su visibilidad.",
-    svc5_t:"Representación y Desarrollo",svc5_d:"Gestión diaria y un plan a la medida de cada atleta.",
+    svc5_t:"Representación y Desarrollo",svc5_d:"Gestión diaria y un plan a la medida de cada atleta.",svc5_pay:"Inscríbete en Representación →",
     who_kicker:"Quién Soy",who_role:"CEO y Fundador · Jugador de Béisbol Profesional",
-    who_bio:"Elite Sports Management fue fundada por Samuele Bruno, un jugador de béisbol profesional que ha competido con los Kitchener Panthers (Canadian Baseball League) y la Selección de Italia. El propio Samuele obtuvo una beca universitaria para jugar en Hastings College (NAIA), donde se graduará en 2027 — una experiencia que hoy guía la forma en que ESM acompaña a sus atletas en el proceso de reclutamiento y becas universitarias.",
-    who_bio2:"Además de la representación, Samuele organiza camps, showcases y un programa de coaching con una sola idea: entrena como un atleta, juega como un profesional.",
-    cred_italy:"Selección de Italia",cred_util:"Jugador de Béisbol Profesional",
+    who_bio:"Elite Sports Management fue fundada por Samuele Bruno — nacido y criado en Italia, y el primer jugador nacido y criado en Italia en llegar a jugar en la Canadian Baseball League. Se formó en el sistema italiano, fue subcampeón con Italia en el Campeonato Europeo Sub-18 y llegó a vestir la camiseta de la Selección Italiana. Jugó seis temporadas como profesional en Italia y obtuvo una beca para jugar tres años de béisbol universitario en Estados Unidos.",
+    who_bio2:"Su propia carrera pasó por el indy ball y las ligas de invierno de Norteamérica y Sudamérica, Australia, Dubái y Asia — las mismas rutas que hoy abre para los atletas de ESM. Además de la representación, Samuele organiza camps, showcases y un programa de coaching con una sola idea: entrena como un atleta, juega como un profesional.",
+    cred_italy:"Selección de Italia",cred_u18:"Campeonato Europeo Sub-18 · Plata",cred_cbl:"Primer italiano de formación en la CBL",cred_pro:"6 Temporadas Pro en Italia",cred_college:"Beca Universitaria en EE. UU.",cred_util:"Jugador de Béisbol Profesional",
     roster_kicker:"Los Jugadores",roster_h2:"Nuestros Atletas",
     roster_p:"Una familia creciente de peloteros de República Dominicana, Venezuela, España, Colombia, Italia y Estados Unidos.",
     filter_all:"Todos",filter_pitcher:"Lanzadores",filter_catcher:"Receptores",filter_infielder:"Infielders",filter_twoway:"Dos Vías",card_view:"Ver perfil →",
@@ -437,33 +693,61 @@ const T = {
     join_kicker:"Únete",join_h2:"Aplica a Elite Sports Management",join_p:"Jugadores, familias y clubes — cuéntanos sobre ti y crearemos tu perfil de atleta.",
     join_tagline:"Entrena como un atleta. Juega como un profesional.",
     f_name:"Nombre y apellido *",f_age:"Edad",f_phone:"Número de teléfono",f_email:"Correo electrónico",f_ig:"Perfil de Instagram",f_country:"País",
-    f_sport:"Deporte",opt_baseball:"Béisbol",opt_softball:"Sóftbol",f_position:"Posición",f_applying:"Aplico para",opt_rep:"Representación",opt_coach:"Coaching",opt_both:"Ambos",
+    f_sport:"Deporte",opt_baseball:"Béisbol",opt_softball:"Sóftbol",f_position:"Posición",f_applying:"Aplico para",opt_rep:"Representación",opt_college:"Colocación en College",opt_indy:"Indy Ball",opt_winter:"Liga de Invierno",opt_coach:"Coaching",opt_both:"Ambos",
     f_why:"¿Por qué quieres empezar? / Tus objetivos",f_other:"¿Algo más?",f_submit:"Enviar solicitud",
     f_success:"¡Gracias! Hemos recibido tu solicitud — la revisaremos y te contactaremos.",
     f_error:"Lo sentimos, hubo un problema al enviar tu solicitud. Inténtalo de nuevo.",
     modal_highlights:"Destacados de Carrera",modal_teams:"Equipos y Afiliaciones",
-    modal_contact_h:"¿Interesado en este jugador?",modal_contact_p:"Reclutadores y entrenadores: paguen la tarifa de contacto para desbloquear la información directa de este atleta.",modal_contact_btn:"Pagar para contactar a este jugador",
+    modal_contact_h:"¿Interesado en este jugador?",modal_contact_p:"Tienes acceso completo al roster. Escríbenos y te conectamos directamente con este atleta.",modal_contact_btn:"Contactar a ESM sobre este jugador",
     band_h2:"¿Eres la próxima gran incorporación?",band_p:"Inicia la conversación con Elite Sports Management.",band_btn:"Aplica Ahora",
     foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",
     install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar",
     admin_link:"Admin",login_h:"Acceso Admin",login_sub:"Gestiona atletas, estadísticas y fotos",login_email:"Correo",login_pass:"Contraseña",login_btn:"Entrar"},
-  it:{nav_about:"Cosa Facciamo",nav_who:"Chi Sono",nav_roster:"Roster",nav_events:"Eventi",nav_join:"Unisciti",nav_cta:"Candidati",
+  it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_cta:"Candidati",
+    contracts_h2:'Oltre 50 contratti firmati <em>dal 2025</em>',
+    contracts_sub:'I nostri atleti hanno firmato contratti in <b>6 paesi diversi</b> a oggi.',
+    feat_role:"Ex organizzazione Cleveland Indians",
+    col_kicker:"Collocamento College",col_h2:"Fatti reclutare. Ottieni la borsa di studio.",
+    col_p:"Accompagniamo gli atleti di baseball e softball in tutto il percorso di recruiting universitario negli USA — dalla prima valutazione all'offerta firmata. NCAA, NAIA e JUCO.",
+    col_1:"Una valutazione onesta di dove il tuo livello si colloca davvero — dalla Division I alla JUCO.",
+    col_2:"Un profilo di recruiting e un highlight video costruiti su ciò che i coach guardano davvero.",
+    col_3:"Contatto diretto con i coach, con il follow-up gestito da noi.",
+    col_4:"Eleggibilità e parte accademica — registrazione NCAA/NAIA, pagelle, test richiesti.",
+    col_5:"Consulenza su offerte e borse di studio, così confronti invece di tirare a indovinare.",
+    col_6:"Per gli atleti internazionali: visto, transizione e supporto all'arrivo.",
+    col_cta_h:"Inizia il tuo recruiting",
+    col_cta_p:"Raccontaci il tuo gioco e ti diamo una lettura onesta delle tue opzioni.",
+    col_price:"Prezzo su richiesta",col_cta_btn:"Inizia →",
+    gate_h:"Il roster è per scout e club",
+    gate_p:"Sblocca tutti gli atleti ESM — profili completi, carriera ed esperienza.",
+    gate_price_note:"Pagamento unico · Accesso a vita",
+    gate_btn:"Sblocca il roster — $49.99",
+    gate_or:"Hai già pagato?",gate_unlock:"Sblocca",
+    gate_err:"Il codice non è corretto. Controlla l'email dell'acquisto o contattaci.",
+    gate_unlocked:"Roster sbloccato — grazie del supporto.",
+    pay_h:"Un ultimo passo",
+    pay_p:"Abbiamo ricevuto la tua candidatura. Completa la registrazione da $125 e Samuele esaminerà il tuo profilo.",
+    pay_btn:"Completa la registrazione — $125",
+    pay_fine:"La tua candidatura è già salvata. Puoi pagare ora o dall'email di conferma.",
+    media_kicker:"Media",media_h2:"Sul campo",
+    media_p:"Video e foto dalla Winter League di Tenerife e dagli eventi ESM.",
+    media_video_label:"Video",media_photo_label:"Foto",
     hero_eyebrow:"Rappresentanza Atleti · In Tutto il Mondo",hero_h1:'Rappresentiamo la <em>nuova generazione</em> del talento del baseball e softball.',
     hero_lead:"Elite Sports Management accompagna gli atleti di baseball e softball dall'academy al professionismo — tra college, indy ball ed Europa.",
-    hero_btn1:"Vedi il Roster",hero_btn2:"Unisciti al Team",
+    hero_btn1:"Vedi il Roster",hero_btn2:"Registrati Qui",
     stat1:"Atleti Rappresentati",stat2:"Paesi",stat3:"Organizzazioni MLB",
     about_kicker:"Cosa Facciamo",about_h2:"Rappresentanza completa, costruita intorno all'atleta.",
     about_p:"La nostra missione è supportare gli atleti di baseball e softball nel raggiungere il loro pieno potenziale — dentro e fuori dal campo.",
-    svc1_t:"Collocamento College",svc1_d:"Mettiamo in contatto i giocatori con i programmi universitari USA e li aiutiamo a ottenere borse di studio sportive su misura per il loro livello, obiettivi e budget.",svc1_pay:"Iscriviti al Collocamento College →",
-    svc2_t:"Indy Ball",svc2_d:"Apriamo le porte alle leghe professionistiche indipendenti del Nord America.",
-    svc6_t:"Winter League",svc6_d:"Inseriamo gli atleti in campionati invernali all'estero per accumulare esperienza e visibilità durante la bassa stagione.",
+    svc1_t:"Collocamento College",svc1_d:"Mettiamo in contatto i giocatori con i programmi universitari USA e li aiutiamo a ottenere borse di studio sportive su misura per il loro livello, obiettivi e budget.",svc1_pay:"Scopri il Collocamento College →",
+    svc2_t:"Indy Ball",svc2_d:"Apriamo le porte alle leghe professionistiche indipendenti del Nord America.",svc2_pay:"Iscriviti all'Indy Ball →",
+    svc6_t:"Winter League",svc6_d:"Inseriamo gli atleti in campionati invernali all'estero per accumulare esperienza e visibilità durante la bassa stagione.",svc6_pay:"Iscriviti alla Winter League →",
     svc3_t:"Europa",svc3_d:"Collochiamo atleti in club di Italia, Spagna, Germania e oltre.",
     svc4_t:"Social Media e Brand",svc4_d:"Costruiamo il profilo e la storia di ogni atleta per aumentarne la visibilità.",
-    svc5_t:"Rappresentanza e Sviluppo",svc5_d:"Gestione quotidiana e un piano su misura per ogni atleta.",
+    svc5_t:"Rappresentanza e Sviluppo",svc5_d:"Gestione quotidiana e un piano su misura per ogni atleta.",svc5_pay:"Iscriviti alla Rappresentanza →",
     who_kicker:"Chi Sono",who_role:"CEO e Fondatore · Giocatore di Baseball Professionista",
-    who_bio:"Elite Sports Management è stata fondata da Samuele Bruno, giocatore di baseball professionista che ha vestito le maglie dei Kitchener Panthers (Canadian Baseball League) e della Nazionale Italiana. Lo stesso Samuele ha ottenuto una borsa di studio universitaria per giocare a Hastings College (NAIA), dove si laureerà nel 2027 — un'esperienza che oggi guida il modo in cui ESM accompagna i propri atleti nel processo di reclutamento e borse di studio universitarie.",
-    who_bio2:"Oltre alla rappresentanza, Samuele organizza camp, showcase e un programma di coaching con un'unica idea: allenati come un atleta, gioca come un professionista.",
-    cred_italy:"Nazionale Italiana",cred_util:"Giocatore di Baseball Professionista",
+    who_bio:"Elite Sports Management è stata fondata da Samuele Bruno — nato e cresciuto in Italia, e il primo giocatore nato e cresciuto in Italia ad arrivare a giocare nella Canadian Baseball League. Cresciuto nel sistema italiano, ha conquistato l'argento con l'Italia al Campionato Europeo U18 ed è arrivato a vestire la maglia della Nazionale Italiana. Ha giocato sei stagioni da professionista in Italia e ha ottenuto una borsa di studio per giocare tre anni di baseball universitario negli Stati Uniti.",
+    who_bio2:"La sua carriera è passata per l'indy ball e le winter league tra Nord e Sud America, Australia, Dubai e Asia — le stesse strade che oggi apre agli atleti ESM. Oltre alla rappresentanza, Samuele organizza camp, showcase e un programma di coaching con un'unica idea: allenati come un atleta, gioca come un professionista.",
+    cred_italy:"Nazionale Italiana",cred_u18:"Campionato Europeo U18 · Argento",cred_cbl:"Primo italiano di formazione nella CBL",cred_pro:"6 Stagioni Pro in Italia",cred_college:"Borsa di Studio negli USA",cred_util:"Giocatore di Baseball Professionista",
     roster_kicker:"Il Roster",roster_h2:"I Nostri Atleti",
     roster_p:"Una famiglia in crescita di giocatori da Repubblica Dominicana, Venezuela, Spagna, Colombia, Italia e Stati Uniti.",
     filter_all:"Tutti",filter_pitcher:"Lanciatori",filter_catcher:"Ricevitori",filter_infielder:"Interni",filter_twoway:"Due Ruoli",card_view:"Vedi profilo →",
@@ -473,12 +757,12 @@ const T = {
     join_kicker:"Unisciti",join_h2:"Candidati a Elite Sports Management",join_p:"Giocatori, famiglie e club — raccontaci di te e creeremo il tuo profilo da atleta.",
     join_tagline:"Allenati come un atleta. Gioca come un professionista.",
     f_name:"Nome e cognome *",f_age:"Età",f_phone:"Numero di telefono",f_email:"Email",f_ig:"Profilo Instagram",f_country:"Paese",
-    f_sport:"Sport",opt_baseball:"Baseball",opt_softball:"Softball",f_position:"Ruolo",f_applying:"Mi candido per",opt_rep:"Rappresentanza",opt_coach:"Coaching",opt_both:"Entrambi",
+    f_sport:"Sport",opt_baseball:"Baseball",opt_softball:"Softball",f_position:"Ruolo",f_applying:"Mi candido per",opt_rep:"Rappresentanza",opt_college:"Collocamento College",opt_indy:"Indy Ball",opt_winter:"Winter League",opt_coach:"Coaching",opt_both:"Entrambi",
     f_why:"Perché vuoi iniziare? / I tuoi obiettivi",f_other:"Altro?",f_submit:"Invia candidatura",
     f_success:"Grazie! Abbiamo ricevuto la tua candidatura — la esamineremo e ti contatteremo.",
     f_error:"Spiacenti, qualcosa è andato storto nell'invio della candidatura. Riprova.",
     modal_highlights:"Carriera in Evidenza",modal_teams:"Squadre e Affiliazioni",
-    modal_contact_h:"Interessato a questo giocatore?",modal_contact_p:"Recruiter e allenatori: pagate la fee di contatto per sbloccare i contatti diretti di questo atleta.",modal_contact_btn:"Paga per contattare questo giocatore",
+    modal_contact_h:"Interessato a questo giocatore?",modal_contact_p:"Hai accesso completo al roster. Scrivici e ti mettiamo in contatto direttamente con questo atleta.",modal_contact_btn:"Contatta ESM per questo atleta",
     band_h2:"Sei la prossima grande aggiunta?",band_p:"Inizia la conversazione con Elite Sports Management.",band_btn:"Candidati",
     foot_tagline:"Unisciti a festeggiare",foot_rights:"Tutti i diritti riservati.",
     install_t:"Installa l'app ESM",install_d:"Aggiungila alla schermata Home",install_btn:"Installa",
@@ -837,8 +1121,8 @@ function renderRoster(){
     </${tag}>`;
   }).join("");
   document.querySelectorAll(".pcard[data-slug]").forEach(c=>c.onclick=()=>openModal(c.dataset.slug));
-  document.getElementById("statAthletes").textContent=PLAYERS.length;
-  document.getElementById("statCountries").textContent=new Set(PLAYERS.map(p=>p.country).filter(Boolean)).size;
+  // Headline stats are set by ESM, not derived from the roster: the public roster
+  // only lists approved athletes, which undercounts who's actually represented.
 }
 function fmtDate(d){try{return new Date(d+"T00:00").toLocaleDateString(lang,{day:"numeric",month:"short",year:"numeric"})}catch(e){return d}}
 function renderEvents(){
@@ -855,10 +1139,40 @@ function renderEvents(){
         ${e.email?`<a class="ev-link" href="mailto:${e.email}">${t("ev_register")} \u2192</a>`:""}
         </div></div>`).join("");
 }
+/* Testimonial fields may be a plain string or an {en,es,it} object. */
+const loc=v=>(v&&typeof v==="object")?(v[lang]||v.en||Object.values(v)[0]||""):(v||"");
+
 function renderTesti(){
   document.getElementById("testiList").innerHTML=TESTIMONIALS.map(x=>`
-    <div class="testi"><div class="q">“</div><p>${x.q}</p>
-      <div class="who"><div class="av">${initials(x.n)}</div><div><div class="nm">${x.n}</div><div class="rl">${x.r}</div></div></div></div>`).join("");
+    <div class="testi"><div class="q">“</div><p>${loc(x.q)}</p>
+      <div class="who">
+        <div class="av" ${x.photo?`style="background-image:url('${x.photo}');background-size:cover;background-position:center 20%;border-color:var(--gold)"`:""}>${x.photo?"":initials(x.n)}</div>
+        <div><div class="nm">${x.n}</div><div class="rl">${loc(x.r)}</div></div>
+      </div></div>`).join("");
+  const feat=document.getElementById("featQuote");
+  if(feat&&TESTIMONIALS[0])feat.textContent="\u201C"+loc(TESTIMONIALS[0].q)+"\u201D";
+}
+
+/* ===== media: video reel + photo gallery ===== */
+function renderMedia(){
+  const reel=document.getElementById("reel");
+  if(reel)reel.innerHTML=CLIPS.map(i=>
+    `<video src="media/video/clip-${i}.mp4" poster="media/video/clip-${i}-poster.jpg" controls playsinline preload="none"></video>`).join("");
+  const gal=document.getElementById("gallery");
+  if(gal){
+    // Real <img> rather than a CSS background: gives us lazy-loading (all 12 thumbs
+    // otherwise download on page load) and alt text for screen readers.
+    gal.innerHTML=GALLERY.map(g=>
+      `<button data-full="media/photos/${g.f}.jpg" data-cap="${g.c}">
+         <img src="media/photos/${g.f}-thumb.jpg" alt="${g.c}" loading="lazy" decoding="async" />
+       </button>`).join("");
+    gal.querySelectorAll("button").forEach(b=>b.onclick=()=>openLightbox(b.dataset.full,b.dataset.cap));
+  }
+}
+function openLightbox(src,cap){
+  document.getElementById("sheetContent").innerHTML=
+    `<div class="lightbox"><img src="${src}" alt="${cap}" /><p style="color:var(--muted);font-size:13.5px;margin-top:12px;text-align:center">${cap}</p></div>`;
+  document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
 }
 function openModal(slug){
   const p=PLAYERS.find(x=>x.slug===slug);if(!p)return;
@@ -873,11 +1187,72 @@ function openModal(slug){
       <div class="sh-contact">
         <div class="sh-label">${t("modal_contact_h")}</div>
         <p class="sh-contact-p">${t("modal_contact_p")}</p>
-        <a class="btn btn-gold" href="${CONTACT_PAYPAL_URL}" target="_blank" rel="noopener">${t("modal_contact_btn")}</a>
+        <a class="btn btn-gold" href="${STRIPE_CONTACT_URL||(FALLBACK_EMAIL+"?subject=Enquiry:%20"+encodeURIComponent(p.name)+"%20%E2%80%94%20ESM%20Roster")}" ${STRIPE_CONTACT_URL?'target="_blank" rel="noopener"':""}>${t("modal_contact_btn")}</a>
       </div>
     </div>`;
   document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
 }
+/* ===== roster paywall =====
+   Client-side gate: the valid code's SHA-256 lives in ROSTER_CODE_HASHES, and the
+   unlock is remembered in localStorage so a buyer only enters it once. */
+function isUnlocked(){try{return localStorage.getItem(UNLOCK_KEY)==="1"}catch(e){return false}}
+
+async function sha256Hex(str){
+  const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function applyLockState(){
+  const wrap=document.getElementById("rosterWrap");
+  const note=document.getElementById("unlockedNote");
+  const open=isUnlocked();
+  if(wrap)wrap.classList.toggle("is-locked",!open);
+  if(note)note.classList.toggle("show",open);
+}
+function unlockRoster(){
+  try{localStorage.setItem(UNLOCK_KEY,"1")}catch(e){}
+  applyLockState();
+  renderRoster();
+}
+const gateForm=document.getElementById("gateForm");
+if(gateForm)gateForm.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const err=document.getElementById("gateErr");
+  const val=(document.getElementById("gateInput").value||"").trim().toUpperCase();
+  err.classList.remove("show");
+  if(!val)return;
+  let hash="";
+  try{hash=await sha256Hex(val);}
+  catch(ex){console.warn("crypto.subtle unavailable",ex);err.classList.add("show");return;}
+  if(ROSTER_CODE_HASHES.includes(hash)){
+    unlockRoster();
+    document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
+  }else{
+    err.classList.add("show");
+  }
+});
+
+/* Service cards (College, Indy Ball, Winter League, Representation) drop the athlete
+   into the Join form with their service already chosen, so the application says what
+   they actually want. */
+function wireServiceSignups(){
+  document.querySelectorAll(".svc-signup").forEach(a=>{
+    a.addEventListener("click",()=>{
+      const svc=a.dataset.svc;
+      const sel=document.getElementById("applyingSelect");
+      if(sel&&svc&&[...sel.options].some(o=>o.value===svc)) sel.value=svc;
+    });
+  });
+}
+
+/* Point each pay button at its Stripe link; fall back to email until they exist. */
+function wirePayButtons(){
+  const set=(id,url)=>{const el=document.getElementById(id);if(el)el.href=url||FALLBACK_EMAIL;};
+  set("rosterPayBtn",STRIPE_ROSTER_URL);
+  set("joinPayBtn",STRIPE_REGISTER_URL);
+  const col=document.getElementById("collegePayBtn");
+  if(col)col.href=STRIPE_COLLEGE_URL||"#join";
+}
+
 function closeModal(){document.getElementById("modal").classList.remove("open");document.body.style.overflow="";}
 document.querySelectorAll("[data-close]").forEach(e=>e.onclick=closeModal);
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
@@ -914,7 +1289,10 @@ form.addEventListener("submit",async e=>{
   if(error){console.error("Application failed",error);msg.textContent=t("f_error");msg.classList.add("show","err");msg.scrollIntoView({behavior:"smooth",block:"center"});return;}
   form.reset();
   msg.textContent=t("f_success");msg.classList.add("show");
-  msg.scrollIntoView({behavior:"smooth",block:"center"});
+  // The lead is saved as `pending` first. Only now do we ask for the $125.
+  const panel=document.getElementById("payPanel");
+  panel.classList.add("show");
+  panel.scrollIntoView({behavior:"smooth",block:"center"});
 });
 
 /* install prompt */
@@ -934,7 +1312,10 @@ async function boot(){
       if(data&&data.length)PLAYERS=data.map(p=>({...p,image:p.image_url||p.image||null}));
     }catch(err){console.warn("Supabase load failed; using embedded roster.",err);}
   }
-  applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();
+  // Repo-committed photos fill in only where Supabase has none.
+  PLAYERS=PLAYERS.map(p=>({...p,image:p.image||LOCAL_PHOTOS[p.slug]||null}));
+  applyLockState();wirePayButtons();wireServiceSignups();
+  applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();renderMedia();
 }
 boot();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}

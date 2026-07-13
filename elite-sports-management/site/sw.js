@@ -1,4 +1,4 @@
-const CACHE = "esm-v3";
+const CACHE = "esm-v4";
 const ASSETS = ["./manifest.json",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 
@@ -13,6 +13,11 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   const { request } = e;
   if (request.method !== "GET") return;
+
+  // Let video go straight to the network. Browsers fetch MP4s with Range requests and
+  // get 206 Partial Content back, which Cache Storage can't store — intercepting here
+  // breaks seeking, and on some browsers playback entirely.
+  if (request.url.includes("/media/video/") || request.headers.has("range")) return;
 
   // Network-first for Supabase/API calls, falling back to cache only if offline.
   if (request.url.includes("supabase.co") || request.url.includes("esm.sh")) {
@@ -36,7 +41,7 @@ self.addEventListener("fetch", e => {
     return;
   }
 
-  // Cache-first for static assets (icons, manifest) — these rarely change and
+  // Cache-first for static assets (icons, manifest, photos) — these rarely change and
   // benefit from instant offline-capable loading.
   e.respondWith(
     caches.match(request).then(hit => hit || fetch(request).then(res => {
