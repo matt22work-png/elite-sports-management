@@ -1,6 +1,6 @@
 import json, re, os, html
 
-SITE_DIR = "/tmp/work/repo/elite-sports-management/site"
+SITE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.join(SITE_DIR, "players")
 os.makedirs(OUT_DIR, exist_ok=True)
 
@@ -19,29 +19,53 @@ def esc(s):
     return html.escape(s or "", quote=True)
 
 EXTRA_CSS = """
-  .pp-wrap{max-width:900px;margin:0 auto;padding:40px 22px 90px}
+  .pp-wrap{max-width:760px;margin:0 auto;padding:40px 22px 90px}
   .pp-back{display:inline-flex;align-items:center;gap:8px;color:var(--gold-soft);font-weight:700;font-size:13.5px;margin-bottom:26px}
   .pp-back:hover{color:var(--gold)}
-  .pp-hero{display:grid;grid-template-columns:180px 1fr;gap:30px;align-items:center;border:1px solid var(--line);border-radius:20px;padding:32px;background:radial-gradient(circle at 12% 20%,rgba(217,177,84,.10),transparent 55%),linear-gradient(180deg,var(--card),var(--navy-2));margin-bottom:30px;position:relative}
-  @media(max-width:640px){.pp-hero{grid-template-columns:1fr;text-align:center}}
-  .pp-photo{font-family:'Anton';font-size:62px;color:var(--gold);width:160px;height:160px;border-radius:50%;border:2px solid rgba(217,177,84,.4);display:grid;place-items:center;background:rgba(6,20,42,.5);margin:0 auto;background-size:cover;background-position:center}
-  .pp-tier{position:absolute;top:22px;right:22px;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:rgba(6,20,42,.7);border:1px solid var(--line);color:var(--gold-soft)}
-  .pp-flag{font-size:26px;margin-right:8px}
-  .pp-name{font-size:clamp(28px,5vw,44px)}
-  .pp-pos{color:var(--gold-soft);font-weight:700;margin-top:6px;font-size:15px}
-  .pp-meta{color:var(--muted);margin-top:10px;font-size:14px}
-  .pp-section{margin-top:30px}
-  .pp-section h2{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-soft);margin-bottom:14px}
-  .pp-bio{font-size:16.5px;color:#d6e1f2;line-height:1.65}
-  .pp-stats{display:flex;gap:12px;flex-wrap:wrap}
-  .pp-stat{border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-align:center;background:rgba(8,26,51,.4);min-width:110px}
-  .pp-stat b{font-family:'Anton';font-size:22px;color:var(--gold);display:block}
-  .pp-stat span{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  .pp-teams{display:flex;gap:9px;flex-wrap:wrap}
+
+  .pp-hero{border:1px solid var(--line);border-radius:20px;padding:34px 30px;background:radial-gradient(circle at 12% 0%,rgba(217,177,84,.10),transparent 55%),linear-gradient(180deg,var(--card),var(--navy-2));margin-bottom:26px}
+  .pp-tier-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .pp-tier{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:rgba(6,20,42,.7);border:1px solid var(--line);color:var(--gold-soft)}
+  .pp-flagchip{font-size:13px;font-weight:700;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+  .pp-flagchip .pp-flag{font-size:18px}
+  .pp-headline{font-size:clamp(24px,4.4vw,34px);line-height:1.25;margin:0 0 12px}
+  .pp-name-line{display:block;font-size:.62em;color:var(--gold-soft);font-weight:700;margin-bottom:6px;letter-spacing:.02em}
+  .pp-meta-list{display:flex;flex-direction:column;gap:6px;margin-top:16px;color:var(--muted);font-size:14px}
+  .pp-meta-list b{color:#d6e1f2;font-weight:600}
+
+  .pp-section{margin-top:34px;padding-top:2px}
+  .pp-section h2{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-soft);margin-bottom:16px}
+  .pp-bio{font-size:16.5px;color:#d6e1f2;line-height:1.7}
+
+  .pp-stats{display:flex;flex-direction:column;gap:10px}
+  .pp-stat{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px 18px;background:rgba(8,26,51,.4)}
+  .pp-stat span{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+  .pp-stat b{font-family:'Anton';font-size:20px;color:var(--gold);font-weight:400;letter-spacing:.02em}
+
+  .pp-exp-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .pp-exp-row{padding:14px 18px;font-size:15px;color:#d6e1f2;background:rgba(8,26,51,.28)}
+  .pp-exp-row:nth-child(even){background:rgba(8,26,51,.5)}
+  .pp-exp-row b{color:var(--ink);font-weight:700}
+
   .pp-contact{margin-top:38px;padding:26px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));text-align:center}
   .pp-contact h2{font-size:19px;margin-bottom:8px;color:var(--ink);font-family:'Anton';text-transform:none;letter-spacing:0}
   .pp-contact p{color:var(--muted);font-size:14.5px;margin-bottom:18px;max-width:48ch;margin-left:auto;margin-right:auto}
+
+  .pp-social{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
 """
+
+def headline_for(p):
+    position = p.get("position") or ""
+    country = p.get("country") or ""
+    tier = p.get("tier") or ""
+    teams = p.get("teams") or []
+    lead_team = teams[0] if teams else ""
+    tier_phrase = {"Pro": "Professional", "International": "International", "College": "College"}.get(tier, tier)
+    parts = [x for x in [tier_phrase, position] if x]
+    headline = " ".join(parts) if parts else "Athlete"
+    if lead_team:
+        headline += " — " + lead_team
+    return headline
 
 def render_page(p):
     slug = p["slug"]
@@ -52,31 +76,32 @@ def render_page(p):
     country = esc(p.get("country") or "")
     heritage = esc(p.get("heritage") or "")
     bio = esc(p.get("bio") or "")
-    image = p.get("image_url") or p.get("image")
-    meta_parts = []
-    if p.get("born"): meta_parts.append(f"Born {esc(p['born'])}")
-    if p.get("birthplace"): meta_parts.append(esc(p["birthplace"]))
-    if p.get("bats"): meta_parts.append(f"Bats {esc(p['bats'])}")
-    meta_line = "  ·  ".join(meta_parts)
 
-    photo_style = f"background-image:url('{esc(image)}');background-size:cover;background-position:center top;font-size:0" if image else ""
-    initials = "".join([w[0] for w in p["name"].split()[:2]]).upper()
+    meta_rows = []
+    if p.get("birthplace"): meta_rows.append(("Birthplace", esc(p["birthplace"])))
+    if p.get("born"): meta_rows.append(("Born", esc(p["born"])))
+    if p.get("bats"): meta_rows.append(("Bats", esc(p["bats"])))
+    meta_html = "".join('<div><b>' + label + ':</b> ' + val + '</div>' for label, val in meta_rows)
+
+    headline = esc(headline_for(p))
 
     stats = p.get("stats") or []
     stats_html = ""
     if stats:
-        chips = "".join(f'<div class="pp-stat"><b>{esc(s["value"])}</b><span>{esc(s["label"])}</span></div>' for s in stats)
-        stats_html = f'<div class="pp-section"><h2>Career Highlights</h2><div class="pp-stats">{chips}</div></div>'
+        rows = "".join('<div class="pp-stat"><span>' + esc(s["label"]) + '</span><b>' + esc(s["value"]) + '</b></div>' for s in stats)
+        stats_html = '<div class="pp-section"><h2>Career Highlights</h2><div class="pp-stats">' + rows + '</div></div>'
     else:
         stats_html = '<div class="pp-section"><h2>Career Highlights</h2><p style="color:var(--muted);font-size:14px">Stats coming soon.</p></div>'
 
     teams = p.get("teams") or []
     teams_html = ""
     if teams:
-        chips = "".join(f'<span class="team-chip">{esc(x)}</span>' for x in teams)
-        teams_html = f'<div class="pp-section"><h2>Teams &amp; Affiliations</h2><div class="pp-teams">{chips}</div></div>'
+        rows = "".join('<div class="pp-exp-row"><b>' + esc(x) + '</b></div>' for x in teams)
+        teams_html = '<div class="pp-section"><h2>Playing Experience</h2><div class="pp-exp-list">' + rows + '</div></div>'
+    else:
+        teams_html = '<div class="pp-section"><h2>Playing Experience</h2><p style="color:var(--muted);font-size:14px">Details coming soon.</p></div>'
 
-    desc = (p.get("bio") or f"{p['name']} — {position} represented by Elite Sports Management.")[:155]
+    desc = (p.get("bio") or (p["name"] + " — " + (p.get("position") or "") + " represented by Elite Sports Management."))[:155]
 
     page = f"""<!DOCTYPE html>
 <html lang="en">
@@ -117,13 +142,12 @@ def render_page(p):
   <a class="pp-back" href="../index.html#roster">&larr; Back to Roster</a>
 
   <div class="pp-hero">
-    <span class="pp-tier">{tier}</span>
-    <div class="pp-photo" style="{photo_style}">{"" if image else initials}</div>
-    <div>
-      <h1 class="display pp-name">{name} <span style="font-size:.55em">{flag}{heritage}</span></h1>
-      <div class="pp-pos">{position}</div>
-      <div class="pp-meta">{meta_line}</div>
+    <div class="pp-tier-row">
+      <span class="pp-tier">{tier}</span>
+      <span class="pp-flagchip"><span class="pp-flag">{flag}</span>{country}</span>
     </div>
+    <h1 class="display pp-headline"><span class="pp-name-line">{name}</span>{headline}</h1>
+    <div class="pp-meta-list">{meta_html}</div>
   </div>
 
   <div class="pp-section">
