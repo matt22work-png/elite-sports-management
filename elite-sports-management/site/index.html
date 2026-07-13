@@ -69,12 +69,15 @@
   .sec-head h2{font-size:clamp(32px,5.5vw,58px);margin-top:12px;max-width:20ch}
   .sec-head p{color:var(--muted);max-width:62ch;margin-top:14px;font-size:16.5px}
 
-  .do-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
-  .do{padding:24px 20px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));transition:.25s}
+  /* Fixed 3-up so the 6 services land as a clean 3 + 3 instead of 5 + an orphan. */
+  .do-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:860px){.do-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.do-grid{grid-template-columns:1fr}}
+  .do{padding:24px 20px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));transition:.25s;display:flex;flex-direction:column}
   .do:hover{transform:translateY(-4px);border-color:var(--gold)}
   .do .ic{font-size:22px;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:rgba(217,177,84,.12);border:1px solid var(--line);margin-bottom:15px}
   .do h3{font-size:17px;margin-bottom:7px}.do p{color:var(--muted);font-size:14px}
-  .svc-pay{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.03em}
+  .svc-pay{display:inline-block;margin-top:auto;padding-top:14px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.03em;align-self:flex-start}
   .svc-pay:hover{color:var(--gold-soft)}
 
   .founder{display:grid;grid-template-columns:200px 1fr;gap:34px;align-items:center;border:1px solid var(--line);border-radius:20px;padding:34px;background:radial-gradient(circle at 12% 20%,rgba(217,177,84,.10),transparent 55%),linear-gradient(180deg,var(--card),var(--navy-2))}
@@ -209,15 +212,16 @@
   .contracts .sub{margin-top:15px;color:var(--muted);font-size:clamp(14px,1.9vw,17px)}
   .contracts .sub b{color:var(--gold-soft);font-weight:700}
   .contracts .rule{width:110px;height:2px;background:var(--gold);margin:26px auto 0;opacity:.75}
-  .feature-grid{display:grid;grid-template-columns:1fr;gap:22px;margin:38px auto 0;text-align:left;max-width:640px}
+  .feature-grid{display:grid;grid-template-columns:1fr;gap:22px;margin:38px auto 0;text-align:left;max-width:720px}
   .stats-in{grid-template-columns:repeat(2,1fr) !important}
 
-  .tcard{display:flex;gap:18px;align-items:flex-start;border:1px solid var(--line);border-radius:18px;padding:24px;background:linear-gradient(180deg,var(--card),var(--navy-2))}
-  .tcard .shot{width:96px;min-width:96px;height:128px;border-radius:12px;background-size:cover;background-position:center 22%;border:1px solid var(--line)}
-  .tcard .qt{font-size:15.5px;line-height:1.65;color:#d6e1f2;font-style:italic}
+  .tcard{display:flex;gap:24px;align-items:flex-start;border:1px solid var(--line);border-radius:18px;padding:30px;background:linear-gradient(180deg,var(--card),var(--navy-2))}
+  /* Tall portrait crop, like the reference card — noticeably taller than it is wide. */
+  .tcard .shot{width:140px;min-width:140px;height:230px;border-radius:12px;background-size:cover;background-position:center 20%;border:1px solid var(--line)}
+  .tcard .qt{font-size:16.5px;line-height:1.7;color:#d6e1f2;font-style:italic}
   .tcard .nm{margin-top:14px;font-family:'Anton';letter-spacing:.09em;font-size:15px;color:var(--gold-soft);text-transform:uppercase}
   .tcard .rl{font-size:12.5px;color:var(--muted);margin-top:3px}
-  @media(max-width:480px){.tcard{flex-direction:column}.tcard .shot{width:100%;height:210px}}
+  @media(max-width:520px){.tcard{flex-direction:column;padding:24px}.tcard .shot{width:100%;height:280px;background-position:center 18%}}
 
   /* ===== media / gallery ===== */
   .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:12px}
