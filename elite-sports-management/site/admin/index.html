@@ -62,6 +62,7 @@
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:rgba(12,33,67,.97);border:1px solid var(--gold);color:var(--ink);padding:12px 20px;border-radius:999px;font-weight:600;font-size:14px;transition:.3s;z-index:50;max-width:90vw;text-align:center}
   .toast.show{transform:translateX(-50%) translateY(0)}
   .toast.err{border-color:var(--red);color:var(--red)}
+  .msg.ok{color:var(--teal-soft,#5fb8c2);border-color:currentColor}
   /* mobile polish: cleaner taps + no iOS zoom-on-focus (inputs ≥16px) */
   *{-webkit-tap-highlight-color:transparent}
   @media(max-width:560px){ input,textarea{font-size:16px} .wrap{padding:18px 14px 80px} }
@@ -86,6 +87,11 @@
       <div class="field"><label>Email</label><input type="email" id="email" autocomplete="username" required /></div>
       <div class="field"><label>Password</label><input type="password" id="password" autocomplete="current-password" required /></div>
       <button class="btn btn-gold" style="width:100%" type="submit">Sign in</button>
+      <div style="text-align:center;margin:14px 0 4px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">or</div>
+      <button class="btn btn-ghost" style="width:100%" type="button" id="magicLink">Email me a login link</button>
+      <p style="margin-top:12px;font-size:12.5px;color:var(--muted);text-align:center">
+        First time? Use the login link — no password needed.
+      </p>
       <div class="msg err" id="loginMsg"></div>
     </form>
   </div>
@@ -105,6 +111,19 @@
 const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
 const PHOTO_BUCKET = "player-photos";
+
+/* ---------- who is allowed in ----------
+   Signing in is not enough: an athlete with a portal account is also an
+   authenticated Supabase user. Only these addresses get the admin panel.
+   This check is a convenience — the real enforcement is the RLS policy in
+   supabase-auth.sql, which uses the SAME list. If you add an admin here,
+   add them there too or their writes will be rejected by the database. */
+const ADMIN_EMAILS = [
+  "brunosamuele48@gmail.com",   // Samuele Bruno — CEO & Founder
+  "mattswagj@gmail.com",
+  "matt22work-png@gmail.com",
+];
+const isAdminEmail = e => !!e && ADMIN_EMAILS.includes(e.trim().toLowerCase());
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -132,6 +151,21 @@ function showView(state){
   $("signOut").style.display  = state === "app"     ? ""      : "none";
 }
 
+/* A signed-in user who isn't on the admin list must not see the panel. Kick them
+   straight back out rather than showing an empty, half-broken app. */
+async function admitOrReject(session){
+  const email = session?.user?.email || "";
+  if (isAdminEmail(email)) { showView("app"); load(); return true; }
+  await SB.auth.signOut();
+  showView("login");
+  const m = $("loginMsg");
+  m.textContent = email
+    ? `${email} isn't an admin account. Athletes should use the player portal instead.`
+    : "Not authorised.";
+  m.classList.add("show");
+  return false;
+}
+
 $("loginForm").addEventListener("submit", async e => {
   e.preventDefault();
   const m = $("loginMsg"); m.classList.remove("show");
@@ -142,14 +176,34 @@ $("loginForm").addEventListener("submit", async e => {
   });
   btn.disabled = false;
   if (error){ m.textContent = error.message; m.classList.add("show"); $("password").value = ""; return; }
-  // On success, onAuthStateChange("SIGNED_IN") swaps to the app view.
+  // On success, onAuthStateChange("SIGNED_IN") runs admitOrReject.
 });
+
+/* Magic link — no password to choose, remember, or send to anyone.
+   Sam clicks a link in his inbox and he's in. This is how he should sign in the
+   first time, since nobody has set a password on his account. */
+$("magicLink").onclick = async () => {
+  const m = $("loginMsg"); m.classList.remove("show", "ok");
+  const email = $("email").value.trim();
+  if (!email){ m.textContent = "Enter your email first."; m.classList.add("show"); $("email").focus(); return; }
+  if (!isAdminEmail(email)){ m.textContent = "That email isn't an admin account."; m.classList.add("show"); return; }
+  const btn = $("magicLink"); btn.disabled = true; btn.textContent = "Sending…";
+  const { error } = await SB.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: location.href.split("#")[0] }
+  });
+  btn.disabled = false; btn.textContent = "Email me a login link";
+  if (error){ m.textContent = error.message; m.classList.add("show"); return; }
+  m.textContent = "Check your inbox — we sent you a sign-in link.";
+  m.classList.remove("err"); m.classList.add("show", "ok");
+};
+
 $("signOut").onclick = async () => { await SB.auth.signOut(); };
 
 // React to explicit transitions only; guard() below owns the initial view, so we
 // ignore INITIAL_SESSION here to avoid loading the roster twice on first paint.
 SB.auth.onAuthStateChange((evt, session) => {
-  if (evt === "SIGNED_IN" && session) { showView("app"); load(); }
+  if (evt === "SIGNED_IN" && session) { admitOrReject(session); }
   else if (evt === "SIGNED_OUT") { showView("login"); }
 });
 
@@ -157,7 +211,7 @@ SB.auth.onAuthStateChange((evt, session) => {
 (async function guard(){
   try {
     const { data: { session } } = await SB.auth.getSession();
-    if (session){ showView("app"); load(); } else { showView("login"); }
+    if (session){ await admitOrReject(session); } else { showView("login"); }
   } catch (err) {
     console.error("Session check failed", err);
     showView("login");
@@ -225,6 +279,13 @@ function cardPlayer(p){
     <div class="editor" id="ed-${p.id}">
       <div class="sub">Photo</div>
       <input type="file" accept="image/*" data-photo="${p.id}" />
+
+      <div class="sub">Profile</div>
+      <div class="field"><label>Position</label><input class="pf-position" data-id="${p.id}" value="${esc(p.position||"")}" placeholder="e.g. Catcher" /></div>
+      <div class="field"><label>Bio</label><textarea class="pf-bio" data-id="${p.id}" rows="4" placeholder="Short bio…">${esc(p.bio||"")}</textarea></div>
+      <div class="field"><label>Teams &amp; affiliations (one per line)</label><textarea class="pf-teams" data-id="${p.id}" rows="3" placeholder="Cleveland Guardians org.&#10;Dominican Summer League">${esc((Array.isArray(p.teams)?p.teams:[]).join("\n"))}</textarea></div>
+      <div class="row-btns"><button class="btn btn-gold" data-saveprofile="${p.id}">Save profile</button></div>
+
       <div class="sub">Stats</div>
       <div id="stats-${p.id}">${stats.map(statRow).join("")}</div>
       <div class="row-btns">
@@ -267,6 +328,24 @@ function bindActions(){
     b.disabled = false;
     if (error){ toast("Save failed: " + error.message, true); return; }
     toast("Stats saved ✓");
+    await load();
+    $("ed-" + id)?.classList.add("open");
+  });
+  document.querySelectorAll("[data-saveprofile]").forEach(b => b.onclick = async () => {
+    const id = +b.dataset.saveprofile;
+    const box = $("ed-" + id);
+    const teams = box.querySelector(".pf-teams").value
+      .split("\n").map(t => t.trim()).filter(Boolean);
+    const patch = {
+      position: box.querySelector(".pf-position").value.trim(),
+      bio:      box.querySelector(".pf-bio").value.trim(),
+      teams,
+    };
+    b.disabled = true;
+    const { error } = await SB.from("players").update(patch).eq("id", id);
+    b.disabled = false;
+    if (error){ toast("Save failed: " + error.message, true); return; }
+    toast("Profile saved ✓");
     await load();
     $("ed-" + id)?.classList.add("open");
   });
