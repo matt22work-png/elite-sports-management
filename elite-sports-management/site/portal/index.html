@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Player Portal — Elite Sports Management</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
+<link rel="shortcut icon" href="../icons/icon-192.png" />
+<meta name="theme-color" content="#081a33" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{--navy:#081a33;--navy-2:#06142a;--gold:#d9b154;--gold-soft:#e7c878;--teal:#3a9aa6;--teal-soft:#5fb8c2;--ink:#eaf0fa;--muted:#9fb1cc;--line:rgba(217,177,84,.22);--card:#0c2143;--red:#ff8f8f}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--navy-2);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase}
+  a{color:var(--gold-soft);text-decoration:none}
+  .wrap{max-width:760px;margin:0 auto;padding:26px 22px 90px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:30px}
+  .logo-img{height:40px;width:auto;display:block}
+  header b{font-size:14px;display:block}
+  header small{display:block;font-size:8.5px;letter-spacing:.3em;color:var(--gold-soft);font-weight:700}
+  .spacer{flex:1}
+  .btn{padding:11px 20px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;border:0;transition:.2s;display:inline-block}
+  .btn-gold{background:var(--gold);color:#05101f}
+  .btn-gold:hover{background:var(--gold-soft)}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .card{border:1px solid var(--line);border-radius:16px;padding:24px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));margin-bottom:16px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .field input{width:100%;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--ink);font-size:15px;font-family:inherit}
+  .field input:focus{outline:0;border-color:var(--gold)}
+  .msg{display:none;margin-top:12px;font-size:13.5px;color:var(--red)}
+  .msg.show{display:block}
+  .msg.ok{color:var(--teal-soft)}
+  .kicker{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-soft);margin:26px 0 12px}
+  .p-head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+  .avatar{width:64px;height:64px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;font-family:'Anton';color:var(--gold);font-size:20px;background-size:cover;background-position:center;flex:0 0 auto}
+  .p-head h2{font-size:24px}
+  .pos{color:var(--muted);font-size:14px}
+  .chip{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--gold-soft)}
+  .chip.approved{color:var(--teal-soft)}
+  .chip.pending{color:var(--gold-soft)}
+  .chip.rejected{color:var(--red)}
+  .row{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid rgba(217,177,84,.12);font-size:15px}
+  .row:last-child{border-bottom:0}
+  .row span{color:var(--muted)}
+  .row b{font-weight:600;text-align:right}
+  .note{font-size:13.5px;color:var(--muted);margin-top:6px}
+  .empty{color:var(--muted);text-align:center;padding:30px 10px}
+  #booting,#loginBox,#app{display:none}
+  @media(max-width:560px){ input{font-size:16px} .wrap{padding:18px 14px 80px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="../index.html"><img class="logo-img" src="../logo.png" alt="Elite Sports Management" /></a>
+    <div><b>Elite Sports Management</b><small>PLAYER PORTAL</small></div>
+    <div class="spacer"></div>
+    <button class="btn btn-ghost" id="signOut" style="display:none">Sign out</button>
+  </header>
+
+  <div id="booting" class="card" style="max-width:420px;margin:8vh auto;text-align:center;color:var(--muted)">Checking session…</div>
+
+  <!-- LOGIN -->
+  <div id="loginBox" class="card" style="max-width:420px;margin:8vh auto">
+    <h2 class="display" style="font-size:22px;margin-bottom:6px">Player <em style="color:var(--gold);font-style:normal">Portal</em></h2>
+    <p class="note" style="margin-bottom:18px">Sign in to see your athlete profile.</p>
+    <form id="loginForm">
+      <div class="field"><label>Email</label><input type="email" id="email" autocomplete="username" required placeholder="the email on your application" /></div>
+      <button class="btn btn-gold" style="width:100%" type="submit">Email me a login link</button>
+      <div class="msg" id="loginMsg"></div>
+    </form>
+    <p class="note" style="margin-top:16px">
+      No password needed — we email you a secure link. Use the same email you applied with.
+      Not signed up yet? <a href="../index.html#join">Apply here</a>.
+    </p>
+  </div>
+
+  <!-- APP -->
+  <div id="app">
+    <div id="profile"></div>
+  </div>
+</div>
+
+<script type="module">
+const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const initials = n => (n||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
+
+function showView(state){
+  $("booting").style.display  = state === "booting" ? "block" : "none";
+  $("loginBox").style.display = state === "login"   ? "block" : "none";
+  $("app").style.display      = state === "app"     ? "block" : "none";
+  $("signOut").style.display  = state === "app"     ? ""      : "none";
+}
+showView("booting");
+
+/* Magic-link only. Athletes never choose a password, so there's no password to
+   leak, reset, or support. The link is sent to the email on their application,
+   which is also what the RLS policy matches their row on. */
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const m = $("loginMsg"); m.classList.remove("show","ok");
+  const email = $("email").value.trim();
+  const btn = e.target.querySelector("button");
+  btn.disabled = true; btn.textContent = "Sending…";
+  const { error } = await SB.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: location.href.split("#")[0] }
+  });
+  btn.disabled = false; btn.textContent = "Email me a login link";
+  if (error){ m.textContent = error.message; m.classList.add("show"); return; }
+  m.textContent = "Check your inbox — we sent you a sign-in link.";
+  m.classList.add("show","ok");
+});
+
+$("signOut").onclick = async () => { await SB.auth.signOut(); };
+
+SB.auth.onAuthStateChange((evt, session) => {
+  if (evt === "SIGNED_IN" && session) { showView("app"); loadMe(session); }
+  else if (evt === "SIGNED_OUT") { showView("login"); }
+});
+
+(async function guard(){
+  try {
+    const { data: { session } } = await SB.auth.getSession();
+    if (session){ showView("app"); loadMe(session); } else { showView("login"); }
+  } catch (err) {
+    console.error("Session check failed", err);
+    showView("login");
+  }
+})();
+
+/* View-only. RLS only returns the row whose `email` matches the signed-in user,
+   so an athlete physically cannot read anyone else's profile — this isn't just a
+   UI restriction. Editing is deliberately not offered: the agency owns the stats. */
+async function loadMe(session){
+  const email = session?.user?.email || "";
+  const { data, error } = await SB.from("players").select("*").eq("email", email).limit(1);
+
+  if (error){
+    $("profile").innerHTML = `<div class="card empty">Couldn't load your profile.<br><small>${esc(error.message)}</small></div>`;
+    return;
+  }
+  const p = (data || [])[0];
+  if (!p){
+    $("profile").innerHTML = `<div class="card empty">
+      <p>No athlete profile found for <b>${esc(email)}</b>.</p>
+      <p class="note" style="margin-top:10px">If you applied with a different email, sign out and use that one.
+      Otherwise <a href="../index.html#join">submit an application</a>.</p>
+    </div>`;
+    return;
+  }
+
+  const teams = Array.isArray(p.teams) ? p.teams : [];
+  const stats = Array.isArray(p.stats) ? p.stats : [];
+  const statusNote = {
+    pending:  "Your application is with Samuele for review. You'll hear from us soon.",
+    approved: "You're live on the ESM roster.",
+    rejected: "This profile isn't currently shown on the roster. Reach out if you think that's wrong.",
+  }[p.status] || "";
+
+  $("profile").innerHTML = `
+    <div class="card">
+      <div class="p-head">
+        <span class="avatar" ${p.image_url ? `style="background-image:url('${esc(p.image_url)}')"` : ""}>${p.image_url ? "" : esc(initials(p.name))}</span>
+        <div style="flex:1">
+          <h2 class="display">${esc(p.name)}</h2>
+          <div class="pos">${esc(p.position || p.group || "")} ${p.flag || ""}</div>
+        </div>
+        <span class="chip ${esc(p.status)}">${esc(p.status)}</span>
+      </div>
+      ${statusNote ? `<p class="note">${statusNote}</p>` : ""}
+    </div>
+
+    ${p.bio ? `<div class="kicker">Bio</div><div class="card"><p>${esc(p.bio)}</p></div>` : ""}
+
+    <div class="kicker">Details</div>
+    <div class="card">
+      ${row("Sport", p.sport)}
+      ${row("Position", p.position)}
+      ${row("Country", p.country)}
+      ${row("Age", p.age)}
+      ${row("Email", p.email)}
+      ${row("Instagram", p.instagram)}
+      ${row("Applying for", p.applying_for)}
+    </div>
+
+    ${stats.length ? `<div class="kicker">Career highlights</div><div class="card">
+      ${stats.map(s => row(s.label, s.value)).join("")}
+    </div>` : ""}
+
+    ${teams.length ? `<div class="kicker">Teams &amp; affiliations</div><div class="card">
+      ${teams.map(t => `<div class="row"><span>${esc(t)}</span></div>`).join("")}
+    </div>` : ""}
+
+    <p class="note" style="margin-top:20px">
+      Your stats and photo are managed by Elite Sports Management. Need something changed?
+      <a href="mailto:elitesportsmanagement50@gmail.com?subject=Profile%20update%20request">Email us</a>.
+    </p>`;
+}
+
+function row(label, value){
+  if (value === null || value === undefined || value === "") return "";
+  return `<div class="row"><span>${esc(label)}</span><b>${esc(value)}</b></div>`;
+}
+</script>
+</body>
+</html>
