@@ -119,6 +119,8 @@
   .ev-body h3{font-size:19px}
   .ev-meta{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
   .ev-body p{color:var(--muted);font-size:14px;margin-top:10px}
+  .ev-body .ev-tags{color:var(--teal-soft);font-size:12.5px;margin-top:8px;line-height:1.5}
+  .ev-body .ev-link{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
 
   /* testimonials */
   .testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
@@ -358,7 +360,7 @@ const CONTACT_PAYPAL_URL = "https://paypal.me/elitesportsmanagement";
 
 /* ===== sample EVENTS & TESTIMONIALS — replace with real ones ===== */
 const EVENTS = [
-  { title:"Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", icon:"🏝️", blurb:"ESM athletes compete in winter league play in Tenerife, Spain — Dec 8–15, 2026. Photos coming soon." },
+  { title:"Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", icon:"🏝️", blurb:"Adult division winter league on the coast of Tenerife, Spain — Dec 8–15, 2026. Includes tournament entry, hotel with meals, transport to the seaside field, official jersey and cap, laundry service, and a showcase in front of MLB and college scouts. Registration is open; the first 20 players to sign up get a bonus surprise.", tags:"⚾ Adult Division  ·  🔭 MLB & College Scouts  ·  🎁 First 20 get a bonus", email:"elitesportsmanagement50@gmail.com" },
   { title:"All-Stars Tournament", date:"2026-01-10", loc:"Italy", status:"upcoming", icon:"🏆", blurb:"International tournament featuring ESM-represented athletes." }
 ];
 const TESTIMONIALS = [
@@ -394,7 +396,7 @@ const T = {
     roster_p:"A growing family of ballplayers from the Dominican Republic, Venezuela, Spain, Colombia, Italy and the United States.",
     filter_all:"All",filter_pitcher:"Pitchers",filter_catcher:"Catchers",filter_infielder:"Infielders",filter_twoway:"Two-Way",card_view:"View profile →",
     events_kicker:"Events",events_h2:"Camps, Showcases & Tournaments",events_p:"Where Elite Sports Management athletes train, compete and get seen.",
-    ev_upcoming:"Upcoming",ev_past:"Past",
+    ev_upcoming:"Upcoming",ev_past:"Past",ev_register:"Register",
     testi_kicker:"Testimonials",testi_h2:"What People Say",testi_p:"Voices from players, families and coaches in the ESM family.",
     join_kicker:"Join Us",join_h2:"Apply to Elite Sports Management",join_p:"Players, families and clubs — tell us about yourself and we'll create your athlete profile.",
     join_tagline:"Train like an athlete. Play like a pro.",
@@ -430,7 +432,7 @@ const T = {
     roster_p:"Una familia creciente de peloteros de República Dominicana, Venezuela, España, Colombia, Italia y Estados Unidos.",
     filter_all:"Todos",filter_pitcher:"Lanzadores",filter_catcher:"Receptores",filter_infielder:"Infielders",filter_twoway:"Dos Vías",card_view:"Ver perfil →",
     events_kicker:"Eventos",events_h2:"Camps, Showcases y Torneos",events_p:"Donde los atletas de Elite Sports Management entrenan, compiten y se hacen ver.",
-    ev_upcoming:"Próximo",ev_past:"Pasado",
+    ev_upcoming:"Próximo",ev_past:"Pasado",ev_register:"Inscribirse",
     testi_kicker:"Testimonios",testi_h2:"Lo Que Dicen",testi_p:"Voces de jugadores, familias y entrenadores de la familia ESM.",
     join_kicker:"Únete",join_h2:"Aplica a Elite Sports Management",join_p:"Jugadores, familias y clubes — cuéntanos sobre ti y crearemos tu perfil de atleta.",
     join_tagline:"Entrena como un atleta. Juega como un profesional.",
@@ -466,7 +468,7 @@ const T = {
     roster_p:"Una famiglia in crescita di giocatori da Repubblica Dominicana, Venezuela, Spagna, Colombia, Italia e Stati Uniti.",
     filter_all:"Tutti",filter_pitcher:"Lanciatori",filter_catcher:"Ricevitori",filter_infielder:"Interni",filter_twoway:"Due Ruoli",card_view:"Vedi profilo →",
     events_kicker:"Eventi",events_h2:"Camp, Showcase e Tornei",events_p:"Dove gli atleti di Elite Sports Management si allenano, competono e si fanno notare.",
-    ev_upcoming:"In arrivo",ev_past:"Passato",
+    ev_upcoming:"In arrivo",ev_past:"Passato",ev_register:"Iscriviti",
     testi_kicker:"Testimonianze",testi_h2:"Cosa Dicono",testi_p:"Le voci di giocatori, famiglie e coach della famiglia ESM.",
     join_kicker:"Unisciti",join_h2:"Candidati a Elite Sports Management",join_p:"Giocatori, famiglie e club — raccontaci di te e creeremo il tuo profilo da atleta.",
     join_tagline:"Allenati come un atleta. Gioca come un professionista.",
@@ -848,7 +850,10 @@ function renderEvents(){
       ${e.image?"":(e.icon||"⚾")}</div>
       <div class="ev-body"><h3 class="display">${e.title}</h3>
         <div class="ev-meta"><span>📅 ${fmtDate(e.date)}</span><span>📍 ${e.loc}</span></div>
-        <p>${e.blurb}</p></div></div>`).join("");
+        <p>${e.blurb}</p>
+        ${e.tags?`<div class="ev-tags">${e.tags}</div>`:""}
+        ${e.email?`<a class="ev-link" href="mailto:${e.email}">${t("ev_register")} \u2192</a>`:""}
+        </div></div>`).join("");
 }
 function renderTesti(){
   document.getElementById("testiList").innerHTML=TESTIMONIALS.map(x=>`
