@@ -1,6 +1,7 @@
 [
   {
     "slug": "brayan-hernandez",
+    "sport": "Baseball",
     "name": "Brayan Hernández",
     "group": "Two-Way",
     "position": "Two-Way (C / 1B / OF)",
@@ -12,11 +13,16 @@
     "tier": "Pro",
     "bats": "Left",
     "bio": "A versatile two-way player out of La Vega known for his offensive power from the left side. Developed in the Baltimore Orioles organization, he can catch, play first base and patrol the outfield.",
-    "teams": ["Baltimore Orioles org.", "Delmarva Shorebirds", "Aberdeen IronBirds"],
+    "teams": [
+      "Baltimore Orioles org.",
+      "Delmarva Shorebirds",
+      "Aberdeen IronBirds"
+    ],
     "stats": []
   },
   {
     "slug": "gianni-westphal",
+    "sport": "Baseball",
     "name": "Gianni Westphal",
     "group": "Pitcher",
     "position": "Pitcher (RHP)",
@@ -28,11 +34,20 @@
     "tier": "International",
     "bats": null,
     "bio": "A Venezuelan pitcher with German citizenship known for a 90 mph fastball and a deep repertoire of slider, sinker and changeup. Played in the German Bundesliga before signing in Italy's Serie B.",
-    "teams": ["Dortmund Wanderers (GER)", "Livorno Baseball 1948 (ITA · Serie B)"],
-    "stats": [{ "label": "Fastball", "value": "90 mph" }]
+    "teams": [
+      "Dortmund Wanderers (GER)",
+      "Livorno Baseball 1948 (ITA · Serie B)"
+    ],
+    "stats": [
+      {
+        "label": "Fastball",
+        "value": "90 mph"
+      }
+    ]
   },
   {
     "slug": "jose-cedeno",
+    "sport": "Baseball",
     "name": "José Cedeño",
     "group": "Catcher",
     "position": "Catcher",
@@ -44,11 +59,16 @@
     "tier": "Pro",
     "bats": null,
     "bio": "A talented catcher developed in the Cleveland Guardians organization after signing as an international prospect. Recognized for his defense behind the plate and a mature approach at a young age.",
-    "teams": ["Cleveland Guardians org.", "Dominican Summer League", "Arizona Complex League"],
+    "teams": [
+      "Cleveland Guardians org.",
+      "Dominican Summer League",
+      "Arizona Complex League"
+    ],
     "stats": []
   },
   {
     "slug": "danyer-sanabria",
+    "sport": "Baseball",
     "name": "Danyer Sanabria",
     "group": "Infielder",
     "position": "Infielder",
@@ -60,11 +80,16 @@
     "tier": "Pro",
     "bats": null,
     "bio": "A Venezuelan talent who has represented his country at the U23 level. Brings experience from affiliated ball plus winter leagues in Argentina and Venezuela and three seasons in Venezuela's Liga Mayor.",
-    "teams": ["Arizona Diamondbacks org.", "Venezuela U23", "Liga Mayor (VEN)"],
+    "teams": [
+      "Arizona Diamondbacks org.",
+      "Venezuela U23",
+      "Liga Mayor (VEN)"
+    ],
     "stats": []
   },
   {
     "slug": "francesco-mazzei",
+    "sport": "Baseball",
     "name": "Francesco Mazzei",
     "group": "Two-Way",
     "position": "Two-Way",
@@ -76,11 +101,14 @@
     "tier": "International",
     "bats": null,
     "bio": "A Spanish talent from Madrid who has represented Spain at both the U18 and U23 national-team levels. A standout in the Spanish baseball system pursuing the U.S. college route.",
-    "teams": ["Spain National Team (U18 / U23)"],
+    "teams": [
+      "Spain National Team (U18 / U23)"
+    ],
     "stats": []
   },
   {
     "slug": "anderson-pena",
+    "sport": "Baseball",
     "name": "Anderson Peña",
     "group": "Infielder",
     "position": "Infielder",
@@ -92,11 +120,15 @@
     "tier": "International",
     "bats": null,
     "bio": "A Spanish infielder developed at the Regensburg Baseball Academy, known for strong defense and contact hitting. Has represented Spain internationally and is pursuing U.S. college baseball with pro potential.",
-    "teams": ["Spain National Team", "Regensburg Baseball Academy"],
+    "teams": [
+      "Spain National Team",
+      "Regensburg Baseball Academy"
+    ],
     "stats": []
   },
   {
     "slug": "jesus-delgado",
+    "sport": "Baseball",
     "name": "Jesús Delgado",
     "group": "Pitcher",
     "position": "Pitcher (LHP)",
@@ -108,14 +140,24 @@
     "tier": "Pro",
     "bats": null,
     "bio": "A left-handed pitcher signed by the Texas Rangers in 2023 who has shown big projection in the minors. Shined as a 2024 DSL All-Star and continued his development in the Arizona Complex League.",
-    "teams": ["Texas Rangers org.", "Arizona Complex League"],
+    "teams": [
+      "Texas Rangers org.",
+      "Arizona Complex League"
+    ],
     "stats": [
-      { "label": "2024 DSL", "value": "All-Star" },
-      { "label": "Strikeouts", "value": "83 in 64 IP" }
+      {
+        "label": "2024 DSL",
+        "value": "All-Star"
+      },
+      {
+        "label": "Strikeouts",
+        "value": "83 in 64 IP"
+      }
     ]
   },
   {
     "slug": "lorenzo-gonzalez",
+    "sport": "Baseball",
     "name": "Lorenzo González",
     "group": "Catcher",
     "position": "Catcher",
@@ -127,11 +169,14 @@
     "tier": "College",
     "bats": null,
     "bio": "A catcher at Campbellsville University whose game is built on consistent receiving, strong blocking and a quick release. Brings leadership and reliable game-calling behind the plate.",
-    "teams": ["Campbellsville University (NAIA)"],
+    "teams": [
+      "Campbellsville University (NAIA)"
+    ],
     "stats": []
   },
   {
     "slug": "jaider-morelos",
+    "sport": "Baseball",
     "name": "Jaider Morelos",
     "group": "Infielder",
     "position": "Infielder",
@@ -143,11 +188,14 @@
     "tier": "College",
     "bats": null,
     "bio": "A Colombian collegiate player competing at the NAIA level with Montreat College. Known for defensive consistency, versatility and a strong work ethic against high-level college talent.",
-    "teams": ["Montreat College (NAIA)"],
+    "teams": [
+      "Montreat College (NAIA)"
+    ],
     "stats": []
   },
   {
     "slug": "bret-bowers",
+    "sport": "Baseball",
     "name": "Bret Bowers",
     "group": "Infielder",
     "position": "Infielder",
@@ -159,11 +207,14 @@
     "tier": "College",
     "bats": null,
     "bio": "A collegiate player developed within the Campbellsville University program at the NAIA level. A member of the Tigers known for his work ethic and coachability against high-level competition.",
-    "teams": ["Campbellsville University (NAIA)"],
+    "teams": [
+      "Campbellsville University (NAIA)"
+    ],
     "stats": []
   },
   {
     "slug": "osiris-german",
+    "sport": "Baseball",
     "name": "Osiris Germán",
     "group": "Pitcher",
     "position": "Pitcher (RHP)",
@@ -175,11 +226,16 @@
     "tier": "Pro",
     "bats": null,
     "bio": "A professional Dominican pitcher developed in the Minnesota Twins organization after signing as an international free agent in 2016. Advanced to Double-A and earned MLB Spring Training invites with the Twins.",
-    "teams": ["Minnesota Twins org.", "Wichita Wind Surge (AA)", "MLB Spring Training"],
+    "teams": [
+      "Minnesota Twins org.",
+      "Wichita Wind Surge (AA)",
+      "MLB Spring Training"
+    ],
     "stats": []
   },
   {
     "slug": "adam-moser",
+    "sport": "Baseball",
     "name": "Adam Moser",
     "group": "Infielder",
     "position": "Infielder / Utility",
@@ -191,15 +247,28 @@
     "tier": "College",
     "bats": "Right",
     "bio": "An Arizona native and former Sunrise Mountain High School standout who went on to play infield at College of the Desert. A versatile utility player with elite hitting and an exciting power-and-defense profile.",
-    "teams": ["Sunrise Mountain HS", "College of the Desert"],
+    "teams": [
+      "Sunrise Mountain HS",
+      "College of the Desert"
+    ],
     "stats": [
-      { "label": "2024 AVG", "value": ".317" },
-      { "label": "Home Runs", "value": "6" },
-      { "label": "SLG", "value": ".545" }
+      {
+        "label": "2024 AVG",
+        "value": ".317"
+      },
+      {
+        "label": "Home Runs",
+        "value": "6"
+      },
+      {
+        "label": "SLG",
+        "value": ".545"
+      }
     ]
   },
   {
     "slug": "yerardo-ciofani",
+    "sport": "Baseball",
     "name": "Yerardo Ciofani",
     "group": "Pitcher",
     "position": "Pitcher (LHP)",
@@ -211,15 +280,28 @@
     "tier": "Pro",
     "bats": null,
     "bio": "A left-handed pitcher born in Maracaibo who signed with the Chicago White Sox in December 2023. Played for the DSL White Sox in 2024, posting a strong rookie campaign.",
-    "teams": ["Chicago White Sox org.", "DSL White Sox"],
+    "teams": [
+      "Chicago White Sox org.",
+      "DSL White Sox"
+    ],
     "stats": [
-      { "label": "2024 Record", "value": "5-1" },
-      { "label": "Strikeouts", "value": "25" },
-      { "label": "WHIP", "value": "2.16" }
+      {
+        "label": "2024 Record",
+        "value": "5-1"
+      },
+      {
+        "label": "Strikeouts",
+        "value": "25"
+      },
+      {
+        "label": "WHIP",
+        "value": "2.16"
+      }
     ]
   },
   {
     "slug": "javier-useche",
+    "sport": "Baseball",
     "name": "José Javier Useche",
     "group": "Pitcher",
     "position": "Pitcher (RHP)",
@@ -231,11 +313,14 @@
     "tier": "International",
     "bats": null,
     "bio": "A young Venezuelan-Portuguese right-hander who has stood out in Italy's Serie B with Porto Sant'Elpidio. Recognized for discipline, precision and competitive maturity, combining power with control.",
-    "teams": ["Porto Sant'Elpidio (ITA · Serie B)"],
+    "teams": [
+      "Porto Sant'Elpidio (ITA · Serie B)"
+    ],
     "stats": []
   },
   {
     "slug": "david-chavez",
+    "sport": "Baseball",
     "name": "David Chávez",
     "group": "Pitcher",
     "position": "Pitcher (RHP)",
@@ -247,11 +332,14 @@
     "tier": "International",
     "bats": null,
     "bio": "A young right-handed pitcher active on the roster of a Serie A team in Italy. His place at a higher level positions him as a player with real growth potential on the Italian league's visibility window.",
-    "teams": ["Serie A (Italy)"],
+    "teams": [
+      "Serie A (Italy)"
+    ],
     "stats": []
   },
   {
     "slug": "matteo-colalucci",
+    "sport": "Baseball",
     "name": "Matteo Colalucci",
     "group": "Two-Way",
     "position": "Pitcher / Infielder",
@@ -263,11 +351,20 @@
     "tier": "International",
     "bats": "Right",
     "bio": "An Italian pitcher and infielder who has played in Serie A and helped earn promotion to Serie B in 2025. Won a silver medal with Italy's U15 national team at the European Championship.",
-    "teams": ["Serie A / Serie B (Italy)", "Italy U15 National Team"],
-    "stats": [{ "label": "U15 Euros", "value": "🥈 Silver" }]
+    "teams": [
+      "Serie A / Serie B (Italy)",
+      "Italy U15 National Team"
+    ],
+    "stats": [
+      {
+        "label": "U15 Euros",
+        "value": "🥈 Silver"
+      }
+    ]
   },
   {
     "slug": "anthony-quattrocchi",
+    "sport": "Baseball",
     "name": "Anthony Quattrocchi",
     "group": "Pitcher",
     "position": "Pitcher (RHP)",
@@ -279,11 +376,25 @@
     "tier": "Pro",
     "bats": null,
     "bio": "A right-handed pitcher recognized for velocity and precision. Set the school strikeout record at Ottawa University Arizona and earned NCCAA First Team All-American honors before advancing to the pro independent leagues.",
-    "teams": ["Ottawa University AZ", "Lake Erie (Frontier)", "Staten Island FerryHawks (Atlantic)", "Idaho Falls Chukars (Pioneer)"],
+    "teams": [
+      "Ottawa University AZ",
+      "Lake Erie (Frontier)",
+      "Staten Island FerryHawks (Atlantic)",
+      "Idaho Falls Chukars (Pioneer)"
+    ],
     "stats": [
-      { "label": "College", "value": "7-2, 2.55 ERA" },
-      { "label": "Strikeouts", "value": "83 (school record)" },
-      { "label": "2021", "value": "NCCAA 1st Team A-A" }
+      {
+        "label": "College",
+        "value": "7-2, 2.55 ERA"
+      },
+      {
+        "label": "Strikeouts",
+        "value": "83 (school record)"
+      },
+      {
+        "label": "2021",
+        "value": "NCCAA 1st Team A-A"
+      }
     ]
   }
 ]

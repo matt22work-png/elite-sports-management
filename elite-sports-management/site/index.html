@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Elite Sports Management — Athlete Representation</title>
-<meta name="description" content="Elite Sports Management — athlete representation and development across college recruiting, independent pro ball and Europe. Founded by professional baseball player Samuele Bruno (Hastings College NAIA, scholarship athlete, class of 2027). Browse the roster, upcoming events and individual athlete profiles." />
+<meta name="description" content="Elite Sports Management — baseball and softball athlete representation and development across college recruiting, independent pro ball and Europe. Founded by professional baseball player Samuele Bruno (Hastings College NAIA, scholarship athlete, class of 2027). Browse the roster, upcoming events and individual athlete profiles." />
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#081a33" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -266,6 +266,7 @@
 
 <section class="sec" id="roster" style="padding-top:10px"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="roster_kicker"></div><h2 class="display" data-i18n="roster_h2"></h2><p data-i18n="roster_p"></p></div>
+  <div class="filters" id="sportFilters"></div>
   <div class="filters" id="filters"></div>
   <div class="roster" id="rosterList"></div>
 </div></section>
@@ -292,6 +293,11 @@
         <div class="field"><label data-i18n="f_email"></label><input name="email" type="email" /></div>
         <div class="field"><label data-i18n="f_ig"></label><input name="ig" placeholder="@" /></div>
         <div class="field"><label data-i18n="f_country"></label><input name="country" /></div>
+        <div class="field"><label data-i18n="f_sport"></label>
+          <select name="sport">
+            <option value="Baseball" data-i18n="opt_baseball"></option>
+            <option value="Softball" data-i18n="opt_softball"></option>
+          </select></div>
         <div class="field"><label data-i18n="f_position"></label>
           <select name="position">
             <option value="Pitcher" data-i18n="filter_pitcher"></option>
@@ -365,12 +371,12 @@ const STATIC_PLAYER_PAGES = new Set(["brayan-hernandez", "gianni-westphal", "jos
 
 const T = {
   en:{nav_about:"What We Do",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_join:"Join Us",nav_cta:"Apply Now",
-    hero_eyebrow:"Athlete Representation · Worldwide",hero_h1:'Representing the <em>next generation</em> of baseball talent.',
-    hero_lead:"Elite Sports Management guides athletes from the academy to the pro ranks — across college, indy ball and Europe.",
+    hero_eyebrow:"Athlete Representation · Worldwide",hero_h1:'Representing the <em>next generation</em> of baseball and softball talent.',
+    hero_lead:"Elite Sports Management guides baseball and softball athletes from the academy to the pro ranks — across college, indy ball and Europe.",
     hero_btn1:"View the Roster",hero_btn2:"Join the Team",
     stat1:"Athletes Represented",stat2:"Countries",stat3:"MLB Organizations",
     about_kicker:"What We Do",about_h2:"Full-service representation, built around the athlete.",
-    about_p:"Our mission is to support athletes as they work to reach their full potential — on the field, in their careers and beyond.",
+    about_p:"Our mission is to support baseball and softball athletes as they work to reach their full potential — on the field, in their careers and beyond.",
     svc1_t:"College Placement",svc1_d:"Connecting players with U.S. college programs and helping them earn athletic scholarships that fit their game, goals and budget.",svc1_pay:"Enroll in College Placement →",
     svc2_t:"Indy Ball",svc2_d:"Opening doors to professional independent leagues across North America.",
     svc6_t:"Winter League",svc6_d:"Placing athletes in winter league play abroad for extra reps and exposure during the offseason.",
@@ -390,7 +396,7 @@ const T = {
     join_kicker:"Join Us",join_h2:"Apply to Elite Sports Management",join_p:"Players, families and clubs — tell us about yourself and we'll create your athlete profile.",
     join_tagline:"Train like an athlete. Play like a pro.",
     f_name:"Full name *",f_age:"Age",f_phone:"Phone number",f_email:"Email",f_ig:"Instagram profile",f_country:"Country",
-    f_position:"Position",f_applying:"I'm applying for",opt_rep:"Representation",opt_coach:"Coaching",opt_both:"Both",
+    f_sport:"Sport",opt_baseball:"Baseball",opt_softball:"Softball",f_position:"Position",f_applying:"I'm applying for",opt_rep:"Representation",opt_coach:"Coaching",opt_both:"Both",
     f_why:"Why do you want to start? / Your goals",f_other:"Anything else?",f_submit:"Submit application",
     f_success:"Thanks! Your application has been received — we'll review it and be in touch.",
     f_error:"Sorry, something went wrong sending your application. Please try again.",
@@ -401,12 +407,12 @@ const T = {
     install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install",
     admin_link:"Admin",login_h:"Admin Login",login_sub:"Manage athletes, stats & photos",login_email:"Email",login_pass:"Password",login_btn:"Log in"},
   es:{nav_about:"Qué Hacemos",nav_who:"Quién Soy",nav_roster:"Jugadores",nav_events:"Eventos",nav_join:"Únete",nav_cta:"Aplica Ahora",
-    hero_eyebrow:"Representación de Atletas · En Todo el Mundo",hero_h1:'Representando a la <em>nueva generación</em> del talento del béisbol.',
-    hero_lead:"Elite Sports Management guía a los atletas desde la academia hasta el profesionalismo — en el college, el indy ball y Europa.",
+    hero_eyebrow:"Representación de Atletas · En Todo el Mundo",hero_h1:'Representando a la <em>nueva generación</em> del talento del béisbol y sóftbol.',
+    hero_lead:"Elite Sports Management guía a los atletas de béisbol y sóftbol desde la academia hasta el profesionalismo — en el college, el indy ball y Europa.",
     hero_btn1:"Ver los Jugadores",hero_btn2:"Únete al Equipo",
     stat1:"Atletas Representados",stat2:"Países",stat3:"Organizaciones MLB",
     about_kicker:"Qué Hacemos",about_h2:"Representación integral, centrada en el atleta.",
-    about_p:"Nuestra misión es apoyar a los atletas para que alcancen todo su potencial — dentro y fuera del terreno.",
+    about_p:"Nuestra misión es apoyar a los atletas de béisbol y sóftbol para que alcancen todo su potencial — dentro y fuera del terreno.",
     svc1_t:"Colocación en College",svc1_d:"Conectamos a los jugadores con programas universitarios en EE. UU. y les ayudamos a conseguir becas deportivas según su nivel, metas y presupuesto.",svc1_pay:"Inscribirse en Colocación en College →",
     svc2_t:"Indy Ball",svc2_d:"Abrimos puertas a las ligas profesionales independientes de Norteamérica.",
     svc6_t:"Liga de Invierno",svc6_d:"Ubicamos atletas en ligas de invierno en el extranjero para sumar experiencia y visibilidad fuera de temporada.",
@@ -426,7 +432,7 @@ const T = {
     join_kicker:"Únete",join_h2:"Aplica a Elite Sports Management",join_p:"Jugadores, familias y clubes — cuéntanos sobre ti y crearemos tu perfil de atleta.",
     join_tagline:"Entrena como un atleta. Juega como un profesional.",
     f_name:"Nombre y apellido *",f_age:"Edad",f_phone:"Número de teléfono",f_email:"Correo electrónico",f_ig:"Perfil de Instagram",f_country:"País",
-    f_position:"Posición",f_applying:"Aplico para",opt_rep:"Representación",opt_coach:"Coaching",opt_both:"Ambos",
+    f_sport:"Deporte",opt_baseball:"Béisbol",opt_softball:"Sóftbol",f_position:"Posición",f_applying:"Aplico para",opt_rep:"Representación",opt_coach:"Coaching",opt_both:"Ambos",
     f_why:"¿Por qué quieres empezar? / Tus objetivos",f_other:"¿Algo más?",f_submit:"Enviar solicitud",
     f_success:"¡Gracias! Hemos recibido tu solicitud — la revisaremos y te contactaremos.",
     f_error:"Lo sentimos, hubo un problema al enviar tu solicitud. Inténtalo de nuevo.",
@@ -437,12 +443,12 @@ const T = {
     install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar",
     admin_link:"Admin",login_h:"Acceso Admin",login_sub:"Gestiona atletas, estadísticas y fotos",login_email:"Correo",login_pass:"Contraseña",login_btn:"Entrar"},
   it:{nav_about:"Cosa Facciamo",nav_who:"Chi Sono",nav_roster:"Roster",nav_events:"Eventi",nav_join:"Unisciti",nav_cta:"Candidati",
-    hero_eyebrow:"Rappresentanza Atleti · In Tutto il Mondo",hero_h1:'Rappresentiamo la <em>nuova generazione</em> del talento del baseball.',
-    hero_lead:"Elite Sports Management accompagna gli atleti dall'academy al professionismo — tra college, indy ball ed Europa.",
+    hero_eyebrow:"Rappresentanza Atleti · In Tutto il Mondo",hero_h1:'Rappresentiamo la <em>nuova generazione</em> del talento del baseball e softball.',
+    hero_lead:"Elite Sports Management accompagna gli atleti di baseball e softball dall'academy al professionismo — tra college, indy ball ed Europa.",
     hero_btn1:"Vedi il Roster",hero_btn2:"Unisciti al Team",
     stat1:"Atleti Rappresentati",stat2:"Paesi",stat3:"Organizzazioni MLB",
     about_kicker:"Cosa Facciamo",about_h2:"Rappresentanza completa, costruita intorno all'atleta.",
-    about_p:"La nostra missione è supportare gli atleti nel raggiungere il loro pieno potenziale — dentro e fuori dal campo.",
+    about_p:"La nostra missione è supportare gli atleti di baseball e softball nel raggiungere il loro pieno potenziale — dentro e fuori dal campo.",
     svc1_t:"Collocamento College",svc1_d:"Mettiamo in contatto i giocatori con i programmi universitari USA e li aiutiamo a ottenere borse di studio sportive su misura per il loro livello, obiettivi e budget.",svc1_pay:"Iscriviti al Collocamento College →",
     svc2_t:"Indy Ball",svc2_d:"Apriamo le porte alle leghe professionistiche indipendenti del Nord America.",
     svc6_t:"Winter League",svc6_d:"Inseriamo gli atleti in campionati invernali all'estero per accumulare esperienza e visibilità durante la bassa stagione.",
@@ -462,7 +468,7 @@ const T = {
     join_kicker:"Unisciti",join_h2:"Candidati a Elite Sports Management",join_p:"Giocatori, famiglie e club — raccontaci di te e creeremo il tuo profilo da atleta.",
     join_tagline:"Allenati come un atleta. Gioca come un professionista.",
     f_name:"Nome e cognome *",f_age:"Età",f_phone:"Numero di telefono",f_email:"Email",f_ig:"Profilo Instagram",f_country:"Paese",
-    f_position:"Ruolo",f_applying:"Mi candido per",opt_rep:"Rappresentanza",opt_coach:"Coaching",opt_both:"Entrambi",
+    f_sport:"Sport",opt_baseball:"Baseball",opt_softball:"Softball",f_position:"Ruolo",f_applying:"Mi candido per",opt_rep:"Rappresentanza",opt_coach:"Coaching",opt_both:"Entrambi",
     f_why:"Perché vuoi iniziare? / I tuoi obiettivi",f_other:"Altro?",f_submit:"Invia candidatura",
     f_success:"Grazie! Abbiamo ricevuto la tua candidatura — la esamineremo e ti contatteremo.",
     f_error:"Spiacenti, qualcosa è andato storto nell'invio della candidatura. Riprova.",
@@ -479,6 +485,7 @@ const FLAGS={"Dominican Republic":"🇩🇴","República Dominicana":"🇩🇴",
 let PLAYERS = [
   {
     "slug": "brayan-hernandez",
+    "sport": "Baseball",
     "name": "Brayan Hernández",
     "group": "Two-Way",
     "position": "Two-Way (C / 1B / OF)",
@@ -495,6 +502,7 @@ let PLAYERS = [
   },
   {
     "slug": "gianni-westphal",
+    "sport": "Baseball",
     "name": "Gianni Westphal",
     "group": "Pitcher",
     "position": "Pitcher (RHP)",
@@ -511,6 +519,7 @@ let PLAYERS = [
   },
   {
     "slug": "jose-cedeno",
+    "sport": "Baseball",
     "name": "José Cedeño",
     "group": "Catcher",
     "position": "Catcher",
@@ -527,6 +536,7 @@ let PLAYERS = [
   },
   {
     "slug": "danyer-sanabria",
+    "sport": "Baseball",
     "name": "Danyer Sanabria",
     "group": "Infielder",
     "position": "Infielder",
@@ -543,6 +553,7 @@ let PLAYERS = [
   },
   {
     "slug": "francesco-mazzei",
+    "sport": "Baseball",
     "name": "Francesco Mazzei",
     "group": "Two-Way",
     "position": "Two-Way",
@@ -559,6 +570,7 @@ let PLAYERS = [
   },
   {
     "slug": "anderson-pena",
+    "sport": "Baseball",
     "name": "Anderson Peña",
     "group": "Infielder",
     "position": "Infielder",
@@ -575,6 +587,7 @@ let PLAYERS = [
   },
   {
     "slug": "jesus-delgado",
+    "sport": "Baseball",
     "name": "Jesús Delgado",
     "group": "Pitcher",
     "position": "Pitcher (LHP)",
@@ -594,6 +607,7 @@ let PLAYERS = [
   },
   {
     "slug": "lorenzo-gonzalez",
+    "sport": "Baseball",
     "name": "Lorenzo González",
     "group": "Catcher",
     "position": "Catcher",
@@ -610,6 +624,7 @@ let PLAYERS = [
   },
   {
     "slug": "jaider-morelos",
+    "sport": "Baseball",
     "name": "Jaider Morelos",
     "group": "Infielder",
     "position": "Infielder",
@@ -626,6 +641,7 @@ let PLAYERS = [
   },
   {
     "slug": "bret-bowers",
+    "sport": "Baseball",
     "name": "Bret Bowers",
     "group": "Infielder",
     "position": "Infielder",
@@ -642,6 +658,7 @@ let PLAYERS = [
   },
   {
     "slug": "osiris-german",
+    "sport": "Baseball",
     "name": "Osiris Germán",
     "group": "Pitcher",
     "position": "Pitcher (RHP)",
@@ -658,6 +675,7 @@ let PLAYERS = [
   },
   {
     "slug": "adam-moser",
+    "sport": "Baseball",
     "name": "Adam Moser",
     "group": "Infielder",
     "position": "Infielder / Utility",
@@ -678,6 +696,7 @@ let PLAYERS = [
   },
   {
     "slug": "yerardo-ciofani",
+    "sport": "Baseball",
     "name": "Yerardo Ciofani",
     "group": "Pitcher",
     "position": "Pitcher (LHP)",
@@ -698,6 +717,7 @@ let PLAYERS = [
   },
   {
     "slug": "javier-useche",
+    "sport": "Baseball",
     "name": "José Javier Useche",
     "group": "Pitcher",
     "position": "Pitcher (RHP)",
@@ -714,6 +734,7 @@ let PLAYERS = [
   },
   {
     "slug": "david-chavez",
+    "sport": "Baseball",
     "name": "David Chávez",
     "group": "Pitcher",
     "position": "Pitcher (RHP)",
@@ -730,6 +751,7 @@ let PLAYERS = [
   },
   {
     "slug": "matteo-colalucci",
+    "sport": "Baseball",
     "name": "Matteo Colalucci",
     "group": "Two-Way",
     "position": "Pitcher / Infielder",
@@ -746,6 +768,7 @@ let PLAYERS = [
   },
   {
     "slug": "anthony-quattrocchi",
+    "sport": "Baseball",
     "name": "Anthony Quattrocchi",
     "group": "Pitcher",
     "position": "Pitcher (RHP)",
@@ -765,7 +788,7 @@ let PLAYERS = [
     ]
   }
 ];
-let lang="en", active="All", SB=null;
+let lang="en", active="All", activeSport="All", SB=null;
 
 const initials=n=>n.replace(/[^A-Za-zÀ-ÿ ]/g,"").split(" ").filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 const t=k=>(T[lang][k]??k);
@@ -779,8 +802,14 @@ function applyI18n(){
   document.querySelectorAll("[data-i18n-html]").forEach(el=>el.innerHTML=t(el.dataset.i18nHtml));
   document.querySelectorAll("#lang button").forEach(b=>b.classList.toggle("on",b.dataset.l===lang));
 }
-function setLang(l){lang=l;applyI18n();renderFilters();renderRoster();renderEvents();renderTesti();}
+function setLang(l){lang=l;applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();}
 
+const SPORT_FILTERS=["All","Baseball","Softball"];
+function renderSportFilters(){
+  const f=document.getElementById("sportFilters");
+  f.innerHTML=SPORT_FILTERS.map(x=>`<button class="chip ${x===activeSport?'active':''}" data-sf="${x}">${x==="All"?t("filter_all"):x}</button>`).join("");
+  f.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{activeSport=c.dataset.sf;active="All";renderFilters();renderSportFilters();renderRoster();});
+}
 const FILTERS=["All","Pitcher","Catcher","Infielder","Two-Way"];
 function renderFilters(){
   const f=document.getElementById("filters");
@@ -788,7 +817,8 @@ function renderFilters(){
   f.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{active=c.dataset.f;renderFilters();renderRoster();});
 }
 function renderRoster(){
-  const list=active==="All"?PLAYERS:PLAYERS.filter(p=>p.group===active);
+  let list=activeSport==="All"?PLAYERS:PLAYERS.filter(p=>(p.sport||"Baseball")===activeSport);
+  list=active==="All"?list:list.filter(p=>p.group===active);
   document.getElementById("rosterList").innerHTML=list.map(p=>{
     const hasPage=STATIC_PLAYER_PAGES.has(p.slug);
     const tag=hasPage?"a":"button";
@@ -853,6 +883,7 @@ form.addEventListener("submit",async e=>{
   const name=(fd.get("name")||"").trim();
   if(!name){form.querySelector("[name=name]").focus();return;}
   const role=fd.get("position")||"Infielder";   // Pitcher | Catcher | Infielder | Two-Way
+  const sport=fd.get("sport")||"Baseball";
   const country=(fd.get("country")||"").trim();
   const btn=form.querySelector("button[type=submit]");
   const msg=document.getElementById("formMsg");
@@ -865,7 +896,7 @@ form.addEventListener("submit",async e=>{
   // Saved as `pending` so an admin reviews it before it appears on the public roster.
   const {error}=await SB.from("players").insert({
     slug:slugify(name)+"-"+Date.now().toString(36),
-    name,"group":role,position:role,country,flag:FLAGS[country]||"🌎",tier:"New",
+    name,"group":role,position:role,sport,country,flag:FLAGS[country]||"🌎",tier:"New",
     bio:(fd.get("why")||"").trim()||"—",teams:[],stats:[],
     age:fd.get("age"),phone:fd.get("phone"),email:fd.get("email"),
     instagram:fd.get("ig"),applying_for:fd.get("applying"),message:fd.get("other"),
@@ -895,7 +926,7 @@ async function boot(){
       if(data&&data.length)PLAYERS=data.map(p=>({...p,image:p.image_url||p.image||null}));
     }catch(err){console.warn("Supabase load failed; using embedded roster.",err);}
   }
-  applyI18n();renderFilters();renderRoster();renderEvents();renderTesti();
+  applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();
 }
 boot();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}

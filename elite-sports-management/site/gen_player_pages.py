@@ -28,6 +28,7 @@ EXTRA_CSS = """
   .pp-tier{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:rgba(6,20,42,.7);border:1px solid var(--line);color:var(--gold-soft)}
   .pp-flagchip{font-size:13px;font-weight:700;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
   .pp-flagchip .pp-flag{font-size:18px}
+  .pp-sport{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-soft);border:1px solid var(--line);border-radius:999px;padding:5px 11px;background:rgba(6,20,42,.5)}
   .pp-headline{font-size:clamp(24px,4.4vw,34px);line-height:1.25;margin:0 0 12px}
   .pp-name-line{display:block;font-size:.62em;color:var(--gold-soft);font-weight:700;margin-bottom:6px;letter-spacing:.02em}
   .pp-meta-list{display:flex;flex-direction:column;gap:6px;margin-top:16px;color:var(--muted);font-size:14px}
@@ -76,6 +77,9 @@ def render_page(p):
     country = esc(p.get("country") or "")
     heritage = esc(p.get("heritage") or "")
     bio = esc(p.get("bio") or "")
+
+    sport = esc(p.get("sport") or "Baseball")
+    sport_badge = '<span class="pp-sport">' + sport + '</span>'
 
     meta_rows = []
     if p.get("birthplace"): meta_rows.append(("Birthplace", esc(p["birthplace"])))
@@ -145,6 +149,7 @@ def render_page(p):
     <div class="pp-tier-row">
       <span class="pp-tier">{tier}</span>
       <span class="pp-flagchip"><span class="pp-flag">{flag}</span>{country}</span>
+      {sport_badge}
     </div>
     <h1 class="display pp-headline"><span class="pp-name-line">{name}</span>{headline}</h1>
     <div class="pp-meta-list">{meta_html}</div>
