@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<!-- iOS Safari auto-detects number strings (e.g. the "$49.99" roster price) as phone
+     numbers and turns them into tappable links; scrolling/tapping then surfaces an
+     unwanted iOS action sheet. Disable data detectors so it never happens in any locale. -->
+<meta name="format-detection" content="telephone=no" />
 <title>Elite Sports Management — Athlete Representation</title>
 <meta name="description" content="Elite Sports Management — baseball and softball athlete representation and development across college recruiting, independent pro ball and Europe. Founded by professional baseball player Samuele Bruno (Hastings College NAIA, scholarship athlete, class of 2027). Browse the roster, upcoming events and individual athlete profiles." />
 <link rel="manifest" href="manifest.json" />
@@ -331,7 +335,7 @@
 
 <div class="stats"><div class="wrap stats-in">
   <div class="stat"><b id="statAthletes">19</b><span data-i18n="stat1"></span></div>
-  <div class="stat"><b id="statCountries">6</b><span data-i18n="stat2"></span></div>
+  <div class="stat"><b id="statCountries">7</b><span data-i18n="stat2"></span></div>
 </div></div>
 
 <section class="sec" id="about"><div class="wrap">
@@ -339,6 +343,7 @@
   <div class="do-grid">
     <div class="do"><div class="ic">🎓</div><h3 data-i18n="svc1_t"></h3><p data-i18n="svc1_d"></p><a class="svc-pay" href="#college" data-i18n="svc1_pay"></a></div>
     <div class="do"><div class="ic">⚾</div><h3 data-i18n="svc2_t"></h3><p data-i18n="svc2_d"></p><a class="svc-pay svc-signup" href="#join" data-svc="Indy Ball" data-i18n="svc2_pay"></a></div>
+    <div class="do"><div class="ic">🥎</div><h3 data-i18n="so_t"></h3><p data-i18n="so_d"></p><a class="svc-pay svc-signup" href="#join" data-svc="Softball" data-i18n="so_pay"></a></div>
     <div class="do"><div class="ic">🏝️</div><h3 data-i18n="svc6_t"></h3><p data-i18n="svc6_d"></p><a class="svc-pay svc-signup" href="#join" data-svc="Winter League" data-i18n="svc6_pay"></a></div>
     <div class="do"><div class="ic">🌍</div><h3 data-i18n="svc3_t"></h3><p data-i18n="svc3_d"></p></div>
     <div class="do"><div class="ic">📣</div><h3 data-i18n="svc4_t"></h3><p data-i18n="svc4_d"></p></div>
@@ -598,7 +603,7 @@ const STATIC_PLAYER_PAGES = new Set(["brayan-hernandez", "gianni-westphal", "jos
 const T = {
   en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_cta:"Apply Now",
     contracts_h2:'50+ contracts signed <em>since 2025</em>',
-    contracts_sub:'Our athletes have signed contracts in <b>6 different countries</b> to date.',
+    contracts_sub:'Our athletes have signed contracts in <b>7 different countries</b> to date.',
     feat_role:"Former Cleveland Indians organization",
     col_kicker:"College Placement",col_h2:"Get recruited. Get a scholarship.",
     col_p:"We guide baseball and softball athletes through the U.S. college recruiting process from first evaluation to signed offer — NCAA, NAIA and JUCO.",
@@ -634,6 +639,7 @@ const T = {
     svc1_t:"College Placement",svc1_d:"Connecting players with U.S. college programs and helping them earn athletic scholarships that fit their game, goals and budget.",svc1_pay:"Explore College Placement →",
     svc2_t:"Indy Ball",svc2_d:"Opening doors to professional independent leagues across North America.",svc2_pay:"Sign up for Indy Ball →",
     svc6_t:"Winter League",svc6_d:"Placing athletes in winter league play abroad for extra reps and exposure during the offseason.",svc6_pay:"Sign up for Winter League →",
+    so_t:"Softball Opportunities",so_d:"Guiding softball athletes through college recruiting, national team pathways and international competition — with player development, showcase events and exposure to college coaches and scouts.",so_pay:"Explore Softball Opportunities →",
     svc3_t:"Europe",svc3_d:"Placing athletes with clubs in Italy, Spain, Germany and beyond.",
     svc4_t:"Social Media & Branding",svc4_d:"Building each athlete's profile and story to grow their visibility.",
     svc5_t:"Representation & Development",svc5_d:"Day-to-day management and a plan tailored to each athlete.",svc5_pay:"Sign up for Representation →",
@@ -667,7 +673,7 @@ const T = {
     admin_link:"Admin",login_h:"Admin Login",login_sub:"Manage athletes, stats & photos",login_email:"Email",login_pass:"Password",login_btn:"Log in"},
   es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_cta:"Aplica Ahora",
     contracts_h2:'Más de 50 contratos firmados <em>desde 2025</em>',
-    contracts_sub:'Nuestros atletas han firmado contratos en <b>6 países diferentes</b> hasta la fecha.',
+    contracts_sub:'Nuestros atletas han firmado contratos en <b>7 países diferentes</b> hasta la fecha.',
     feat_role:"Ex organización de los Cleveland Indians",
     col_kicker:"Colocación en College",col_h2:"Que te recluten. Consigue tu beca.",
     col_p:"Acompañamos a atletas de béisbol y sóftbol en todo el proceso de reclutamiento universitario en EE. UU. — desde la primera evaluación hasta la oferta firmada. NCAA, NAIA y JUCO.",
@@ -703,6 +709,7 @@ const T = {
     svc1_t:"Colocación en College",svc1_d:"Conectamos a los jugadores con programas universitarios en EE. UU. y les ayudamos a conseguir becas deportivas según su nivel, metas y presupuesto.",svc1_pay:"Ver Colocación en College →",
     svc2_t:"Indy Ball",svc2_d:"Abrimos puertas a las ligas profesionales independientes de Norteamérica.",svc2_pay:"Inscríbete en Indy Ball →",
     svc6_t:"Liga de Invierno",svc6_d:"Ubicamos atletas en ligas de invierno en el extranjero para sumar experiencia y visibilidad fuera de temporada.",svc6_pay:"Inscríbete en la Liga de Invierno →",
+    so_t:"Oportunidades de Sóftbol",so_d:"Acompañamos a las atletas de sóftbol en el reclutamiento universitario, las vías hacia las selecciones nacionales y la competición internacional — con desarrollo de jugadoras, showcases y visibilidad ante entrenadores y scouts.",so_pay:"Explora las Oportunidades de Sóftbol →",
     svc3_t:"Europa",svc3_d:"Ubicamos atletas en clubes de Italia, España, Alemania y más.",
     svc4_t:"Redes Sociales y Marca",svc4_d:"Construimos el perfil y la historia de cada atleta para aumentar su visibilidad.",
     svc5_t:"Representación y Desarrollo",svc5_d:"Gestión diaria y un plan a la medida de cada atleta.",svc5_pay:"Inscríbete en Representación →",
@@ -736,7 +743,7 @@ const T = {
     admin_link:"Admin",login_h:"Acceso Admin",login_sub:"Gestiona atletas, estadísticas y fotos",login_email:"Correo",login_pass:"Contraseña",login_btn:"Entrar"},
   it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_cta:"Candidati",
     contracts_h2:'Oltre 50 contratti firmati <em>dal 2025</em>',
-    contracts_sub:'I nostri atleti hanno firmato contratti in <b>6 paesi diversi</b> a oggi.',
+    contracts_sub:'I nostri atleti hanno firmato contratti in <b>7 paesi diversi</b> a oggi.',
     feat_role:"Ex organizzazione Cleveland Indians",
     col_kicker:"Collocamento College",col_h2:"Fatti reclutare. Ottieni la borsa di studio.",
     col_p:"Accompagniamo gli atleti di baseball e softball in tutto il percorso di recruiting universitario negli USA — dalla prima valutazione all'offerta firmata. NCAA, NAIA e JUCO.",
@@ -772,6 +779,7 @@ const T = {
     svc1_t:"Collocamento College",svc1_d:"Mettiamo in contatto i giocatori con i programmi universitari USA e li aiutiamo a ottenere borse di studio sportive su misura per il loro livello, obiettivi e budget.",svc1_pay:"Scopri il Collocamento College →",
     svc2_t:"Indy Ball",svc2_d:"Apriamo le porte alle leghe professionistiche indipendenti del Nord America.",svc2_pay:"Iscriviti all'Indy Ball →",
     svc6_t:"Winter League",svc6_d:"Inseriamo gli atleti in campionati invernali all'estero per accumulare esperienza e visibilità durante la bassa stagione.",svc6_pay:"Iscriviti alla Winter League →",
+    so_t:"Opportunità nel Softball",so_d:"Accompagniamo le atlete di softball nel recruiting universitario, nei percorsi verso le nazionali e nella competizione internazionale — con sviluppo delle giocatrici, showcase ed esposizione a coach e scout.",so_pay:"Scopri le Opportunità nel Softball →",
     svc3_t:"Europa",svc3_d:"Collochiamo atleti in club di Italia, Spagna, Germania e oltre.",
     svc4_t:"Social Media e Brand",svc4_d:"Costruiamo il profilo e la storia di ogni atleta per aumentarne la visibilità.",
     svc5_t:"Rappresentanza e Sviluppo",svc5_d:"Gestione quotidiana e un piano su misura per ogni atleta.",svc5_pay:"Iscriviti alla Rappresentanza →",
