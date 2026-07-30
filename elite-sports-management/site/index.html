@@ -148,6 +148,9 @@
   .join{border:1px solid var(--line);border-radius:20px;padding:34px;background:linear-gradient(180deg,var(--card),var(--navy-2))}
   .join .tagline{font-family:'Anton';text-transform:uppercase;color:var(--gold);font-size:clamp(18px,3vw,26px);margin-bottom:16px;letter-spacing:.02em}
   .join-pitch{color:var(--muted);font-size:15px;line-height:1.65;max-width:64ch;margin:0 0 26px}
+  /* Honeypot: off-screen (not display:none, so bots still auto-fill it) — a real
+     visitor never sees or fills it, so any value means the submission is a bot. */
+  .hp{position:absolute!important;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;opacity:0}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   @media(max-width:560px){.grid2{grid-template-columns:1fr}}
   .field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
@@ -500,6 +503,8 @@
       </div>
       <div class="field"><label data-i18n="f_why"></label><textarea name="why"></textarea></div>
       <div class="field"><label data-i18n="f_other"></label><textarea name="other"></textarea></div>
+      <!-- Anti-spam honeypot — hidden from real users; must stay empty. -->
+      <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <button class="btn btn-gold" type="submit" data-i18n="f_submit"></button>
       <div class="form-msg" id="formMsg"></div>
     </form>
@@ -1344,6 +1349,7 @@ document.getElementById("lang").querySelectorAll("button").forEach(b=>b.onclick=
 document.getElementById("yr").textContent=new Date().getFullYear();
 
 const form=document.getElementById("applyForm");
+const FORM_T0=Date.now();   // page-load time, for the anti-spam time trap below
 form.addEventListener("submit",async e=>{
   e.preventDefault();
   const fd=new FormData(form);
@@ -1355,6 +1361,15 @@ form.addEventListener("submit",async e=>{
   const btn=form.querySelector("button[type=submit]");
   const msg=document.getElementById("formMsg");
   msg.classList.remove("show","err");
+
+  // Dependency-free spam guard: bots auto-fill the hidden honeypot ("company"), and no
+  // real user reaches and submits this bottom-of-page form within 1.5s of load. Either
+  // signal → show the success UI but skip the insert, so bots don't retry or spam the
+  // moderation queue. Real submissions are unaffected.
+  if((fd.get("company")||"").trim() || (Date.now()-FORM_T0)<1500){
+    form.reset();msg.textContent=t("f_success");msg.classList.add("show");
+    return;
+  }
 
   // Applications require the live database; without it we can't save them.
   if(!SB){msg.textContent=t("f_error");msg.classList.add("show","err");msg.scrollIntoView({behavior:"smooth",block:"center"});return;}
