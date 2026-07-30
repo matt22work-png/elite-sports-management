@@ -83,6 +83,8 @@
   .btn{padding:14px 26px;border-radius:999px;font-weight:700;font-size:15px;transition:.22s;cursor:pointer;border:0;display:inline-block}
   .btn-gold{background:var(--gold);color:#05101f}.btn-gold:hover{background:var(--gold-soft);transform:translateY(-2px)}
   .btn-ghost{border:1px solid var(--line);color:var(--ink)}.btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+  /* Keyboard focus indicator — visible for keyboard/AT users, not on mouse click. */
+  a:focus-visible,button:focus-visible,.chip:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
 
   .stats{position:relative;z-index:1;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(8,26,51,.5)}
   .stats-in{display:grid;grid-template-columns:repeat(3,1fr)}
@@ -333,7 +335,7 @@
       <a href="#events" data-i18n="nav_events"></a>
       <a href="#join" data-i18n="nav_join"></a>
     </nav>
-    <div class="lang" id="lang"><button data-l="en" class="on">EN</button><button data-l="es">ES</button><button data-l="it">IT</button></div>
+    <div class="lang" id="lang"><button type="button" data-l="en" class="on" aria-label="English">EN</button><button type="button" data-l="es" aria-label="Español">ES</button><button type="button" data-l="it" aria-label="Italiano">IT</button></div>
     <a class="nav-cta" href="#join" data-i18n="nav_cta"></a>
   </div>
 </div></header>
@@ -560,9 +562,9 @@
   </div>
 </div></footer>
 
-<div class="modal" id="modal"><div class="scrim" data-close></div><div class="sheet"><button class="close" data-close>✕</button><div id="sheetContent"></div></div></div>
+<div class="modal" id="modal"><div class="scrim" data-close></div><div class="sheet"><button type="button" class="close" data-close aria-label="Close">✕</button><div id="sheetContent"></div></div></div>
 
-<div class="install" id="install"><div class="box"><div><b data-i18n="install_t"></b><span data-i18n="install_d"></span></div><button id="installBtn" data-i18n="install_btn"></button><button class="x" id="installX">✕</button></div></div>
+<div class="install" id="install"><div class="box"><div><b data-i18n="install_t"></b><span data-i18n="install_d"></span></div><button type="button" id="installBtn" data-i18n="install_btn"></button><button type="button" class="x" id="installX" aria-label="Dismiss">✕</button></div></div>
 
 <script>
 /* ===== CONFIG: Supabase (live roster + applications) =====
@@ -1188,13 +1190,13 @@ function setLang(l){lang=l;applyI18n();renderSportFilters();renderFilters();rend
 const SPORT_FILTERS=["All","Baseball","Softball"];
 function renderSportFilters(){
   const f=document.getElementById("sportFilters");
-  f.innerHTML=SPORT_FILTERS.map(x=>`<button class="chip ${x===activeSport?'active':''}" data-sf="${x}">${x==="All"?t("filter_all"):x}</button>`).join("");
+  f.innerHTML=SPORT_FILTERS.map(x=>`<button type="button" class="chip ${x===activeSport?'active':''}" data-sf="${x}">${x==="All"?t("filter_all"):x}</button>`).join("");
   f.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{activeSport=c.dataset.sf;active="All";renderFilters();renderSportFilters();renderRoster();});
 }
 const FILTERS=["All","Pitcher","Catcher","Infielder","Two-Way"];
 function renderFilters(){
   const f=document.getElementById("filters");
-  f.innerHTML=FILTERS.map(x=>`<button class="chip ${x===active?'active':''}" data-f="${x}">${t("filter_"+(x==="All"?"all":groupKey(x)))}</button>`).join("");
+  f.innerHTML=FILTERS.map(x=>`<button type="button" class="chip ${x===active?'active':''}" data-f="${x}">${t("filter_"+(x==="All"?"all":groupKey(x)))}</button>`).join("");
   f.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{active=c.dataset.f;renderFilters();renderRoster();});
 }
 function renderRoster(){
@@ -1252,7 +1254,7 @@ function openEventModal(i){
       <div class="sub-label">${t("media_video_label")}</div>
       <div class="reel">${CLIPS.map(n=>`<video src="media/video/clip-${n}.mp4" poster="media/video/clip-${n}-poster.jpg" controls playsinline preload="none"></video>`).join("")}</div>
       <div class="sub-label">${t("media_photo_label")}</div>
-      <div class="gal">${GALLERY.map(g=>`<button data-full="media/photos/${g.f}.jpg" data-cap="${g.c}"><img src="media/photos/${g.f}-thumb.jpg" alt="${g.c}" loading="lazy" decoding="async" /></button>`).join("")}</div>`:"";
+      <div class="gal">${GALLERY.map(g=>`<button type="button" data-full="media/photos/${g.f}.jpg" data-cap="${g.c}"><img src="media/photos/${g.f}-thumb.jpg" alt="${g.c}" loading="lazy" decoding="async" /></button>`).join("")}</div>`:"";
   document.getElementById("sheetContent").innerHTML=`
     <div class="sh-top"><span class="sh-mono" style="${bgImg(e.image)}">${e.image?"":(e.icon||"\u26be")}</span>
       <div><h3 class="display">${esc(e.title)}</h3>
