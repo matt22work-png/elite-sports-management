@@ -1143,6 +1143,10 @@ const t=k=>(T[lang][k]??k);
 const groupKey=g=>({Pitcher:"pitcher",Catcher:"catcher",Infielder:"infielder","Two-Way":"twoway"}[g]||"infielder");
 const slugify=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const bgImg=u=>u?`background-image:url('${u}')`:"";
+/* Escape untrusted text before it goes into innerHTML. Roster/modal data comes from
+   Supabase (and originally from the public application form), so player-supplied
+   strings like name/position/bio must not be able to inject markup. */
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 function applyI18n(){
   document.documentElement.lang=lang;
@@ -1170,13 +1174,13 @@ function renderRoster(){
   document.getElementById("rosterList").innerHTML=list.map(p=>{
     const hasPage=STATIC_PLAYER_PAGES.has(p.slug);
     const tag=hasPage?"a":"button";
-    const linkAttr=hasPage?`href="players/${p.slug}.html"`:`data-slug="${p.slug}"`;
+    const linkAttr=hasPage?`href="players/${encodeURIComponent(p.slug)}.html"`:`data-slug="${esc(p.slug)}"`;
     return `
     <${tag} class="pcard" ${linkAttr}>
-      <div class="top" style="${bgImg(p.image)}"><span class="flag">${p.flag||"🌎"}${p.heritage?(" "+p.heritage):""}</span>
-        ${p.tier?`<span class="tier">${p.tier}</span>`:""}${p.image?"":`<span class="mono">${initials(p.name)}</span>`}</div>
-      <div class="body"><h3 class="display">${p.name}</h3><div class="pos">${p.position}</div>
-        ${p.teams&&p.teams[0]?`<div class="team">${p.teams[0]}</div>`:""}<div class="view">${t("card_view")}</div></div>
+      <div class="top" style="${bgImg(p.image)}"><span class="flag">${esc(p.flag)||"🌎"}${p.heritage?(" "+esc(p.heritage)):""}</span>
+        ${p.tier?`<span class="tier">${esc(p.tier)}</span>`:""}${p.image?"":`<span class="mono">${initials(p.name)}</span>`}</div>
+      <div class="body"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position)}</div>
+        ${p.teams&&p.teams[0]?`<div class="team">${esc(p.teams[0])}</div>`:""}<div class="view">${t("card_view")}</div></div>
     </${tag}>`;
   }).join("");
   document.querySelectorAll(".pcard[data-slug]").forEach(c=>c.onclick=()=>openModal(c.dataset.slug));
@@ -1189,13 +1193,13 @@ function renderEvents(){
   const order={upcoming:0,past:1};
   EV_VIEW=[...EVENTS].sort((a,b)=>(order[a.status]-order[b.status])||a.date.localeCompare(b.date));
   document.getElementById("eventsList").innerHTML=EV_VIEW.map((e,i)=>`
-    <div class="ev-card${e.media?' has-media':''}"${e.media?` data-ev="${i}" role="button" tabindex="0" aria-label="${e.title}"`:""}><div class="ev-img" style="${bgImg(e.image)}">
+    <div class="ev-card${e.media?' has-media':''}"${e.media?` data-ev="${i}" role="button" tabindex="0" aria-label="${esc(e.title)}"`:""}><div class="ev-img" style="${bgImg(e.image)}">
       <span class="ev-status ${e.status==='upcoming'?'up':'past'}">${e.status==='upcoming'?t("ev_upcoming"):t("ev_past")}</span>
       ${e.image?"":(e.icon||"⚾")}</div>
-      <div class="ev-body"><h3 class="display">${e.title}</h3>
-        <div class="ev-meta"><span>📅 ${fmtDate(e.date)}</span><span>📍 ${e.loc}</span></div>
-        <p>${e.blurb}</p>
-        ${e.tags?`<div class="ev-tags">${e.tags}</div>`:""}
+      <div class="ev-body"><h3 class="display">${esc(e.title)}</h3>
+        <div class="ev-meta"><span>📅 ${fmtDate(e.date)}</span><span>📍 ${esc(e.loc)}</span></div>
+        <p>${esc(e.blurb)}</p>
+        ${e.tags?`<div class="ev-tags">${esc(e.tags)}</div>`:""}
         <div class="ev-actions">
           ${e.media?`<button type="button" class="ev-link ev-media-btn" data-ev="${i}">${t("ev_gallery")} \u2192</button>`:""}
           ${e.email?`<a class="ev-link" href="mailto:${e.email}">${t("ev_register")} \u2192</a>`:""}
@@ -1222,12 +1226,12 @@ function openEventModal(i){
       <div class="gal">${GALLERY.map(g=>`<button data-full="media/photos/${g.f}.jpg" data-cap="${g.c}"><img src="media/photos/${g.f}-thumb.jpg" alt="${g.c}" loading="lazy" decoding="async" /></button>`).join("")}</div>`:"";
   document.getElementById("sheetContent").innerHTML=`
     <div class="sh-top"><span class="sh-mono" style="${bgImg(e.image)}">${e.image?"":(e.icon||"\u26be")}</span>
-      <div><h3 class="display">${e.title}</h3>
+      <div><h3 class="display">${esc(e.title)}</h3>
       <div class="sh-pos">\ud83d\udcc5 ${fmtDate(e.date)}</div>
-      <div class="sh-meta">\ud83d\udccd ${e.loc}</div></div></div>
+      <div class="sh-meta">\ud83d\udccd ${esc(e.loc)}</div></div></div>
     <div class="sh-body">
-      <p class="bio">${e.blurb}</p>
-      ${e.tags?`<div class="ev-tags" style="margin:-10px 0 24px">${e.tags}</div>`:""}
+      <p class="bio">${esc(e.blurb)}</p>
+      ${e.tags?`<div class="ev-tags" style="margin:-10px 0 24px">${esc(e.tags)}</div>`:""}
       ${media}
       ${e.email?`<div style="margin-top:28px"><a class="btn btn-gold" href="mailto:${e.email}?subject=${encodeURIComponent(e.title+" \u2014 Registration")}">${t("ev_register")} \u2192</a></div>`:""}
     </div>`;
@@ -1239,10 +1243,10 @@ const loc=v=>(v&&typeof v==="object")?(v[lang]||v.en||Object.values(v)[0]||""):(
 
 function renderTesti(){
   document.getElementById("testiList").innerHTML=TESTIMONIALS.map(x=>`
-    <div class="testi"><div class="q">“</div><p>${loc(x.q)}</p>
+    <div class="testi"><div class="q">“</div><p>${esc(loc(x.q))}</p>
       <div class="who">
         <div class="av" ${x.photo?`style="background-image:url('${x.photo}');background-size:cover;background-position:center 20%;border-color:var(--gold)"`:""}>${x.photo?"":initials(x.n)}</div>
-        <div><div class="nm">${x.n}</div><div class="rl">${loc(x.r)}</div></div>
+        <div><div class="nm">${esc(x.n)}</div><div class="rl">${esc(loc(x.r))}</div></div>
       </div></div>`).join("");
   const feat=document.getElementById("featQuote");
   if(feat&&TESTIMONIALS[0])feat.textContent="\u201C"+loc(TESTIMONIALS[0].q)+"\u201D";
@@ -1259,11 +1263,11 @@ function openModal(slug){
   const meta=[p.born?("Born "+p.born):null,p.birthplace,p.bats?("Bats "+p.bats):null].filter(Boolean).join("  ·  ");
   document.getElementById("sheetContent").innerHTML=`
     <div class="sh-top"><span class="sh-mono" style="${bgImg(p.image)}">${p.image?"":initials(p.name)}</span>
-      <div><h3 class="display">${p.name} <span style="font-size:.6em">${p.flag||""}${p.heritage||""}</span></h3>
-      <div class="sh-pos">${p.position}</div><div class="sh-meta">${meta}</div></div></div>
-    <div class="sh-body"><p class="bio">${p.bio||""}</p>
-      ${p.stats&&p.stats.length?`<div class="sh-label">${t("modal_highlights")}</div><div class="sh-stats">${p.stats.map(s=>`<div class="sh-stat"><b>${s.value}</b><span>${s.label}</span></div>`).join("")}</div>`:""}
-      ${p.teams&&p.teams.length?`<div class="sh-label">${t("modal_teams")}</div><div class="team-chips">${p.teams.map(x=>`<span class="team-chip">${x}</span>`).join("")}</div>`:""}
+      <div><h3 class="display">${esc(p.name)} <span style="font-size:.6em">${esc(p.flag)}${esc(p.heritage)}</span></h3>
+      <div class="sh-pos">${esc(p.position)}</div><div class="sh-meta">${esc(meta)}</div></div></div>
+    <div class="sh-body"><p class="bio">${esc(p.bio)}</p>
+      ${p.stats&&p.stats.length?`<div class="sh-label">${t("modal_highlights")}</div><div class="sh-stats">${p.stats.map(s=>`<div class="sh-stat"><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join("")}</div>`:""}
+      ${p.teams&&p.teams.length?`<div class="sh-label">${t("modal_teams")}</div><div class="team-chips">${p.teams.map(x=>`<span class="team-chip">${esc(x)}</span>`).join("")}</div>`:""}
       <div class="sh-contact">
         <div class="sh-label">${t("modal_contact_h")}</div>
         <p class="sh-contact-p">${t("modal_contact_p")}</p>
@@ -1385,8 +1389,12 @@ async function boot(){
   if(SUPABASE_URL&&SUPABASE_ANON_KEY){
     try{const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
       SB=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-      // Only approved players are publicly readable (enforced by RLS too).
-      const {data,error}=await SB.from("players").select("*").eq("status","approved").order("sort_order");
+      // Only approved players are publicly readable (enforced by RLS too). We request
+      // just the public display columns — NOT the intake PII (age/phone/email/instagram/
+      // message) — so an approved athlete's contact details are never sent to the browser.
+      const {data,error}=await SB.from("players")
+        .select("slug,name,group,position,country,flag,heritage,born,birthplace,tier,bats,bio,teams,stats,image_url,sport,sort_order")
+        .eq("status","approved").order("sort_order");
       if(error)throw error;
       // Supabase stores the photo in `image_url`; the renderer reads `image`.
       if(data&&data.length)PLAYERS=data.map(p=>({...p,image:p.image_url||p.image||null}));
