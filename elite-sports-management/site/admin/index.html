@@ -97,6 +97,22 @@
 
   <!-- APP -->
   <div id="adminApp">
+    <div class="kicker">Add a player</div>
+    <div class="card">
+      <button class="btn btn-gold" type="button" id="addToggle">+ Add a player</button>
+      <div class="editor" id="addEditor">
+        <div class="sub">New athlete — saved as <b>approved</b>, goes straight to the roster</div>
+        <div class="field"><label>Full name *</label><input id="ap-name" placeholder="Jane Doe" /></div>
+        <div class="field"><label>Position</label><input id="ap-position" placeholder="e.g. Catcher" /></div>
+        <div class="field"><label>Sport</label><select id="ap-sport"><option value="Baseball">Baseball</option><option value="Softball">Softball</option></select></div>
+        <div class="field"><label>Country</label><input id="ap-country" placeholder="e.g. Italy" /></div>
+        <div class="field"><label>Bio</label><textarea id="ap-bio" rows="4" placeholder="Short bio…"></textarea></div>
+        <div class="field"><label>Photo</label><input type="file" accept="image/*" id="ap-photo" /></div>
+        <div class="row-btns"><button class="btn btn-gold" type="button" id="ap-save">Add player</button></div>
+        <div class="msg err" id="ap-msg"></div>
+      </div>
+    </div>
+
     <div class="kicker">Pending applications<span class="count" id="pendingCount">0</span></div>
     <div id="pendingList"></div>
 
@@ -119,6 +135,7 @@ const PHOTO_BUCKET = "player-photos";
    add them there too or their writes will be rejected by the database. */
 const ADMIN_EMAILS = [
   "brunosamuele48@gmail.com",   // Samuele Bruno — CEO & Founder
+  "softball.esm@gmail.com",     // Marianna Zumerle — Softball Specialist
   "mattswagj@gmail.com",
   "matt22work-png@gmail.com",
 ];
@@ -366,6 +383,45 @@ function bindActions(){
     $("ed-" + id)?.classList.add("open");
   });
 }
+
+/* ---------- add a brand-new player (admin-created, saved approved) ----------
+   For athletes Sam has already signed, so they skip the public application form.
+   RLS ("admin insert players") allows an admin to insert at any status. */
+const slugify = s => (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+$("addToggle").onclick = () => $("addEditor").classList.toggle("open");
+$("ap-save").onclick = async () => {
+  const msg = $("ap-msg"); msg.classList.remove("show");
+  const name = $("ap-name").value.trim();
+  if (!name){ msg.textContent = "Name is required."; msg.classList.add("show"); $("ap-name").focus(); return; }
+  const position = $("ap-position").value.trim();
+  const sport = $("ap-sport").value;
+  const country = $("ap-country").value.trim();
+  const bio = $("ap-bio").value.trim();
+  const slug = (slugify(name) || "player") + "-" + Date.now().toString(36);
+  const btn = $("ap-save"); btn.disabled = true;
+  // Optional photo — upload first (the storage path needs the slug), then embed the URL.
+  let image_url = null;
+  const file = $("ap-photo").files?.[0];
+  if (file){
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
+    toast("Uploading photo…");
+    const path = `${slug}.${ext}`;
+    const { error: upErr } = await SB.storage.from(PHOTO_BUCKET).upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
+    if (upErr){ btn.disabled = false; msg.textContent = "Photo upload failed: " + upErr.message; msg.classList.add("show"); return; }
+    image_url = SB.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+  const { error } = await SB.from("players").insert({
+    slug, name, "group": position || "Player", position, sport, country,
+    bio: bio || "", teams: [], stats: [], image_url, status: "approved",
+  });
+  btn.disabled = false;
+  if (error){ msg.textContent = "Save failed: " + error.message; msg.classList.add("show"); return; }
+  toast("Player added ✓");
+  ["ap-name","ap-position","ap-country","ap-bio"].forEach(id => { $(id).value = ""; });
+  $("ap-photo").value = "";
+  $("addEditor").classList.remove("open");
+  await load();
+};
 </script>
 </body>
 </html>
