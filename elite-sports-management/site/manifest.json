@@ -1,6 +1,7 @@
 {
   "name": "Elite Sports Management",
   "short_name": "ESM",
+  "id": "/",
   "description": "Athlete representation & development — roster, events, and athlete profiles.",
   "start_url": "./",
   "scope": "./",
