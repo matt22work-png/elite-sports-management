@@ -31,6 +31,10 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ### Docs
 - **34f75d6** Synced `supabase-schema.sql` with live (added `sport` column + CHECK; refreshed applying_for comment). Doc-only; disproved the audit's "applications failing" scare (sport exists in prod).
+- **43926a0** Added this ENGINEERING_LOG.md.
+
+### Content / UX
+- **a160ddb** Sam "Contact Him" founder-card button mirroring Marianna's `.founder-contact` pill. Sam→elitesportsmanagement50@gmail.com, Marianna→softball.esm@gmail.com, both with pre-filled subject. `sam_contact` EN/ES/IT. Assumption: kept gendered labels (Contact Her/Him) over literal "Contact Now" to preserve Marianna's prior explicit label.
 
 ---
 
@@ -41,7 +45,7 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## In progress
 - Tier 3 SEO: OG/Twitter/canonical meta (base URL https://elite-sports-management.vercel.app). Chosen share image TBD (hero photo placeholder).
-- Sam "Contact Now" button (mirror Marianna's pattern) + Instagram icon (footer).
+- Footer Instagram icon (replace ◎ glyph with inline SVG).
 
 ## Pending (roadmap)
 - Tier 4 maintainability: reconcile design tokens across index/admin/portal; shared esc/$/initials/client (no-build only); strip ~250 lines dead CSS from generated player pages; dup `.msg.ok` in admin; remove unused local `sam.jpeg` if truly unref; manifest `id`+screenshots; a11y pass.
