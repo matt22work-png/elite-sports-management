@@ -56,6 +56,10 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 ## In progress
 - (Tier 3 complete. Next: Tier 4 maintainability, then Tier 5 content.)
 
+## Deferred (with reason — do NOT redo blindly)
+- **Strip dead CSS from 17 generated player pages** — DEFERRED. Python is unavailable in this env, so `gen_player_pages.py` (the source of truth) can't be run to regenerate safely. Trimming the 17 files by hand or porting the generator to Node risks generator↔output drift and unverifiable layout regressions. Low impact (pages are noindex + paywalled, only 17). Recommended fix: update `gen_player_pages.py` to inline a curated BASE_CSS (root vars, base reset, fonts, `.wrap/.display/.bg-fx`, nav+brand+logo+nav-cta, `.btn/.btn-gold`, footer/`.foot`/`.pill`/`.muted` + their media queries) instead of the whole index `<style>`, then `python gen_player_pages.py`. Used classes on a player page: bg-fx, nav*, brand, logo-img, wrap, display, nav-cta, btn(-gold), foot*, pill, muted, pp-*.
+- **Extract shared Supabase client + esc/$/initials into one file** — DEFERRED. Touches 3 working apps incl. admin/portal auth; can't manually test the admin magic-link/password login unattended, so regression risk > the DRY gain. A no-build `<script src>` include is viable when it can be interactively verified.
+
 ## Pending (roadmap)
 - Tier 4 maintainability: reconcile design tokens across index/admin/portal; shared esc/$/initials/client (no-build only); strip ~250 lines dead CSS from generated player pages; dup `.msg.ok` in admin; remove unused local `sam.jpeg` if truly unref; manifest `id`+screenshots; a11y pass.
 - Tier 5: merge Winter League + Indy Ball → "Professional Leagues" card; "Specialized Personalized Training" emphasis in Representation card; nav reorder (keep Media, move to end); admin "Add Player" direct flow.
