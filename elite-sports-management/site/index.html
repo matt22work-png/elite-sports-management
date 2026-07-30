@@ -127,7 +127,11 @@
   .ev-meta{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
   .ev-body p{color:var(--muted);font-size:14px;margin-top:10px}
   .ev-body .ev-tags{color:var(--teal-soft);font-size:12.5px;margin-top:8px;line-height:1.5}
-  .ev-body .ev-link{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
+  .ev-body .ev-link{display:inline-block;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
+  .ev-actions{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:12px}
+  .ev-media-btn{background:none;border:0;padding:0;cursor:pointer;font-family:inherit}
+  .ev-card.has-media{cursor:pointer}
+  .ev-card.has-media:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
   /* testimonials */
   .testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
@@ -298,7 +302,6 @@
       <a href="#who" data-i18n="nav_who"></a>
       <a href="#roster" data-i18n="nav_roster"></a>
       <a href="#events" data-i18n="nav_events"></a>
-      <a href="#media" data-i18n="nav_media"></a>
       <a href="#join" data-i18n="nav_join"></a>
     </nav>
     <div class="lang" id="lang"><button data-l="en" class="on">EN</button><button data-l="es">ES</button><button data-l="it">IT</button></div>
@@ -440,13 +443,8 @@
   <div class="ev-grid" id="eventsList"></div>
 </div></section>
 
-<section class="sec" id="media" style="padding-top:10px"><div class="wrap">
-  <div class="sec-head"><div class="kicker" data-i18n="media_kicker"></div><h2 class="display" data-i18n="media_h2"></h2><p data-i18n="media_p"></p></div>
-  <div class="sub-label" data-i18n="media_video_label"></div>
-  <div class="reel" id="reel"></div>
-  <div class="sub-label" data-i18n="media_photo_label"></div>
-  <div class="gal" id="gallery"></div>
-</div></section>
+<!-- Tenerife Winter League media (video reel + photo gallery) now lives inside the
+     Winter League event detail modal (see openEventModal), gated behind its event card. -->
 
 <section class="sec" id="testi" style="padding-top:10px"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="testi_kicker"></div><h2 class="display" data-i18n="testi_h2"></h2><p data-i18n="testi_p"></p></div>
@@ -586,7 +584,7 @@ const LOCAL_PHOTOS = { "jose-cedeno":"media/photos/jose-cedeno.jpg" };
 
 /* ===== EVENTS ===== */
 const EVENTS = [
-  { title:"Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", icon:"🏝️", image:"media/photos/twl-field-aerial-thumb.jpg", blurb:"Adult division winter league on the coast of Tenerife, Spain — Dec 8–15, 2026. Includes tournament entry, hotel with meals, transport to the seaside field, official jersey and cap, laundry service, and a showcase in front of MLB and college scouts. Registration is open; the first 20 players to sign up get a bonus surprise.", tags:"⚾ Adult Division  ·  🔭 MLB & College Scouts  ·  🎁 First 20 get a bonus", email:"elitesportsmanagement50@gmail.com" }
+  { title:"Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", media:true, icon:"🏝️", image:"media/photos/twl-field-aerial-thumb.jpg", blurb:"Adult division winter league on the coast of Tenerife, Spain — Dec 8–15, 2026. Includes tournament entry, hotel with meals, transport to the seaside field, official jersey and cap, laundry service, and a showcase in front of MLB and college scouts. Registration is open; the first 20 players to sign up get a bonus surprise.", tags:"⚾ Adult Division  ·  🔭 MLB & College Scouts  ·  🎁 First 20 get a bonus", email:"elitesportsmanagement50@gmail.com" }
 ];
 
 /* ===== TESTIMONIALS =====
@@ -666,7 +664,7 @@ const T = {
     roster_p:"A growing family of ballplayers from the Dominican Republic, Venezuela, Spain, Colombia, Italy and the United States.",
     filter_all:"All",filter_pitcher:"Pitchers",filter_catcher:"Catchers",filter_infielder:"Infielders",filter_twoway:"Two-Way",card_view:"View profile →",
     events_kicker:"Events",events_h2:"Camps, Showcases & Tournaments",events_p:"Where Elite Sports Management athletes train, compete and get seen.",
-    ev_upcoming:"Upcoming",ev_past:"Past",ev_register:"Register",
+    ev_upcoming:"Upcoming",ev_past:"Past",ev_register:"Register",ev_gallery:"View media & photos",
     testi_kicker:"Testimonials",testi_h2:"What People Say",testi_p:"Voices from players, families and coaches in the ESM family.",
     join_kicker:"Join Us",join_h2:"Apply to Elite Sports Management",join_p:"Players, families and clubs — tell us about yourself and we'll create your athlete profile.",
     join_tagline:"Train like an athlete. Play like a pro.",
@@ -737,7 +735,7 @@ const T = {
     roster_p:"Una familia creciente de peloteros de República Dominicana, Venezuela, España, Colombia, Italia y Estados Unidos.",
     filter_all:"Todos",filter_pitcher:"Lanzadores",filter_catcher:"Receptores",filter_infielder:"Infielders",filter_twoway:"Dos Vías",card_view:"Ver perfil →",
     events_kicker:"Eventos",events_h2:"Camps, Showcases y Torneos",events_p:"Donde los atletas de Elite Sports Management entrenan, compiten y se hacen ver.",
-    ev_upcoming:"Próximo",ev_past:"Pasado",ev_register:"Inscribirse",
+    ev_upcoming:"Próximo",ev_past:"Pasado",ev_register:"Inscribirse",ev_gallery:"Ver fotos y videos",
     testi_kicker:"Testimonios",testi_h2:"Lo Que Dicen",testi_p:"Voces de jugadores, familias y entrenadores de la familia ESM.",
     join_kicker:"Únete",join_h2:"Aplica a Elite Sports Management",join_p:"Jugadores, familias y clubes — cuéntanos sobre ti y crearemos tu perfil de atleta.",
     join_tagline:"Entrena como un atleta. Juega como un profesional.",
@@ -808,7 +806,7 @@ const T = {
     roster_p:"Una famiglia in crescita di giocatori da Repubblica Dominicana, Venezuela, Spagna, Colombia, Italia e Stati Uniti.",
     filter_all:"Tutti",filter_pitcher:"Lanciatori",filter_catcher:"Ricevitori",filter_infielder:"Interni",filter_twoway:"Due Ruoli",card_view:"Vedi profilo →",
     events_kicker:"Eventi",events_h2:"Camp, Showcase e Tornei",events_p:"Dove gli atleti di Elite Sports Management si allenano, competono e si fanno notare.",
-    ev_upcoming:"In arrivo",ev_past:"Passato",ev_register:"Iscriviti",
+    ev_upcoming:"In arrivo",ev_past:"Passato",ev_register:"Iscriviti",ev_gallery:"Foto e video",
     testi_kicker:"Testimonianze",testi_h2:"Cosa Dicono",testi_p:"Le voci di giocatori, famiglie e coach della famiglia ESM.",
     join_kicker:"Unisciti",join_h2:"Candidati a Elite Sports Management",join_p:"Giocatori, famiglie e club — raccontaci di te e creeremo il tuo profilo da atleta.",
     join_tagline:"Allenati come un atleta. Gioca come un professionista.",
@@ -1182,19 +1180,55 @@ function renderRoster(){
   // only lists approved athletes, which undercounts who's actually represented.
 }
 function fmtDate(d){try{return new Date(d+"T00:00").toLocaleDateString(lang,{day:"numeric",month:"short",year:"numeric"})}catch(e){return d}}
+let EV_VIEW=[];
 function renderEvents(){
   const order={upcoming:0,past:1};
-  const list=[...EVENTS].sort((a,b)=>(order[a.status]-order[b.status])||a.date.localeCompare(b.date));
-  document.getElementById("eventsList").innerHTML=list.map(e=>`
-    <div class="ev-card"><div class="ev-img" style="${bgImg(e.image)}">
+  EV_VIEW=[...EVENTS].sort((a,b)=>(order[a.status]-order[b.status])||a.date.localeCompare(b.date));
+  document.getElementById("eventsList").innerHTML=EV_VIEW.map((e,i)=>`
+    <div class="ev-card${e.media?' has-media':''}"${e.media?` data-ev="${i}" role="button" tabindex="0" aria-label="${e.title}"`:""}><div class="ev-img" style="${bgImg(e.image)}">
       <span class="ev-status ${e.status==='upcoming'?'up':'past'}">${e.status==='upcoming'?t("ev_upcoming"):t("ev_past")}</span>
       ${e.image?"":(e.icon||"⚾")}</div>
       <div class="ev-body"><h3 class="display">${e.title}</h3>
         <div class="ev-meta"><span>📅 ${fmtDate(e.date)}</span><span>📍 ${e.loc}</span></div>
         <p>${e.blurb}</p>
         ${e.tags?`<div class="ev-tags">${e.tags}</div>`:""}
-        ${e.email?`<a class="ev-link" href="mailto:${e.email}">${t("ev_register")} \u2192</a>`:""}
+        <div class="ev-actions">
+          ${e.media?`<button type="button" class="ev-link ev-media-btn" data-ev="${i}">${t("ev_gallery")} \u2192</button>`:""}
+          ${e.email?`<a class="ev-link" href="mailto:${e.email}">${t("ev_register")} \u2192</a>`:""}
+        </div>
         </div></div>`).join("");
+  const el=document.getElementById("eventsList");
+  el.querySelectorAll(".ev-media-btn").forEach(b=>b.onclick=ev=>{ev.stopPropagation();openEventModal(+b.dataset.ev);});
+  el.querySelectorAll(".ev-card.has-media").forEach(c=>{
+    // Whole card opens the event detail (gallery lives inside it); the register
+    // mailto and the explicit media button handle their own clicks.
+    c.addEventListener("click",ev=>{if(ev.target.closest("a")||ev.target.closest(".ev-media-btn"))return;openEventModal(+c.dataset.ev);});
+    c.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();openEventModal(+c.dataset.ev);}});
+  });
+}
+/* Event detail modal \u2014 reuses the shared #modal sheet. The Tenerife Winter League
+   media (video reel + photo gallery) is rendered here so it only appears once the
+   athlete clicks into that event, rather than on the main page. */
+function openEventModal(i){
+  const e=EV_VIEW[i];if(!e)return;
+  const media=e.media?`
+      <div class="sub-label">${t("media_video_label")}</div>
+      <div class="reel">${CLIPS.map(n=>`<video src="media/video/clip-${n}.mp4" poster="media/video/clip-${n}-poster.jpg" controls playsinline preload="none"></video>`).join("")}</div>
+      <div class="sub-label">${t("media_photo_label")}</div>
+      <div class="gal">${GALLERY.map(g=>`<button data-full="media/photos/${g.f}.jpg" data-cap="${g.c}"><img src="media/photos/${g.f}-thumb.jpg" alt="${g.c}" loading="lazy" decoding="async" /></button>`).join("")}</div>`:"";
+  document.getElementById("sheetContent").innerHTML=`
+    <div class="sh-top"><span class="sh-mono" style="${bgImg(e.image)}">${e.image?"":(e.icon||"\u26be")}</span>
+      <div><h3 class="display">${e.title}</h3>
+      <div class="sh-pos">\ud83d\udcc5 ${fmtDate(e.date)}</div>
+      <div class="sh-meta">\ud83d\udccd ${e.loc}</div></div></div>
+    <div class="sh-body">
+      <p class="bio">${e.blurb}</p>
+      ${e.tags?`<div class="ev-tags" style="margin:-10px 0 24px">${e.tags}</div>`:""}
+      ${media}
+      ${e.email?`<div style="margin-top:28px"><a class="btn btn-gold" href="mailto:${e.email}?subject=${encodeURIComponent(e.title+" \u2014 Registration")}">${t("ev_register")} \u2192</a></div>`:""}
+    </div>`;
+  document.querySelectorAll("#sheetContent .gal button").forEach(b=>b.onclick=()=>openLightbox(b.dataset.full,b.dataset.cap));
+  document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
 }
 /* Testimonial fields may be a plain string or an {en,es,it} object. */
 const loc=v=>(v&&typeof v==="object")?(v[lang]||v.en||Object.values(v)[0]||""):(v||"");
@@ -1210,22 +1244,7 @@ function renderTesti(){
   if(feat&&TESTIMONIALS[0])feat.textContent="\u201C"+loc(TESTIMONIALS[0].q)+"\u201D";
 }
 
-/* ===== media: video reel + photo gallery ===== */
-function renderMedia(){
-  const reel=document.getElementById("reel");
-  if(reel)reel.innerHTML=CLIPS.map(i=>
-    `<video src="media/video/clip-${i}.mp4" poster="media/video/clip-${i}-poster.jpg" controls playsinline preload="none"></video>`).join("");
-  const gal=document.getElementById("gallery");
-  if(gal){
-    // Real <img> rather than a CSS background: gives us lazy-loading (all 12 thumbs
-    // otherwise download on page load) and alt text for screen readers.
-    gal.innerHTML=GALLERY.map(g=>
-      `<button data-full="media/photos/${g.f}.jpg" data-cap="${g.c}">
-         <img src="media/photos/${g.f}-thumb.jpg" alt="${g.c}" loading="lazy" decoding="async" />
-       </button>`).join("");
-    gal.querySelectorAll("button").forEach(b=>b.onclick=()=>openLightbox(b.dataset.full,b.dataset.cap));
-  }
-}
+/* ===== media lightbox (opened from the event detail modal's photo gallery) ===== */
 function openLightbox(src,cap){
   document.getElementById("sheetContent").innerHTML=
     `<div class="lightbox"><img src="${src}" alt="${cap}" /><p style="color:var(--muted);font-size:13.5px;margin-top:12px;text-align:center">${cap}</p></div>`;
@@ -1372,7 +1391,7 @@ async function boot(){
   // Repo-committed photos fill in only where Supabase has none.
   PLAYERS=PLAYERS.map(p=>({...p,image:p.image||LOCAL_PHOTOS[p.slug]||null}));
   applyLockState();wirePayButtons();wireServiceSignups();
-  applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();renderMedia();
+  applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();
 }
 boot();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
