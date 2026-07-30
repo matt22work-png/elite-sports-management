@@ -1402,9 +1402,14 @@ async function boot(){
   }
   // Repo-committed photos fill in only where Supabase has none.
   PLAYERS=PLAYERS.map(p=>({...p,image:p.image||LOCAL_PHOTOS[p.slug]||null}));
-  applyLockState();wirePayButtons();wireServiceSignups();
+  wirePayButtons();wireServiceSignups();
   applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();
 }
+// Apply the roster lock state synchronously, before boot()'s async network work.
+// The lock depends only on localStorage; gating it behind the esm.sh import + Supabase
+// fetch made already-unlocked visitors see the "$49.99" gate flash on slow connections
+// (the roster ships with `is-locked` in the HTML and JS only removes it once unlocked).
+applyLockState();
 boot();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
 </script>
