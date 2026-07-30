@@ -1,4 +1,4 @@
-const CACHE = "esm-v4";
+const CACHE = "esm-v5";
 const ASSETS = ["./manifest.json",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 
@@ -33,8 +33,12 @@ self.addEventListener("fetch", e => {
   if (isNavigation) {
     e.respondWith(
       fetch(request).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE).then(c => c.put(request, copy)).catch(() => {});
+        // Only cache a genuinely OK response — never a 404/500 error page, or the
+        // offline fallback would later serve that instead of the real index.html.
+        if (res && res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then(c => c.put(request, copy)).catch(() => {});
+        }
         return res;
       }).catch(() => caches.match(request).then(hit => hit || caches.match("./index.html")))
     );
@@ -45,8 +49,13 @@ self.addEventListener("fetch", e => {
   // benefit from instant offline-capable loading.
   e.respondWith(
     caches.match(request).then(hit => hit || fetch(request).then(res => {
-      const copy = res.clone();
-      caches.open(CACHE).then(c => c.put(request, copy)).catch(() => {});
+      // Only cache successful, non-opaque responses. Caching an opaque cross-origin
+      // response (e.g. a failed Google Fonts fetch, status 0) or an error response
+      // would pin a broken asset in the cache until the CACHE version is bumped.
+      if (res && res.ok && res.type !== "opaque") {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(request, copy)).catch(() => {});
+      }
       return res;
     }))
   );
