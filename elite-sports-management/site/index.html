@@ -298,6 +298,12 @@
   .gate-code input:focus{outline:0;border-color:var(--gold)}
   .gate-code button{background:transparent;border:1px solid var(--gold);color:var(--gold-soft);border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer;font-size:14px;white-space:nowrap}
   .gate-code button:hover{background:var(--gold);color:#05101f}
+  /* Profile-creation gate (€124.99) — a second, independent instance of the gate
+     pattern. Toggles between the locked payment card and the unlocked CTA. */
+  .pgate{display:flex;justify-content:center}
+  .pgate-done{display:none;justify-content:center}
+  #profile.is-unlocked .pgate{display:none}
+  #profile.is-unlocked .pgate-done{display:flex}
   .gate-err{margin-top:11px;font-size:13px;color:#ff9c9c;display:none}
   .gate-err.show{display:block}
   .unlocked-note{display:none;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--teal-soft);margin-bottom:16px;font-weight:700;letter-spacing:.03em}
@@ -489,6 +495,35 @@
   <div class="testi-grid" id="testiList"></div>
 </div></section>
 
+<!-- Profile-creation gate (€124.99). Independent second instance of the roster paywall:
+     its own code hash, its own localStorage key, and it directs to #join once unlocked. -->
+<section class="sec" id="profile" style="padding-top:10px"><div class="wrap">
+  <div class="sec-head"><div class="kicker" data-i18n="pg_kicker"></div><h2 class="display" data-i18n="pg_h2"></h2><p data-i18n="pg_p2"></p></div>
+  <div class="pgate" id="profileGate">
+    <div class="gate-in">
+      <div class="gate-lock">🪪</div>
+      <h3 data-i18n="pg_h"></h3>
+      <p data-i18n="pg_p"></p>
+      <div class="gate-price">€124.99<small data-i18n="pg_price_note"></small></div>
+      <a class="btn btn-gold" id="profilePayBtn" href="#" target="_blank" rel="noopener" style="margin-top:18px" data-i18n="pg_btn"></a>
+      <div class="gate-or" data-i18n="pg_or"></div>
+      <form class="gate-code" id="profileForm">
+        <input id="profileInput" type="text" autocomplete="off" spellcheck="false" placeholder="ACCESS CODE" aria-label="Profile access code" />
+        <button type="submit" data-i18n="pg_unlock"></button>
+      </form>
+      <div class="gate-err" id="profileErr" data-i18n="pg_err"></div>
+    </div>
+  </div>
+  <div class="pgate-done" id="profileDone">
+    <div class="gate-in">
+      <div class="gate-lock">✅</div>
+      <h3 data-i18n="pg_done_h"></h3>
+      <p data-i18n="pg_done_p"></p>
+      <a class="btn btn-gold" href="#join" style="margin-top:16px" data-i18n="pg_done_btn"></a>
+    </div>
+  </div>
+</div></section>
+
 <section class="sec" id="join" style="padding-top:10px"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="join_kicker"></div><h2 class="display" data-i18n="join_h2"></h2><p data-i18n="join_p"></p></div>
   <div class="join">
@@ -584,6 +619,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
    here. Until they're filled in, the pay buttons fall back to emailing ESM, so
    nothing on the site is a dead end. */
 const STRIPE_ROSTER_URL   = "";   // $49.99 — lifetime roster access (scouts & teams)
+const PAYPAL_PROFILE_URL  = "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=brunosamuele56@gmail.com&currency_code=EUR&amount=124.99&item_name=ESM%20Player%20Profile";   // €124.99 profile creation — Sam's PayPal
 const STRIPE_REGISTER_URL = "";   // $125   — athlete registration
 const STRIPE_COLLEGE_URL  = "";   // college placement — price TBD
 const FALLBACK_EMAIL      = "mailto:elitesportsmanagement50@gmail.com";
@@ -601,6 +637,10 @@ const STRIPE_CONTACT_URL = "";
    HTML still ships to the browser. Move to real logins when revenue justifies it. */
 const ROSTER_CODE_HASHES = ["99b2bfb3a4ac35e32491d22207e082500404dbbd30f0cd8a5152cd6185c3cc58"];
 const UNLOCK_KEY = "esm_roster_unlock_v1";
+/* Profile-creation gate — SEPARATE code + key from the roster gate (no collision).
+   Current code: ESM-PROFILE-2026 (SHA-256 below). Change the code by replacing the hash. */
+const PROFILE_CODE_HASHES = ["e15bc2cb66c49eed1616431667ec0f6911edf2d11624a296b38e7255497198f3"];
+const PROFILE_UNLOCK_KEY = "esm_profile_unlock_v1";
 
 /* ===== Media (Tenerife Winter League) ===== */
 const GALLERY = [
@@ -671,6 +711,11 @@ const T = {
     gate_or:"Already paid?",gate_unlock:"Unlock",
     gate_err:"That code isn't right. Check the email from your purchase, or contact us.",
     gate_unlocked:"Roster unlocked — thanks for your support.",
+    pg_kicker:"Create Your Profile",pg_h2:"Get Represented by ESM",pg_p2:"Create your official athlete profile and start your journey with Elite Sports Management.",
+    pg_h:"Create Your Player Profile",pg_p:"To create your official ESM athlete profile, send €124.99 via PayPal to brunosamuele56@gmail.com. We'll email you an access code — enter it below to continue to your application.",
+    pg_price_note:"One-time · Profile creation",pg_btn:"Pay €124.99 with PayPal",pg_or:"Already paid? Enter your code",pg_unlock:"Unlock",
+    pg_err:"That code isn't right. Check the email from your purchase, or contact us.",
+    pg_done_h:"You're all set!",pg_done_p:"Your access is unlocked. Complete the application form to create your athlete profile.",pg_done_btn:"Continue to your application →",
     pay_h:"One last step",
     pay_p:"We've got your application. Complete your $125 registration and Samuele will review your profile.",
     pay_btn:"Complete registration — $125",
@@ -742,6 +787,11 @@ const T = {
     gate_or:"¿Ya pagaste?",gate_unlock:"Desbloquear",
     gate_err:"Ese código no es correcto. Revisa el correo de tu compra o contáctanos.",
     gate_unlocked:"Roster desbloqueado — gracias por tu apoyo.",
+    pg_kicker:"Crea Tu Perfil",pg_h2:"Hazte Representar por ESM",pg_p2:"Crea tu perfil oficial de atleta y comienza tu camino con Elite Sports Management.",
+    pg_h:"Crea Tu Perfil de Jugador",pg_p:"Para crear tu perfil oficial de atleta ESM, envía €124.99 por PayPal a brunosamuele56@gmail.com. Te enviaremos un código de acceso por correo — introdúcelo abajo para continuar con tu solicitud.",
+    pg_price_note:"Pago único · Creación de perfil",pg_btn:"Paga €124.99 con PayPal",pg_or:"¿Ya pagaste? Introduce tu código",pg_unlock:"Desbloquear",
+    pg_err:"Ese código no es correcto. Revisa el correo de tu compra o contáctanos.",
+    pg_done_h:"¡Todo listo!",pg_done_p:"Tu acceso está desbloqueado. Completa el formulario para crear tu perfil de atleta.",pg_done_btn:"Continúa con tu solicitud →",
     pay_h:"Un último paso",
     pay_p:"Ya tenemos tu solicitud. Completa tu registro de $125 y Samuele revisará tu perfil.",
     pay_btn:"Completar registro — $125",
@@ -813,6 +863,11 @@ const T = {
     gate_or:"Hai già pagato?",gate_unlock:"Sblocca",
     gate_err:"Il codice non è corretto. Controlla l'email dell'acquisto o contattaci.",
     gate_unlocked:"Roster sbloccato — grazie del supporto.",
+    pg_kicker:"Crea il Tuo Profilo",pg_h2:"Fatti Rappresentare da ESM",pg_p2:"Crea il tuo profilo ufficiale da atleta e inizia il tuo percorso con Elite Sports Management.",
+    pg_h:"Crea il Tuo Profilo da Giocatore",pg_p:"Per creare il tuo profilo ufficiale da atleta ESM, invia €124.99 tramite PayPal a brunosamuele56@gmail.com. Ti invieremo un codice di accesso via email — inseriscilo qui sotto per continuare con la candidatura.",
+    pg_price_note:"Pagamento unico · Creazione profilo",pg_btn:"Paga €124.99 con PayPal",pg_or:"Hai già pagato? Inserisci il codice",pg_unlock:"Sblocca",
+    pg_err:"Codice non corretto. Controlla l'email del tuo acquisto o contattaci.",
+    pg_done_h:"Tutto pronto!",pg_done_p:"Il tuo accesso è sbloccato. Completa il modulo per creare il tuo profilo da atleta.",pg_done_btn:"Continua con la candidatura →",
     pay_h:"Un ultimo passo",
     pay_p:"Abbiamo ricevuto la tua candidatura. Completa la registrazione da $125 e Samuele esaminerà il tuo profilo.",
     pay_btn:"Completa la registrazione — $125",
@@ -1351,6 +1406,36 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
   }
 });
 
+/* ===== profile-creation gate (€124.99) — independent second instance of the gate =====
+   Own code hash (PROFILE_CODE_HASHES) and own localStorage key (PROFILE_UNLOCK_KEY), so
+   it never collides with the roster gate. Unlocking reveals the CTA to the #join form. */
+function isProfileUnlocked(){try{return localStorage.getItem(PROFILE_UNLOCK_KEY)==="1"}catch(e){return false}}
+function applyProfileState(){
+  const sec=document.getElementById("profile");
+  if(sec)sec.classList.toggle("is-unlocked",isProfileUnlocked());
+}
+function unlockProfile(){
+  try{localStorage.setItem(PROFILE_UNLOCK_KEY,"1")}catch(e){}
+  applyProfileState();
+}
+const profileForm=document.getElementById("profileForm");
+if(profileForm)profileForm.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const err=document.getElementById("profileErr");
+  const val=(document.getElementById("profileInput").value||"").trim().toUpperCase();
+  err.classList.remove("show");
+  if(!val)return;
+  let hash="";
+  try{hash=await sha256Hex(val);}
+  catch(ex){console.warn("crypto.subtle unavailable",ex);err.classList.add("show");return;}
+  if(PROFILE_CODE_HASHES.includes(hash)){
+    unlockProfile();
+    document.getElementById("join").scrollIntoView({behavior:"smooth",block:"start"});
+  }else{
+    err.classList.add("show");
+  }
+});
+
 /* Service cards (College, Indy Ball, Winter League, Representation) drop the athlete
    into the Join form with their service already chosen, so the application says what
    they actually want. */
@@ -1368,6 +1453,7 @@ function wireServiceSignups(){
 function wirePayButtons(){
   const set=(id,url)=>{const el=document.getElementById(id);if(el)el.href=url||FALLBACK_EMAIL;};
   set("rosterPayBtn",STRIPE_ROSTER_URL);
+  set("profilePayBtn",PAYPAL_PROFILE_URL);
   set("joinPayBtn",STRIPE_REGISTER_URL);
   const col=document.getElementById("collegePayBtn");
   if(col)col.href=STRIPE_COLLEGE_URL||"#join";
@@ -1456,6 +1542,7 @@ async function boot(){
 // fetch made already-unlocked visitors see the "$49.99" gate flash on slow connections
 // (the roster ships with `is-locked` in the HTML and JS only removes it once unlocked).
 applyLockState();
+applyProfileState();
 boot();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
 </script>
