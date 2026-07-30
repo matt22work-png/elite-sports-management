@@ -37,6 +37,9 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 - **a160ddb** Sam "Contact Him" founder-card button mirroring Marianna's `.founder-contact` pill. Sam→elitesportsmanagement50@gmail.com, Marianna→softball.esm@gmail.com, both with pre-filled subject. `sam_contact` EN/ES/IT. Assumption: kept gendered labels (Contact Her/Him) over literal "Contact Now" to preserve Marianna's prior explicit label.
 - **f1b7b04** Footer Instagram: replaced `◎` glyph with inline SVG icon (currentColor, aria-hidden + link aria-label). Link/handle unchanged.
 
+### SEO
+- **25b3677** OG + Twitter Card + canonical meta. Base https://elite-sports-management.vercel.app. og:image = /media/photos/twl-champions.jpg (1600x900 placeholder, verified live). English-only by design. Swap in a 1200x630 branded card later (Manual Action).
+
 ---
 
 ## Verified facts (live)
@@ -45,7 +48,7 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 - Prod serves `site/` at root: `/`, `/logo.png`, `/media/photos/*`, `/icons/*` all 200.
 
 ## In progress
-- Tier 3 SEO: OG/Twitter/canonical meta (base URL https://elite-sports-management.vercel.app). Chosen share image TBD (hero photo placeholder).
+- (Tier 3 complete. Next: Tier 4 maintainability, then Tier 5 content.)
 
 ## Pending (roadmap)
 - Tier 4 maintainability: reconcile design tokens across index/admin/portal; shared esc/$/initials/client (no-build only); strip ~250 lines dead CSS from generated player pages; dup `.msg.ok` in admin; remove unused local `sam.jpeg` if truly unref; manifest `id`+screenshots; a11y pass.
