@@ -1,5 +1,10 @@
 -- Elite Sports Management — Supabase schema
 -- Run in the Supabase SQL Editor (Dashboard → SQL → New query).
+--
+-- This is the base schema. Incremental migrations layer on top and are their own
+-- files, applied in order:
+--   supabase-harden-players-columns.sql  — column-scoped anon SELECT (hide intake PII)
+--   supabase-players-constraints.sql     — length-cap CHECK constraints on intake fields
 
 -- ---------- PLAYERS / APPLICANTS ----------
 create table if not exists players (
@@ -7,6 +12,7 @@ create table if not exists players (
   slug        text unique not null,
   name        text not null,
   "group"     text not null,             -- Pitcher | Catcher | Infielder | Two-Way
+  sport       text default 'Baseball' check (sport in ('Baseball','Softball')),
   position    text,
   country     text,
   flag        text,
@@ -24,7 +30,7 @@ create table if not exists players (
   phone       text,
   email       text,
   instagram   text,
-  applying_for text,                     -- Representation | Coaching | Both
+  applying_for text,                     -- e.g. Baseball Representation | Softball Representation | College Placement | Coaching
   message     text,
   status      text default 'pending',    -- moderation ON: applicants start as 'pending' until an admin approves
   owner_id    uuid,                      -- reserved for future athlete logins (Supabase Auth)
