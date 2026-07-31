@@ -31,8 +31,10 @@
   .card{border:1px solid var(--line);border-radius:16px;padding:24px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));margin-bottom:16px}
   .field{margin-bottom:14px}
   .field label{display:block;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-  .field input{width:100%;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--ink);font-size:15px;font-family:inherit}
-  .field input:focus{outline:0;border-color:var(--gold)}
+  .field input,.field textarea,.field select{width:100%;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--ink);font-size:15px;font-family:inherit}
+  .field input:focus,.field textarea:focus,.field select:focus{outline:0;border-color:var(--gold)}
+  .field textarea{resize:vertical}
+  .btn-gold[disabled],.btn[disabled]{opacity:.55;cursor:wait}
   .msg{display:none;margin-top:12px;font-size:13.5px;color:var(--red)}
   .msg.show{display:block}
   .msg.ok{color:var(--teal-soft)}
@@ -90,6 +92,7 @@
 <script type="module">
 const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
+const PHOTO_BUCKET = "player-photos";
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -127,15 +130,16 @@ $("loginForm").addEventListener("submit", async e => {
 
 $("signOut").onclick = async () => { await SB.auth.signOut(); };
 
+let ME_SESSION = null;   // kept so the edit form knows the user's id (photo path) + email
 SB.auth.onAuthStateChange((evt, session) => {
-  if (evt === "SIGNED_IN" && session) { showView("app"); loadMe(session); }
-  else if (evt === "SIGNED_OUT") { showView("login"); }
+  if (evt === "SIGNED_IN" && session) { ME_SESSION = session; showView("app"); loadMe(session); }
+  else if (evt === "SIGNED_OUT") { ME_SESSION = null; showView("login"); }
 });
 
 (async function guard(){
   try {
     const { data: { session } } = await SB.auth.getSession();
-    if (session){ showView("app"); loadMe(session); } else { showView("login"); }
+    if (session){ ME_SESSION = session; showView("app"); loadMe(session); } else { showView("login"); }
   } catch (err) {
     console.error("Session check failed", err);
     showView("login");
@@ -205,10 +209,63 @@ async function loadMe(session){
       ${teams.map(t => `<div class="row"><span>${esc(t)}</span></div>`).join("")}
     </div>` : ""}
 
-    <p class="note" style="margin-top:20px">
-      Your stats and photo are managed by Elite Sports Management. Need something changed?
-      <a href="mailto:elitesportsmanagement50@gmail.com?subject=Profile%20update%20request">Email us</a>.
+    <div class="kicker">Edit my details</div>
+    <div class="card">
+      <p class="note" style="margin-bottom:16px">Update your own bio, contact details and photo below. Your
+      career stats, position and roster status are managed by Elite Sports Management.</p>
+      <div class="field"><label>Profile photo</label><input type="file" accept="image/*" id="me-photo" /></div>
+      <div class="field"><label>Bio</label><textarea id="me-bio" rows="4" placeholder="Tell your story…">${esc(p.bio || "")}</textarea></div>
+      <div class="field"><label>Instagram</label><input id="me-instagram" value="${esc(p.instagram || "")}" placeholder="@yourhandle" /></div>
+      <div class="field"><label>Phone</label><input id="me-phone" value="${esc(p.phone || "")}" placeholder="+39 …" /></div>
+      <div class="field"><label>Age</label><input id="me-age" inputmode="numeric" value="${esc(p.age || "")}" placeholder="e.g. 21" /></div>
+      <button class="btn btn-gold" style="width:100%" type="button" id="me-save">Save my changes</button>
+      <div class="msg" id="me-msg"></div>
+    </div>
+
+    <p class="note" style="margin-top:16px">
+      Need a stat or your position updated? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Profile%20update%20request">Email us</a>.
     </p>`;
+
+  bindEditor();
+}
+
+/* Self-service edit. Writes go through the update_my_profile() RPC, which only
+   touches this athlete's own row and only the whitelisted columns — the browser
+   never gets to name a table, a row, or a status. */
+function bindEditor(){
+  const save = $("me-save"); if (!save) return;
+  save.onclick = async () => {
+    const m = $("me-msg"); m.classList.remove("show","ok");
+    save.disabled = true; save.textContent = "Saving…";
+    try {
+      let image_url = null;
+      const file = $("me-photo").files?.[0];
+      if (file){
+        const uid = ME_SESSION?.user?.id;
+        if (!uid) throw new Error("Session expired — please sign in again.");
+        const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
+        const path = `self/${uid}/${Date.now()}.${ext}`;
+        const { error: upErr } = await SB.storage.from(PHOTO_BUCKET)
+          .upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
+        if (upErr) throw upErr;
+        image_url = SB.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+      }
+      const { error } = await SB.rpc("update_my_profile", {
+        p_bio:       $("me-bio").value.trim(),
+        p_instagram: $("me-instagram").value.trim(),
+        p_phone:     $("me-phone").value.trim(),
+        p_age:       $("me-age").value.trim(),
+        p_image_url: image_url,   // null → keep current photo
+      });
+      if (error) throw error;
+      m.textContent = "Saved ✓"; m.classList.add("show","ok");
+      loadMe(ME_SESSION);   // re-render with fresh data (incl. new photo)
+    } catch (err){
+      m.textContent = "Couldn't save: " + (err?.message || err); m.classList.add("show");
+    } finally {
+      save.disabled = false; save.textContent = "Save my changes";
+    }
+  };
 }
 
 function row(label, value){
