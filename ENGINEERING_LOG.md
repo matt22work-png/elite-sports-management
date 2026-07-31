@@ -65,6 +65,9 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 - **a8a4c8a** €124.99 profile-creation gate (#profile section) — 2nd independent instance of the roster paywall. Own key `esm_profile_unlock_v1`, own hash. Code: ESM-PROFILE-2026. PayPal instructions (brunosamuele56@gmail.com) + PayPal _xclick pay button. Unlock → CTA to #join. pg_* keys EN/ES/IT. FLAG: separate section, does NOT hard-block the open #join form.
 - **31b5fb2** Removed redundant standalone Europe card (svc3) — now covered by Professional Leagues. 5 cards in "What We Do".
 
+### Admin portal (Tier 1)
+- **9d3d926** Fixed Marianna's admin access — `softball.esm@gmail.com` was in DB `esm_admins` but missing from client `ADMIN_EMAILS`, so she got signed out on login. Added her. Built "Add Player" admin form (name/position/sport/country/bio + photo → insert status='approved'). Verified live: both accounts confirmed in auth.users, all 4 admins in esm_admins, insert shape valid against schema. Roster-view / bio-edit / photo-upload already worked (no change).
+
 ### Finding to report (no change made — awaiting Matt)
 - **$49.99 roster gate payment method**: `STRIPE_ROSTER_URL` is EMPTY (index.html), so `wirePayButtons` falls the "Unlock the roster — $49.99" button back to `FALLBACK_EMAIL` (mailto:elitesportsmanagement50@gmail.com). So it is NOT wired to a working Stripe link — it just opens an email. Not changed per instruction; Matt to decide (Stripe link vs PayPal like the €124.99 gate).
 
