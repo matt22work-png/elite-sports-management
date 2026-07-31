@@ -49,12 +49,22 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 ---
 
 ## Verified facts (live)
-- players table: 17 approved rows, served from DB (embedded array is fallback). `sport` column exists (default Baseball, CHECK Baseball/Softball).
-- Anon PII read now blocked (column grant). Public roster read still 200 with 17 rows, no PII keys.
+- players table: 17 approved rows, served from DB (embedded array is fallback). `sport` column exists (default Baseball, CHECK Baseball/Softball). **All 17 have `email = NULL`** — they are curated seed athletes, so NONE can currently sign into the player portal (which matches on email). The portal serves *applicants* (form sets email) + any player an admin gives an email. To onboard a seed athlete: admin edits their row to set the email, then that athlete magic-links in.
+- Anon PII read now blocked (column grant). Public roster read still 200 with 17 rows, no PII keys. `source` and internal notes are NOT anon-readable.
 - Prod serves `site/` at root: `/`, `/logo.png`, `/media/photos/*`, `/icons/*` all 200.
+- RLS proven (simulated JWT, session 2026-07-30): athlete sees only own players row + 0 player_notes; update_my_profile only touches whitelisted cols on own row.
+- Supabase advisors after this session: SECURITY = 1 INFO (esm_admins no-policy, by design) + 2 WARN (update_my_profile SECURITY DEFINER — intentional self-service pattern; leaked-password protection — dashboard Manual Action). PERFORMANCE = 1 WARN left (multiple_permissive_policies on players SELECT — inherent to admin+athlete both being `authenticated`; accepted, not worth merging).
+
+### Portals + auth (autonomous session 2026-07-30)
+- **Homepage Sign In nav** — native `<details class="signin">` dropdown between the language switch and Apply CTA, brand-styled (gold caret, navy popover), links to `/admin/` + `/portal/`. Closes on outside-click / Escape. i18n `nav_signin`/`nav_signin_admin`/`nav_signin_player` EN/ES/IT. (index.html)
+- **DB — internal notes** (`supabase-player-notes.sql`, APPLIED as `player_internal_notes`): admin-only `public.player_notes` table (player_id PK → players, notes, updated_at, updated_by). Deliberately a SEPARATE table, not a players column, because "athlete reads own row" would leak a column to that athlete. No anon grants; admin-only RLS. Verified: athlete sees 0 notes.
+- **DB — player self-service** (`supabase-player-self-service.sql`, APPLIED as `player_self_edit_rpc` + `player_self_edit_rpc_lockdown` + `athlete_self_photo_upload`): `update_my_profile(p_bio,p_instagram,p_phone,p_age,p_image_url)` SECURITY DEFINER RPC, search_path='', updates ONLY whitelisted cols on the caller's OWN row (matched on JWT email). Revoked from PUBLIC/anon, granted to authenticated. Storage policies let an athlete upload/replace only under `self/<uid>/` in player-photos. Verified via simulated JWT: bio/instagram/age change; name/status/stats untouched.
+- **Admin portal** (admin/index.html): added hard **Delete** (confirm dialog, distinct from Archive; cascade removes notes), **Archive**/Restore (`status='archived'`, hidden from public roster by the anon status=approved policy), **internal notes** editor (player_notes, labelled "never shown publicly"), and expanded profile editor to name/position/sport/country/age/instagram/phone + bio/teams (name required; patch-object shape → easy to extend). Notes merged into load().
+- **Player portal** (portal/index.html): now self-service — athletes edit own bio/Instagram/phone/age + upload a profile photo via the RPC + `self/<uid>/` storage. Stats/position/status stay read-only/agency-owned.
+- **Perf** (`supabase-rls-initplan.sql`, APPLIED as `rls_initplan_optimization`): wrapped `auth.jwt()` / `private.is_esm_admin()` in `(select …)` across players + player_notes policies (lint 0003). Semantics identical, verified RLS still isolates (athlete sees 1 row of 18, 0 notes).
 
 ## In progress
-- (Tier 3 complete. Next: Tier 4 maintainability, then Tier 5 content.)
+- (All four current-priority features done + validated. See NEXT SESSION.)
 
 ### Tier 5 content + priority interrupts
 - **74f0b71** Nav reorder: What We Do, Who I Am, College, Roster, Events, Join. (No Media item — already removed in f063ac6.)
@@ -88,3 +98,37 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 ## Notes / assumptions
 - marianna.jpeg (829×1456, 81KB) left as-is: displayed downscaled (already sharp), below-fold, and the crop (`background-position:54% 27%`) was deliberately tuned in 2a1f6d4 — pre-crop risked regression for little gain.
 - Push access for ceasaipro-art confirmed working (all commits pushed to origin/main).
+
+---
+
+# NEXT SESSION
+
+**Current state:** Repository is deployable and all four current-priority features are complete, committed, and DB-validated. Nothing is half-built. Local branch `main`; commits are being pushed to origin (verify `git status` — if the portal/log commits are ahead of origin, push them).
+
+**Completed this session (2026-07-30, autonomous):**
+1. Homepage premium Sign In nav dropdown (Admin + Player portals), i18n EN/ES/IT.
+2. DB: `player_notes` (admin-only internal notes), `update_my_profile()` self-edit RPC, athlete `self/<uid>/` photo storage policies — all APPLIED to prod + saved as SQL files.
+3. Admin portal: delete, archive/restore, internal-notes editor, expanded profile editing (name/position/sport/country/age/instagram/phone/bio/teams).
+4. Player portal: self-service editing (bio/instagram/phone/age + photo) via the RPC; stats/status stay agency-owned.
+5. Perf: RLS init-plan optimization.
+
+**Commits created this session** (newest last): Sign In nav → DB notes+self-service SQL → admin portal → player portal → (pending) rls-initplan SQL + ENGINEERING_LOG. Run `git log --oneline -8` to see exact hashes.
+
+**Validation performed:** JS syntax-checked all 3 HTML files (node --check). RPC + RLS exercised against prod with simulated athlete JWT: whitelist holds, own-row isolation holds, notes invisible to athletes. Supabase security + performance advisors reviewed (no new actionable issues).
+
+**Exact next task (highest priority first):**
+1. **Manual UI smoke test** the two portals in a browser signed in as a real admin (mattswagj@gmail.com via magic link) and, if possible, a test athlete — the automated tests covered DB/RLS + JS syntax but NOT the live click-through (magic-link login can't be driven headless here). Verify: admin add/edit/delete/archive/notes save + toasts; portal edit + photo upload round-trip. Files: `site/admin/index.html`, `site/portal/index.html`.
+2. Then continue the roadmap: **SEO** (replace placeholder 1200×630 OG image — Manual Action asset), **a11y** re-audit of the new dropdown + portal forms, then **maintainability** (the two long-standing Deferred items: player-page CSS trim via `gen_player_pages.py`, shared-Supabase-client extraction — both need interactive verification).
+
+**Files to open first:** `ENGINEERING_LOG.md` (this file), `site/admin/index.html`, `site/portal/index.html`, `site/index.html` (nav ~line 348, i18n ~line 709).
+
+**Remaining risks:**
+- Portals not yet clicked through live (see next task #1). Low risk — DB layer proven, JS parses — but the magic-link + storage-upload happy path is unproven end-to-end in prod.
+- Seed athletes have no email → can't use portal until an admin sets one (documented above).
+- `update_my_profile` is intentionally SECURITY DEFINER + authenticated-executable (advisor WARN is expected).
+
+**Manual actions required (external / dashboard-only):**
+- Supabase Auth → URL Configuration → Redirect URLs must include `https://elite-sports-management.vercel.app/admin/` and `/portal/` (needed for magic links — pre-existing requirement, confirm still set).
+- Enable Supabase Auth leaked-password protection (dashboard).
+- Provide a real 1200×630 branded OG share image (placeholder hero in use).
+- If any of the 17 seed athletes should get portal access, an admin must set their email on the player row.
