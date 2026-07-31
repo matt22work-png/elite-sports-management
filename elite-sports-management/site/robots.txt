@@ -5,6 +5,8 @@ Allow: /
 # Private app routes — nothing to index (auth-gated single-page apps).
 Disallow: /admin/
 Disallow: /portal/
+Disallow: /scout/
+Disallow: /register/
 
 # /players/*.html are intentionally noindex (paywalled roster detail). They are
 # left crawlable on purpose so crawlers can SEE the noindex directive and keep
