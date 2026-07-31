@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Create Account — Elite Sports Management</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
+<link rel="shortcut icon" href="../icons/icon-192.png" />
+<meta name="theme-color" content="#081a33" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{--navy:#081a33;--navy-2:#06142a;--gold:#d9b154;--gold-soft:#e7c878;--teal:#3a9aa6;--teal-soft:#5fb8c2;--ink:#eaf0fa;--muted:#9fb1cc;--line:rgba(217,177,84,.22);--card:#0c2143;--red:#e05d5d}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--navy-2);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(900px 500px at 78% -10%,rgba(217,177,84,.16),transparent 60%),radial-gradient(800px 600px at 8% 110%,rgba(20,70,140,.30),transparent 55%),linear-gradient(180deg,var(--navy),var(--navy-2))}
+  .display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase}
+  a{color:var(--gold-soft);text-decoration:none}
+  .wrap{max-width:600px;margin:0 auto;padding:26px 22px 90px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .logo-img{height:40px;width:auto;display:block}
+  header b{font-size:14px;display:block}
+  header small{display:block;font-size:8.5px;letter-spacing:.3em;color:var(--gold-soft);font-weight:700}
+  .spacer{flex:1}
+  .btn{padding:12px 22px;border-radius:999px;font-weight:700;font-size:15px;cursor:pointer;border:0;transition:.2s;display:inline-block;font-family:inherit;text-align:center}
+  .btn-gold{background:var(--gold);color:#05101f}
+  .btn-gold:hover{background:var(--gold-soft)}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .btn[disabled]{opacity:.55;cursor:wait}
+  .card{border:1px solid var(--line);border-radius:16px;padding:26px 24px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));margin-bottom:16px}
+  h1.display{font-size:26px;margin-bottom:6px}
+  h1.display em{color:var(--gold);font-style:normal}
+  .lead{color:var(--muted);font-size:14.5px;margin-bottom:20px}
+  .steps{display:flex;gap:8px;margin-bottom:22px}
+  .steps .dot{flex:1;height:5px;border-radius:999px;background:rgba(217,177,84,.18)}
+  .steps .dot.on{background:var(--gold)}
+  .steps .dot.done{background:var(--teal)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--ink);font-size:15px;font-family:inherit}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:0;border-color:var(--gold)}
+  .field textarea{resize:vertical}
+  .field .hint{font-size:12px;color:var(--muted);margin-top:5px}
+  .role-pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:4px 0 18px}
+  .role-opt{border:1.5px solid var(--line);border-radius:14px;padding:18px 14px;cursor:pointer;text-align:center;transition:.18s;background:rgba(6,20,42,.4)}
+  .role-opt:hover{border-color:var(--gold-soft)}
+  .role-opt.sel{border-color:var(--gold);background:rgba(217,177,84,.1)}
+  .role-opt .ic{font-size:26px;display:block;margin-bottom:8px}
+  .role-opt b{font-size:15px;display:block}
+  .role-opt span{font-size:12.5px;color:var(--muted)}
+  .msg{display:none;margin-top:14px;font-size:13.5px;color:var(--red);padding:11px 14px;border:1px solid rgba(224,93,93,.4);border-radius:10px;background:rgba(224,93,93,.08)}
+  .msg.show{display:block}
+  .msg.ok{color:var(--teal-soft);border-color:var(--teal-soft);background:rgba(58,154,166,.1)}
+  .note{font-size:13px;color:var(--muted);margin-top:16px;text-align:center}
+  .pay-steps{list-style:none;margin:14px 0 4px;padding:0}
+  .pay-steps li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(217,177,84,.12);font-size:14.5px;color:var(--ink)}
+  .pay-steps li:last-child{border-bottom:0}
+  .pay-steps .n{flex:0 0 26px;height:26px;border-radius:50%;background:rgba(217,177,84,.15);color:var(--gold-soft);display:grid;place-items:center;font-weight:800;font-size:13px}
+  .center{text-align:center}
+  #booting{color:var(--muted);text-align:center;padding:30px}
+  .hide{display:none}
+  @media(max-width:560px){ .wrap{padding:18px 14px 80px} .grid2,.role-pick{grid-template-columns:1fr} .field input,.field select,.field textarea{font-size:16px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="../index.html"><img class="logo-img" src="../logo.png" alt="Elite Sports Management" /></a>
+    <div><b>Elite Sports Management</b><small>CREATE ACCOUNT</small></div>
+    <div class="spacer"></div>
+    <button class="btn btn-ghost" id="signOut" style="display:none">Sign out</button>
+  </header>
+
+  <div id="booting">Loading…</div>
+
+  <!-- STEP 1 — account -->
+  <div id="step1" class="card hide">
+    <div class="steps"><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
+    <h1 class="display">Create your <em>account</em></h1>
+    <p class="lead">Set up your login first — you'll complete your profile and payment on the next steps.</p>
+    <form id="acctForm">
+      <div class="grid2">
+        <div class="field"><label for="first">First name</label><input id="first" autocomplete="given-name" required /></div>
+        <div class="field"><label for="last">Last name</label><input id="last" autocomplete="family-name" required /></div>
+      </div>
+      <div class="field"><label for="email">Email</label><input type="email" id="email" autocomplete="email" required /></div>
+      <div class="field"><label for="password">Password</label><input type="password" id="password" autocomplete="new-password" minlength="8" required /><div class="hint">At least 8 characters. You'll use this email + password to sign in after approval.</div></div>
+
+      <label class="field" style="margin-bottom:6px">I am a…</label>
+      <div class="role-pick" id="rolePick" role="radiogroup" aria-label="Account type">
+        <div class="role-opt" data-role="player" role="radio" aria-checked="false" tabindex="0"><span class="ic">⚾</span><b>Player</b><span>Athlete seeking representation</span></div>
+        <div class="role-opt" data-role="scout" role="radio" aria-checked="false" tabindex="0"><span class="ic">🔎</span><b>Scout / Recruiter</b><span>Roster &amp; recruiting access</span></div>
+      </div>
+
+      <button class="btn btn-gold" type="submit" style="width:100%">Create account &amp; continue</button>
+      <div class="msg" id="acctMsg" role="alert" aria-live="assertive"></div>
+    </form>
+    <p class="note">Already registered? <a href="../portal/">Player sign in</a> · <a href="../scout/">Scout sign in</a></p>
+  </div>
+
+  <!-- confirm-email interstitial (only if the project requires email confirmation) -->
+  <div id="confirmBox" class="card hide">
+    <h1 class="display">Confirm your <em>email</em></h1>
+    <p class="lead" id="confirmText"></p>
+    <p class="note">Once confirmed you'll return here automatically to finish your profile.</p>
+  </div>
+
+  <!-- STEP 2 — profile (player) -->
+  <div id="step2player" class="card hide">
+    <div class="steps"><span class="dot done"></span><span class="dot on"></span><span class="dot"></span></div>
+    <h1 class="display">Your player <em>profile</em></h1>
+    <p class="lead">This is what Elite Sports Management reviews. You can refine it later in your portal.</p>
+    <form id="playerForm">
+      <div class="field"><label for="p-position">Position</label><input id="p-position" placeholder="e.g. Catcher / RHP" /></div>
+      <div class="field"><label for="p-sport">Sport</label><select id="p-sport"><option>Baseball</option><option>Softball</option></select></div>
+      <div class="grid2">
+        <div class="field"><label for="p-country">Country</label><input id="p-country" placeholder="e.g. Italy" /></div>
+        <div class="field"><label for="p-age">Age</label><input id="p-age" inputmode="numeric" placeholder="e.g. 21" /></div>
+      </div>
+      <div class="field"><label for="p-bio">Short bio</label><textarea id="p-bio" rows="4" placeholder="Tell your story — background, achievements, goals…"></textarea></div>
+      <div class="field"><label for="p-teams">Teams &amp; affiliations (one per line)</label><textarea id="p-teams" rows="3" placeholder="Cleveland Guardians org.&#10;Dominican Summer League"></textarea></div>
+      <div class="grid2">
+        <div class="field"><label for="p-instagram">Instagram</label><input id="p-instagram" placeholder="@handle" /></div>
+        <div class="field"><label for="p-phone">Phone</label><input id="p-phone" placeholder="+39 …" /></div>
+      </div>
+      <div class="field"><label for="p-photo">Profile photo (optional)</label><input type="file" accept="image/*" id="p-photo" /></div>
+      <button class="btn btn-gold" type="submit" style="width:100%">Save profile &amp; continue</button>
+      <div class="msg" id="playerMsg" role="alert" aria-live="assertive"></div>
+    </form>
+  </div>
+
+  <!-- STEP 2 — profile (scout) -->
+  <div id="step2scout" class="card hide">
+    <div class="steps"><span class="dot done"></span><span class="dot on"></span><span class="dot"></span></div>
+    <h1 class="display">Your scout <em>details</em></h1>
+    <p class="lead">Just what we need to grant roster access.</p>
+    <form id="scoutForm">
+      <div class="field"><label for="s-org">Organization</label><input id="s-org" placeholder="e.g. Cleveland Guardians" /></div>
+      <div class="field"><label for="s-title">Position / Title</label><input id="s-title" placeholder="e.g. Area Scout" /></div>
+      <div class="field"><label for="s-school">School / Team (if applicable)</label><input id="s-school" placeholder="e.g. Hastings College" /></div>
+      <div class="grid2">
+        <div class="field"><label for="s-country">Country</label><input id="s-country" placeholder="e.g. USA" /></div>
+        <div class="field"><label for="s-phone">Phone</label><input id="s-phone" placeholder="+1 …" /></div>
+      </div>
+      <div class="field"><label for="s-notes">Notes (optional)</label><textarea id="s-notes" rows="3" placeholder="Anything we should know about your interest…"></textarea></div>
+      <button class="btn btn-gold" type="submit" style="width:100%">Save details &amp; continue</button>
+      <div class="msg" id="scoutMsg" role="alert" aria-live="assertive"></div>
+    </form>
+  </div>
+
+  <!-- STEP 3 — payment -->
+  <div id="step3" class="card hide">
+    <div class="steps"><span class="dot done"></span><span class="dot done"></span><span class="dot on"></span></div>
+    <h1 class="display">Activate your <em>account</em></h1>
+    <p class="lead" id="payLead">Thank you for completing your registration. Your account has been created successfully.</p>
+    <ol class="pay-steps">
+      <li><span class="n">1</span><span>Complete your payment using the secure link below.</span></li>
+      <li><span class="n">2</span><span>Elite Sports Management verifies your payment and reviews your account.</span></li>
+      <li><span class="n">3</span><span>Once approved, simply sign in with the same email &amp; password you just created — no additional registration needed.</span></li>
+    </ol>
+    <a class="btn btn-gold" id="payBtn" style="width:100%;margin-top:16px" target="_blank" rel="noopener">Continue to Secure Payment →</a>
+    <p class="note">You can close this page after paying. We'll email you once your account is approved.</p>
+    <p class="note" id="payAppt" style="margin-top:8px"></p>
+  </div>
+</div>
+
+<script type="module">
+/* =====================================================================
+   CONFIGURE ME — Samuele's external payment link (PayPal / Stripe / etc.)
+   Payment is handled entirely OFF-SITE. This is the only place to set it.
+   ===================================================================== */
+const PAYMENT_URL = "https://www.paypal.com/paypalme/EliteSportsManagement";
+
+const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
+const PHOTO_BUCKET = "player-photos";
+const STASH_KEY = "esm_reg_pending";
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const $ = id => document.getElementById(id);
+const slugify = s => (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+const VIEWS = ["booting","step1","confirmBox","step2player","step2scout","step3"];
+function show(id){ VIEWS.forEach(v => $(v).classList.toggle("hide", v !== id)); }
+function msg(el, text, ok){ el.textContent = text; el.classList.toggle("ok", !!ok); el.classList.add("show"); }
+function clearMsg(el){ el.classList.remove("show","ok"); }
+
+$("payBtn").href = PAYMENT_URL;
+$("signOut").onclick = async () => { await SB.auth.signOut(); localStorage.removeItem(STASH_KEY); location.reload(); };
+
+/* ---------- role picker (step 1) ---------- */
+let chosenRole = null;
+function pickRole(r){
+  chosenRole = r;
+  document.querySelectorAll("#rolePick .role-opt").forEach(o => {
+    const sel = o.dataset.role === r;
+    o.classList.toggle("sel", sel); o.setAttribute("aria-checked", sel ? "true" : "false");
+  });
+}
+document.querySelectorAll("#rolePick .role-opt").forEach(o => {
+  o.onclick = () => pickRole(o.dataset.role);
+  o.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pickRole(o.dataset.role); } };
+});
+
+/* ---------- step 1: create the account ---------- */
+$("acctForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  clearMsg($("acctMsg"));
+  if (!chosenRole){ msg($("acctMsg"), "Please choose whether you're a Player or a Scout."); return; }
+  const first = $("first").value.trim(), last = $("last").value.trim();
+  const email = $("email").value.trim(), password = $("password").value;
+  const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+  // Stash identity so we can finalize the profile after (a possible) email confirmation.
+  localStorage.setItem(STASH_KEY, JSON.stringify({ first, last, email, role: chosenRole }));
+  const { data, error } = await SB.auth.signUp({
+    email, password,
+    options: { emailRedirectTo: location.href.split("#")[0], data: { first_name: first, last_name: last, role: chosenRole } }
+  });
+  btn.disabled = false;
+  if (error){ msg($("acctMsg"), error.message); return; }
+  if (data.session){
+    // Email confirmation is off — we're signed in; create the profile now.
+    await ensureProfile();
+    routeAfterProfile();
+  } else {
+    // Confirmation required — user must click the email link, then they return here.
+    $("confirmText").textContent = `We've sent a confirmation link to ${email}. Open it to verify your address and continue your registration.`;
+    show("confirmBox");
+  }
+});
+
+/* ---------- ensure the profile row exists (idempotent) ---------- */
+async function ensureProfile(){
+  const { data: sess } = await SB.auth.getSession();
+  const user = sess?.session?.user; if (!user) return null;
+  let { data: prof } = await SB.from("profiles").select("*").eq("id", user.id).maybeSingle();
+  if (prof) return prof;
+  const stash = JSON.parse(localStorage.getItem(STASH_KEY) || "{}");
+  const role = stash.role || user.user_metadata?.role;
+  if (!role) return null;
+  const { data: created, error } = await SB.from("profiles").insert({
+    id: user.id, role,
+    first_name: stash.first || user.user_metadata?.first_name || "",
+    last_name:  stash.last  || user.user_metadata?.last_name  || "",
+    email: user.email,
+  }).select().single();
+  if (error){ console.error("profile insert", error); return null; }
+  return created;
+}
+
+/* ---------- step 2 (player): create the roster row ---------- */
+$("playerForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  clearMsg($("playerMsg"));
+  const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+  try {
+    const { data: sess } = await SB.auth.getSession();
+    const user = sess?.session?.user; if (!user) throw new Error("Your session expired — please sign in again.");
+    const stash = JSON.parse(localStorage.getItem(STASH_KEY) || "{}");
+    const fullName = [stash.first, stash.last].filter(Boolean).join(" ").trim() || (user.email.split("@")[0]);
+    // optional photo
+    let image_url = null;
+    const file = $("p-photo").files?.[0];
+    if (file){
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
+      const path = `self/${user.id}/${Date.now()}.${ext}`;
+      const { error: upErr } = await SB.storage.from(PHOTO_BUCKET).upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
+      if (upErr) throw upErr;
+      image_url = SB.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+    }
+    const teams = $("p-teams").value.split("\n").map(t => t.trim()).filter(Boolean);
+    const position = $("p-position").value.trim();
+    const { error } = await SB.from("players").insert({
+      slug: (slugify(fullName) || "player") + "-" + user.id.slice(0,8),
+      name: fullName, "group": position || "Player", position,
+      sport: $("p-sport").value, country: $("p-country").value.trim() || null,
+      age: $("p-age").value.trim() || null, bio: $("p-bio").value.trim(),
+      instagram: $("p-instagram").value.trim() || null, phone: $("p-phone").value.trim() || null,
+      teams, stats: [], image_url, email: user.email,
+      owner_id: user.id, status: "pending", source: "registration",
+    });
+    if (error){
+      // Unique-violation → they already created a row; just move on to payment.
+      if (error.code === "23505"){ show("step3"); return; }
+      throw error;
+    }
+    show("step3");
+  } catch (err){
+    msg($("playerMsg"), "Couldn't save your profile: " + (err?.message || err));
+  } finally { btn.disabled = false; }
+});
+
+/* ---------- step 2 (scout): create the scout row ---------- */
+$("scoutForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  clearMsg($("scoutMsg"));
+  const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+  try {
+    const { data: sess } = await SB.auth.getSession();
+    const user = sess?.session?.user; if (!user) throw new Error("Your session expired — please sign in again.");
+    const { error } = await SB.from("scouts").upsert({
+      id: user.id,
+      organization: $("s-org").value.trim() || null,
+      title: $("s-title").value.trim() || null,
+      school_team: $("s-school").value.trim() || null,
+      country: $("s-country").value.trim() || null,
+      phone: $("s-phone").value.trim() || null,
+      notes: $("s-notes").value.trim() || null,
+    }, { onConflict: "id" });
+    if (error) throw error;
+    show("step3");
+  } catch (err){
+    msg($("scoutMsg"), "Couldn't save your details: " + (err?.message || err));
+  } finally { btn.disabled = false; }
+});
+
+/* ---------- routing ---------- */
+async function routeAfterProfile(){
+  const prof = await ensureProfile();
+  if (!prof){ show("step1"); return; }
+  // If already approved, they don't need to register again — send them to their portal.
+  if (prof.account_status === "approved"){
+    location.href = prof.role === "scout" ? "../scout/" : "../portal/";
+    return;
+  }
+  // Has the role-specific record been completed already? If so, go to payment.
+  if (prof.role === "player"){
+    const { data: row } = await SB.from("players").select("id").eq("owner_id", prof.id).maybeSingle();
+    show(row ? "step3" : "step2player");
+  } else {
+    const { data: row } = await SB.from("scouts").select("id").eq("id", prof.id).maybeSingle();
+    show(row ? "step3" : "step2scout");
+  }
+}
+
+SB.auth.onAuthStateChange((evt, session) => {
+  if (evt === "SIGNED_IN" && session){ $("signOut").style.display = ""; ensureProfile().then(routeAfterProfile); }
+});
+
+(async function boot(){
+  try {
+    const { data: { session } } = await SB.auth.getSession();
+    if (session){ $("signOut").style.display = ""; await routeAfterProfile(); }
+    else { show("step1"); }
+  } catch (err){ console.error(err); show("step1"); }
+})();
+</script>
+</body>
+</html>
