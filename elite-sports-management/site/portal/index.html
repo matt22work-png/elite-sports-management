@@ -73,9 +73,9 @@
     <h2 class="display" style="font-size:22px;margin-bottom:6px">Player <em style="color:var(--gold);font-style:normal">Portal</em></h2>
     <p class="note" style="margin-bottom:18px">Sign in to see your athlete profile.</p>
     <form id="loginForm">
-      <div class="field"><label>Email</label><input type="email" id="email" autocomplete="username" required placeholder="the email on your application" /></div>
+      <div class="field"><label for="email">Email</label><input type="email" id="email" autocomplete="username" required placeholder="the email on your application" /></div>
       <button class="btn btn-gold" style="width:100%" type="submit">Email me a login link</button>
-      <div class="msg" id="loginMsg"></div>
+      <div class="msg" id="loginMsg" role="alert" aria-live="assertive"></div>
     </form>
     <p class="note" style="margin-top:16px">
       No password needed — we email you a secure link. Use the same email you applied with.
@@ -214,13 +214,13 @@ async function loadMe(session){
     <div class="card">
       <p class="note" style="margin-bottom:16px">Update your own bio, contact details and photo below. Your
       career stats, position and roster status are managed by Elite Sports Management.</p>
-      <div class="field"><label>Profile photo</label><input type="file" accept="image/*" id="me-photo" /></div>
-      <div class="field"><label>Bio</label><textarea id="me-bio" rows="4" placeholder="Tell your story…">${esc(p.bio || "")}</textarea></div>
-      <div class="field"><label>Instagram</label><input id="me-instagram" value="${esc(p.instagram || "")}" placeholder="@yourhandle" /></div>
-      <div class="field"><label>Phone</label><input id="me-phone" value="${esc(p.phone || "")}" placeholder="+39 …" /></div>
-      <div class="field"><label>Age</label><input id="me-age" inputmode="numeric" value="${esc(p.age || "")}" placeholder="e.g. 21" /></div>
+      <div class="field"><label for="me-photo">Profile photo</label><input type="file" accept="image/*" id="me-photo" /></div>
+      <div class="field"><label for="me-bio">Bio</label><textarea id="me-bio" rows="4" placeholder="Tell your story…">${esc(p.bio || "")}</textarea></div>
+      <div class="field"><label for="me-instagram">Instagram</label><input id="me-instagram" value="${esc(p.instagram || "")}" placeholder="@yourhandle" /></div>
+      <div class="field"><label for="me-phone">Phone</label><input id="me-phone" value="${esc(p.phone || "")}" placeholder="+39 …" /></div>
+      <div class="field"><label for="me-age">Age</label><input id="me-age" inputmode="numeric" value="${esc(p.age || "")}" placeholder="e.g. 21" /></div>
       <button class="btn btn-gold" style="width:100%" type="button" id="me-save">Save my changes</button>
-      <div class="msg" id="me-msg"></div>
+      <div class="msg" id="me-msg" role="alert" aria-live="assertive"></div>
     </div>
 
     <p class="note" style="margin-top:16px">

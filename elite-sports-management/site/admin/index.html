@@ -87,15 +87,15 @@
   <div id="loginBox" class="card" style="max-width:420px;margin:8vh auto;display:none">
     <h2 class="display" style="font-size:22px;margin-bottom:16px">Admin <em style="color:var(--gold);font-style:normal">Login</em></h2>
     <form id="loginForm">
-      <div class="field"><label>Email</label><input type="email" id="email" autocomplete="username" required /></div>
-      <div class="field"><label>Password</label><input type="password" id="password" autocomplete="current-password" required /></div>
+      <div class="field"><label for="email">Email</label><input type="email" id="email" autocomplete="username" required /></div>
+      <div class="field"><label for="password">Password</label><input type="password" id="password" autocomplete="current-password" required /></div>
       <button class="btn btn-gold" style="width:100%" type="submit">Sign in</button>
       <div style="text-align:center;margin:14px 0 4px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">or</div>
       <button class="btn btn-ghost" style="width:100%" type="button" id="magicLink">Email me a login link</button>
       <p style="margin-top:12px;font-size:12.5px;color:var(--muted);text-align:center">
         First time? Use the login link — no password needed.
       </p>
-      <div class="msg err" id="loginMsg"></div>
+      <div class="msg err" id="loginMsg" role="alert" aria-live="assertive"></div>
     </form>
   </div>
 
@@ -106,15 +106,15 @@
       <button class="btn btn-gold" type="button" id="addToggle">+ Add a player</button>
       <div class="editor" id="addEditor">
         <div class="sub">New athlete — saved as <b>approved</b>, goes straight to the roster</div>
-        <div class="field"><label>Full name *</label><input id="ap-name" placeholder="Jane Doe" /></div>
-        <div class="field"><label>Position</label><input id="ap-position" placeholder="e.g. Catcher" /></div>
-        <div class="field"><label>Sport</label><select id="ap-sport"><option value="Baseball">Baseball</option><option value="Softball">Softball</option></select></div>
-        <div class="field"><label>Country</label><input id="ap-country" placeholder="e.g. Italy" /></div>
-        <div class="field"><label>Bio</label><textarea id="ap-bio" rows="4" placeholder="Short bio…"></textarea></div>
-        <div class="field"><label>Teams &amp; affiliations (one per line)</label><textarea id="ap-teams" rows="3" placeholder="Cleveland Guardians org.&#10;Dominican Summer League"></textarea></div>
-        <div class="field"><label>Photo</label><input type="file" accept="image/*" id="ap-photo" /></div>
+        <div class="field"><label for="ap-name">Full name *</label><input id="ap-name" placeholder="Jane Doe" /></div>
+        <div class="field"><label for="ap-position">Position</label><input id="ap-position" placeholder="e.g. Catcher" /></div>
+        <div class="field"><label for="ap-sport">Sport</label><select id="ap-sport"><option value="Baseball">Baseball</option><option value="Softball">Softball</option></select></div>
+        <div class="field"><label for="ap-country">Country</label><input id="ap-country" placeholder="e.g. Italy" /></div>
+        <div class="field"><label for="ap-bio">Bio</label><textarea id="ap-bio" rows="4" placeholder="Short bio…"></textarea></div>
+        <div class="field"><label for="ap-teams">Teams &amp; affiliations (one per line)</label><textarea id="ap-teams" rows="3" placeholder="Cleveland Guardians org.&#10;Dominican Summer League"></textarea></div>
+        <div class="field"><label for="ap-photo">Photo</label><input type="file" accept="image/*" id="ap-photo" /></div>
         <div class="row-btns"><button class="btn btn-gold" type="button" id="ap-save">Add player</button></div>
-        <div class="msg err" id="ap-msg"></div>
+        <div class="msg err" id="ap-msg" role="alert" aria-live="assertive"></div>
       </div>
     </div>
 
@@ -125,7 +125,7 @@
     <div id="playerList"></div>
   </div>
 </div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script type="module">
 const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
@@ -319,23 +319,23 @@ function cardPlayer(p){
     </div>
     <div class="editor" id="ed-${p.id}">
       <div class="sub">Photo</div>
-      <input type="file" accept="image/*" data-photo="${p.id}" />
+      <input type="file" accept="image/*" data-photo="${p.id}" aria-label="Upload photo for ${esc(p.name)}" />
 
       <div class="sub">Profile</div>
-      <div class="field"><label>Full name</label><input class="pf-name" data-id="${p.id}" value="${esc(p.name||"")}" placeholder="Full name" /></div>
-      <div class="field"><label>Position</label><input class="pf-position" data-id="${p.id}" value="${esc(p.position||"")}" placeholder="e.g. Catcher" /></div>
-      <div class="field"><label>Sport</label><select class="pf-sport" data-id="${p.id}">${sportOptions(p.sport)}</select></div>
-      <div class="field"><label>Country</label><input class="pf-country" data-id="${p.id}" value="${esc(p.country||"")}" placeholder="e.g. Italy" /></div>
-      <div class="field"><label>Age</label><input class="pf-age" data-id="${p.id}" value="${esc(p.age||"")}" placeholder="e.g. 21" /></div>
-      <div class="field"><label>Instagram</label><input class="pf-instagram" data-id="${p.id}" value="${esc(p.instagram||"")}" placeholder="@handle" /></div>
-      <div class="field"><label>Phone</label><input class="pf-phone" data-id="${p.id}" value="${esc(p.phone||"")}" placeholder="+39 …" /></div>
-      <div class="field"><label>Bio</label><textarea class="pf-bio" data-id="${p.id}" rows="4" placeholder="Short bio…">${esc(p.bio||"")}</textarea></div>
-      <div class="field"><label>Teams &amp; affiliations (one per line)</label><textarea class="pf-teams" data-id="${p.id}" rows="3" placeholder="Cleveland Guardians org.&#10;Dominican Summer League">${esc((Array.isArray(p.teams)?p.teams:[]).join("\n"))}</textarea></div>
-      <div class="row-btns"><button class="btn btn-gold" data-saveprofile="${p.id}">Save profile</button></div>
+      <div class="field"><label>Full name</label><input class="pf-name" data-id="${p.id}" value="${esc(p.name||"")}" placeholder="Full name" aria-label="Full name" /></div>
+      <div class="field"><label>Position</label><input class="pf-position" data-id="${p.id}" value="${esc(p.position||"")}" placeholder="e.g. Catcher" aria-label="Position" /></div>
+      <div class="field"><label>Sport</label><select class="pf-sport" data-id="${p.id}" aria-label="Sport">${sportOptions(p.sport)}</select></div>
+      <div class="field"><label>Country</label><input class="pf-country" data-id="${p.id}" value="${esc(p.country||"")}" placeholder="e.g. Italy" aria-label="Country" /></div>
+      <div class="field"><label>Age</label><input class="pf-age" data-id="${p.id}" value="${esc(p.age||"")}" placeholder="e.g. 21" aria-label="Age" /></div>
+      <div class="field"><label>Instagram</label><input class="pf-instagram" data-id="${p.id}" value="${esc(p.instagram||"")}" placeholder="@handle" aria-label="Instagram" /></div>
+      <div class="field"><label>Phone</label><input class="pf-phone" data-id="${p.id}" value="${esc(p.phone||"")}" placeholder="+39 …" aria-label="Phone" /></div>
+      <div class="field"><label>Bio</label><textarea class="pf-bio" data-id="${p.id}" rows="4" placeholder="Short bio…" aria-label="Bio">${esc(p.bio||"")}</textarea></div>
+      <div class="field"><label>Teams &amp; affiliations (one per line)</label><textarea class="pf-teams" data-id="${p.id}" rows="3" placeholder="Cleveland Guardians org.&#10;Dominican Summer League" aria-label="Teams and affiliations, one per line">${esc((Array.isArray(p.teams)?p.teams:[]).join("\n"))}</textarea></div>
+      <div class="row-btns"><button class="btn btn-gold" data-saveprofile="${p.id}" type="button">Save profile</button></div>
 
       <div class="sub note-lock">🔒 Internal notes — admins only, never shown publicly</div>
-      <div class="field"><textarea class="pf-note note-box" data-id="${p.id}" rows="3" placeholder="Private notes about this player (visible to admins only)…">${esc(p._note||"")}</textarea></div>
-      <div class="row-btns"><button class="btn btn-ghost" data-savenote="${p.id}">Save note</button></div>
+      <div class="field"><textarea class="pf-note note-box" data-id="${p.id}" rows="3" placeholder="Private notes about this player (visible to admins only)…" aria-label="Internal notes, admins only">${esc(p._note||"")}</textarea></div>
+      <div class="row-btns"><button class="btn btn-ghost" data-savenote="${p.id}" type="button">Save note</button></div>
 
       <div class="sub">Stats</div>
       <div id="stats-${p.id}">${stats.map(statRow).join("")}</div>
@@ -350,7 +350,7 @@ function cardPlayer(p){
 const statRow = s => `<div class="stat-row">
   <input placeholder="Label (e.g. Fastball)" class="st-label" value="${esc(s?.label||"")}" />
   <input placeholder="Value (e.g. 90 mph)" class="st-value" value="${esc(s?.value||"")}" />
-  <button type="button" onclick="this.parentElement.remove()" title="Remove">✕</button>
+  <button type="button" onclick="this.parentElement.remove()" title="Remove" aria-label="Remove stat">✕</button>
 </div>`;
 
 /* ---------- actions ---------- */
