@@ -47,6 +47,7 @@
   .chip.pending{color:var(--gold-soft)}
   .chip.approved{color:var(--teal);border-color:rgba(46,196,182,.4)}
   .chip.rejected{color:var(--red);border-color:rgba(224,93,93,.4)}
+  .chip.paid{color:var(--gold-soft);border-color:rgba(217,177,84,.5);background:rgba(217,177,84,.1)}
   .p-meta{color:var(--muted);font-size:13.5px;margin-top:10px;word-break:break-word}
   .p-meta b{color:var(--ink)}
   .row-btns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
@@ -269,7 +270,8 @@ function cardPending(p){
   ].filter(Boolean).join(" &nbsp;·&nbsp; ");
   return `<div class="card" data-id="${p.id}">
     <div class="p-head">${avatar(p)}
-      <div><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position||p.group||"")} ${p.flag||""}</div></div>
+      <div style="flex:1"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position||p.group||"")} ${p.flag||""}</div></div>
+      ${p.source === "profile-gate" ? `<span class="chip paid" title="Paid €124.99 self-created profile">💳 Paid profile</span>` : `<span class="chip" style="opacity:.6">Applicant</span>`}
     </div>
     ${contact ? `<div class="p-meta">${contact}</div>` : ""}
     ${p.bio ? `<div class="p-meta">${esc(p.bio)}</div>` : ""}
@@ -414,7 +416,7 @@ $("ap-save").onclick = async () => {
   }
   const { error } = await SB.from("players").insert({
     slug, name, "group": position || "Player", position, sport, country,
-    bio: bio || "", teams, stats: [], image_url, status: "approved",
+    bio: bio || "", teams, stats: [], image_url, source: "admin", status: "approved",
   });
   btn.disabled = false;
   if (error){ msg.textContent = "Save failed: " + error.message; msg.classList.add("show"); return; }

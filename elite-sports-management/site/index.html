@@ -1492,6 +1492,9 @@ form.addEventListener("submit",async e=>{
     bio:(fd.get("why")||"").trim()||"—",teams:[],stats:[],
     age:fd.get("age"),phone:fd.get("phone"),email:fd.get("email"),
     instagram:fd.get("ig"),applying_for:fd.get("applying"),message:fd.get("other"),
+    // Tag paid €124.99 profile-gate submissions so admins can tell them apart from
+    // regular representation applicants in the pending queue.
+    source:isProfileUnlocked()?"profile-gate":"application",
     status:"pending",
   });
   btn.disabled=false;
