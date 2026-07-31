@@ -87,8 +87,13 @@ Two account types (player, scout) with email+password registration, external pay
 - **/admin/** — Pending accounts + All accounts sections: type/payment/reg-date/profile/contact, Approve&activate / Reject / Archive, payment-status selector, per-account internal notes.
 - **Homepage** — Sign In dropdown now: Create Account / Player Portal / Scout Portal / Admin Portal (i18n EN/ES/IT). Public site client made **session-less** (persistSession:false) so a logged-in user's JWT can't shrink the public roster to their own row.
 
+### Accounts follow-ups (autonomous session 2026-07-31, cont.)
+- **Password reset** added to `/portal/` and `/scout/`: "Forgot your password?" → `resetPasswordForEmail(redirectTo=self)`; a "Set a new password" view shown on the `PASSWORD_RECOVERY` event / `#type=recovery` return; a `RECOVERING` guard stops normal routing from skipping the reset form; success → `updateUser({password})` → signed in. (These portals had password login but no recovery path.)
+- **Verified email-confirmation is ON in prod** (real signup to a throwaway mailinator address → no session returned, `confirmation_sent_at` set; test user deleted). The register page already handles this (confirm interstitial + resume-on-return via the localStorage stash), so registration works as-is; turning confirm OFF in the dashboard would just make it smoother (see Manual Actions).
+- **robots.txt**: also disallow `/scout/` and `/register/` (private app routes).
+
 ## In progress
-- (Registration+approval workflow done + validated. See NEXT SESSION.)
+- (Registration+approval workflow + password reset done + validated. See NEXT SESSION.)
 
 ### Tier 5 content + priority interrupts
 - **74f0b71** Nav reorder: What We Do, Who I Am, College, Roster, Events, Join. (No Media item — already removed in f063ac6.)
@@ -150,7 +155,7 @@ Two account types (player, scout) with email+password registration, external pay
 - Seed athletes (17) still have `email = NULL` and no owner_id → not tied to any account (unchanged; they're admin-managed roster entries).
 
 **Manual actions required (external / dashboard-only):**
-- **Supabase Auth → "Confirm email"**: for the smoothest registration (signUp returns a session so the profile is created immediately), consider turning email confirmation OFF — payment + admin approval is the real gate. The register page also finalizes the profile on first authenticated load, so confirm-ON degrades gracefully (user clicks the email link, returns, finishes profile).
+- **Supabase Auth → "Confirm email" is currently ON (verified 2026-07-31).** Registration works either way (the register page shows a confirm interstitial and resumes from the localStorage stash when the user returns via the email link). For the smoothest flow (signUp returns a session → profile created immediately, no email round-trip before payment), turn email confirmation OFF — payment + admin approval is the real gate. Password reset + magic-link also depend on redirect URLs being allowlisted (below).
 - **Supabase Auth → Redirect URLs**: include `https://elite-sports-management.vercel.app/` and the `/admin/ /portal/ /scout/ /register/` paths (magic-link + email-confirm redirects).
 - **Set the real payment link**: `PAYMENT_URL` at the top of `site/register/index.html` (currently a PayPal.me placeholder). Payment stays entirely off-site.
 - Enable Supabase Auth leaked-password protection (dashboard).
