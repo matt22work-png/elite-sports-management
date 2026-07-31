@@ -242,7 +242,9 @@ SB.auth.onAuthStateChange((evt, session) => {
 
 /* ---------- data ---------- */
 let PLAYERS = [];
+let LOADED_ONCE = false;
 async function load(){
+  if (!LOADED_ONCE){ $("playerList").innerHTML = `<div class="card empty">Loading players…</div>`; }
   const { data, error } = await SB.from("players").select("*").order("status").order("sort_order");
   if (error){ toast("Load failed: " + error.message, true); return; }
   // Internal notes live in a separate admin-only table; merge them in for display.
@@ -250,6 +252,7 @@ async function load(){
   if (nErr){ toast("Notes load failed: " + nErr.message, true); }
   const noteMap = Object.fromEntries((notes || []).map(n => [n.player_id, n.notes || ""]));
   PLAYERS = (data || []).map(p => ({ ...p, _note: noteMap[p.id] || "" }));
+  LOADED_ONCE = true;
   render();
 }
 

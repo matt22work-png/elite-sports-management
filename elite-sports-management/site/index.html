@@ -83,7 +83,22 @@
   .signin-menu a{color:var(--muted);font-size:14px;font-weight:600;padding:10px 12px;border-radius:8px;transition:.15s;white-space:nowrap}
   .signin-menu a:hover,.signin-menu a:focus-visible{background:rgba(217,177,84,.12);color:var(--gold-soft)}
   @media(max-width:860px){.nav-links{display:none}}
-  @media(max-width:420px){.nav-right{gap:10px}.signin-menu{min-width:170px}}
+  /* Small phones: with the nav links gone, the header holds brand + language +
+     Sign In + Apply. Tighten spacing/padding so it never overflows down to ~320px. */
+  @media(max-width:560px){
+    .nav-right{gap:9px}
+    .lang{padding:2px}
+    .lang button{padding:5px 7px;font-size:11px}
+    .signin>summary{font-size:12px;padding:8px 2px;gap:4px}
+    .nav-cta{padding:8px 11px;font-size:12px}
+    .signin-menu{min-width:172px}
+  }
+  @media(max-width:380px){
+    .logo-img{height:32px}
+    .nav-right{gap:7px}
+    .lang button{padding:5px 6px}
+    .nav-cta{padding:7px 9px}
+  }
 
   .hero{position:relative;z-index:1;padding:58px 0 46px}
   .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--gold-soft);border:1px solid var(--line);padding:7px 14px;border-radius:999px;margin-bottom:26px}

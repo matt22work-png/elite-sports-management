@@ -151,6 +151,7 @@ SB.auth.onAuthStateChange((evt, session) => {
    UI restriction. Editing is deliberately not offered: the agency owns the stats. */
 async function loadMe(session){
   const email = session?.user?.email || "";
+  $("profile").innerHTML = `<div class="card empty">Loading your profile…</div>`;
   const { data, error } = await SB.from("players").select("*").eq("email", email).limit(1);
 
   if (error){
