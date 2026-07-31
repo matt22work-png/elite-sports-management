@@ -51,6 +51,16 @@
   .chip.paid{color:var(--gold-soft);border-color:rgba(217,177,84,.5);background:rgba(217,177,84,.1)}
   .note-box{border-color:rgba(217,177,84,.45);background:rgba(217,177,84,.05)}
   .note-lock{font-size:11.5px;color:var(--gold-soft);font-weight:700;display:flex;align-items:center;gap:6px}
+  .chip.role-player{color:var(--teal-soft);border-color:rgba(58,154,166,.4)}
+  .chip.role-scout{color:var(--gold-soft);border-color:rgba(217,177,84,.5)}
+  .chip.pay-unpaid{color:var(--red);border-color:rgba(224,93,93,.4)}
+  .chip.pay-submitted{color:var(--gold-soft);border-color:rgba(217,177,84,.5)}
+  .chip.pay-verified{color:var(--teal);border-color:rgba(46,196,182,.5)}
+  .acct-meta{color:var(--muted);font-size:13.5px;margin-top:8px}
+  .acct-meta b{color:var(--ink)}
+  .chips-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .pay-select{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:var(--muted)}
+  .pay-select select{width:auto;padding:8px 10px;font-size:14px}
   .p-meta{color:var(--muted);font-size:13.5px;margin-top:10px;word-break:break-word}
   .p-meta b{color:var(--ink)}
   .row-btns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
@@ -101,6 +111,9 @@
 
   <!-- APP -->
   <div id="adminApp">
+    <div class="kicker">Pending accounts<span class="count" id="pendingAcctCount">0</span></div>
+    <div id="pendingAccounts"></div>
+
     <div class="kicker">Add a player</div>
     <div class="card">
       <button class="btn btn-gold" type="button" id="addToggle">+ Add a player</button>
@@ -123,6 +136,9 @@
 
     <div class="kicker">All players</div>
     <div id="playerList"></div>
+
+    <div class="kicker">All accounts</div>
+    <div id="allAccounts"></div>
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -254,6 +270,116 @@ async function load(){
   PLAYERS = (data || []).map(p => ({ ...p, _note: noteMap[p.id] || "" }));
   LOADED_ONCE = true;
   render();
+  loadAccounts();
+}
+
+/* ---------- registered accounts (profiles + scouts) ---------- */
+let ACCOUNTS = [];
+async function loadAccounts(){
+  if (!ACCOUNTS.length){ $("pendingAccounts").innerHTML = `<div class="card empty">Loading accounts…</div>`; }
+  const [{ data: profs, error: pErr }, { data: scouts }, { data: notes }] = await Promise.all([
+    SB.from("profiles").select("*").order("created_at", { ascending: false }),
+    SB.from("scouts").select("*"),
+    SB.from("account_notes").select("profile_id,notes"),
+  ]);
+  if (pErr){ $("pendingAccounts").innerHTML = `<div class="card empty">Couldn't load accounts: ${esc(pErr.message)}</div>`; return; }
+  const scoutMap = Object.fromEntries((scouts || []).map(s => [s.id, s]));
+  const noteMap  = Object.fromEntries((notes  || []).map(n => [n.profile_id, n.notes || ""]));
+  const playerByOwner = Object.fromEntries(PLAYERS.filter(p => p.owner_id).map(p => [p.owner_id, p]));
+  ACCOUNTS = (profs || []).map(a => ({ ...a, _scout: scoutMap[a.id] || null, _player: playerByOwner[a.id] || null, _note: noteMap[a.id] || "" }));
+  renderAccounts();
+}
+
+function renderAccounts(){
+  const pending = ACCOUNTS.filter(a => a.account_status === "pending");
+  $("pendingAcctCount").textContent = pending.length;
+  $("pendingAccounts").innerHTML = pending.length ? pending.map(cardAccount).join("")
+    : `<div class="card empty">No accounts awaiting approval. 🎉</div>`;
+  $("allAccounts").innerHTML = ACCOUNTS.length ? ACCOUNTS.map(cardAccount).join("")
+    : `<div class="card empty">No registered accounts yet.</div>`;
+  bindAccountActions();
+}
+
+const fmtDate = s => { try { return new Date(s).toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" }); } catch { return ""; } };
+
+function cardAccount(a){
+  const name = [a.first_name, a.last_name].filter(Boolean).join(" ") || "(no name)";
+  const st = a.account_status;
+  const details = a.role === "scout"
+    ? (() => { const s = a._scout || {}; return [
+        s.organization ? `<b>Org:</b> ${esc(s.organization)}` : "",
+        s.title ? `<b>Title:</b> ${esc(s.title)}` : "",
+        s.school_team ? `<b>School/Team:</b> ${esc(s.school_team)}` : "",
+        s.country ? `<b>Country:</b> ${esc(s.country)}` : "",
+        s.phone ? `<b>Phone:</b> ${esc(s.phone)}` : "",
+        s.notes ? `<b>Their notes:</b> ${esc(s.notes)}` : "",
+      ].filter(Boolean).join(" &nbsp;·&nbsp; "); })()
+    : (() => { const p = a._player; return p ? [
+        p.position ? `<b>Position:</b> ${esc(p.position)}` : "",
+        p.sport ? `<b>Sport:</b> ${esc(p.sport)}` : "",
+        p.country ? `<b>Country:</b> ${esc(p.country)}` : "",
+        p.age ? `<b>Age:</b> ${esc(p.age)}` : "",
+        p.phone ? `<b>Phone:</b> ${esc(p.phone)}` : "",
+      ].filter(Boolean).join(" &nbsp;·&nbsp; ") : `<i>No roster profile created yet.</i>`; })();
+  const payOpts = ["unpaid","submitted","verified"].map(v => `<option value="${v}"${a.payment_status===v?" selected":""}>${v}</option>`).join("");
+  return `<div class="card" data-acct="${a.id}">
+    <div class="p-head">
+      <span class="avatar">${esc(initials(name))}</span>
+      <div style="flex:1">
+        <h3 class="display">${esc(name)}</h3>
+        <div class="chips-row" style="margin-top:4px">
+          <span class="chip role-${a.role}">${a.role === "scout" ? "🔎 Scout" : "⚾ Player"}</span>
+          <span class="chip ${esc(st)}">${esc(st)}</span>
+          <span class="chip pay-${esc(a.payment_status)}">💳 ${esc(a.payment_status)}</span>
+        </div>
+      </div>
+    </div>
+    <div class="acct-meta"><b>Email:</b> ${esc(a.email || "")} &nbsp;·&nbsp; <b>Registered:</b> ${esc(fmtDate(a.created_at))}</div>
+    ${details ? `<div class="acct-meta">${details}</div>` : ""}
+    <div class="pay-select"><label for="pay-${a.id}">Payment:</label>
+      <select id="pay-${a.id}" data-pay="${a.id}" aria-label="Payment status for ${esc(name)}">${payOpts}</select>
+    </div>
+    <div class="row-btns">
+      ${st !== "approved" ? `<button class="btn btn-teal" data-acct-approve="${a.id}">✓ Approve &amp; activate</button>` : ""}
+      ${st !== "rejected" ? `<button class="btn btn-red" data-acct-reject="${a.id}">✕ Reject</button>` : ""}
+      ${st !== "archived" ? `<button class="btn btn-ghost" data-acct-archive="${a.id}">🗄 Archive</button>` : ""}
+    </div>
+    <div class="sub note-lock" style="margin-top:14px">🔒 Internal notes — admins only</div>
+    <div class="field"><textarea class="acct-note note-box" data-acct-note="${a.id}" rows="2" placeholder="Private notes about this account…" aria-label="Internal notes for ${esc(name)}">${esc(a._note || "")}</textarea></div>
+    <div class="row-btns"><button class="btn btn-ghost" data-acct-savenote="${a.id}" type="button">Save note</button></div>
+  </div>`;
+}
+
+async function setAccountStatus(id, account_status, btn){
+  btn.disabled = true;
+  const { error } = await SB.from("profiles").update({ account_status }).eq("id", id);
+  btn.disabled = false;
+  if (error){ toast("Update failed: " + error.message, true); return; }
+  toast(account_status === "approved" ? "Account activated ✓" : account_status === "rejected" ? "Account rejected" : "Account archived");
+  await load();   // reload players too (approval trigger syncs the roster row)
+}
+
+function bindAccountActions(){
+  document.querySelectorAll("[data-acct-approve]").forEach(b => b.onclick = () => setAccountStatus(b.dataset.acctApprove, "approved", b));
+  document.querySelectorAll("[data-acct-reject]").forEach(b => b.onclick = () => setAccountStatus(b.dataset.acctReject, "rejected", b));
+  document.querySelectorAll("[data-acct-archive]").forEach(b => b.onclick = () => setAccountStatus(b.dataset.acctArchive, "archived", b));
+  document.querySelectorAll("[data-pay]").forEach(sel => sel.onchange = async () => {
+    const { error } = await SB.from("profiles").update({ payment_status: sel.value }).eq("id", sel.dataset.pay);
+    if (error){ toast("Payment update failed: " + error.message, true); return; }
+    const a = ACCOUNTS.find(x => x.id === sel.dataset.pay); if (a) a.payment_status = sel.value;
+    toast("Payment marked " + sel.value);
+  });
+  document.querySelectorAll("[data-acct-savenote]").forEach(b => b.onclick = async () => {
+    const id = b.dataset.acctSavenote;
+    const notes = document.querySelector(`[data-acct-note="${id}"]`).value.trim();
+    b.disabled = true;
+    const { error } = await SB.from("account_notes")
+      .upsert({ profile_id: id, notes, updated_at: new Date().toISOString(), updated_by: ADMIN_EMAIL }, { onConflict: "profile_id" });
+    b.disabled = false;
+    if (error){ toast("Note save failed: " + error.message, true); return; }
+    const a = ACCOUNTS.find(x => x.id === id); if (a) a._note = notes;
+    toast("Internal note saved ✓");
+  });
 }
 
 function render(){
