@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Scout Portal — Elite Sports Management</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
+<link rel="shortcut icon" href="../icons/icon-192.png" />
+<meta name="theme-color" content="#081a33" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{--navy:#081a33;--navy-2:#06142a;--gold:#d9b154;--gold-soft:#e7c878;--teal:#3a9aa6;--teal-soft:#5fb8c2;--ink:#eaf0fa;--muted:#9fb1cc;--line:rgba(217,177,84,.22);--card:#0c2143;--red:#e05d5d}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--navy-2);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(900px 500px at 78% -10%,rgba(217,177,84,.16),transparent 60%),radial-gradient(800px 600px at 8% 110%,rgba(20,70,140,.30),transparent 55%),linear-gradient(180deg,var(--navy),var(--navy-2))}
+  .display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase}
+  a{color:var(--gold-soft);text-decoration:none}
+  .wrap{max-width:820px;margin:0 auto;padding:26px 22px 90px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .logo-img{height:40px;width:auto;display:block}
+  header b{font-size:14px;display:block}
+  header small{display:block;font-size:8.5px;letter-spacing:.3em;color:var(--gold-soft);font-weight:700}
+  .spacer{flex:1}
+  .btn{padding:11px 20px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;border:0;transition:.2s;display:inline-block;font-family:inherit;text-align:center}
+  .btn-gold{background:var(--gold);color:#05101f}.btn-gold:hover{background:var(--gold-soft)}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .btn[disabled]{opacity:.55;cursor:wait}
+  .card{border:1px solid var(--line);border-radius:16px;padding:22px 20px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));margin-bottom:14px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .field input{width:100%;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--ink);font-size:15px;font-family:inherit}
+  .field input:focus{outline:0;border-color:var(--gold)}
+  .msg{display:none;margin-top:12px;font-size:13.5px;color:var(--red)}
+  .msg.show{display:block}.msg.ok{color:var(--teal-soft)}
+  .note{font-size:13px;color:var(--muted);margin-top:16px}
+  h1.display{font-size:24px}h1.display em{color:var(--gold);font-style:normal}
+  .toolbar{display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+  .toolbar input{flex:1;min-width:180px;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:999px;padding:11px 16px;color:var(--ink);font-size:15px;font-family:inherit}
+  .toolbar input:focus{outline:0;border-color:var(--gold)}
+  .count{font-size:13px;color:var(--muted)}
+  .p-head{display:flex;align-items:center;gap:14px}
+  .avatar{width:56px;height:56px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;font-family:'Anton';color:var(--gold);font-size:18px;background-size:cover;background-position:center;flex:0 0 auto}
+  .p-head h3{font-size:18px}
+  .pos{color:var(--muted);font-size:13.5px}
+  .contact{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .contact a,.contact span{font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--ink);background:rgba(6,20,42,.5)}
+  .contact a:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .bio{color:var(--muted);font-size:14px;margin-top:12px}
+  .stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .stat{font-size:12.5px;color:var(--ink);background:rgba(217,177,84,.08);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+  .stat b{color:var(--gold-soft)}
+  .teams{margin-top:10px;font-size:13px;color:var(--muted)}
+  #booting,#loginBox,#statusBox,#app{display:none}
+  .center{text-align:center}
+  @media(max-width:560px){ .wrap{padding:18px 14px 80px} .field input,.toolbar input{font-size:16px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="../index.html"><img class="logo-img" src="../logo.png" alt="Elite Sports Management" /></a>
+    <div><b>Elite Sports Management</b><small>SCOUT PORTAL</small></div>
+    <div class="spacer"></div>
+    <button class="btn btn-ghost" id="signOut" style="display:none">Sign out</button>
+  </header>
+
+  <div id="booting" class="card center" style="max-width:420px;margin:8vh auto;color:var(--muted)">Checking session…</div>
+
+  <!-- LOGIN -->
+  <div id="loginBox" class="card" style="max-width:420px;margin:8vh auto">
+    <h1 class="display" style="margin-bottom:6px">Scout <em>Portal</em></h1>
+    <p class="note" style="margin:0 0 18px">Sign in with the email &amp; password you created at registration.</p>
+    <form id="pwForm">
+      <div class="field"><label for="email">Email</label><input type="email" id="email" autocomplete="username" required placeholder="you@email.com" /></div>
+      <div class="field"><label for="password">Password</label><input type="password" id="password" autocomplete="current-password" required /></div>
+      <button class="btn btn-gold" style="width:100%" type="submit">Sign in</button>
+      <div class="msg" id="loginMsg" role="alert" aria-live="assertive"></div>
+    </form>
+    <div style="text-align:center;margin:16px 0 4px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">or</div>
+    <button class="btn btn-ghost" style="width:100%" type="button" id="magicBtn">Email me a sign-in link</button>
+    <p class="note" style="margin-top:16px">New here? <a href="../register/">Create a scout account</a>.</p>
+  </div>
+
+  <!-- STATUS -->
+  <div id="statusBox" class="card" style="max-width:460px;margin:8vh auto"></div>
+
+  <!-- APP (roster) -->
+  <div id="app">
+    <h1 class="display" style="margin-bottom:14px">Roster <em>— Scout Access</em></h1>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Search by name, position or country…" aria-label="Search roster" />
+      <span class="count" id="count"></span>
+    </div>
+    <div id="roster"></div>
+  </div>
+</div>
+
+<script type="module">
+const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const initials = n => (n||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
+
+function showView(state){
+  ["booting","loginBox","statusBox","app"].forEach(v => $(v).style.display = "none");
+  $({booting:"booting",login:"loginBox",status:"statusBox",app:"app"}[state]).style.display = "block";
+  $("signOut").style.display = (state === "app" || state === "status") ? "" : "none";
+}
+showView("booting");
+
+$("pwForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const m = $("loginMsg"); m.classList.remove("show","ok");
+  const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+  const { error } = await SB.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
+  btn.disabled = false;
+  if (error){ m.textContent = error.message; m.classList.add("show"); $("password").value = ""; return; }
+});
+$("magicBtn").onclick = async () => {
+  const m = $("loginMsg"); m.classList.remove("show","ok");
+  const email = $("email").value.trim();
+  if (!email){ m.textContent = "Enter your email first."; m.classList.add("show"); $("email").focus(); return; }
+  const btn = $("magicBtn"); btn.disabled = true; btn.textContent = "Sending…";
+  const { error } = await SB.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href.split("#")[0] } });
+  btn.disabled = false; btn.textContent = "Email me a sign-in link";
+  if (error){ m.textContent = error.message; m.classList.add("show"); return; }
+  m.textContent = "Check your inbox — we sent you a sign-in link."; m.classList.add("show","ok");
+};
+$("signOut").onclick = async () => { await SB.auth.signOut(); };
+
+const STATUS_COPY = {
+  pending:  { icon:"⏳", title:"Almost there", body:"Your registration has been received and we're verifying your payment. Your roster access unlocks automatically as soon as Elite Sports Management approves your account. We'll email you the moment it's ready." },
+  rejected: { icon:"✉️", title:"Let's talk", body:"We're not able to activate your scout access right now. If you think this is a mistake or you'd like to know more, please reach out." },
+  archived: { icon:"📁", title:"Account archived", body:"Your account is archived and access is paused. Contact us any time to reactivate it." },
+  notscout: { icon:"⚾", title:"You're a player account", body:"This is the scout portal. Head to your Player Portal to see your profile." },
+  none:     { icon:"🔎", title:"No scout account yet", body:"We couldn't find a scout account for this login. Create one to request roster access." },
+};
+function showStatus(kind, link){
+  const c = STATUS_COPY[kind] || STATUS_COPY.pending;
+  $("statusBox").innerHTML = `<div class="center">
+    <div style="font-size:40px;margin-bottom:10px">${c.icon}</div>
+    <h2 class="display" style="font-size:22px;margin-bottom:10px">${esc(c.title)}</h2>
+    <p class="note" style="font-size:14.5px;line-height:1.6">${esc(c.body)}</p>
+    ${link || `<p class="note" style="margin-top:18px">Questions? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Scout%20account">Email us</a>.</p>`}
+  </div>`;
+  showView("status");
+}
+
+async function gate(session){
+  const user = session?.user; if (!user){ showView("login"); return; }
+  const { data: prof } = await SB.from("profiles").select("role,account_status").eq("id", user.id).maybeSingle();
+  if (!prof){ showStatus("none", `<p class="note" style="margin-top:18px"><a class="btn btn-gold" href="../register/">Create a scout account</a></p>`); return; }
+  if (prof.role !== "scout"){ showStatus("notscout", `<p class="note" style="margin-top:18px"><a class="btn btn-gold" href="../portal/">Go to Player Portal</a></p>`); return; }
+  if (prof.account_status !== "approved"){ showStatus(prof.account_status); return; }
+  showView("app"); loadRoster();
+}
+
+SB.auth.onAuthStateChange((evt, session) => {
+  if (evt === "SIGNED_IN" && session) { gate(session); }
+  else if (evt === "SIGNED_OUT") { showView("login"); }
+});
+(async function guard(){
+  try { const { data:{ session } } = await SB.auth.getSession(); session ? gate(session) : showView("login"); }
+  catch (err){ console.error(err); showView("login"); }
+})();
+
+/* Elevated roster — the RPC returns rows only for approved scouts (DB-enforced). */
+let ROSTER = [];
+async function loadRoster(){
+  $("roster").innerHTML = `<div class="card" style="color:var(--muted)">Loading roster…</div>`;
+  const { data, error } = await SB.rpc("scout_roster");
+  if (error){ $("roster").innerHTML = `<div class="card">Couldn't load the roster.<br><small>${esc(error.message)}</small></div>`; return; }
+  ROSTER = data || [];
+  render();
+}
+$("search").addEventListener("input", render);
+
+function render(){
+  const q = $("search").value.trim().toLowerCase();
+  const rows = ROSTER.filter(p => !q ||
+    [p.name, p.position, p.group, p.country, p.sport].some(v => String(v||"").toLowerCase().includes(q)));
+  $("count").textContent = `${rows.length} player${rows.length===1?"":"s"}`;
+  $("roster").innerHTML = rows.length ? rows.map(card).join("")
+    : `<div class="card" style="color:var(--muted)">No players match “${esc(q)}”.</div>`;
+}
+
+function card(p){
+  const stats = Array.isArray(p.stats) ? p.stats : [];
+  const teams = Array.isArray(p.teams) ? p.teams : [];
+  const contact = [
+    p.email ? `<a href="mailto:${esc(p.email)}">✉️ ${esc(p.email)}</a>` : "",
+    p.phone ? `<a href="tel:${esc(String(p.phone).replace(/[^+0-9]/g,''))}">📞 ${esc(p.phone)}</a>` : "",
+    p.instagram ? `<a href="https://instagram.com/${esc(String(p.instagram).replace(/^@/,''))}" target="_blank" rel="noopener">📷 ${esc(p.instagram)}</a>` : "",
+    p.age ? `<span>Age ${esc(p.age)}</span>` : "",
+  ].filter(Boolean).join("");
+  return `<div class="card">
+    <div class="p-head">
+      <span class="avatar" ${p.image_url ? `style="background-image:url('${esc(p.image_url)}')"` : ""}>${p.image_url ? "" : esc(initials(p.name))}</span>
+      <div style="flex:1">
+        <h3 class="display">${esc(p.name)}</h3>
+        <div class="pos">${esc(p.position || p.group || "")} ${p.flag || ""} ${p.country ? "· "+esc(p.country) : ""} · ${esc(p.sport || "Baseball")}</div>
+      </div>
+    </div>
+    ${contact ? `<div class="contact">${contact}</div>` : ""}
+    ${p.bio ? `<div class="bio">${esc(p.bio)}</div>` : ""}
+    ${stats.length ? `<div class="stats">${stats.map(s => `<span class="stat"><b>${esc(s.label)}:</b> ${esc(s.value)}</span>`).join("")}</div>` : ""}
+    ${teams.length ? `<div class="teams"><b>Teams:</b> ${teams.map(esc).join(" · ")}</div>` : ""}
+  </div>`;
+}
+</script>
+</body>
+</html>
