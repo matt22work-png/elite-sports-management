@@ -28,6 +28,8 @@
   .btn-gold{background:var(--gold);color:#05101f}.btn-gold:hover{background:var(--gold-soft)}
   .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
   .btn[disabled]{opacity:.55;cursor:wait}
+  .linklike{background:none;border:0;color:var(--gold-soft);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;text-decoration:underline;padding:4px}
+  .linklike:hover{color:var(--gold)}
   .card{border:1px solid var(--line);border-radius:16px;padding:22px 20px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));margin-bottom:14px}
   .field{margin-bottom:14px}
   .field label{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
@@ -53,7 +55,7 @@
   .stat{font-size:12.5px;color:var(--ink);background:rgba(217,177,84,.08);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
   .stat b{color:var(--gold-soft)}
   .teams{margin-top:10px;font-size:13px;color:var(--muted)}
-  #booting,#loginBox,#statusBox,#app{display:none}
+  #booting,#loginBox,#resetBox,#statusBox,#app{display:none}
   .center{text-align:center}
   @media(max-width:560px){ .wrap{padding:18px 14px 80px} .field input,.toolbar input{font-size:16px} }
 </style>
@@ -79,9 +81,21 @@
       <button class="btn btn-gold" style="width:100%" type="submit">Sign in</button>
       <div class="msg" id="loginMsg" role="alert" aria-live="assertive"></div>
     </form>
-    <div style="text-align:center;margin:16px 0 4px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">or</div>
+    <div style="text-align:center;margin-top:12px"><button type="button" id="forgotBtn" class="linklike">Forgot your password?</button></div>
+    <div style="text-align:center;margin:14px 0 4px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">or</div>
     <button class="btn btn-ghost" style="width:100%" type="button" id="magicBtn">Email me a sign-in link</button>
     <p class="note" style="margin-top:16px">New here? <a href="../register/">Create a scout account</a>.</p>
+  </div>
+
+  <!-- RESET PASSWORD -->
+  <div id="resetBox" class="card" style="max-width:420px;margin:8vh auto">
+    <h1 class="display" style="margin-bottom:6px">Set a new <em>password</em></h1>
+    <p class="note" style="margin:0 0 18px">Choose a new password for your account.</p>
+    <form id="resetForm">
+      <div class="field"><label for="newpass">New password</label><input type="password" id="newpass" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters" /></div>
+      <button class="btn btn-gold" style="width:100%" type="submit">Update password</button>
+      <div class="msg" id="resetMsg" role="alert" aria-live="assertive"></div>
+    </form>
   </div>
 
   <!-- STATUS -->
@@ -110,11 +124,12 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 const initials = n => (n||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
 
 function showView(state){
-  ["booting","loginBox","statusBox","app"].forEach(v => $(v).style.display = "none");
-  $({booting:"booting",login:"loginBox",status:"statusBox",app:"app"}[state]).style.display = "block";
+  ["booting","loginBox","resetBox","statusBox","app"].forEach(v => $(v).style.display = "none");
+  $({booting:"booting",login:"loginBox",reset:"resetBox",status:"statusBox",app:"app"}[state]).style.display = "block";
   $("signOut").style.display = (state === "app" || state === "status") ? "" : "none";
 }
 showView("booting");
+let RECOVERING = location.hash.includes("type=recovery");
 
 $("pwForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -136,6 +151,29 @@ $("magicBtn").onclick = async () => {
 };
 $("signOut").onclick = async () => { await SB.auth.signOut(); };
 
+$("forgotBtn").onclick = async () => {
+  const m = $("loginMsg"); m.classList.remove("show","ok");
+  const email = $("email").value.trim();
+  if (!email){ m.textContent = "Enter your email first, then tap “Forgot your password?”."; m.classList.add("show"); $("email").focus(); return; }
+  const btn = $("forgotBtn"); btn.disabled = true; btn.textContent = "Sending…";
+  const { error } = await SB.auth.resetPasswordForEmail(email, { redirectTo: location.href.split("#")[0] });
+  btn.disabled = false; btn.textContent = "Forgot your password?";
+  if (error){ m.textContent = error.message; m.classList.add("show"); return; }
+  m.textContent = "Check your inbox — we sent a link to reset your password."; m.classList.add("show","ok");
+};
+$("resetForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const m = $("resetMsg"); m.classList.remove("show","ok");
+  const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+  const { error } = await SB.auth.updateUser({ password: $("newpass").value });
+  btn.disabled = false;
+  if (error){ m.textContent = error.message; m.classList.add("show"); return; }
+  RECOVERING = false;
+  m.textContent = "Password updated — signing you in…"; m.classList.add("show","ok");
+  const { data: { session } } = await SB.auth.getSession();
+  if (session) gate(session); else showView("login");
+});
+
 const STATUS_COPY = {
   pending:  { icon:"⏳", title:"Almost there", body:"Your registration has been received and we're verifying your payment. Your roster access unlocks automatically as soon as Elite Sports Management approves your account. We'll email you the moment it's ready." },
   rejected: { icon:"✉️", title:"Let's talk", body:"We're not able to activate your scout access right now. If you think this is a mistake or you'd like to know more, please reach out." },
@@ -155,6 +193,7 @@ function showStatus(kind, link){
 }
 
 async function gate(session){
+  if (RECOVERING){ showView("reset"); return; }
   const user = session?.user; if (!user){ showView("login"); return; }
   const { data: prof } = await SB.from("profiles").select("role,account_status").eq("id", user.id).maybeSingle();
   if (!prof){ showStatus("none", `<p class="note" style="margin-top:18px"><a class="btn btn-gold" href="../register/">Create a scout account</a></p>`); return; }
@@ -164,7 +203,8 @@ async function gate(session){
 }
 
 SB.auth.onAuthStateChange((evt, session) => {
-  if (evt === "SIGNED_IN" && session) { gate(session); }
+  if (evt === "PASSWORD_RECOVERY"){ RECOVERING = true; showView("reset"); }
+  else if (evt === "SIGNED_IN" && session) { gate(session); }
   else if (evt === "SIGNED_OUT") { showView("login"); }
 });
 (async function guard(){

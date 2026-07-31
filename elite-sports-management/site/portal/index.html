@@ -35,6 +35,8 @@
   .field input:focus,.field textarea:focus,.field select:focus{outline:0;border-color:var(--gold)}
   .field textarea{resize:vertical}
   .btn-gold[disabled],.btn[disabled]{opacity:.55;cursor:wait}
+  .linklike{background:none;border:0;color:var(--gold-soft);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;text-decoration:underline;padding:4px}
+  .linklike:hover{color:var(--gold)}
   .msg{display:none;margin-top:12px;font-size:13.5px;color:var(--red)}
   .msg.show{display:block}
   .msg.ok{color:var(--teal-soft)}
@@ -78,12 +80,24 @@
       <button class="btn btn-gold" style="width:100%" type="submit">Sign in</button>
       <div class="msg" id="loginMsg" role="alert" aria-live="assertive"></div>
     </form>
-    <div style="text-align:center;margin:16px 0 4px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">or</div>
+    <div style="text-align:center;margin-top:12px"><button type="button" id="forgotBtn" class="linklike">Forgot your password?</button></div>
+    <div style="text-align:center;margin:14px 0 4px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">or</div>
     <button class="btn btn-ghost" style="width:100%" type="button" id="magicBtn">Email me a sign-in link</button>
     <p class="note" style="margin-top:16px">
       New here? <a href="../register/">Create an account</a>.
       Applied the old way? Use the sign-in link with your application email.
     </p>
+  </div>
+
+  <!-- RESET PASSWORD (shown when arriving from a reset email) -->
+  <div id="resetBox" class="card" style="max-width:420px;margin:8vh auto;display:none">
+    <h2 class="display" style="font-size:22px;margin-bottom:6px">Set a new <em style="color:var(--gold);font-style:normal">password</em></h2>
+    <p class="note" style="margin-bottom:18px">Choose a new password for your account.</p>
+    <form id="resetForm">
+      <div class="field"><label for="newpass">New password</label><input type="password" id="newpass" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters" /></div>
+      <button class="btn btn-gold" style="width:100%" type="submit">Update password</button>
+      <div class="msg" id="resetMsg" role="alert" aria-live="assertive"></div>
+    </form>
   </div>
 
   <!-- STATUS (pending / rejected / archived) -->
@@ -110,11 +124,16 @@ const initials = n => (n||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toU
 function showView(state){
   $("booting").style.display   = state === "booting" ? "block" : "none";
   $("loginBox").style.display  = state === "login"   ? "block" : "none";
+  $("resetBox").style.display  = state === "reset"   ? "block" : "none";
   $("statusBox").style.display = state === "status"  ? "block" : "none";
   $("app").style.display       = state === "app"     ? "block" : "none";
   $("signOut").style.display   = (state === "app" || state === "status") ? "" : "none";
 }
 showView("booting");
+
+/* True while handling a password-reset link, so the normal session routing
+   doesn't whisk the user past the "set new password" form. */
+let RECOVERING = location.hash.includes("type=recovery");
 
 /* Password sign-in — the account created at registration. */
 $("pwForm").addEventListener("submit", async e => {
@@ -141,6 +160,33 @@ $("magicBtn").onclick = async () => {
 };
 
 $("signOut").onclick = async () => { await SB.auth.signOut(); };
+
+/* Forgot password → email a reset link back to this page. */
+$("forgotBtn").onclick = async () => {
+  const m = $("loginMsg"); m.classList.remove("show","ok");
+  const email = $("email").value.trim();
+  if (!email){ m.textContent = "Enter your email first, then tap “Forgot your password?”."; m.classList.add("show"); $("email").focus(); return; }
+  const btn = $("forgotBtn"); btn.disabled = true; btn.textContent = "Sending…";
+  const { error } = await SB.auth.resetPasswordForEmail(email, { redirectTo: location.href.split("#")[0] });
+  btn.disabled = false; btn.textContent = "Forgot your password?";
+  if (error){ m.textContent = error.message; m.classList.add("show"); return; }
+  m.textContent = "Check your inbox — we sent a link to reset your password.";
+  m.classList.add("show","ok");
+};
+
+/* Set a new password after following the reset link. */
+$("resetForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const m = $("resetMsg"); m.classList.remove("show","ok");
+  const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+  const { error } = await SB.auth.updateUser({ password: $("newpass").value });
+  btn.disabled = false;
+  if (error){ m.textContent = error.message; m.classList.add("show"); return; }
+  RECOVERING = false;
+  m.textContent = "Password updated — signing you in…"; m.classList.add("show","ok");
+  const { data: { session } } = await SB.auth.getSession();
+  if (session) gate(session); else showView("login");
+});
 
 /* Professional, non-technical status screens for unapproved accounts. */
 const STATUS_COPY = {
@@ -172,6 +218,7 @@ function showStatus(status){
 /* Decide what a signed-in user sees: their own approved profile, a status
    screen, a nudge to the scout portal, or (legacy) an email-matched profile. */
 async function gate(session){
+  if (RECOVERING){ showView("reset"); return; }   // let them finish setting a new password
   const user = session?.user; if (!user){ showView("login"); return; }
   const { data: prof } = await SB.from("profiles").select("role,account_status").eq("id", user.id).maybeSingle();
   if (prof){
@@ -193,7 +240,8 @@ async function gate(session){
 
 let ME_SESSION = null;   // kept so the edit form knows the user's id (photo path) + email
 SB.auth.onAuthStateChange((evt, session) => {
-  if (evt === "SIGNED_IN" && session) { ME_SESSION = session; gate(session); }
+  if (evt === "PASSWORD_RECOVERY"){ RECOVERING = true; showView("reset"); }
+  else if (evt === "SIGNED_IN" && session) { ME_SESSION = session; gate(session); }
   else if (evt === "SIGNED_OUT") { ME_SESSION = null; showView("login"); }
 });
 
