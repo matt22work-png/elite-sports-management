@@ -63,8 +63,18 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 - **Player portal** (portal/index.html): now self-service — athletes edit own bio/Instagram/phone/age + upload a profile photo via the RPC + `self/<uid>/` storage. Stats/position/status stay read-only/agency-owned.
 - **Perf** (`supabase-rls-initplan.sql`, APPLIED as `rls_initplan_optimization`): wrapped `auth.jwt()` / `private.is_esm_admin()` in `(select …)` across players + player_notes policies (lint 0003). Semantics identical, verified RLS still isolates (athlete sees 1 row of 18, 0 notes).
 
+### Production hardening (autonomous session 2026-07-31)
+- **Portal verification** — traced auth/route-protection/error/loading paths. Service worker (`sw.js`) reviewed: network-first for HTML means `/admin/` + `/portal/` always get fresh auth pages online (cache is offline-only fallback), skips Range/video, guards on `res.ok`. No SW change needed. Magic-link redirect uses `location.href.split('#')[0]` → works on any host; the redirect-URL allow-list stays a dashboard Manual Action.
+- **Mobile header fix** (index.html) — adding Sign In could overflow the header on <~400px (brand+lang+SignIn+Apply). Added `@media(max-width:560px)` + `@media(max-width:380px)` blocks tightening nav spacing/padding so it fits to ~320px. No desktop change.
+- **Loading states** — portal shows "Loading your profile…"; admin shows "Loading players…" on first fetch (was momentarily empty).
+- **Security sweep** — verified against live prod: anon `players?select=*` → 42501 (denied, `*` includes ungranted PII); explicit PII select → denied; `player_notes` → denied. No secrets in repo (grep clean). `players.json` + generated player pages carry NO player PII (only agency contact); player pages `noindex`. Public roster query uses explicit non-PII columns (index.html:1565). Storage: athletes confined to `self/<uid>/`, admin policies intact.
+- **SEO** — added `robots.txt` (allow site; disallow /admin/,/portal/; /players/ left crawlable so noindex is honoured; sitemap ref), `sitemap.xml` (homepage only — player pages noindex by design), and `SportsOrganization` **JSON-LD** on the homepage. OG/Twitter/canonical were already complete.
+- **Performance** — added explicit `width`/`height` to both logo `<img>`s (CLS), `fetchpriority=high` on nav logo, `loading=lazy` on footer logo. Confirmed homepage payload is light (logo 22KB; gallery uses thumb/full split + lazy; CSS-gradient backgrounds, no hero image). Full gallery JPEGs (100–340KB) load only behind an event click.
+- **Accessibility** — associated every form label with its control (for/id on login + add-player + player self-edit; aria-label on the class-based admin per-player editor); `role=status`/`aria-live` on toast; `role=alert`/`aria-live=assertive` on inline error/success msgs; aria-label on icon-only remove-stat button; type=button on save actions.
+- **Deploy verified live**: robots.txt 200, sitemap.xml 200, JSON-LD/logo-dims/mobile-CSS/portal-a11y all present in prod HTML.
+
 ## In progress
-- (All four current-priority features done + validated. See NEXT SESSION.)
+- (Current-priority features + production hardening done + validated. See NEXT SESSION.)
 
 ### Tier 5 content + priority interrupts
 - **74f0b71** Nav reorder: What We Do, Who I Am, College, Roster, Events, Join. (No Media item — already removed in f063ac6.)
@@ -103,32 +113,38 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 # NEXT SESSION
 
-**Current state:** Repository is deployable and all four current-priority features are complete, committed, and DB-validated. Nothing is half-built. Local branch `main`; commits are being pushed to origin (verify `git status` — if the portal/log commits are ahead of origin, push them).
+**Current state:** Repository is deployable, fully pushed to `origin/main`, and verified live in prod. All four current-priority features (Sign In nav, Admin portal, Player portal, DB security) PLUS a full production-hardening pass (verification, security sweep, SEO, performance, accessibility) are complete and committed. Nothing is half-built. `git status` should be clean/ahead-0 after the final log commit.
 
-**Completed this session (2026-07-30, autonomous):**
-1. Homepage premium Sign In nav dropdown (Admin + Player portals), i18n EN/ES/IT.
-2. DB: `player_notes` (admin-only internal notes), `update_my_profile()` self-edit RPC, athlete `self/<uid>/` photo storage policies — all APPLIED to prod + saved as SQL files.
-3. Admin portal: delete, archive/restore, internal-notes editor, expanded profile editing (name/position/sport/country/age/instagram/phone/bio/teams).
-4. Player portal: self-service editing (bio/instagram/phone/age + photo) via the RPC; stats/status stay agency-owned.
-5. Perf: RLS init-plan optimization.
+**Completed — session 2026-07-30 (features):** Sign In nav; `player_notes` (admin-only) + `update_my_profile()` RPC + athlete photo storage (all APPLIED to prod); admin delete/archive/notes/expanded-edit; player self-service edit + photo; RLS init-plan optimization.
 
-**Commits created this session** (newest last): Sign In nav → DB notes+self-service SQL → admin portal → player portal → (pending) rls-initplan SQL + ENGINEERING_LOG. Run `git log --oneline -8` to see exact hashes.
+**Completed — session 2026-07-31 (production hardening):**
+1. Portal verification (auth/route-protection/error/loading traced; SW confirmed network-first so auth pages never stale).
+2. Mobile header overflow fix (nav fits to ~320px) + loading states in both portals.
+3. Security sweep — verified live: anon blocked from players.*/PII/player_notes (42501); no secrets; no PII in players.json or player pages; storage confinement intact.
+4. SEO — `robots.txt`, `sitemap.xml`, `SportsOrganization` JSON-LD.
+5. Performance — logo width/height (CLS) + fetchpriority/lazy hints.
+6. Accessibility — label associations + aria-live regions + icon-button labels across both portals.
 
-**Validation performed:** JS syntax-checked all 3 HTML files (node --check). RPC + RLS exercised against prod with simulated athlete JWT: whitelist holds, own-row isolation holds, notes invisible to athletes. Supabase security + performance advisors reviewed (no new actionable issues).
+**Commits this session (2026-07-31), newest last:** `mobile header + loading states` → `SEO robots/sitemap/JSON-LD` → `perf logo dims` → `a11y labels + live regions` → (this) `log + handoff`. Run `git log --oneline -10` for hashes. Latest pushed: b807d74 (before the final log commit).
+
+**Validation performed:** JS syntax-checked admin/portal/index (node --check). Live prod curl checks: robots/sitemap 200, JSON-LD + logo dims + mobile CSS + portal aria-live all present. Anon PII/notes denial confirmed via REST. RLS/RPC proven earlier via simulated JWT.
 
 **Exact next task (highest priority first):**
-1. **Manual UI smoke test** the two portals in a browser signed in as a real admin (mattswagj@gmail.com via magic link) and, if possible, a test athlete — the automated tests covered DB/RLS + JS syntax but NOT the live click-through (magic-link login can't be driven headless here). Verify: admin add/edit/delete/archive/notes save + toasts; portal edit + photo upload round-trip. Files: `site/admin/index.html`, `site/portal/index.html`.
-2. Then continue the roadmap: **SEO** (replace placeholder 1200×630 OG image — Manual Action asset), **a11y** re-audit of the new dropdown + portal forms, then **maintainability** (the two long-standing Deferred items: player-page CSS trim via `gen_player_pages.py`, shared-Supabase-client extraction — both need interactive verification).
+1. **Manual UI smoke test** the two portals in a real browser (magic-link login can't be driven headless here). Sign in as admin (mattswagj@gmail.com): add/edit/delete/archive a player, save an internal note, upload a photo — confirm toasts. Then as a test athlete: edit bio/photo and confirm the round-trip. This is the ONLY unproven-end-to-end path.
+2. **Maintainability** (the two long-standing Deferred items, both need interactive verification): player-page dead-CSS trim via `gen_player_pages.py` (Python unavailable in the autonomous env — port generator to Node or run where Python exists), and shared-Supabase-client extraction across the 3 apps.
+3. Optional polish: submit sitemap to Google Search Console (Manual Action); consider making athlete profiles indexable for SEO IF the business decides to un-paywall them (currently noindex by design — do NOT change without confirmation).
 
-**Files to open first:** `ENGINEERING_LOG.md` (this file), `site/admin/index.html`, `site/portal/index.html`, `site/index.html` (nav ~line 348, i18n ~line 709).
+**Files to open first:** `ENGINEERING_LOG.md` (this file), `site/admin/index.html`, `site/portal/index.html`, `site/index.html` (nav ~line 386, signin CSS ~line 76, i18n ~line 720).
 
 **Remaining risks:**
-- Portals not yet clicked through live (see next task #1). Low risk — DB layer proven, JS parses — but the magic-link + storage-upload happy path is unproven end-to-end in prod.
-- Seed athletes have no email → can't use portal until an admin sets one (documented above).
-- `update_my_profile` is intentionally SECURITY DEFINER + authenticated-executable (advisor WARN is expected).
+- Portals still not clicked-through live end-to-end (task #1). DB layer proven, JS parses, HTML live — but magic-link + storage-upload happy path is unverified by a human.
+- Seed athletes (17) have `email = NULL` → none can log into the portal until an admin sets their email row.
+- `update_my_profile` is intentionally SECURITY DEFINER + authenticated-executable (advisor WARN is expected/reviewed).
 
 **Manual actions required (external / dashboard-only):**
-- Supabase Auth → URL Configuration → Redirect URLs must include `https://elite-sports-management.vercel.app/admin/` and `/portal/` (needed for magic links — pre-existing requirement, confirm still set).
+- Supabase Auth → URL Configuration → Redirect URLs must include `https://elite-sports-management.vercel.app/admin/` and `/portal/` (magic links bounce to localhost without this — CONFIRM it's set; this is the most likely cause if login "doesn't work").
 - Enable Supabase Auth leaked-password protection (dashboard).
-- Provide a real 1200×630 branded OG share image (placeholder hero in use).
-- If any of the 17 seed athletes should get portal access, an admin must set their email on the player row.
+- Provide a real 1200×630 branded OG share image (placeholder team photo in use at `/media/photos/twl-champions.jpg`).
+- Submit `sitemap.xml` in Google Search Console (optional).
+- To give a seed athlete portal access, an admin sets their email on the player row.
+- Supabase free tier PAUSES when idle — if the live site/portal "won't load", restore the project (ref `sbexwyvsgqayxrsrlrpm`) first.
