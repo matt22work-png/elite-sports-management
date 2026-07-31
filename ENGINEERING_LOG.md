@@ -73,8 +73,22 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 - **Accessibility** — associated every form label with its control (for/id on login + add-player + player self-edit; aria-label on the class-based admin per-player editor); `role=status`/`aria-live` on toast; `role=alert`/`aria-live=assertive` on inline error/success msgs; aria-label on icon-only remove-stat button; type=button on save actions.
 - **Deploy verified live**: robots.txt 200, sitemap.xml 200, JSON-LD/logo-dims/mobile-CSS/portal-a11y all present in prod HTML.
 
+### Account registration + manual-approval workflow (autonomous session 2026-07-31)
+Two account types (player, scout) with email+password registration, external payment, and admin approval.
+- **DB backbone** (`supabase-accounts.sql`, APPLIED as `accounts_profiles_and_scouts` + `scout_roster_revoke_anon`):
+  - `profiles` (1 per auth user): role, first/last name, email, account_status (pending/approved/rejected/archived), payment_status (unpaid/submitted/verified). Users create only their OWN pending/unpaid profile; only admins approve/verify. `scouts` table = scout-specific data (owner-managed + admin-read).
+  - players: `owner_id` links registered athletes (unique partial index); own-row read now matches owner_id OR email (legacy applicants intact); players insert only their OWN pending row; **scout_roster()** SECURITY DEFINER RPC returns the approved roster WITH contact info to approved scouts only (revoked from anon/public — verified 401). Column grants can't separate scout from player (same `authenticated` role), so the RPC is the boundary.
+  - Trigger `sync_player_status`: approving/rejecting/archiving a player ACCOUNT mirrors onto their roster row (one admin action). Helpers `private.is_approved_scout()`, `private.is_registered_player()`.
+  - `account_notes` (`supabase-account-notes.sql`, APPLIED as `account_internal_notes`): admin-only internal notes per account (separate table — a notes column on profiles would leak via own-profile read).
+  - **Validated with simulated JWTs (rolled back):** no self-approve; pending player isolated to own row; can't insert an approved row; trigger sync works; approved scout sees full roster w/ PII; cross-account isolation (scout A sees only own profile/scout row, 0 account_notes); anon blocked from profiles/scouts/account_notes (401) and scout_roster (401).
+- **/register/** — 3-step wizard: account+role (signUp) → role-specific profile (player creates owned pending roster row + optional photo; scout creates scout record) → payment screen with configurable `PAYMENT_URL`. Resumable across the email-confirm path.
+- **/portal/** — added email+password sign-in (kept magic-link fallback); `gate()` routes: approved player→profile, pending/rejected/archived→professional status screen, scout account→nudge, legacy applicant→email-matched profile.
+- **/scout/** — new scout portal: approved scouts get the elevated roster (contact info) via `scout_roster()`, client-side search; unapproved→status screen.
+- **/admin/** — Pending accounts + All accounts sections: type/payment/reg-date/profile/contact, Approve&activate / Reject / Archive, payment-status selector, per-account internal notes.
+- **Homepage** — Sign In dropdown now: Create Account / Player Portal / Scout Portal / Admin Portal (i18n EN/ES/IT). Public site client made **session-less** (persistSession:false) so a logged-in user's JWT can't shrink the public roster to their own row.
+
 ## In progress
-- (Current-priority features + production hardening done + validated. See NEXT SESSION.)
+- (Registration+approval workflow done + validated. See NEXT SESSION.)
 
 ### Tier 5 content + priority interrupts
 - **74f0b71** Nav reorder: What We Do, Who I Am, College, Roster, Events, Join. (No Media item — already removed in f063ac6.)
@@ -113,38 +127,32 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 # NEXT SESSION
 
-**Current state:** Repository is deployable, fully pushed to `origin/main`, and verified live in prod. All four current-priority features (Sign In nav, Admin portal, Player portal, DB security) PLUS a full production-hardening pass (verification, security sweep, SEO, performance, accessibility) are complete and committed. Nothing is half-built. `git status` should be clean/ahead-0 after the final log commit.
+**Current state:** Repository is deployable, pushed to `origin/main`, and verified live in prod. The full **account registration + manual-approval workflow** (players + scouts) is complete on top of the earlier portals + production-hardening work. Nothing is half-built. All 4 new pages return 200 live. `git status` clean/ahead-0 after the final log commit.
 
-**Completed — session 2026-07-30 (features):** Sign In nav; `player_notes` (admin-only) + `update_my_profile()` RPC + athlete photo storage (all APPLIED to prod); admin delete/archive/notes/expanded-edit; player self-service edit + photo; RLS init-plan optimization.
+**Completed — session 2026-07-30:** Sign In nav; player_notes + update_my_profile RPC + athlete photo storage; admin delete/archive/notes/expanded-edit; player self-service; RLS init-plan opt.
+**Completed — session 2026-07-31 (hardening):** portal verification; mobile header fix + loading states; security sweep; SEO (robots/sitemap/JSON-LD); perf (logo dims); a11y (labels + live regions).
+**Completed — session 2026-07-31 (accounts workflow):** profiles+scouts+account_notes tables & RLS; scout_roster RPC; approval trigger; `/register/` wizard; `/portal/` password+status; `/scout/` portal; admin accounts queue; nav wiring; session-less public client. (See the "Account registration + manual-approval workflow" section above for detail.)
 
-**Completed — session 2026-07-31 (production hardening):**
-1. Portal verification (auth/route-protection/error/loading traced; SW confirmed network-first so auth pages never stale).
-2. Mobile header overflow fix (nav fits to ~320px) + loading states in both portals.
-3. Security sweep — verified live: anon blocked from players.*/PII/player_notes (42501); no secrets; no PII in players.json or player pages; storage confinement intact.
-4. SEO — `robots.txt`, `sitemap.xml`, `SportsOrganization` JSON-LD.
-5. Performance — logo width/height (CLS) + fetchpriority/lazy hints.
-6. Accessibility — label associations + aria-live regions + icon-button labels across both portals.
+**Commits (accounts workflow), newest last:** `DB accounts backbone` → `/register/ wizard` → `portal password+gate` → `scout portal` → `admin accounts queue` → `nav + session-less client`. Latest pushed: 2ad32a3 (before scout_roster anon-revoke + this log commit). Run `git log --oneline -12` for hashes.
 
-**Commits this session (2026-07-31), newest last:** `mobile header + loading states` → `SEO robots/sitemap/JSON-LD` → `perf logo dims` → `a11y labels + live regions` → (this) `log + handoff`. Run `git log --oneline -10` for hashes. Latest pushed: b807d74 (before the final log commit).
-
-**Validation performed:** JS syntax-checked admin/portal/index (node --check). Live prod curl checks: robots/sitemap 200, JSON-LD + logo dims + mobile CSS + portal aria-live all present. Anon PII/notes denial confirmed via REST. RLS/RPC proven earlier via simulated JWT.
+**Validation performed (DB, via simulated JWTs, rolled back):** no self-approve; pending isolation to own row; approved-scout elevated roster; trigger sync; cross-account isolation; anon 401 on profiles/scouts/account_notes/scout_roster. JS syntax-checked all pages (node --check). Live: register/scout/portal/admin all 200; nav + session-less client present.
 
 **Exact next task (highest priority first):**
-1. **Manual UI smoke test** the two portals in a real browser (magic-link login can't be driven headless here). Sign in as admin (mattswagj@gmail.com): add/edit/delete/archive a player, save an internal note, upload a photo — confirm toasts. Then as a test athlete: edit bio/photo and confirm the round-trip. This is the ONLY unproven-end-to-end path.
-2. **Maintainability** (the two long-standing Deferred items, both need interactive verification): player-page dead-CSS trim via `gen_player_pages.py` (Python unavailable in the autonomous env — port generator to Node or run where Python exists), and shared-Supabase-client extraction across the 3 apps.
-3. Optional polish: submit sitemap to Google Search Console (Manual Action); consider making athlete profiles indexable for SEO IF the business decides to un-paywall them (currently noindex by design — do NOT change without confirmation).
+1. **Manual browser smoke test of the whole flow** (can't be driven headless — password/magic login + storage upload). (a) Register a Player → complete profile → payment screen; register a Scout. (b) As admin (mattswagj@gmail.com) open /admin/ → Pending accounts → set payment=verified → Approve; confirm the player's roster row flips to approved (trigger) and an internal note saves. (c) Sign in at /portal/ as the player (pending first → status screen; after approval → profile + edit). (d) Sign in at /scout/ as the approved scout → confirm the elevated roster with contact info; a pending scout sees the status screen.
+2. **Maintainability** (long-standing Deferred, need interactive verify): player-page dead-CSS trim via `gen_player_pages.py`; shared-Supabase-client extraction across the now-5 apps.
+3. Optional: submit sitemap to Search Console; branded OG image.
 
-**Files to open first:** `ENGINEERING_LOG.md` (this file), `site/admin/index.html`, `site/portal/index.html`, `site/index.html` (nav ~line 386, signin CSS ~line 76, i18n ~line 720).
+**Files to open first:** `ENGINEERING_LOG.md`; `site/register/index.html`, `site/scout/index.html`, `site/portal/index.html`, `site/admin/index.html`; `site/supabase-accounts.sql` (schema/RLS reference); `site/index.html` (nav ~line 397, i18n ~line 747).
 
 **Remaining risks:**
-- Portals still not clicked-through live end-to-end (task #1). DB layer proven, JS parses, HTML live — but magic-link + storage-upload happy path is unverified by a human.
-- Seed athletes (17) have `email = NULL` → none can log into the portal until an admin sets their email row.
-- `update_my_profile` is intentionally SECURITY DEFINER + authenticated-executable (advisor WARN is expected/reviewed).
+- Whole account flow not yet clicked-through live end-to-end (task #1). DB/RLS proven, JS parses, pages 200 — but signUp→profile→approve→login→scout-roster happy path is unverified by a human.
+- `scout_roster` / `update_my_profile` are intentionally SECURITY DEFINER + authenticated-executable (advisor WARNs are expected/reviewed — the functions enforce their own row/role boundaries).
+- Seed athletes (17) still have `email = NULL` and no owner_id → not tied to any account (unchanged; they're admin-managed roster entries).
 
 **Manual actions required (external / dashboard-only):**
-- Supabase Auth → URL Configuration → Redirect URLs must include `https://elite-sports-management.vercel.app/admin/` and `/portal/` (magic links bounce to localhost without this — CONFIRM it's set; this is the most likely cause if login "doesn't work").
+- **Supabase Auth → "Confirm email"**: for the smoothest registration (signUp returns a session so the profile is created immediately), consider turning email confirmation OFF — payment + admin approval is the real gate. The register page also finalizes the profile on first authenticated load, so confirm-ON degrades gracefully (user clicks the email link, returns, finishes profile).
+- **Supabase Auth → Redirect URLs**: include `https://elite-sports-management.vercel.app/` and the `/admin/ /portal/ /scout/ /register/` paths (magic-link + email-confirm redirects).
+- **Set the real payment link**: `PAYMENT_URL` at the top of `site/register/index.html` (currently a PayPal.me placeholder). Payment stays entirely off-site.
 - Enable Supabase Auth leaked-password protection (dashboard).
-- Provide a real 1200×630 branded OG share image (placeholder team photo in use at `/media/photos/twl-champions.jpg`).
-- Submit `sitemap.xml` in Google Search Console (optional).
-- To give a seed athlete portal access, an admin sets their email on the player row.
-- Supabase free tier PAUSES when idle — if the live site/portal "won't load", restore the project (ref `sbexwyvsgqayxrsrlrpm`) first.
+- Provide a real 1200×630 branded OG share image (placeholder team photo in use).
+- Supabase free tier PAUSES when idle — restore project `sbexwyvsgqayxrsrlrpm` if the site/portal "won't load".

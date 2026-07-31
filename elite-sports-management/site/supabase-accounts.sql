@@ -135,7 +135,10 @@ create or replace function public.scout_roster() returns setof public.players
   where status = 'approved' and (select private.is_approved_scout())
   order by sort_order, name;
 $$;
+-- Supabase auto-grants EXECUTE to anon+authenticated on new public functions;
+-- revoke from public AND anon so only signed-in users can call it (lint 0028).
 revoke all on function public.scout_roster() from public;
+revoke all on function public.scout_roster() from anon;   -- migration scout_roster_revoke_anon
 grant execute on function public.scout_roster() to authenticated;
 
 -- ---------- sync roster row with account approval ----------
