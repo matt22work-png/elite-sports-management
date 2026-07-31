@@ -397,8 +397,10 @@
     <details class="signin" id="signin">
       <summary><span data-i18n="nav_signin"></span></summary>
       <div class="signin-menu">
-        <a href="admin/" data-i18n="nav_signin_admin"></a>
+        <a href="register/" data-i18n="nav_signin_create"></a>
         <a href="portal/" data-i18n="nav_signin_player"></a>
+        <a href="scout/" data-i18n="nav_signin_scout"></a>
+        <a href="admin/" data-i18n="nav_signin_admin"></a>
       </div>
     </details>
     <a class="nav-cta" href="#join" data-i18n="nav_cta"></a>
@@ -744,7 +746,7 @@ const TESTIMONIALS = [
 const STATIC_PLAYER_PAGES = new Set(["brayan-hernandez", "gianni-westphal", "jose-cedeno", "danyer-sanabria", "francesco-mazzei", "anderson-pena", "jesus-delgado", "lorenzo-gonzalez", "jaider-morelos", "bret-bowers", "osiris-german", "adam-moser", "yerardo-ciofani", "javier-useche", "david-chavez", "matteo-colalucci", "anthony-quattrocchi"]);
 
 const T = {
-  en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_signin:"Sign In",nav_signin_admin:"Admin Portal",nav_signin_player:"Player Portal",nav_cta:"Apply Now",
+  en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_signin:"Sign In",nav_signin_create:"Create Account",nav_signin_player:"Player Portal",nav_signin_scout:"Scout Portal",nav_signin_admin:"Admin Portal",nav_cta:"Apply Now",
     contracts_h2:'50+ contracts signed <em>since 2025</em>',
     contracts_sub:'Our athletes have signed contracts in <b>7 different countries</b> to date.',
     feat_role:"Former Cleveland Indians organization",
@@ -818,7 +820,7 @@ const T = {
     foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",
     install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install",
     admin_link:"Admin",login_h:"Admin Login",login_sub:"Manage athletes, stats & photos",login_email:"Email",login_pass:"Password",login_btn:"Log in"},
-  es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_signin:"Entrar",nav_signin_admin:"Portal Admin",nav_signin_player:"Portal Jugador",nav_cta:"Aplica Ahora",
+  es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_signin:"Entrar",nav_signin_create:"Crear Cuenta",nav_signin_player:"Portal Jugador",nav_signin_scout:"Portal Scout",nav_signin_admin:"Portal Admin",nav_cta:"Aplica Ahora",
     contracts_h2:'Más de 50 contratos firmados <em>desde 2025</em>',
     contracts_sub:'Nuestros atletas han firmado contratos en <b>7 países diferentes</b> hasta la fecha.',
     feat_role:"Ex organización de los Cleveland Indians",
@@ -892,7 +894,7 @@ const T = {
     foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",
     install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar",
     admin_link:"Admin",login_h:"Acceso Admin",login_sub:"Gestiona atletas, estadísticas y fotos",login_email:"Correo",login_pass:"Contraseña",login_btn:"Entrar"},
-  it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_signin:"Accedi",nav_signin_admin:"Portale Admin",nav_signin_player:"Portale Giocatore",nav_cta:"Candidati",
+  it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_signin:"Accedi",nav_signin_create:"Crea Account",nav_signin_player:"Portale Giocatore",nav_signin_scout:"Portale Scout",nav_signin_admin:"Portale Admin",nav_cta:"Candidati",
     contracts_h2:'Oltre 50 contratti firmati <em>dal 2025</em>',
     contracts_sub:'I nostri atleti hanno firmato contratti in <b>7 paesi diversi</b> a oggi.',
     feat_role:"Ex organizzazione Cleveland Indians",
@@ -1580,7 +1582,11 @@ document.getElementById("installX").onclick=()=>document.getElementById("install
 async function boot(){
   if(SUPABASE_URL&&SUPABASE_ANON_KEY){
     try{const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
-      SB=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+      // The public site is anonymous by design. Don't load any signed-in session
+      // from storage — otherwise a logged-in player/scout browsing the homepage
+      // would send their JWT and RLS would return only their own row, breaking the
+      // public roster. persistSession:false keeps every request purely anon.
+      SB=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
       // Only approved players are publicly readable (enforced by RLS too). We request
       // just the public display columns — NOT the intake PII (age/phone/email/instagram/
       // message) — so an approved athlete's contact details are never sent to the browser.
