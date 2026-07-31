@@ -47,7 +47,10 @@
   .chip.pending{color:var(--gold-soft)}
   .chip.approved{color:var(--teal);border-color:rgba(46,196,182,.4)}
   .chip.rejected{color:var(--red);border-color:rgba(224,93,93,.4)}
+  .chip.archived{color:var(--muted);border-color:var(--line)}
   .chip.paid{color:var(--gold-soft);border-color:rgba(217,177,84,.5);background:rgba(217,177,84,.1)}
+  .note-box{border-color:rgba(217,177,84,.45);background:rgba(217,177,84,.05)}
+  .note-lock{font-size:11.5px;color:var(--gold-soft);font-weight:700;display:flex;align-items:center;gap:6px}
   .p-meta{color:var(--muted);font-size:13.5px;margin-top:10px;word-break:break-word}
   .p-meta b{color:var(--ink)}
   .row-btns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
@@ -171,9 +174,10 @@ function showView(state){
 
 /* A signed-in user who isn't on the admin list must not see the panel. Kick them
    straight back out rather than showing an empty, half-broken app. */
+let ADMIN_EMAIL = "";
 async function admitOrReject(session){
   const email = session?.user?.email || "";
-  if (isAdminEmail(email)) { showView("app"); load(); return true; }
+  if (isAdminEmail(email)) { ADMIN_EMAIL = email.trim().toLowerCase(); showView("app"); load(); return true; }
   await SB.auth.signOut();
   showView("login");
   const m = $("loginMsg");
@@ -241,7 +245,11 @@ let PLAYERS = [];
 async function load(){
   const { data, error } = await SB.from("players").select("*").order("status").order("sort_order");
   if (error){ toast("Load failed: " + error.message, true); return; }
-  PLAYERS = data || [];
+  // Internal notes live in a separate admin-only table; merge them in for display.
+  const { data: notes, error: nErr } = await SB.from("player_notes").select("player_id,notes");
+  if (nErr){ toast("Notes load failed: " + nErr.message, true); }
+  const noteMap = Object.fromEntries((notes || []).map(n => [n.player_id, n.notes || ""]));
+  PLAYERS = (data || []).map(p => ({ ...p, _note: noteMap[p.id] || "" }));
   render();
 }
 
@@ -283,27 +291,48 @@ function cardPending(p){
   </div>`;
 }
 
+const sportOptions = sel => ["Baseball","Softball"]
+  .map(s => `<option${(sel||"Baseball")===s?" selected":""}>${s}</option>`).join("");
+
 function cardPlayer(p){
   const stats = Array.isArray(p.stats) ? p.stats : [];
+  // Visibility actions depend on current status. approved = public roster;
+  // pending = awaiting review; rejected = declined applicant; archived = retired.
+  const st = p.status;
+  const visBtns = [
+    (st === "rejected" || st === "archived") ? `<button class="btn btn-teal" data-approve="${p.id}">✓ ${st==="archived"?"Restore to roster":"Approve"}</button>` : "",
+    (st === "pending")  ? `<button class="btn btn-red" data-reject="${p.id}">✕ Reject</button>` : "",
+    (st === "approved") ? `<button class="btn btn-ghost" data-archive="${p.id}">🗄 Archive</button>` : "",
+  ].filter(Boolean).join("");
   return `<div class="card" data-id="${p.id}">
     <div class="p-head">${avatar(p)}
       <div style="flex:1"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position||p.group||"")} ${p.flag||""}</div></div>
       <span class="chip ${esc(p.status)}">${esc(p.status)}</span>
     </div>
     <div class="row-btns">
-      <button class="btn btn-ghost" data-edit="${p.id}">✎ Edit stats &amp; photo</button>
-      ${p.status === "rejected" ? `<button class="btn btn-teal" data-approve="${p.id}">✓ Approve</button>` : ""}
-      ${p.status === "approved" ? `<button class="btn btn-red" data-reject="${p.id}">Hide</button>` : ""}
+      <button class="btn btn-ghost" data-edit="${p.id}">✎ Edit</button>
+      ${visBtns}
+      <button class="btn btn-red" data-delete="${p.id}">🗑 Delete</button>
     </div>
     <div class="editor" id="ed-${p.id}">
       <div class="sub">Photo</div>
       <input type="file" accept="image/*" data-photo="${p.id}" />
 
       <div class="sub">Profile</div>
+      <div class="field"><label>Full name</label><input class="pf-name" data-id="${p.id}" value="${esc(p.name||"")}" placeholder="Full name" /></div>
       <div class="field"><label>Position</label><input class="pf-position" data-id="${p.id}" value="${esc(p.position||"")}" placeholder="e.g. Catcher" /></div>
+      <div class="field"><label>Sport</label><select class="pf-sport" data-id="${p.id}">${sportOptions(p.sport)}</select></div>
+      <div class="field"><label>Country</label><input class="pf-country" data-id="${p.id}" value="${esc(p.country||"")}" placeholder="e.g. Italy" /></div>
+      <div class="field"><label>Age</label><input class="pf-age" data-id="${p.id}" value="${esc(p.age||"")}" placeholder="e.g. 21" /></div>
+      <div class="field"><label>Instagram</label><input class="pf-instagram" data-id="${p.id}" value="${esc(p.instagram||"")}" placeholder="@handle" /></div>
+      <div class="field"><label>Phone</label><input class="pf-phone" data-id="${p.id}" value="${esc(p.phone||"")}" placeholder="+39 …" /></div>
       <div class="field"><label>Bio</label><textarea class="pf-bio" data-id="${p.id}" rows="4" placeholder="Short bio…">${esc(p.bio||"")}</textarea></div>
       <div class="field"><label>Teams &amp; affiliations (one per line)</label><textarea class="pf-teams" data-id="${p.id}" rows="3" placeholder="Cleveland Guardians org.&#10;Dominican Summer League">${esc((Array.isArray(p.teams)?p.teams:[]).join("\n"))}</textarea></div>
       <div class="row-btns"><button class="btn btn-gold" data-saveprofile="${p.id}">Save profile</button></div>
+
+      <div class="sub note-lock">🔒 Internal notes — admins only, never shown publicly</div>
+      <div class="field"><textarea class="pf-note note-box" data-id="${p.id}" rows="3" placeholder="Private notes about this player (visible to admins only)…">${esc(p._note||"")}</textarea></div>
+      <div class="row-btns"><button class="btn btn-ghost" data-savenote="${p.id}">Save note</button></div>
 
       <div class="sub">Stats</div>
       <div id="stats-${p.id}">${stats.map(statRow).join("")}</div>
@@ -322,19 +351,43 @@ const statRow = s => `<div class="stat-row">
 </div>`;
 
 /* ---------- actions ---------- */
+const STATUS_TOAST = { approved: "Now live on the roster ✓", rejected: "Rejected", archived: "Archived 🗄" };
 async function setStatus(id, status, btn){
   btn.disabled = true;
   const { error } = await SB.from("players").update({ status }).eq("id", id);
   btn.disabled = false;
   if (error){ toast("Update failed: " + error.message, true); return; }
-  toast(status === "approved" ? "Approved ✓" : "Rejected");
+  toast(STATUS_TOAST[status] || "Updated");
   await load();
 }
 
 function bindActions(){
   document.querySelectorAll("[data-approve]").forEach(b => b.onclick = () => setStatus(+b.dataset.approve, "approved", b));
   document.querySelectorAll("[data-reject]").forEach(b => b.onclick = () => setStatus(+b.dataset.reject, "rejected", b));
+  document.querySelectorAll("[data-archive]").forEach(b => b.onclick = () => setStatus(+b.dataset.archive, "archived", b));
   document.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => $("ed-" + b.dataset.edit).classList.toggle("open"));
+  document.querySelectorAll("[data-delete]").forEach(b => b.onclick = async () => {
+    const id = +b.dataset.delete;
+    const p = PLAYERS.find(x => x.id === id);
+    if (!confirm(`Permanently delete ${p?.name || "this player"}?\n\nThis removes their profile and internal notes for good. This cannot be undone. To hide them instead, use Archive.`)) return;
+    b.disabled = true;
+    const { error } = await SB.from("players").delete().eq("id", id);
+    b.disabled = false;
+    if (error){ toast("Delete failed: " + error.message, true); return; }
+    toast("Player deleted");
+    await load();
+  });
+  document.querySelectorAll("[data-savenote]").forEach(b => b.onclick = async () => {
+    const id = +b.dataset.savenote;
+    const notes = $("ed-" + id).querySelector(".pf-note").value.trim();
+    b.disabled = true;
+    const { error } = await SB.from("player_notes")
+      .upsert({ player_id: id, notes, updated_at: new Date().toISOString(), updated_by: ADMIN_EMAIL }, { onConflict: "player_id" });
+    b.disabled = false;
+    if (error){ toast("Note save failed: " + error.message, true); return; }
+    const p = PLAYERS.find(x => x.id === id); if (p) p._note = notes;
+    toast("Internal note saved ✓");
+  });
   document.querySelectorAll("[data-addstat]").forEach(b => b.onclick = () => $("stats-" + b.dataset.addstat).insertAdjacentHTML("beforeend", statRow()));
   document.querySelectorAll("[data-save]").forEach(b => b.onclick = async () => {
     const id = +b.dataset.save;
@@ -355,9 +408,17 @@ function bindActions(){
     const box = $("ed-" + id);
     const teams = box.querySelector(".pf-teams").value
       .split("\n").map(t => t.trim()).filter(Boolean);
+    const name = box.querySelector(".pf-name").value.trim();
+    if (!name){ toast("Name can't be empty.", true); box.querySelector(".pf-name").focus(); return; }
     const patch = {
-      position: box.querySelector(".pf-position").value.trim(),
-      bio:      box.querySelector(".pf-bio").value.trim(),
+      name,
+      position:  box.querySelector(".pf-position").value.trim(),
+      sport:     box.querySelector(".pf-sport").value,
+      country:   box.querySelector(".pf-country").value.trim() || null,
+      age:       box.querySelector(".pf-age").value.trim() || null,
+      instagram: box.querySelector(".pf-instagram").value.trim() || null,
+      phone:     box.querySelector(".pf-phone").value.trim() || null,
+      bio:       box.querySelector(".pf-bio").value.trim(),
       teams,
     };
     b.disabled = true;
