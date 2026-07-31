@@ -107,6 +107,7 @@
         <div class="field"><label>Sport</label><select id="ap-sport"><option value="Baseball">Baseball</option><option value="Softball">Softball</option></select></div>
         <div class="field"><label>Country</label><input id="ap-country" placeholder="e.g. Italy" /></div>
         <div class="field"><label>Bio</label><textarea id="ap-bio" rows="4" placeholder="Short bio…"></textarea></div>
+        <div class="field"><label>Teams &amp; affiliations (one per line)</label><textarea id="ap-teams" rows="3" placeholder="Cleveland Guardians org.&#10;Dominican Summer League"></textarea></div>
         <div class="field"><label>Photo</label><input type="file" accept="image/*" id="ap-photo" /></div>
         <div class="row-btns"><button class="btn btn-gold" type="button" id="ap-save">Add player</button></div>
         <div class="msg err" id="ap-msg"></div>
@@ -397,6 +398,7 @@ $("ap-save").onclick = async () => {
   const sport = $("ap-sport").value;
   const country = $("ap-country").value.trim();
   const bio = $("ap-bio").value.trim();
+  const teams = $("ap-teams").value.split("\n").map(t => t.trim()).filter(Boolean);
   const slug = (slugify(name) || "player") + "-" + Date.now().toString(36);
   const btn = $("ap-save"); btn.disabled = true;
   // Optional photo — upload first (the storage path needs the slug), then embed the URL.
@@ -412,12 +414,12 @@ $("ap-save").onclick = async () => {
   }
   const { error } = await SB.from("players").insert({
     slug, name, "group": position || "Player", position, sport, country,
-    bio: bio || "", teams: [], stats: [], image_url, status: "approved",
+    bio: bio || "", teams, stats: [], image_url, status: "approved",
   });
   btn.disabled = false;
   if (error){ msg.textContent = "Save failed: " + error.message; msg.classList.add("show"); return; }
   toast("Player added ✓");
-  ["ap-name","ap-position","ap-country","ap-bio"].forEach(id => { $(id).value = ""; });
+  ["ap-name","ap-position","ap-country","ap-bio","ap-teams"].forEach(id => { $(id).value = ""; });
   $("ap-photo").value = "";
   $("addEditor").classList.remove("open");
   await load();
