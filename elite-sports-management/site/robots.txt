@@ -1,0 +1,13 @@
+# Elite Sports Management — https://elite-sports-management.vercel.app
+User-agent: *
+Allow: /
+
+# Private app routes — nothing to index (auth-gated single-page apps).
+Disallow: /admin/
+Disallow: /portal/
+
+# /players/*.html are intentionally noindex (paywalled roster detail). They are
+# left crawlable on purpose so crawlers can SEE the noindex directive and keep
+# them out of the index cleanly — do NOT Disallow them here.
+
+Sitemap: https://elite-sports-management.vercel.app/sitemap.xml
