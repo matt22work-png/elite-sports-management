@@ -131,6 +131,15 @@
       </div>
     </div>
 
+    <div class="kicker">Roster</div>
+    <div class="card">
+      <div class="row-btns" id="sportFilter" role="group" aria-label="Filter roster by sport">
+        <button class="btn btn-gold" type="button" data-sport="All" aria-pressed="true">All</button>
+        <button class="btn btn-ghost" type="button" data-sport="Baseball" aria-pressed="false">⚾ Baseball</button>
+        <button class="btn btn-ghost" type="button" data-sport="Softball" aria-pressed="false">🥎 Softball</button>
+      </div>
+    </div>
+
     <div class="kicker">Pending applications<span class="count" id="pendingCount">0</span></div>
     <div id="pendingList"></div>
 
@@ -395,12 +404,34 @@ function bindAccountActions(){
   });
 }
 
+/* ---------- roster sport filter ----------
+   In-session only (defaults to All on load; not persisted across logins). Not
+   tied to the logged-in admin — Sam, Marianna, or Matt can each toggle it. */
+let SPORT_FILTER = "All";   // "All" | "Baseball" | "Softball"
+function setSportFilter(sport){
+  SPORT_FILTER = sport;
+  document.querySelectorAll("#sportFilter [data-sport]").forEach(b => {
+    const on = b.dataset.sport === sport;
+    b.classList.toggle("btn-gold", on);
+    b.classList.toggle("btn-ghost", !on);
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  if (LOADED_ONCE) render();   // don't wipe the "Loading players…" placeholder pre-load
+}
+document.querySelectorAll("#sportFilter [data-sport]").forEach(b => b.onclick = () => setSportFilter(b.dataset.sport));
+
 function render(){
-  const pending = PLAYERS.filter(p => p.status === "pending");
+  // Sport filter (in-session) narrows BOTH roster views. Seed rows with a null
+  // sport count as Baseball, mirroring the DB default + the edit form's default.
+  const inSport = p => SPORT_FILTER === "All" || (p.sport || "Baseball") === SPORT_FILTER;
+  const list = PLAYERS.filter(inSport);
+  const suffix = SPORT_FILTER === "All" ? "" : " in " + SPORT_FILTER;
+  const pending = list.filter(p => p.status === "pending");
   $("pendingCount").textContent = pending.length;
   $("pendingList").innerHTML = pending.length ? pending.map(cardPending).join("") :
-    `<div class="card empty">No pending applications. 🎉</div>`;
-  $("playerList").innerHTML = PLAYERS.map(cardPlayer).join("");
+    `<div class="card empty">No pending applications${suffix}. 🎉</div>`;
+  $("playerList").innerHTML = list.length ? list.map(cardPlayer).join("") :
+    `<div class="card empty">No players${suffix}.</div>`;
   bindActions();
 }
 
