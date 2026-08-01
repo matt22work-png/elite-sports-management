@@ -139,6 +139,19 @@ Root cause (not a symptom patch): the paywall gate is `position:absolute;inset:0
 - **Sub-task 3 (Tenerife registrant admin section):** N/A yet — belongs to Phase 2, which is GATED on Sam's Phase-1 review. Deferred with the rest of Phase 2.
 - Admin JS `node --check` clean.
 
+### PHASE 5 — Pricing & content copy (session 2026-08-01) — DONE (items 1–7,9; D+E blocked)
+Commits `9c93dbf` → `e2ea38e`, each atomic. All copy EN/ES/IT (parity verified each commit).
+- **Item 1** — Representation card: `€500 / 6 months` price + bullets (progress tracking, personalized training, nutrition, WhatsApp support). New `.do-price`/`.do-bul`; keys `svc5_per`/`svc5_b1..4`.
+- **Item 2** — College: removed the price element entirely; reframed as consulting → `col_cta_p` "get connected and set up an evaluation", `col_cta_btn` "Get connected →". (€3,000 was never displayed; it already said "Pricing on request".) Still routes to `#join` (→ Phase 6 email).
+- **Item 3** — Hero reworked to action/agency: `hero_h1` = "We get baseball and softball athletes **seen, signed and developed**."; `band_p` echoes "get seen/signed/developed" (consistent, not identical). **DISCREPANCY:** the referenced quote "Train Like an Athlete. Play Like a Pro." was NOT in the code — reworked the actual hero/band instead; old copy in git if Sam prefers a revert.
+- **Item 4** — roster headline `roster_h2` → "A growing family of baseball players from around the world".
+- **Item 5** — "See all testimonials": José stays featured on the grid; a button opens a modal (`openTestiModal`) listing the full set. Extra testimonials fetched from the `testimonials` CMS table in `boot()` (anon read verified; they're generic placeholders — Sam should curate). Button hidden when no extras. `testi_seeall`/`testi_all_h`.
+- **Item 6** — country flags for all players: `flagFor(p)` = stored flag → country-derived (`FLAGS`) → globe, used in roster card + modal; register now stores `flag` from country at signup so new players get one.
+- **Item 7** — country-code phone input: dial-code `<select>` (curated to ESM's Caribbean/LatAm/Europe/US markets) + number, combined to "+39 340…" via `combinePhone()`, on `#join` (index) + player/scout registration. No library. Phone fields pulled to full width.
+- **Item 9** — CeasAI footer cross-promo: "Want a website like this? Built by **CeasAI** →" strip. Link via `CEASAI_URL` const — **TODO(Matt): set the real CeasAI page URL** (defaults to a mailto so it's never a dead end). `ceasai_cta` EN/ES/IT.
+- **Items 8 (Tenerife gallery rename) + D/E (STOP&ASK) — SKIPPED** (blocked pending Sam's answers on the gallery "folder" UX and "take away picture").
+- Validation: index + register `node --check` clean each commit; EN/ES/IT parity scripted; testimonials anon-read verified via MCP. Not clicked-through live (forms/phone need a browser).
+
 ## In progress
 - Phase 1 (profile-creation flow) built + validated; awaiting Sam's live click-through review before Phase 2. Phases 3, 4, 7 done. STOP&ASK C/D/E open. Remaining roadmap: Phase 2 (roster/Tenerife — GATED on Sam's Phase-1 review; includes the Tenerife admin section), Phase 5 (pricing/copy incl. form-field reduction B), Phase 6 (email notifications).
 
