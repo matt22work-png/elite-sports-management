@@ -681,6 +681,72 @@ $("pw-save").onclick = async () => {
   msg.classList.remove("err"); msg.classList.add("show", "ok");
   toast("Password updated ✓");
 };
+
+/* ---------- pull-to-refresh (installed PWA only) ----------
+   An installed PWA has no browser chrome, so it loses Safari's native pull-to-refresh.
+   That matters here: an admin looking at a stale roster needs a way to force-refresh.
+   This adds a custom gesture that only arms in standalone display mode and only when
+   scrolled to the very top, so it never fights normal scrolling or affects a browser tab.
+   On trigger it asks the service worker to check for a new version (the SW uses
+   skipWaiting + clients.claim, so a found update self-activates) THEN reloads — the
+   reload re-runs load(), which re-fetches players/accounts from Supabase (network-first),
+   so it pulls genuinely fresh data, not just a cosmetic repaint. */
+(function(){
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  if (!standalone) return;
+
+  const THRESHOLD = 70;                 // px of pull needed to trigger a refresh
+  const scroller = document.scrollingElement || document.documentElement;
+  let startY = 0, dist = 0, pulling = false, refreshing = false;
+
+  const ind = document.createElement("div");
+  ind.id = "ptr"; ind.setAttribute("aria-hidden", "true");
+  ind.innerHTML = '<div class="ptr-spin"></div>';
+  const style = document.createElement("style");
+  style.textContent =
+    "#ptr{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;z-index:200;" +
+    "width:38px;height:38px;border-radius:50%;display:grid;place-items:center;" +
+    "background:rgba(12,33,67,.97);border:1px solid var(--gold,#d9b154);" +
+    "box-shadow:0 8px 22px rgba(0,0,0,.45);opacity:0;pointer-events:none;" +
+    "transform:translateX(-50%) translateY(-70px);transition:transform .15s ease,opacity .15s}" +
+    ".ptr-spin{width:17px;height:17px;border-radius:50%;border:2px solid rgba(217,177,84,.3);border-top-color:var(--gold,#d9b154)}" +
+    "#ptr.spin .ptr-spin{animation:ptr-rot .6s linear infinite}" +
+    "@keyframes ptr-rot{to{transform:rotate(360deg)}}";
+  document.head.appendChild(style);
+  document.body.appendChild(ind);
+
+  function reset(){ pulling = false; dist = 0; ind.classList.remove("spin"); ind.style.opacity = ""; ind.style.transform = ""; }
+
+  addEventListener("touchstart", e => {
+    if (refreshing || e.touches.length !== 1 || scroller.scrollTop > 0) return;
+    startY = e.touches[0].clientY; pulling = true; dist = 0;
+  }, { passive: true });
+
+  addEventListener("touchmove", e => {
+    if (!pulling || refreshing) return;
+    if (scroller.scrollTop > 0){ reset(); return; }   // user scrolled away from the top
+    dist = e.touches[0].clientY - startY;
+    if (dist <= 0){ reset(); return; }                // pulling up, not a refresh gesture
+    ind.style.opacity = Math.min(dist / THRESHOLD, 1);
+    ind.style.transform = "translateX(-50%) translateY(" + Math.min(-70 + dist * 0.6, 10) + "px)";
+    ind.classList.toggle("spin", dist >= THRESHOLD);  // pre-spin once past the threshold
+  }, { passive: true });
+
+  addEventListener("touchend", async () => {
+    if (!pulling || refreshing){ reset(); return; }
+    if (dist < THRESHOLD){ reset(); return; }
+    refreshing = true;
+    ind.classList.add("spin"); ind.style.opacity = "1";
+    ind.style.transform = "translateX(-50%) translateY(10px)";
+    try {
+      if ("serviceWorker" in navigator){
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (reg) await reg.update();     // fetch a newer sw.js if one was deployed
+      }
+    } catch (_) {}
+    location.reload();                   // fresh shell (network-first) + fresh Supabase data
+  }, { passive: true });
+})();
 </script>
 </body>
 </html>
