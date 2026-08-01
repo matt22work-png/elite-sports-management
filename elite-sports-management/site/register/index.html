@@ -63,7 +63,30 @@
   .center{text-align:center}
   #booting{color:var(--muted);text-align:center;padding:30px}
   .hide{display:none}
-  @media(max-width:560px){ .wrap{padding:18px 14px 80px} .grid2,.role-pick{grid-template-columns:1fr} .field input,.field select,.field textarea{font-size:16px} }
+  /* season-stats builder (player profile) */
+  .stat-add{display:flex;gap:8px;flex-wrap:wrap}
+  .mini-add{padding:9px 14px;font-size:13px}
+  .stat-block{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;background:rgba(6,20,42,.45)}
+  .sb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .sb-kind{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-soft)}
+  .sb-del{background:none;border:1px solid rgba(224,93,93,.5);color:var(--red);border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:14px;flex:0 0 auto}
+  .sb-del:hover{background:rgba(224,93,93,.12)}
+  .sb-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .mini{display:flex;flex-direction:column;gap:3px}
+  .mini label{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .mini input{width:100%;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:8px;padding:8px 9px;color:var(--ink);font-size:14px;font-family:inherit}
+  .mini input:focus{outline:0;border-color:var(--gold)}
+  /* payment service summary (step 3) */
+  .pay-service{border:1px solid var(--line);border-radius:12px;padding:16px 16px 6px;background:rgba(6,20,42,.4);margin:4px 0 16px}
+  .pay-service .ps-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+  .pay-service .ps-title{font-weight:800;font-size:15px}
+  .pay-service .ps-price{font-family:'Anton',sans-serif;font-size:26px;color:var(--gold);flex:0 0 auto}
+  .pay-service ul{list-style:none;margin:0 0 10px;padding:0}
+  .pay-service li{display:flex;gap:9px;align-items:flex-start;font-size:14px;color:var(--ink);padding:5px 0}
+  .pay-service li::before{content:"✓";color:var(--teal-soft);font-weight:800;flex:0 0 auto}
+  .pay-service .ps-access{font-size:13px;color:var(--gold-soft);font-weight:700;border-top:1px solid rgba(217,177,84,.15);padding-top:10px}
+  @media(max-width:560px){ .wrap{padding:18px 14px 80px} .grid2,.role-pick,.sb-meta{grid-template-columns:1fr} .stat-grid{grid-template-columns:repeat(3,1fr)} .field input,.field select,.field textarea{font-size:16px} .mini input{font-size:16px} }
 </style>
 </head>
 <body>
@@ -123,6 +146,18 @@
       </div>
       <div class="field"><label for="p-bio">Short bio</label><textarea id="p-bio" rows="4" placeholder="Tell your story — background, achievements, goals…"></textarea></div>
       <div class="field"><label for="p-teams">Teams &amp; affiliations (one per line)</label><textarea id="p-teams" rows="3" placeholder="Cleveland Guardians org.&#10;Dominican Summer League"></textarea></div>
+
+      <div class="field">
+        <label style="margin-bottom:8px">Season stats <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <p class="hint" style="margin:-2px 0 12px">Add a line per season — batting, pitching and/or fielding. Enter raw totals; we calculate AVG / OBP / SLG, ERA / WHIP and Fielding % for you. You can refine these later in your portal.</p>
+        <div id="statRows"></div>
+        <div class="stat-add">
+          <button type="button" class="btn btn-ghost mini-add" data-add="batting">+ Batting season</button>
+          <button type="button" class="btn btn-ghost mini-add" data-add="pitching">+ Pitching season</button>
+          <button type="button" class="btn btn-ghost mini-add" data-add="fielding">+ Fielding season</button>
+        </div>
+      </div>
+
       <div class="grid2">
         <div class="field"><label for="p-instagram">Instagram</label><input id="p-instagram" placeholder="@handle" /></div>
         <div class="field"><label for="p-phone">Phone</label><input id="p-phone" placeholder="+39 …" /></div>
@@ -157,6 +192,7 @@
     <div class="steps"><span class="dot done"></span><span class="dot done"></span><span class="dot on"></span></div>
     <h1 class="display">Activate your <em>account</em></h1>
     <p class="lead" id="payLead">Thank you for completing your registration. Your account has been created successfully.</p>
+    <div id="payService" class="pay-service"></div>
     <ol class="pay-steps">
       <li><span class="n">1</span><span>Complete your payment using the secure link below.</span></li>
       <li><span class="n">2</span><span>Elite Sports Management verifies your payment and reviews your account.</span></li>
@@ -170,10 +206,35 @@
 
 <script type="module">
 /* =====================================================================
-   CONFIGURE ME — Samuele's external payment link (PayPal / Stripe / etc.)
-   Payment is handled entirely OFF-SITE. This is the only place to set it.
+   Off-site payment, per account role. Payment is handled entirely OFF-SITE.
+   - player: €124.99 profile creation — LIVE (Phase 1), Wise.
+   - scout:  $49.99 roster access   — Phase 2 (still the old placeholder
+     link until that flow is built; do not point users here yet).
+   Kept role-keyed so the roster ($49.99) and Tenerife (€559.99) flows can
+   drop in without reworking this step.
    ===================================================================== */
-const PAYMENT_URL = "https://www.paypal.com/paypalme/EliteSportsManagement";
+const PAY = {
+  player: {
+    url: "https://wise.com/pay/r/NKJf01HKt8PuX2s",
+    price: "€124.99",
+    title: "Official Player Profile",
+    // Placeholder service copy — reasonable professional draft, Sam to finalize.
+    includes: [
+      "A professionally built athlete profile on the ESM roster",
+      "Your bio, photo and season-by-season stats, presented properly",
+      "Exposure to the scouts, coaches and teams in the ESM network",
+      "Your own portal to keep your profile up to date",
+    ],
+    access: "3 years of profile access + 1 year free — 4 years total.",
+  },
+  scout: {
+    url: "https://www.paypal.com/paypalme/EliteSportsManagement",  // Phase 2 TODO → Wise roster link https://wise.com/pay/r/Zhxkm7xyYL04RjA
+    price: "",
+    title: "Account activation",
+    includes: [],
+    access: "",
+  },
+};
 
 const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
@@ -190,8 +251,68 @@ function show(id){ VIEWS.forEach(v => $(v).classList.toggle("hide", v !== id)); 
 function msg(el, text, ok){ el.textContent = text; el.classList.toggle("ok", !!ok); el.classList.add("show"); }
 function clearMsg(el){ el.classList.remove("show","ok"); }
 
-$("payBtn").href = PAYMENT_URL;
+/* Populate + reveal the payment step for a given role (price, service summary,
+   access duration, and the correct off-site link). */
+function renderPayStep(role){
+  const cfg = PAY[role] || PAY.player;
+  $("payBtn").href = cfg.url;
+  const svc = $("payService");
+  if (cfg.includes && cfg.includes.length){
+    svc.style.display = "";
+    svc.innerHTML =
+      `<div class="ps-top"><span class="ps-title">${cfg.title}</span>${cfg.price ? `<span class="ps-price">${cfg.price}</span>` : ""}</div>` +
+      `<ul>${cfg.includes.map(i => `<li>${i}</li>`).join("")}</ul>` +
+      (cfg.access ? `<div class="ps-access">${cfg.access}</div>` : "");
+  } else {
+    svc.style.display = "none"; svc.innerHTML = "";
+  }
+}
+function showPay(role){ renderPayStep(role); show("step3"); }
+
 $("signOut").onclick = async () => { await SB.auth.signOut(); localStorage.removeItem(STASH_KEY); location.reload(); };
+
+/* ---------- season-stats builder (player profile) ----------
+   Raw per-season totals; derived stats (AVG/OBP/SLG, ERA/WHIP, Fld%) are
+   computed on render, never stored. Baseball core-stats v1. */
+const STAT_FIELDS = {
+  batting:  ["G","AB","R","H","2B","3B","HR","RBI","BB","SO","SB"],
+  pitching: ["W","L","G","GS","IP","H","R","ER","BB","SO"],
+  fielding: ["G","PO","A","E"],
+};
+const KIND_LABEL = { batting:"⚾ Batting", pitching:"🎯 Pitching", fielding:"🧤 Fielding" };
+function addStatBlock(kind){
+  const block = document.createElement("div");
+  block.className = "stat-block"; block.dataset.kind = kind;
+  const fields = (STAT_FIELDS[kind] || []).map(f =>
+    `<div class="mini"><label>${f}</label><input inputmode="${f === "IP" ? "decimal" : "numeric"}" data-stat="${f}" aria-label="${kind} ${f}" /></div>`).join("");
+  block.innerHTML =
+    `<div class="sb-head"><span class="sb-kind">${KIND_LABEL[kind] || kind}</span>` +
+    `<button type="button" class="sb-del" aria-label="Remove this season">✕</button></div>` +
+    `<div class="sb-meta">` +
+      `<div class="mini"><label>Season</label><input data-meta="season" placeholder="2024" inputmode="numeric" /></div>` +
+      `<div class="mini"><label>Team</label><input data-meta="team" placeholder="Team / club" /></div>` +
+      `<div class="mini"><label>Level</label><input data-meta="level" placeholder="e.g. NAIA" /></div>` +
+    `</div><div class="stat-grid">${fields}</div>`;
+  block.querySelector(".sb-del").onclick = () => block.remove();
+  $("statRows").appendChild(block);
+}
+document.querySelectorAll("[data-add]").forEach(b => b.onclick = () => addStatBlock(b.dataset.add));
+
+function collectSeasonStats(){
+  const out = [];
+  document.querySelectorAll("#statRows .stat-block").forEach(block => {
+    const row = { kind: block.dataset.kind };
+    block.querySelectorAll("[data-meta]").forEach(i => { const v = i.value.trim(); if (v) row[i.dataset.meta] = v; });
+    let hasStat = false;
+    block.querySelectorAll("[data-stat]").forEach(i => {
+      const raw = i.value.trim(); if (raw === "") return;
+      const num = Number(raw); if (!Number.isFinite(num)) return;
+      row[i.dataset.stat] = num; hasStat = true;
+    });
+    if (hasStat || row.season) out.push(row);   // drop fully-empty blocks
+  });
+  return out;
+}
 
 /* ---------- role picker (step 1) ---------- */
 let chosenRole = null;
@@ -281,15 +402,15 @@ $("playerForm").addEventListener("submit", async e => {
       sport: $("p-sport").value, country: $("p-country").value.trim() || null,
       age: $("p-age").value.trim() || null, bio: $("p-bio").value.trim(),
       instagram: $("p-instagram").value.trim() || null, phone: $("p-phone").value.trim() || null,
-      teams, stats: [], image_url, email: user.email,
+      teams, stats: [], season_stats: collectSeasonStats(), image_url, email: user.email,
       owner_id: user.id, status: "pending", source: "registration",
     });
     if (error){
       // Unique-violation → they already created a row; just move on to payment.
-      if (error.code === "23505"){ show("step3"); return; }
+      if (error.code === "23505"){ showPay("player"); return; }
       throw error;
     }
-    show("step3");
+    showPay("player");
   } catch (err){
     msg($("playerMsg"), "Couldn't save your profile: " + (err?.message || err));
   } finally { btn.disabled = false; }
@@ -313,7 +434,7 @@ $("scoutForm").addEventListener("submit", async e => {
       notes: $("s-notes").value.trim() || null,
     }, { onConflict: "id" });
     if (error) throw error;
-    show("step3");
+    showPay("scout");
   } catch (err){
     msg($("scoutMsg"), "Couldn't save your details: " + (err?.message || err));
   } finally { btn.disabled = false; }
@@ -331,10 +452,10 @@ async function routeAfterProfile(){
   // Has the role-specific record been completed already? If so, go to payment.
   if (prof.role === "player"){
     const { data: row } = await SB.from("players").select("id").eq("owner_id", prof.id).maybeSingle();
-    show(row ? "step3" : "step2player");
+    if (row) showPay("player"); else show("step2player");
   } else {
     const { data: row } = await SB.from("scouts").select("id").eq("id", prof.id).maybeSingle();
-    show(row ? "step3" : "step2scout");
+    if (row) showPay("scout"); else show("step2scout");
   }
 }
 
