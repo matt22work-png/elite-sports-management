@@ -139,6 +139,19 @@
 
     <div class="kicker">All accounts</div>
     <div id="allAccounts"></div>
+
+    <div class="kicker">Your account</div>
+    <div class="card">
+      <div class="acct-meta" id="acctWho"></div>
+      <button class="btn btn-ghost" type="button" id="pwToggle" style="margin-top:12px">🔑 Change password</button>
+      <div class="editor" id="pwEditor">
+        <div class="sub">Set a new password for this account. Takes effect immediately — no email needed.</div>
+        <div class="field"><label for="pw-new">New password</label><input type="password" id="pw-new" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" /></div>
+        <div class="field"><label for="pw-confirm">Confirm new password</label><input type="password" id="pw-confirm" autocomplete="new-password" placeholder="Re-enter new password" /></div>
+        <div class="row-btns"><button class="btn btn-gold" type="button" id="pw-save">Update password</button></div>
+        <div class="msg err" id="pw-msg" role="alert" aria-live="assertive"></div>
+      </div>
+    </div>
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -193,7 +206,7 @@ function showView(state){
 let ADMIN_EMAIL = "";
 async function admitOrReject(session){
   const email = session?.user?.email || "";
-  if (isAdminEmail(email)) { ADMIN_EMAIL = email.trim().toLowerCase(); showView("app"); load(); return true; }
+  if (isAdminEmail(email)) { ADMIN_EMAIL = email.trim().toLowerCase(); $("acctWho").innerHTML = `Signed in as <b>${esc(ADMIN_EMAIL)}</b>`; showView("app"); load(); return true; }
   await SB.auth.signOut();
   showView("login");
   const m = $("loginMsg");
@@ -615,6 +628,27 @@ $("ap-save").onclick = async () => {
   $("ap-photo").value = "";
   $("addEditor").classList.remove("open");
   await load();
+};
+
+/* ---------- change your own password ----------
+   updateUser({password}) acts on the currently-signed-in session, so a logged-in
+   admin can set a new password directly — no email reset / redirect involved.
+   Works for whoever is logged in (Sam, Marianna, Matt), no special permission. */
+$("pwToggle").onclick = () => $("pwEditor").classList.toggle("open");
+$("pw-save").onclick = async () => {
+  const msg = $("pw-msg"); msg.classList.remove("show", "ok"); msg.classList.add("err");
+  const pw = $("pw-new").value;
+  const confirmPw = $("pw-confirm").value;
+  if (pw.length < 8){ msg.textContent = "Password must be at least 8 characters."; msg.classList.add("show"); $("pw-new").focus(); return; }
+  if (pw !== confirmPw){ msg.textContent = "Passwords don't match. Please re-enter."; msg.classList.add("show"); $("pw-confirm").focus(); return; }
+  const btn = $("pw-save"); btn.disabled = true;
+  const { error } = await SB.auth.updateUser({ password: pw });
+  btn.disabled = false;
+  if (error){ msg.textContent = "Couldn't update password: " + error.message; msg.classList.add("show"); return; }
+  $("pw-new").value = ""; $("pw-confirm").value = "";
+  msg.textContent = "Password updated ✓ Use it next time you sign in.";
+  msg.classList.remove("err"); msg.classList.add("show", "ok");
+  toast("Password updated ✓");
 };
 </script>
 </body>
