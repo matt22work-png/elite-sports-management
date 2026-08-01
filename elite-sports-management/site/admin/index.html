@@ -78,7 +78,20 @@
   .toast.err{border-color:var(--red);color:var(--red)}
   /* mobile polish: cleaner taps + no iOS zoom-on-focus (inputs ≥16px) */
   *{-webkit-tap-highlight-color:transparent}
-  @media(max-width:560px){ input,textarea{font-size:16px} .wrap{padding:18px 14px 80px} }
+  /* season-stats editor (raw inputs only; derived stats auto-computed, not editable) */
+  .season-block{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:rgba(6,20,42,.4)}
+  .season-block .sb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+  .season-block .sb-kind{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-soft)}
+  .season-block .sb-del{background:none;border:1px solid rgba(224,93,93,.5);color:var(--red);border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:14px;flex:0 0 auto}
+  .season-block .sb-del:hover{background:rgba(224,93,93,.12)}
+  .sb-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:9px}
+  .season-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .season-block .mini{display:flex;flex-direction:column;gap:3px}
+  .season-block .mini label{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .season-block .mini input{width:100%;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:8px;padding:8px 9px;color:var(--ink);font-size:14px;font-family:inherit}
+  .season-block .mini input:focus{outline:0;border-color:var(--gold)}
+  .season-derived{margin-top:9px;font-size:12.5px;font-weight:700;color:var(--teal-soft);letter-spacing:.02em}
+  @media(max-width:560px){ input,textarea{font-size:16px} .wrap{padding:18px 14px 80px} .sb-meta{grid-template-columns:1fr} .season-grid{grid-template-columns:repeat(3,1fr)} .season-block .mini input{font-size:16px} }
 </style>
 </head>
 <body>
@@ -507,11 +520,20 @@ function cardPlayer(p){
       <div class="field"><textarea class="pf-note note-box" data-id="${p.id}" rows="3" placeholder="Private notes about this player (visible to admins only)…" aria-label="Internal notes, admins only">${esc(p._note||"")}</textarea></div>
       <div class="row-btns"><button class="btn btn-ghost" data-savenote="${p.id}" type="button">Save note</button></div>
 
-      <div class="sub">Stats</div>
+      <div class="sub">Career highlights <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(short label + value pills)</span></div>
       <div id="stats-${p.id}">${stats.map(statRow).join("")}</div>
       <div class="row-btns">
         <button class="btn btn-ghost" data-addstat="${p.id}">+ Add stat</button>
         <button class="btn btn-gold" data-save="${p.id}">Save stats</button>
+      </div>
+
+      <div class="sub">Season stats <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(raw totals — AVG/OBP/SLG · ERA/WHIP · Fld% auto-calculated)</span></div>
+      <div id="season-${p.id}">${(Array.isArray(p.season_stats)?p.season_stats:[]).map(r => seasonBlock(r.kind, r)).join("")}</div>
+      <div class="row-btns" style="flex-wrap:wrap">
+        <button class="btn btn-ghost" data-addseason="${p.id}" data-kind="batting" type="button">+ Batting</button>
+        <button class="btn btn-ghost" data-addseason="${p.id}" data-kind="pitching" type="button">+ Pitching</button>
+        <button class="btn btn-ghost" data-addseason="${p.id}" data-kind="fielding" type="button">+ Fielding</button>
+        <button class="btn btn-gold" data-saveseason="${p.id}" type="button">Save season stats</button>
       </div>
     </div>
   </div>`;
@@ -522,6 +544,57 @@ const statRow = s => `<div class="stat-row">
   <input placeholder="Value (e.g. 90 mph)" class="st-value" value="${esc(s?.value||"")}" />
   <button type="button" onclick="this.parentElement.remove()" title="Remove" aria-label="Remove stat">✕</button>
 </div>`;
+
+/* ---------- season-stats editor (shared shape with register + public render) ----------
+   Raw per-season totals only. Derived stats (AVG/OBP/SLG · ERA/WHIP · Fld%) are
+   auto-computed here from the raw inputs and shown live — never entered/editable. */
+const SEASON_FIELDS = {
+  batting:  ["G","AB","R","H","2B","3B","HR","RBI","BB","SO","SB"],
+  pitching: ["W","L","G","GS","IP","H","R","ER","BB","SO"],
+  fielding: ["G","PO","A","E"],
+};
+const SEASON_KIND = { batting:"⚾ Batting", pitching:"🎯 Pitching", fielding:"🧤 Fielding" };
+function seasonDerived(kind, r){
+  const n = v => (v===null||v===undefined||v==="") ? null : (isFinite(Number(v)) ? Number(v) : null);
+  const a3 = x => (x===null||!isFinite(x)) ? "—" : x.toFixed(3).replace(/^0(?=\.)/,"");
+  const a2 = x => (x===null||!isFinite(x)) ? "—" : x.toFixed(2);
+  if (kind === "batting"){
+    const ab=n(r.AB),h=n(r.H),bb=n(r.BB)||0,d2=n(r["2B"])||0,t3=n(r["3B"])||0,hr=n(r.HR)||0;
+    const avg=ab?(h||0)/ab:null, obp=((ab||0)+bb)?((h||0)+bb)/((ab||0)+bb):null, slg=ab?((h||0)+d2+2*t3+3*hr)/ab:null;
+    return `AVG ${a3(avg)} · OBP ${a3(obp)} · SLG ${a3(slg)}`;
+  }
+  if (kind === "pitching"){
+    const er=n(r.ER),ip=n(r.IP),bb=n(r.BB)||0,h=n(r.H)||0;
+    return `ERA ${a2((ip&&er!==null)?9*er/ip:null)} · WHIP ${a2(ip?(bb+h)/ip:null)}`;
+  }
+  if (kind === "fielding"){
+    const po=n(r.PO)||0,a=n(r.A)||0,e=n(r.E)||0,tc=po+a+e;
+    return `FLD% ${tc?a3((po+a)/tc):"—"}`;
+  }
+  return "";
+}
+function seasonBlock(kind, row){
+  row = row || {};
+  const val = k => (row[k]!==undefined && row[k]!==null) ? esc(String(row[k])) : "";
+  const fields = (SEASON_FIELDS[kind] || []).map(f =>
+    `<div class="mini"><label>${f}</label><input inputmode="${f==="IP"?"decimal":"numeric"}" data-stat="${f}" value="${val(f)}" aria-label="${kind} ${f}" /></div>`).join("");
+  return `<div class="season-block" data-kind="${kind}">
+    <div class="sb-head"><span class="sb-kind">${SEASON_KIND[kind]||kind}</span><button type="button" class="sb-del" aria-label="Remove this season">✕</button></div>
+    <div class="sb-meta">
+      <div class="mini"><label>Season</label><input data-meta="season" value="${val("season")}" placeholder="2024" /></div>
+      <div class="mini"><label>Team</label><input data-meta="team" value="${val("team")}" placeholder="Team / club" /></div>
+      <div class="mini"><label>Level</label><input data-meta="level" value="${val("level")}" placeholder="e.g. NAIA" /></div>
+    </div>
+    <div class="season-grid">${fields}</div>
+    <div class="season-derived">${seasonDerived(kind, row)}</div>
+  </div>`;
+}
+function readSeasonBlock(block){
+  const row = { kind: block.dataset.kind };
+  block.querySelectorAll("[data-meta]").forEach(i => { const v=i.value.trim(); if(v) row[i.dataset.meta]=v; });
+  block.querySelectorAll("[data-stat]").forEach(i => { const raw=i.value.trim(); if(raw==="") return; const num=Number(raw); if(Number.isFinite(num)) row[i.dataset.stat]=num; });
+  return row;
+}
 
 /* ---------- actions ---------- */
 const STATUS_TOAST = { approved: "Now live on the roster ✓", rejected: "Rejected", archived: "Archived 🗄" };
@@ -573,6 +646,33 @@ function bindActions(){
     b.disabled = false;
     if (error){ toast("Save failed: " + error.message, true); return; }
     toast("Stats saved ✓");
+    await load();
+    $("ed-" + id)?.classList.add("open");
+  });
+  // Season stats: add a block, live-recompute derived on input, remove on ✕ (delegated
+  // so it covers both pre-rendered and newly-added blocks), and save the whole set.
+  document.querySelectorAll("[data-addseason]").forEach(b => b.onclick = () =>
+    $("season-" + b.dataset.addseason).insertAdjacentHTML("beforeend", seasonBlock(b.dataset.kind, {})));
+  document.querySelectorAll("[id^='season-']").forEach(cont => {
+    cont.addEventListener("input", e => {
+      const block = e.target.closest(".season-block"); if (!block) return;
+      const d = block.querySelector(".season-derived");
+      if (d) d.textContent = seasonDerived(block.dataset.kind, readSeasonBlock(block));
+    });
+    cont.addEventListener("click", e => {
+      const del = e.target.closest(".sb-del"); if (!del) return;
+      del.closest(".season-block")?.remove();
+    });
+  });
+  document.querySelectorAll("[data-saveseason]").forEach(b => b.onclick = async () => {
+    const id = +b.dataset.saveseason;
+    const season_stats = [...$("season-" + id).querySelectorAll(".season-block")]
+      .map(readSeasonBlock).filter(r => Object.keys(r).length > 1);   // drop blocks with only {kind}
+    b.disabled = true;
+    const { error } = await SB.from("players").update({ season_stats }).eq("id", id);
+    b.disabled = false;
+    if (error){ toast("Season stats save failed: " + error.message, true); return; }
+    toast("Season stats saved ✓");
     await load();
     $("ed-" + id)?.classList.add("open");
   });

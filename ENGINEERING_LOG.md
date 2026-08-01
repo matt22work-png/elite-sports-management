@@ -132,8 +132,15 @@ Root cause (not a symptom patch): the paywall gate is `position:absolute;inset:0
 - Added a nav item `#collab` ("Collaborators") between "Who I Am" and "College" in `.nav-links`; new `nav_collab` key. All three keys EN/ES/IT (parity verified). Nav-links are desktop-only (existing `@media(max-width:860px)` hides them on mobile — Marianna's section is still reachable by scrolling, same as every other section).
 - Verified: exactly one `#who`, one `#collab`, one Marianna card, one `specialistPhoto`; no JS references the moved node (both founder/specialist photos are static bg-image divs). No orphaned refs.
 
+### PHASE 3 — Admin stats editing UI (session 2026-08-01) — DONE (`<next commit>`)
+- **Season-stats editor** in `admin/index.html` player editor: batting/pitching/fielding blocks (raw totals only), pre-filled from `players.season_stats`, add/remove per block, **live auto-computed derived line** (AVG/OBP/SLG · ERA/WHIP · Fld%) that recomputes on input — derived values are never entered/editable (Phase-3 requirement). Save writes `players.season_stats`. Reuses the exact shape/formulas of the register builder + public `seasonStatsHTML()` (duplicated pure helpers per file — no-build). Delegated input/click listeners on `#season-<id>` cover pre-rendered + newly-added blocks. Legacy `{label,value}` "Stats" relabeled "Career highlights" to distinguish from the new "Season stats".
+- **Full edit access regardless of source (sub-task 2):** verified via `pg_policies` that `players` has a single row-level `admin update players` UPDATE policy (`is_esm_admin()`), NOT column-restricted — so an admin edits ANY player row (legacy seed / admin-added / self-created) and ANY column incl. season_stats. The existing admin editor already covers profile/photo/legacy-stats; season_stats now joins it.
+- **RLS verified server-side (rolled back):** simulated an admin JWT (email from `private.esm_admins`) → `is_esm_admin()=true`, `UPDATE players.season_stats` affected 1 row, then rolled back (player 1 season_stats back to `[]`). No migration needed — season_stats is an existing column under existing policies.
+- **Sub-task 3 (Tenerife registrant admin section):** N/A yet — belongs to Phase 2, which is GATED on Sam's Phase-1 review. Deferred with the rest of Phase 2.
+- Admin JS `node --check` clean.
+
 ## In progress
-- Phase 1 (profile-creation flow) built + validated (DB/RLS/parse); awaiting Sam's live click-through review before Phase 2. Phase 7 + Phase 4 done. STOP&ASK C/D/E open. Remaining roadmap: Phase 2 (roster/Tenerife — GATED on Sam's Phase-1 review), Phase 3 (admin stats UI), Phase 5 (pricing/copy incl. form-field reduction B), Phase 6 (email notifications).
+- Phase 1 (profile-creation flow) built + validated; awaiting Sam's live click-through review before Phase 2. Phases 3, 4, 7 done. STOP&ASK C/D/E open. Remaining roadmap: Phase 2 (roster/Tenerife — GATED on Sam's Phase-1 review; includes the Tenerife admin section), Phase 5 (pricing/copy incl. form-field reduction B), Phase 6 (email notifications).
 
 ### Tier 5 content + priority interrupts
 - **74f0b71** Nav reorder: What We Do, Who I Am, College, Roster, Events, Join. (No Media item — already removed in f063ac6.)
