@@ -263,7 +263,9 @@
   .sh-mono{font-family:'Anton';font-size:40px;color:var(--gold);width:88px;height:88px;flex:none;border-radius:50%;border:2px solid rgba(217,177,84,.4);display:grid;place-items:center;background:rgba(6,20,42,.5);background-size:cover;background-position:center}
   .sheet h3{font-size:clamp(24px,5vw,34px)}
   .sh-pos{color:var(--gold-soft);font-weight:700;margin-top:4px}.sh-meta{color:var(--muted);font-size:14px;margin-top:8px}
-  .sh-body{padding:26px 28px 34px}.sh-body p.bio{font-size:16px;color:#d6e1f2;margin-bottom:24px}
+  /* Bottom-sheet modal is flush to the screen bottom on mobile, so pad its body
+     past the iOS home indicator (0 fallback elsewhere) — matches footer/install. */
+  .sh-body{padding:26px 28px calc(34px + env(safe-area-inset-bottom,0px))}.sh-body p.bio{font-size:16px;color:#d6e1f2;margin-bottom:24px}
   .sh-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
   .sh-stat{flex:1;min-width:120px;border:1px solid var(--line);border-radius:13px;padding:14px 16px;background:rgba(8,26,51,.5)}
   .sh-stat b{font-family:'Anton';font-size:22px;color:var(--gold);display:block;line-height:1.1}
