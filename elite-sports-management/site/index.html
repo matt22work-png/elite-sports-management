@@ -346,6 +346,13 @@
 
   /* ===== roster paywall ===== */
   .roster-wrap{position:relative}
+  /* The locked gate overlay is position:absolute;inset:0, so it takes the wrap's
+     height. A sport/position filter matching few or zero athletes would otherwise
+     shrink the wrap below the gate card, making the gate spill over the sections
+     above/below (the "filter tabs break the layout" bug). A min-height reserves
+     room for the overlay no matter how many cards match. Only applies while locked. */
+  .roster-wrap.is-locked{min-height:540px}
+  .roster-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:34px 12px;font-size:15px}
   .roster-wrap.is-locked .roster{filter:blur(9px) saturate(.55);pointer-events:none;user-select:none;max-height:600px;overflow:hidden}
   .roster-wrap.is-locked::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,20,42,.3),rgba(6,20,42,.93));pointer-events:none;border-radius:18px}
   .gate{display:none}
@@ -812,7 +819,7 @@ const T = {
     mz_cred1:"NASM Certified Personal Trainer",mz_cred2:"Italian National Team ×3",mz_cred3:"U22 European Champion · Gold 2026",mz_cred4:"LSC All-Conference Tournament Team 2026",mz_cred5:"Serie A1 · Italy's Top Level",mz_contact:"Contact Her",sam_contact:"Contact Him",
     roster_kicker:"The Roster",roster_h2:"Our Athletes",
     roster_p:"A growing family of ballplayers from the Dominican Republic, Venezuela, Spain, Colombia, Italy and the United States.",
-    filter_all:"All",filter_pitcher:"Pitchers",filter_catcher:"Catchers",filter_infielder:"Infielders",filter_twoway:"Two-Way",card_view:"View profile →",
+    filter_all:"All",filter_pitcher:"Pitchers",filter_catcher:"Catchers",filter_infielder:"Infielders",filter_twoway:"Two-Way",card_view:"View profile →",roster_empty:"No athletes in this category yet.",
     events_kicker:"Events",events_h2:"Camps, Showcases & Tournaments",events_p:"Where Elite Sports Management athletes train, compete and get seen.",
     ev_upcoming:"Upcoming",ev_past:"Past",ev_register:"Register",ev_gallery:"View media & photos",
     testi_kicker:"Testimonials",testi_h2:"What People Say",testi_p:"Voices from players, families and coaches in the ESM family.",
@@ -888,7 +895,7 @@ const T = {
     mz_cred1:"Entrenadora Personal Certificada NASM",mz_cred2:"Selección de Italia ×3",mz_cred3:"Campeona Europea U22 · Oro 2026",mz_cred4:"Equipo All-Conference del Torneo LSC 2026",mz_cred5:"Serie A1 · Máxima Categoría de Italia",mz_contact:"Contáctala",sam_contact:"Contáctalo",
     roster_kicker:"Los Jugadores",roster_h2:"Nuestros Atletas",
     roster_p:"Una familia creciente de peloteros de República Dominicana, Venezuela, España, Colombia, Italia y Estados Unidos.",
-    filter_all:"Todos",filter_pitcher:"Lanzadores",filter_catcher:"Receptores",filter_infielder:"Infielders",filter_twoway:"Dos Vías",card_view:"Ver perfil →",
+    filter_all:"Todos",filter_pitcher:"Lanzadores",filter_catcher:"Receptores",filter_infielder:"Infielders",filter_twoway:"Dos Vías",card_view:"Ver perfil →",roster_empty:"Aún no hay atletas en esta categoría.",
     events_kicker:"Eventos",events_h2:"Camps, Showcases y Torneos",events_p:"Donde los atletas de Elite Sports Management entrenan, compiten y se hacen ver.",
     ev_upcoming:"Próximo",ev_past:"Pasado",ev_register:"Inscribirse",ev_gallery:"Ver fotos y videos",
     testi_kicker:"Testimonios",testi_h2:"Lo Que Dicen",testi_p:"Voces de jugadores, familias y entrenadores de la familia ESM.",
@@ -964,7 +971,7 @@ const T = {
     mz_cred1:"Personal Trainer Certificata NASM",mz_cred2:"Nazionale Italiana ×3",mz_cred3:"Campionessa Europea U22 · Oro 2026",mz_cred4:"Tournament Team All-Conference LSC 2026",mz_cred5:"Serie A1 · Massimo Campionato Italiano",mz_contact:"Contattala",sam_contact:"Contattalo",
     roster_kicker:"Il Roster",roster_h2:"I Nostri Atleti",
     roster_p:"Una famiglia in crescita di giocatori da Repubblica Dominicana, Venezuela, Spagna, Colombia, Italia e Stati Uniti.",
-    filter_all:"Tutti",filter_pitcher:"Lanciatori",filter_catcher:"Ricevitori",filter_infielder:"Interni",filter_twoway:"Due Ruoli",card_view:"Vedi profilo →",
+    filter_all:"Tutti",filter_pitcher:"Lanciatori",filter_catcher:"Ricevitori",filter_infielder:"Interni",filter_twoway:"Due Ruoli",card_view:"Vedi profilo →",roster_empty:"Ancora nessun atleta in questa categoria.",
     events_kicker:"Eventi",events_h2:"Camp, Showcase e Tornei",events_p:"Dove gli atleti di Elite Sports Management si allenano, competono e si fanno notare.",
     ev_upcoming:"In arrivo",ev_past:"Passato",ev_register:"Iscriviti",ev_gallery:"Foto e video",
     testi_kicker:"Testimonianze",testi_h2:"Cosa Dicono",testi_p:"Le voci di giocatori, famiglie e coach della famiglia ESM.",
@@ -1327,7 +1334,7 @@ function renderFilters(){
 function renderRoster(){
   let list=activeSport==="All"?PLAYERS:PLAYERS.filter(p=>(p.sport||"Baseball")===activeSport);
   list=active==="All"?list:list.filter(p=>p.group===active);
-  document.getElementById("rosterList").innerHTML=list.map(p=>{
+  const cards=list.map(p=>{
     const hasPage=STATIC_PLAYER_PAGES.has(p.slug);
     const tag=hasPage?"a":"button";
     const linkAttr=hasPage?`href="players/${encodeURIComponent(p.slug)}.html"`:`data-slug="${esc(p.slug)}"`;
@@ -1339,6 +1346,7 @@ function renderRoster(){
         ${p.teams&&p.teams[0]?`<div class="team">${esc(p.teams[0])}</div>`:""}<div class="view">${t("card_view")}</div></div>
     </${tag}>`;
   }).join("");
+  document.getElementById("rosterList").innerHTML=cards||`<div class="roster-empty">${t("roster_empty")}</div>`;
   document.querySelectorAll(".pcard[data-slug]").forEach(c=>c.onclick=()=>openModal(c.dataset.slug));
   // Headline stats are set by ESM, not derived from the roster: the public roster
   // only lists approved athletes, which undercounts who's actually represented.
