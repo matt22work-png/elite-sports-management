@@ -261,6 +261,11 @@
   @media(max-width:560px){.foot-links{align-items:flex-start}}
   .pill{display:inline-flex;align-items:center;gap:9px;color:var(--gold-soft);font-weight:700;border:1px solid var(--line);padding:10px 16px;border-radius:999px;transition:.2s}
   .pill:hover{border-color:var(--gold);background:rgba(217,177,84,.08)}
+  /* CeasAI cross-promo strip at the very bottom of the footer */
+  .ceasai{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);text-align:center}
+  .ceasai a{font-size:12.5px;color:var(--muted);transition:.2s;display:inline-flex;gap:6px;align-items:center}
+  .ceasai a:hover{color:var(--gold-soft)}
+  .ceasai b{color:var(--gold-soft);font-weight:800;letter-spacing:.02em}
 
   .modal{position:fixed;inset:0;z-index:100;display:none;align-items:flex-end;justify-content:center}
   .modal.open{display:flex}
@@ -696,7 +701,9 @@
     <a class="pill" href="https://instagram.com/elite_sports_management__" target="_blank" rel="noopener" aria-label="Elite Sports Management on Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>@elite_sports_management__</a>
     <a class="pill" href="mailto:elitesportsmanagement50@gmail.com">✉ elitesportsmanagement50@gmail.com</a>
   </div>
-</div></footer>
+</div>
+<div class="wrap ceasai"><a id="ceasaiLink" href="#" target="_blank" rel="noopener"><span data-i18n="ceasai_cta"></span> <b>CeasAI</b> →</a></div>
+</footer>
 
 <div class="modal" id="modal"><div class="scrim" data-close></div><div class="sheet"><button type="button" class="close" data-close aria-label="Close">✕</button><div id="sheetContent"></div></div></div>
 
@@ -857,7 +864,7 @@ const T = {
     modal_highlights:"Career Highlights",modal_season_stats:"Season Stats",modal_teams:"Teams & Affiliations",
     modal_contact_h:"Interested in this player?",modal_contact_p:"You have full roster access. Get in touch and we'll connect you with this athlete directly.",modal_contact_btn:"Contact ESM about this player",
     band_h2:"Are you the next great addition?",band_p:"Get seen, get signed, get developed — start the conversation with Elite Sports Management.",band_btn:"Apply Now",
-    foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",
+    foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",ceasai_cta:"Want a website like this? Built by",
     install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install",
     admin_link:"Admin",login_h:"Admin Login",login_sub:"Manage athletes, stats & photos",login_email:"Email",login_pass:"Password",login_btn:"Log in"},
   es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_collab:"Colaboradores",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_signin:"Entrar",nav_signin_create:"Crear Cuenta",nav_signin_player:"Portal Jugador",nav_signin_scout:"Portal Scout",nav_signin_admin:"Portal Admin",nav_cta:"Aplica Ahora",
@@ -933,7 +940,7 @@ const T = {
     modal_highlights:"Destacados de Carrera",modal_season_stats:"Estadísticas por Temporada",modal_teams:"Equipos y Afiliaciones",
     modal_contact_h:"¿Interesado en este jugador?",modal_contact_p:"Tienes acceso completo al roster. Escríbenos y te conectamos directamente con este atleta.",modal_contact_btn:"Contactar a ESM sobre este jugador",
     band_h2:"¿Eres la próxima gran incorporación?",band_p:"Que te vean, que te firmen, que te desarrollen — inicia la conversación con Elite Sports Management.",band_btn:"Aplica Ahora",
-    foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",
+    foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",ceasai_cta:"¿Quieres una web como esta? Creada por",
     install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar",
     admin_link:"Admin",login_h:"Acceso Admin",login_sub:"Gestiona atletas, estadísticas y fotos",login_email:"Correo",login_pass:"Contraseña",login_btn:"Entrar"},
   it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_collab:"Collaboratori",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_signin:"Accedi",nav_signin_create:"Crea Account",nav_signin_player:"Portale Giocatore",nav_signin_scout:"Portale Scout",nav_signin_admin:"Portale Admin",nav_cta:"Candidati",
@@ -1009,7 +1016,7 @@ const T = {
     modal_highlights:"Carriera in Evidenza",modal_season_stats:"Statistiche per Stagione",modal_teams:"Squadre e Affiliazioni",
     modal_contact_h:"Interessato a questo giocatore?",modal_contact_p:"Hai accesso completo al roster. Scrivici e ti mettiamo in contatto direttamente con questo atleta.",modal_contact_btn:"Contatta ESM per questo atleta",
     band_h2:"Sei la prossima grande aggiunta?",band_p:"Farti notare, firmare e crescere — inizia la conversazione con Elite Sports Management.",band_btn:"Candidati",
-    foot_tagline:"Unisciti a festeggiare",foot_rights:"Tutti i diritti riservati.",
+    foot_tagline:"Unisciti a festeggiare",foot_rights:"Tutti i diritti riservati.",ceasai_cta:"Vuoi un sito come questo? Realizzato da",
     install_t:"Installa l'app ESM",install_d:"Aggiungila alla schermata Home",install_btn:"Installa",
     admin_link:"Admin",login_h:"Accesso Admin",login_sub:"Gestisci atleti, statistiche e foto",login_email:"Email",login_pass:"Password",login_btn:"Accedi"}
 };
@@ -1622,6 +1629,11 @@ document.getElementById("yr").textContent=new Date().getFullYear();
 
 const form=document.getElementById("applyForm");
 fillCC(document.getElementById("joinCC"),"IT");   // populate the #join country-code select
+
+/* CeasAI footer cross-promo. TODO(Matt): point CEASAI_URL at the real CeasAI page;
+   defaults to an email contact so the link is never a dead end. */
+const CEASAI_URL="mailto:ceasaispring@gmail.com?subject=I%20want%20a%20website%20like%20this";
+{ const cl=document.getElementById("ceasaiLink"); if(cl)cl.href=CEASAI_URL; }
 const FORM_T0=Date.now();   // page-load time, for the anti-spam time trap below
 form.addEventListener("submit",async e=>{
   e.preventDefault();
