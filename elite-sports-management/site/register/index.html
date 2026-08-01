@@ -45,6 +45,9 @@
   .field input:focus,.field select:focus,.field textarea:focus{outline:0;border-color:var(--gold)}
   .field textarea{resize:vertical}
   .field .hint{font-size:12px;color:var(--muted);margin-top:5px}
+  .phone-row{display:flex;gap:8px}
+  .phone-row .phone-cc{flex:0 0 auto;width:auto;max-width:142px}
+  .phone-row .phone-num{flex:1;min-width:0}
   .role-pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:4px 0 18px}
   .role-opt{border:1.5px solid var(--line);border-radius:14px;padding:18px 14px;cursor:pointer;text-align:center;transition:.18s;background:rgba(6,20,42,.4)}
   .role-opt:hover{border-color:var(--gold-soft)}
@@ -158,10 +161,8 @@
         </div>
       </div>
 
-      <div class="grid2">
-        <div class="field"><label for="p-instagram">Instagram</label><input id="p-instagram" placeholder="@handle" /></div>
-        <div class="field"><label for="p-phone">Phone</label><input id="p-phone" placeholder="+39 …" /></div>
-      </div>
+      <div class="field"><label for="p-instagram">Instagram</label><input id="p-instagram" placeholder="@handle" /></div>
+      <div class="field"><label for="p-phone">Phone</label><div class="phone-row"><select class="phone-cc" id="p-cc" aria-label="Country dialing code"></select><input class="phone-num" id="p-phone" inputmode="tel" placeholder="Phone number" /></div></div>
       <div class="field"><label for="p-photo">Profile photo (optional)</label><input type="file" accept="image/*" id="p-photo" /></div>
       <button class="btn btn-gold" type="submit" style="width:100%">Save profile &amp; continue</button>
       <div class="msg" id="playerMsg" role="alert" aria-live="assertive"></div>
@@ -177,10 +178,8 @@
       <div class="field"><label for="s-org">Organization</label><input id="s-org" placeholder="e.g. Cleveland Guardians" /></div>
       <div class="field"><label for="s-title">Position / Title</label><input id="s-title" placeholder="e.g. Area Scout" /></div>
       <div class="field"><label for="s-school">School / Team (if applicable)</label><input id="s-school" placeholder="e.g. Hastings College" /></div>
-      <div class="grid2">
-        <div class="field"><label for="s-country">Country</label><input id="s-country" placeholder="e.g. USA" /></div>
-        <div class="field"><label for="s-phone">Phone</label><input id="s-phone" placeholder="+1 …" /></div>
-      </div>
+      <div class="field"><label for="s-country">Country</label><input id="s-country" placeholder="e.g. USA" /></div>
+      <div class="field"><label for="s-phone">Phone</label><div class="phone-row"><select class="phone-cc" id="s-cc" aria-label="Country dialing code"></select><input class="phone-num" id="s-phone" inputmode="tel" placeholder="Phone number" /></div></div>
       <div class="field"><label for="s-notes">Notes (optional)</label><textarea id="s-notes" rows="3" placeholder="Anything we should know about your interest…"></textarea></div>
       <button class="btn btn-gold" type="submit" style="width:100%">Save details &amp; continue</button>
       <div class="msg" id="scoutMsg" role="alert" aria-live="assertive"></div>
@@ -243,6 +242,26 @@ const STASH_KEY = "esm_reg_pending";
 // Country → flag emoji, so a registered athlete's roster card shows their flag
 // (mirrors the public site's FLAGS map). Unknown country → left null (site falls back).
 const FLAGS = {"Dominican Republic":"🇩🇴","República Dominicana":"🇩🇴","Repubblica Dominicana":"🇩🇴","Venezuela":"🇻🇪","Spain":"🇪🇸","España":"🇪🇸","Spagna":"🇪🇸","Colombia":"🇨🇴","Italy":"🇮🇹","Italia":"🇮🇹","United States":"🇺🇸","USA":"🇺🇸","Estados Unidos":"🇺🇸","Stati Uniti":"🇺🇸","Germany":"🇩🇪","Alemania":"🇩🇪","Germania":"🇩🇪","Portugal":"🇵🇹","Canada":"🇨🇦","Mexico":"🇲🇽","México":"🇲🇽"};
+// Country-code phone input (dial-code select + number → "+39 340…"). Same curated
+// list as the public site; names here are static/trusted so no escaping needed.
+const DIAL_CODES=[
+  {c:"IT",n:"Italy",d:"+39",f:"🇮🇹"},{c:"US",n:"United States",d:"+1",f:"🇺🇸"},
+  {c:"DO",n:"Dominican Republic",d:"+1",f:"🇩🇴"},{c:"VE",n:"Venezuela",d:"+58",f:"🇻🇪"},
+  {c:"CO",n:"Colombia",d:"+57",f:"🇨🇴"},{c:"MX",n:"Mexico",d:"+52",f:"🇲🇽"},
+  {c:"CU",n:"Cuba",d:"+53",f:"🇨🇺"},{c:"PR",n:"Puerto Rico",d:"+1",f:"🇵🇷"},
+  {c:"PA",n:"Panama",d:"+507",f:"🇵🇦"},{c:"NI",n:"Nicaragua",d:"+505",f:"🇳🇮"},
+  {c:"CR",n:"Costa Rica",d:"+506",f:"🇨🇷"},{c:"ES",n:"Spain",d:"+34",f:"🇪🇸"},
+  {c:"CA",n:"Canada",d:"+1",f:"🇨🇦"},{c:"DE",n:"Germany",d:"+49",f:"🇩🇪"},
+  {c:"PT",n:"Portugal",d:"+351",f:"🇵🇹"},{c:"FR",n:"France",d:"+33",f:"🇫🇷"},
+  {c:"GB",n:"United Kingdom",d:"+44",f:"🇬🇧"},{c:"NL",n:"Netherlands",d:"+31",f:"🇳🇱"},
+  {c:"AU",n:"Australia",d:"+61",f:"🇦🇺"},{c:"JP",n:"Japan",d:"+81",f:"🇯🇵"},
+  {c:"KR",n:"South Korea",d:"+82",f:"🇰🇷"},{c:"BR",n:"Brazil",d:"+55",f:"🇧🇷"},
+  {c:"AR",n:"Argentina",d:"+54",f:"🇦🇷"},{c:"CW",n:"Curaçao",d:"+599",f:"🇨🇼"},
+  {c:"AW",n:"Aruba",d:"+297",f:"🇦🇼"},
+];
+function fillCC(id, def){ const sel=document.getElementById(id); if(!sel)return; sel.innerHTML=DIAL_CODES.map(x=>`<option value="${x.d}"${x.c===def?" selected":""}>${x.f} ${x.n} ${x.d}</option>`).join(""); }
+function combinePhone(ccId, numId){ const cc=document.getElementById(ccId), num=document.getElementById(numId); const n=((num&&num.value)||"").trim(); return n?(((cc&&cc.value)||"")+" "+n).trim():""; }
+fillCC("p-cc","IT"); fillCC("s-cc","US");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -417,7 +436,7 @@ $("playerForm").addEventListener("submit", async e => {
       sport: $("p-sport").value, country: $("p-country").value.trim() || null,
       flag: FLAGS[$("p-country").value.trim()] || null,
       age: $("p-age").value.trim() || null, bio: $("p-bio").value.trim(),
-      instagram: $("p-instagram").value.trim() || null, phone: $("p-phone").value.trim() || null,
+      instagram: $("p-instagram").value.trim() || null, phone: combinePhone("p-cc","p-phone") || null,
       teams, stats: [], season_stats: collectSeasonStats(), image_url, email: user.email,
       owner_id: user.id, status: "pending", source: "registration",
     });
@@ -447,7 +466,7 @@ $("scoutForm").addEventListener("submit", async e => {
       title: $("s-title").value.trim() || null,
       school_team: $("s-school").value.trim() || null,
       country: $("s-country").value.trim() || null,
-      phone: $("s-phone").value.trim() || null,
+      phone: combinePhone("s-cc","s-phone") || null,
       notes: $("s-notes").value.trim() || null,
     }, { onConflict: "id" });
     if (error) throw error;
