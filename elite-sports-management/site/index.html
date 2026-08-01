@@ -1012,6 +1012,10 @@ const T = {
 };
 
 const FLAGS={"Dominican Republic":"🇩🇴","República Dominicana":"🇩🇴","Repubblica Dominicana":"🇩🇴","Venezuela":"🇻🇪","Spain":"🇪🇸","España":"🇪🇸","Spagna":"🇪🇸","Colombia":"🇨🇴","Italy":"🇮🇹","Italia":"🇮🇹","United States":"🇺🇸","USA":"🇺🇸","Estados Unidos":"🇺🇸","Stati Uniti":"🇺🇸","Germany":"🇩🇪","Alemania":"🇩🇪","Germania":"🇩🇪","Portugal":"🇵🇹","Canada":"🇨🇦","Mexico":"🇲🇽","México":"🇲🇽"};
+// Show a real country flag next to every player: use a stored flag if present, else
+// derive it from the country, else a neutral globe. Keeps flags on registered/legacy
+// players that never had the emoji stored.
+const flagFor=p=>p.flag||FLAGS[p&&p.country]||"🌎";
 
 let PLAYERS = [
   {
@@ -1360,7 +1364,7 @@ function renderRoster(){
     const linkAttr=hasPage?`href="players/${encodeURIComponent(p.slug)}.html"`:`data-slug="${esc(p.slug)}"`;
     return `
     <${tag} class="pcard" ${linkAttr}>
-      <div class="top" style="${bgImg(p.image)}"><span class="flag">${esc(p.flag)||"🌎"}${p.heritage?(" "+esc(p.heritage)):""}</span>
+      <div class="top" style="${bgImg(p.image)}"><span class="flag">${esc(flagFor(p))}${p.heritage?(" "+esc(p.heritage)):""}</span>
         ${p.tier?`<span class="tier">${esc(p.tier)}</span>`:""}${p.image?"":`<span class="mono">${initials(p.name)}</span>`}</div>
       <div class="body"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position)}</div>
         ${p.teams&&p.teams[0]?`<div class="team">${esc(p.teams[0])}</div>`:""}<div class="view">${t("card_view")}</div></div>
@@ -1499,7 +1503,7 @@ function openModal(slug){
   const meta=[p.born?("Born "+p.born):null,p.birthplace,p.bats?("Bats "+p.bats):null].filter(Boolean).join("  ·  ");
   document.getElementById("sheetContent").innerHTML=`
     <div class="sh-top"><span class="sh-mono" style="${bgImg(p.image)}">${p.image?"":initials(p.name)}</span>
-      <div><h3 class="display">${esc(p.name)} <span style="font-size:.6em">${esc(p.flag)}${esc(p.heritage)}</span></h3>
+      <div><h3 class="display">${esc(p.name)} <span style="font-size:.6em">${esc(flagFor(p))}${esc(p.heritage)}</span></h3>
       <div class="sh-pos">${esc(p.position)}</div><div class="sh-meta">${esc(meta)}</div></div></div>
     <div class="sh-body"><p class="bio">${esc(p.bio)}</p>
       ${p.stats&&p.stats.length?`<div class="sh-label">${t("modal_highlights")}</div><div class="sh-stats">${p.stats.map(s=>`<div class="sh-stat"><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join("")}</div>`:""}
