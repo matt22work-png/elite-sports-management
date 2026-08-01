@@ -79,7 +79,10 @@
   .bg-fx::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 500px at 78% -10%,rgba(217,177,84,.16),transparent 60%),radial-gradient(800px 600px at 8% 110%,rgba(20,70,140,.30),transparent 55%),linear-gradient(180deg,var(--navy),var(--navy-2))}
   .bg-fx::after{content:"";position:absolute;inset:0;opacity:.04;background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 9px)}
 
-  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(6,20,42,.72);border-bottom:1px solid var(--line)}
+  /* iOS PWA: status-bar-style is black-translucent + viewport-fit=cover, so page
+     content draws UNDER the status bar. Pad the sticky header down by the top
+     safe-area inset (0px fallback off-notch) so the nav clears the clock/battery. */
+  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(6,20,42,.72);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
   .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px;gap:14px}
   .brand{display:flex;align-items:center;gap:11px;font-weight:800}
   .logo{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#10305c,#06142a);font-family:'Anton';font-size:13px;color:var(--gold);position:relative}
