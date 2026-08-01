@@ -411,6 +411,7 @@
     <nav class="nav-links">
       <a href="#about" data-i18n="nav_about"></a>
       <a href="#who" data-i18n="nav_who"></a>
+      <a href="#collab" data-i18n="nav_collab"></a>
       <a href="#college" data-i18n="nav_college"></a>
       <a href="#roster" data-i18n="nav_roster"></a>
       <a href="#events" data-i18n="nav_events"></a>
@@ -516,7 +517,12 @@
       <a class="founder-contact" href="mailto:elitesportsmanagement50@gmail.com?subject=Inquiry%20-%20Elite%20Sports%20Management"><span class="ic">✉</span><span data-i18n="sam_contact"></span></a>
     </div>
   </div>
-  <div class="founder" style="margin-top:22px">
+</div></section>
+
+<!-- Collaborators / Staff — Marianna's card moved out of #who here in Phase 4. -->
+<section class="sec" id="collab" style="padding-top:10px"><div class="wrap">
+  <div class="sec-head"><div class="kicker" data-i18n="collab_kicker"></div><h2 class="display" data-i18n="collab_h2"></h2></div>
+  <div class="founder">
     <div class="mono" id="specialistPhoto" style="background-image:url('marianna.jpeg');background-size:220%;background-position:54% 27%;font-size:0"></div>
     <div>
       <h3 class="display">Marianna Zumerle</h3>
@@ -761,7 +767,7 @@ const TESTIMONIALS = [
 const STATIC_PLAYER_PAGES = new Set(["brayan-hernandez", "gianni-westphal", "jose-cedeno", "danyer-sanabria", "francesco-mazzei", "anderson-pena", "jesus-delgado", "lorenzo-gonzalez", "jaider-morelos", "bret-bowers", "osiris-german", "adam-moser", "yerardo-ciofani", "javier-useche", "david-chavez", "matteo-colalucci", "anthony-quattrocchi"]);
 
 const T = {
-  en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_signin:"Sign In",nav_signin_create:"Create Account",nav_signin_player:"Player Portal",nav_signin_scout:"Scout Portal",nav_signin_admin:"Admin Portal",nav_cta:"Apply Now",
+  en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_collab:"Collaborators",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_signin:"Sign In",nav_signin_create:"Create Account",nav_signin_player:"Player Portal",nav_signin_scout:"Scout Portal",nav_signin_admin:"Admin Portal",nav_cta:"Apply Now",
     contracts_h2:'50+ contracts signed <em>since 2025</em>',
     contracts_sub:'Our athletes have signed contracts in <b>7 different countries</b> to date.',
     feat_role:"Former Cleveland Indians organization",
@@ -808,7 +814,7 @@ const T = {
     svc6_t:"Winter League",svc6_d:"Placing athletes in winter league play abroad for extra reps and exposure during the offseason.",svc6_pay:"Sign up for Winter League →",svc_pro_t:"Professional Leagues",svc_pro_d:"Opening doors to professional play — independent leagues in North America, winter leagues abroad, and clubs across Europe.",svc_pro_pay:"Explore Professional Leagues →",
     so_t:"Softball Opportunities",so_d:"Guiding softball athletes through college recruiting, national team pathways and international competition — with player development, showcase events and exposure to college coaches and scouts.",so_pay:"Explore Softball Opportunities →",    svc4_t:"Social Media & Branding",svc4_d:"Building each athlete's profile and story to grow their visibility.",
     svc5_t:"Representation & Development",svc5_d:"Day-to-day management and a plan tailored to each athlete.",svc5_pay:"Sign up for Representation →",svc5_hl_t:"Specialized Personalized Training",svc5_hl_d:"One-on-one and online coaching tailored to each athlete's game and goals.",
-    who_kicker:"Who I Am",who_role:"CEO & Founder · Professional Baseball Player",
+    who_kicker:"Who I Am",who_role:"CEO & Founder · Professional Baseball Player",collab_kicker:"The Team",collab_h2:"Collaborators",
     who_bio:"Elite Sports Management was founded by Samuele Bruno — born and raised in Italy, and the first player born and raised in Italy to go on and play in the Canadian Baseball League. He came up through the Italian system, took silver with Italy at the U18 European Championship, and went on to wear the shirt of the Italian National Team. He played six seasons professionally in Italy, and earned a scholarship to play three years of college baseball in the United States.",
     who_bio2:"His own career ran through indy ball and winter leagues across North America and Australia — the same routes he now opens for ESM athletes. Beyond representation, Samuele runs camps, showcases and a coaching program built on one idea: train like an athlete, play like a pro.",
     cred_italy:"Italy National Team",cred_u18:"U18 European Championship · Silver",cred_cbl:"First Italian-raised player in the CBL",cred_pro:"6 Seasons Pro in Italy",cred_college:"U.S. College Scholarship",cred_hastings:"Hastings College · All-GPAC Honorable Mention",cred_cod:"College of the Desert · 3 HR in One Game",cred_ecc:"ECC College · Region 16 Champions",cred_util:"Professional Baseball Player",
@@ -837,7 +843,7 @@ const T = {
     foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",
     install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install",
     admin_link:"Admin",login_h:"Admin Login",login_sub:"Manage athletes, stats & photos",login_email:"Email",login_pass:"Password",login_btn:"Log in"},
-  es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_signin:"Entrar",nav_signin_create:"Crear Cuenta",nav_signin_player:"Portal Jugador",nav_signin_scout:"Portal Scout",nav_signin_admin:"Portal Admin",nav_cta:"Aplica Ahora",
+  es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_collab:"Colaboradores",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_signin:"Entrar",nav_signin_create:"Crear Cuenta",nav_signin_player:"Portal Jugador",nav_signin_scout:"Portal Scout",nav_signin_admin:"Portal Admin",nav_cta:"Aplica Ahora",
     contracts_h2:'Más de 50 contratos firmados <em>desde 2025</em>',
     contracts_sub:'Nuestros atletas han firmado contratos en <b>7 países diferentes</b> hasta la fecha.',
     feat_role:"Ex organización de los Cleveland Indians",
@@ -884,7 +890,7 @@ const T = {
     svc6_t:"Liga de Invierno",svc6_d:"Ubicamos atletas en ligas de invierno en el extranjero para sumar experiencia y visibilidad fuera de temporada.",svc6_pay:"Inscríbete en la Liga de Invierno →",svc_pro_t:"Ligas Profesionales",svc_pro_d:"Abrimos puertas al béisbol profesional — ligas independientes en Norteamérica, ligas de invierno en el extranjero y clubes por toda Europa.",svc_pro_pay:"Explora las Ligas Profesionales →",
     so_t:"Oportunidades de Sóftbol",so_d:"Acompañamos a las atletas de sóftbol en el reclutamiento universitario, las vías hacia las selecciones nacionales y la competición internacional — con desarrollo de jugadoras, showcases y visibilidad ante entrenadores y scouts.",so_pay:"Explora las Oportunidades de Sóftbol →",    svc4_t:"Redes Sociales y Marca",svc4_d:"Construimos el perfil y la historia de cada atleta para aumentar su visibilidad.",
     svc5_t:"Representación y Desarrollo",svc5_d:"Gestión diaria y un plan a la medida de cada atleta.",svc5_pay:"Inscríbete en Representación →",svc5_hl_t:"Entrenamiento Personalizado Especializado",svc5_hl_d:"Coaching individual y online adaptado al juego y los objetivos de cada atleta.",
-    who_kicker:"Quién Soy",who_role:"CEO y Fundador · Jugador de Béisbol Profesional",
+    who_kicker:"Quién Soy",who_role:"CEO y Fundador · Jugador de Béisbol Profesional",collab_kicker:"El Equipo",collab_h2:"Colaboradores",
     who_bio:"Elite Sports Management fue fundada por Samuele Bruno — nacido y criado en Italia, y el primer jugador nacido y criado en Italia en llegar a jugar en la Canadian Baseball League. Se formó en el sistema italiano, fue subcampeón con Italia en el Campeonato Europeo Sub-18 y llegó a vestir la camiseta de la Selección Italiana. Jugó seis temporadas como profesional en Italia y obtuvo una beca para jugar tres años de béisbol universitario en Estados Unidos.",
     who_bio2:"Su propia carrera pasó por el indy ball y las ligas de invierno de Norteamérica y Australia — las mismas rutas que hoy abre para los atletas de ESM. Además de la representación, Samuele organiza camps, showcases y un programa de coaching con una sola idea: entrena como un atleta, juega como un profesional.",
     cred_italy:"Selección de Italia",cred_u18:"Campeonato Europeo Sub-18 · Plata",cred_cbl:"Primer italiano de formación en la CBL",cred_pro:"6 Temporadas Pro en Italia",cred_college:"Beca Universitaria en EE. UU.",cred_hastings:"Hastings College · Mención de Honor All-GPAC",cred_cod:"College of the Desert · 3 HR en un Partido",cred_ecc:"ECC College · Campeones de la Región 16",cred_util:"Jugador de Béisbol Profesional",
@@ -913,7 +919,7 @@ const T = {
     foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",
     install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar",
     admin_link:"Admin",login_h:"Acceso Admin",login_sub:"Gestiona atletas, estadísticas y fotos",login_email:"Correo",login_pass:"Contraseña",login_btn:"Entrar"},
-  it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_signin:"Accedi",nav_signin_create:"Crea Account",nav_signin_player:"Portale Giocatore",nav_signin_scout:"Portale Scout",nav_signin_admin:"Portale Admin",nav_cta:"Candidati",
+  it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_collab:"Collaboratori",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_signin:"Accedi",nav_signin_create:"Crea Account",nav_signin_player:"Portale Giocatore",nav_signin_scout:"Portale Scout",nav_signin_admin:"Portale Admin",nav_cta:"Candidati",
     contracts_h2:'Oltre 50 contratti firmati <em>dal 2025</em>',
     contracts_sub:'I nostri atleti hanno firmato contratti in <b>7 paesi diversi</b> a oggi.',
     feat_role:"Ex organizzazione Cleveland Indians",
@@ -960,7 +966,7 @@ const T = {
     svc6_t:"Winter League",svc6_d:"Inseriamo gli atleti in campionati invernali all'estero per accumulare esperienza e visibilità durante la bassa stagione.",svc6_pay:"Iscriviti alla Winter League →",svc_pro_t:"Leghe Professionistiche",svc_pro_d:"Apriamo le porte al professionismo — leghe indipendenti in Nord America, winter league all'estero e club in tutta Europa.",svc_pro_pay:"Scopri le Leghe Professionistiche →",
     so_t:"Opportunità nel Softball",so_d:"Accompagniamo le atlete di softball nel recruiting universitario, nei percorsi verso le nazionali e nella competizione internazionale — con sviluppo delle giocatrici, showcase ed esposizione a coach e scout.",so_pay:"Scopri le Opportunità nel Softball →",    svc4_t:"Social Media e Brand",svc4_d:"Costruiamo il profilo e la storia di ogni atleta per aumentarne la visibilità.",
     svc5_t:"Rappresentanza e Sviluppo",svc5_d:"Gestione quotidiana e un piano su misura per ogni atleta.",svc5_pay:"Iscriviti alla Rappresentanza →",svc5_hl_t:"Allenamento Personalizzato Specializzato",svc5_hl_d:"Coaching individuale e online su misura per il gioco e gli obiettivi di ogni atleta.",
-    who_kicker:"Chi Sono",who_role:"CEO e Fondatore · Giocatore di Baseball Professionista",
+    who_kicker:"Chi Sono",who_role:"CEO e Fondatore · Giocatore di Baseball Professionista",collab_kicker:"Il Team",collab_h2:"Collaboratori",
     who_bio:"Elite Sports Management è stata fondata da Samuele Bruno — nato e cresciuto in Italia, e il primo giocatore nato e cresciuto in Italia ad arrivare a giocare nella Canadian Baseball League. Cresciuto nel sistema italiano, ha conquistato l'argento con l'Italia al Campionato Europeo U18 ed è arrivato a vestire la maglia della Nazionale Italiana. Ha giocato sei stagioni da professionista in Italia e ha ottenuto una borsa di studio per giocare tre anni di baseball universitario negli Stati Uniti.",
     who_bio2:"La sua carriera è passata per l'indy ball e le winter league tra Nord America e Australia — le stesse strade che oggi apre agli atleti ESM. Oltre alla rappresentanza, Samuele organizza camp, showcase e un programma di coaching con un'unica idea: allenati come un atleta, gioca come un professionista.",
     cred_italy:"Nazionale Italiana",cred_u18:"Campionato Europeo U18 · Argento",cred_cbl:"Primo italiano di formazione nella CBL",cred_pro:"6 Stagioni Pro in Italia",cred_college:"Borsa di Studio negli USA",cred_hastings:"Hastings College · Menzione d'Onore All-GPAC",cred_cod:"College of the Desert · 3 HR in una Partita",cred_ecc:"ECC College · Campioni della Regione 16",cred_util:"Giocatore di Baseball Professionista",

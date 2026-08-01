@@ -124,8 +124,16 @@ Payment is role-keyed (`PAY` object in register) so roster/Tenerife drop in with
 
 **Open for Sam / next:** (1) finalize the €124.99 service-description copy (placeholder). (2) Dashboard: allowlist redirect URLs + keep "Confirm email" per accounts-workflow notes. (3) Phase 2 (roster $49.99 + Tenerife €559.99) only after Sam reviews Phase 1. (4) STOP&ASK C/D/E still open (bank info; Tenerife gallery "take away picture"; folder UX) — those Phase-5 items skipped.
 
+### PHASE 7 — public roster filter-tab layout bug (session 2026-08-01) — FIXED (`211f208`)
+Root cause (not a symptom patch): the paywall gate is `position:absolute;inset:0` inside `.roster-wrap`, so it takes the wrap's height. A sport/position filter matching FEW or ZERO athletes shrank the blurred `.roster` (and thus the wrap) below the gate card's own height, so the gate spilled over the sections above/below — only visible in the LOCKED state (hence distinct from the admin filter, which has no overlay). Fix: `.roster-wrap.is-locked{min-height:540px}` reserves room for the overlay regardless of match count. Also added a graceful empty-state (`.roster-empty` + `roster_empty` EN/ES/IT) for zero-match filters (useful once unlocked). One-line root fix + UX nicety; parity + parse verified.
+
+### PHASE 4 — Collaborators/Staff section (session 2026-08-01) — DONE (`<next commit>`)
+- Moved Marianna's card OUT of `#who` (which is now Sam only) into a NEW `#collab` section (same card markup, no rebuild; dropped its `margin-top:22px`). Section header uses new `collab_kicker`/`collab_h2`.
+- Added a nav item `#collab` ("Collaborators") between "Who I Am" and "College" in `.nav-links`; new `nav_collab` key. All three keys EN/ES/IT (parity verified). Nav-links are desktop-only (existing `@media(max-width:860px)` hides them on mobile — Marianna's section is still reachable by scrolling, same as every other section).
+- Verified: exactly one `#who`, one `#collab`, one Marianna card, one `specialistPhoto`; no JS references the moved node (both founder/specialist photos are static bg-image divs). No orphaned refs.
+
 ## In progress
-- Phase 1 (profile-creation flow) built + validated (DB/RLS/parse); awaiting Sam's live click-through review before Phase 2. STOP&ASK C/D/E open.
+- Phase 1 (profile-creation flow) built + validated (DB/RLS/parse); awaiting Sam's live click-through review before Phase 2. Phase 7 + Phase 4 done. STOP&ASK C/D/E open. Remaining roadmap: Phase 2 (roster/Tenerife — GATED on Sam's Phase-1 review), Phase 3 (admin stats UI), Phase 5 (pricing/copy incl. form-field reduction B), Phase 6 (email notifications).
 
 ### Tier 5 content + priority interrupts
 - **74f0b71** Nav reorder: What We Do, Who I Am, College, Roster, Events, Join. (No Media item — already removed in f063ac6.)
