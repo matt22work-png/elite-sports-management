@@ -56,6 +56,17 @@
   .note{font-size:13.5px;color:var(--muted);margin-top:6px}
   .empty{color:var(--muted);text-align:center;padding:30px 10px}
   #booting,#loginBox,#app{display:none}
+  /* self-entered per-season stats tables (derived AVG/OBP/SLG · ERA/WHIP · Fld%) */
+  .ss-block{margin-bottom:16px}
+  .ss-block:last-child{margin-bottom:0}
+  .ss-title{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-soft);font-weight:800;margin-bottom:8px}
+  .ss-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:10px}
+  .ss-table{width:100%;border-collapse:collapse;font-size:13px;min-width:max-content}
+  .ss-table th,.ss-table td{padding:8px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid rgba(217,177,84,.1)}
+  .ss-table th:first-child,.ss-table td:first-child,.ss-table th:nth-child(2),.ss-table td:nth-child(2){text-align:left}
+  .ss-table thead th{color:var(--gold-soft);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:rgba(8,26,51,.6)}
+  .ss-table tbody tr:last-child td{border-bottom:0}
+  .ss-table tbody td{color:#d6e1f2}
   @media(max-width:560px){ input{font-size:16px} .wrap{padding:18px 14px 80px} }
 </style>
 </head>
@@ -315,6 +326,8 @@ async function loadMe(session){
       ${stats.map(s => row(s.label, s.value)).join("")}
     </div>` : ""}
 
+    ${(() => { const ss = seasonStatsHTML(p.season_stats); return ss ? `<div class="kicker">Season stats</div><div class="card">${ss}</div>` : ""; })()}
+
     ${teams.length ? `<div class="kicker">Teams &amp; affiliations</div><div class="card">
       ${teams.map(t => `<div class="row"><span>${esc(t)}</span></div>`).join("")}
     </div>` : ""}
@@ -381,6 +394,44 @@ function bindEditor(){
 function row(label, value){
   if (value === null || value === undefined || value === "") return "";
   return `<div class="row"><span>${esc(label)}</span><b>${esc(value)}</b></div>`;
+}
+
+/* Render self-entered per-season stats. Derived stats (AVG/OBP/SLG · ERA/WHIP ·
+   Fld%) are computed here from the raw inputs, never stored. Shared shape with the
+   register builder + the public roster modal. */
+function seasonStatsHTML(seasonStats){
+  const rows = Array.isArray(seasonStats) ? seasonStats : [];
+  if (!rows.length) return "";
+  const n = v => (v===null||v===undefined||v==="") ? null : (isFinite(Number(v)) ? Number(v) : null);
+  const avg = x => (x===null||!isFinite(x)) ? "—" : x.toFixed(3).replace(/^0(?=\.)/,"");
+  const two = x => (x===null||!isFinite(x)) ? "—" : x.toFixed(2);
+  const META = {
+    batting:{label:"Batting",cols:["Season","Team","AB","H","HR","RBI","AVG","OBP","SLG"]},
+    pitching:{label:"Pitching",cols:["Season","Team","W","L","ERA","IP","SO","WHIP"]},
+    fielding:{label:"Fielding",cols:["Season","Team","G","E","FLD%"]},
+  };
+  function cell(r,c){
+    switch(c){
+      case "Season": return esc(r.season||"—");
+      case "Team":   return esc(r.team||"—");
+      case "AVG":  { const ab=n(r.AB),h=n(r.H); return avg(ab?(h||0)/ab:null); }
+      case "OBP":  { const ab=n(r.AB),h=n(r.H),bb=n(r.BB)||0,d=(ab||0)+bb; return avg(d?((h||0)+bb)/d:null); }
+      case "SLG":  { const ab=n(r.AB),h=n(r.H),d2=n(r["2B"])||0,t3=n(r["3B"])||0,hr=n(r.HR)||0,tb=(h||0)+d2+2*t3+3*hr; return avg(ab?tb/ab:null); }
+      case "ERA":  { const er=n(r.ER),ip=n(r.IP); return two((ip&&er!==null)?9*er/ip:null); }
+      case "WHIP": { const bb=n(r.BB)||0,h=n(r.H)||0,ip=n(r.IP); return two(ip?(bb+h)/ip:null); }
+      case "FLD%": { const po=n(r.PO)||0,a=n(r.A)||0,e=n(r.E)||0,tc=po+a+e; return tc?avg((po+a)/tc):"—"; }
+      default:     { const v=n(r[c]); return v===null?"—":esc(String(r[c])); }
+    }
+  }
+  let out = "";
+  for (const kind of ["batting","pitching","fielding"]){
+    const list = rows.filter(r => r && r.kind === kind); if (!list.length) continue;
+    const m = META[kind];
+    out += `<div class="ss-block"><div class="ss-title">${m.label}</div><div class="ss-scroll"><table class="ss-table"><thead><tr>${m.cols.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>` +
+      list.map(r => `<tr>${m.cols.map(c=>`<td>${cell(r,c)}</td>`).join("")}</tr>`).join("") +
+      `</tbody></table></div></div>`;
+  }
+  return out;
 }
 </script>
 </body>

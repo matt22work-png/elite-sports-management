@@ -275,6 +275,16 @@
   .sh-contact{margin-top:28px;padding-top:24px;border-top:1px solid var(--line)}
   .sh-contact-p{color:var(--muted);font-size:14px;margin:6px 0 16px}
   .team-chip{font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid var(--line);color:#cdd9ec;background:rgba(8,26,51,.5)}
+  /* self-entered per-season stats (derived AVG/OBP/SLG · ERA/WHIP · Fld% computed on render) */
+  .ss-block{margin-bottom:18px}
+  .ss-title{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft);font-weight:700;margin-bottom:8px}
+  .ss-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:12px}
+  .ss-table{width:100%;border-collapse:collapse;font-size:13px;min-width:max-content}
+  .ss-table th,.ss-table td{padding:8px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid rgba(217,177,84,.1)}
+  .ss-table th:first-child,.ss-table td:first-child,.ss-table th:nth-child(2),.ss-table td:nth-child(2){text-align:left}
+  .ss-table thead th{color:var(--gold-soft);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:rgba(8,26,51,.6)}
+  .ss-table tbody tr:last-child td{border-bottom:0}
+  .ss-table tbody td{color:#d6e1f2}
   .close{position:absolute;top:16px;right:16px;z-index:3;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(6,20,42,.7);color:var(--ink);font-size:18px;cursor:pointer;display:grid;place-items:center}
   .close:hover{border-color:var(--gold);color:var(--gold)}
 
@@ -814,7 +824,7 @@ const T = {
     f_why:"Why do you want to start? / Your goals",f_other:"Anything else?",f_submit:"Submit application",
     f_success:"Thanks! Your application has been received — we'll review it and be in touch.",
     f_error:"Sorry, something went wrong sending your application. Please try again.",
-    modal_highlights:"Career Highlights",modal_teams:"Teams & Affiliations",
+    modal_highlights:"Career Highlights",modal_season_stats:"Season Stats",modal_teams:"Teams & Affiliations",
     modal_contact_h:"Interested in this player?",modal_contact_p:"You have full roster access. Get in touch and we'll connect you with this athlete directly.",modal_contact_btn:"Contact ESM about this player",
     band_h2:"Are you the next great addition?",band_p:"Start the conversation with Elite Sports Management.",band_btn:"Apply Now",
     foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",
@@ -890,7 +900,7 @@ const T = {
     f_why:"¿Por qué quieres empezar? / Tus objetivos",f_other:"¿Algo más?",f_submit:"Enviar solicitud",
     f_success:"¡Gracias! Hemos recibido tu solicitud — la revisaremos y te contactaremos.",
     f_error:"Lo sentimos, hubo un problema al enviar tu solicitud. Inténtalo de nuevo.",
-    modal_highlights:"Destacados de Carrera",modal_teams:"Equipos y Afiliaciones",
+    modal_highlights:"Destacados de Carrera",modal_season_stats:"Estadísticas por Temporada",modal_teams:"Equipos y Afiliaciones",
     modal_contact_h:"¿Interesado en este jugador?",modal_contact_p:"Tienes acceso completo al roster. Escríbenos y te conectamos directamente con este atleta.",modal_contact_btn:"Contactar a ESM sobre este jugador",
     band_h2:"¿Eres la próxima gran incorporación?",band_p:"Inicia la conversación con Elite Sports Management.",band_btn:"Aplica Ahora",
     foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",
@@ -966,7 +976,7 @@ const T = {
     f_why:"Perché vuoi iniziare? / I tuoi obiettivi",f_other:"Altro?",f_submit:"Invia candidatura",
     f_success:"Grazie! Abbiamo ricevuto la tua candidatura — la esamineremo e ti contatteremo.",
     f_error:"Spiacenti, qualcosa è andato storto nell'invio della candidatura. Riprova.",
-    modal_highlights:"Carriera in Evidenza",modal_teams:"Squadre e Affiliazioni",
+    modal_highlights:"Carriera in Evidenza",modal_season_stats:"Statistiche per Stagione",modal_teams:"Squadre e Affiliazioni",
     modal_contact_h:"Interessato a questo giocatore?",modal_contact_p:"Hai accesso completo al roster. Scrivici e ti mettiamo in contatto direttamente con questo atleta.",modal_contact_btn:"Contatta ESM per questo atleta",
     band_h2:"Sei la prossima grande aggiunta?",band_p:"Inizia la conversazione con Elite Sports Management.",band_btn:"Candidati",
     foot_tagline:"Unisciti a festeggiare",foot_rights:"Tutti i diritti riservati.",
@@ -1404,6 +1414,44 @@ function openLightbox(src,cap){
     `<div class="lightbox"><img src="${src}" alt="${cap}" /><p style="color:var(--muted);font-size:13.5px;margin-top:12px;text-align:center">${cap}</p></div>`;
   document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
 }
+/* Render self-entered per-season stats as batting/pitching/fielding tables.
+   Derived stats (AVG/OBP/SLG · ERA/WHIP · Fld%) are computed here from the raw
+   inputs, never stored, so they can't drift. Shared shape with portal/register. */
+function seasonStatsHTML(seasonStats){
+  const rows=Array.isArray(seasonStats)?seasonStats:[];
+  if(!rows.length)return"";
+  const n=v=>(v===null||v===undefined||v==="")?null:(isFinite(Number(v))?Number(v):null);
+  const avg=x=>(x===null||!isFinite(x))?"—":x.toFixed(3).replace(/^0(?=\.)/,"");   // .318 / 1.000
+  const two=x=>(x===null||!isFinite(x))?"—":x.toFixed(2);
+  const META={
+    batting:{label:"Batting",cols:["Season","Team","AB","H","HR","RBI","AVG","OBP","SLG"]},
+    pitching:{label:"Pitching",cols:["Season","Team","W","L","ERA","IP","SO","WHIP"]},
+    fielding:{label:"Fielding",cols:["Season","Team","G","E","FLD%"]},
+  };
+  function cell(r,c){
+    switch(c){
+      case"Season":return esc(r.season||"—");
+      case"Team":return esc(r.team||"—");
+      case"AVG":{const ab=n(r.AB),h=n(r.H);return avg(ab?(h||0)/ab:null);}
+      case"OBP":{const ab=n(r.AB),h=n(r.H),bb=n(r.BB)||0,d=(ab||0)+bb;return avg(d?((h||0)+bb)/d:null);}
+      case"SLG":{const ab=n(r.AB),h=n(r.H),d2=n(r["2B"])||0,t3=n(r["3B"])||0,hr=n(r.HR)||0,tb=(h||0)+d2+2*t3+3*hr;return avg(ab?tb/ab:null);}
+      case"ERA":{const er=n(r.ER),ip=n(r.IP);return two((ip&&er!==null)?9*er/ip:null);}
+      case"WHIP":{const bb=n(r.BB)||0,h=n(r.H)||0,ip=n(r.IP);return two(ip?(bb+h)/ip:null);}
+      case"FLD%":{const po=n(r.PO)||0,a=n(r.A)||0,e=n(r.E)||0,tc=po+a+e;return tc?avg((po+a)/tc):"—";}
+      default:{const v=n(r[c]);return v===null?"—":esc(String(r[c]));}
+    }
+  }
+  let out="";
+  for(const kind of["batting","pitching","fielding"]){
+    const list=rows.filter(r=>r&&r.kind===kind);if(!list.length)continue;
+    const m=META[kind];
+    out+=`<div class="ss-block"><div class="ss-title">${m.label}</div><div class="ss-scroll"><table class="ss-table"><thead><tr>${m.cols.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>`+
+      list.map(r=>`<tr>${m.cols.map(c=>`<td>${cell(r,c)}</td>`).join("")}</tr>`).join("")+
+      `</tbody></table></div></div>`;
+  }
+  return out;
+}
+
 function openModal(slug){
   const p=PLAYERS.find(x=>x.slug===slug);if(!p)return;
   const meta=[p.born?("Born "+p.born):null,p.birthplace,p.bats?("Bats "+p.bats):null].filter(Boolean).join("  ·  ");
@@ -1413,6 +1461,7 @@ function openModal(slug){
       <div class="sh-pos">${esc(p.position)}</div><div class="sh-meta">${esc(meta)}</div></div></div>
     <div class="sh-body"><p class="bio">${esc(p.bio)}</p>
       ${p.stats&&p.stats.length?`<div class="sh-label">${t("modal_highlights")}</div><div class="sh-stats">${p.stats.map(s=>`<div class="sh-stat"><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join("")}</div>`:""}
+      ${(()=>{const ss=seasonStatsHTML(p.season_stats);return ss?`<div class="sh-label">${t("modal_season_stats")}</div>${ss}`:"";})()}
       ${p.teams&&p.teams.length?`<div class="sh-label">${t("modal_teams")}</div><div class="team-chips">${p.teams.map(x=>`<span class="team-chip">${esc(x)}</span>`).join("")}</div>`:""}
       <div class="sh-contact">
         <div class="sh-label">${t("modal_contact_h")}</div>
@@ -1569,7 +1618,7 @@ async function boot(){
       // just the public display columns — NOT the intake PII (age/phone/email/instagram/
       // message) — so an approved athlete's contact details are never sent to the browser.
       const {data,error}=await SB.from("players")
-        .select("slug,name,group,position,country,flag,heritage,born,birthplace,tier,bats,bio,teams,stats,image_url,sport,sort_order")
+        .select("slug,name,group,position,country,flag,heritage,born,birthplace,tier,bats,bio,teams,stats,season_stats,image_url,sport,sort_order")
         .eq("status","approved").order("sort_order");
       if(error)throw error;
       // Supabase stores the photo in `image_url`; the renderer reads `image`.
