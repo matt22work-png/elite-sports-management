@@ -266,6 +266,10 @@
   .ceasai a{font-size:12.5px;color:var(--muted);transition:.2s;display:inline-flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
   .ceasai a:hover{color:var(--gold-soft)}
   .ceasai-logo{width:34px;height:34px;border-radius:8px;display:block;flex:none}
+  /* CeasAI social icons — small square icon buttons matching the footer aesthetic. */
+  .ceasai-social{display:inline-flex;gap:10px;align-items:center;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .ceasai-social a{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;border:1px solid var(--line);color:var(--muted);transition:.2s}
+  .ceasai-social a:hover{border-color:var(--gold);color:var(--gold-soft);background:rgba(217,177,84,.08)}
 
   .modal{position:fixed;inset:0;z-index:100;display:none;align-items:flex-end;justify-content:center}
   .modal.open{display:flex}
@@ -654,7 +658,14 @@
     <a class="pill" href="mailto:elitesportsmanagement50@gmail.com">✉ elitesportsmanagement50@gmail.com</a>
   </div>
 </div>
-<div class="wrap ceasai"><a href="https://protiqai.com" target="_blank" rel="noopener"><img class="ceasai-logo" src="ceasai-logo.jpeg" alt="CeasAI — Custom Solutions" width="34" height="34" loading="lazy" /><span data-i18n="ceasai_cta"></span></a></div>
+<div class="wrap ceasai">
+  <a href="https://protiqai.com" target="_blank" rel="noopener"><img class="ceasai-logo" src="ceasai-logo.jpeg" alt="CeasAI — Custom Solutions" width="34" height="34" loading="lazy" /><span data-i18n="ceasai_cta"></span></a>
+  <div class="ceasai-social">
+    <a href="https://www.instagram.com/ceas_ai/" target="_blank" rel="noopener noreferrer" data-i18n-aria="ceasai_ig"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+    <a href="mailto:ceasai.solutions@gmail.com" data-i18n-aria="ceasai_email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></a>
+    <a href="https://www.tiktok.com/@ceas_ai" target="_blank" rel="noopener noreferrer" data-i18n-aria="ceasai_tiktok"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M16.5 3c.3 2.1 1.6 3.6 3.5 3.9v2.4c-1.3.1-2.5-.3-3.5-1v5.5c0 3.2-2.4 5.2-5.2 5.2-2.7 0-4.8-2-4.8-4.7 0-2.8 2.3-4.8 5.1-4.6v2.5c-.3-.1-.7-.1-1-.1-1.2 0-2.2.9-2.2 2.2 0 1.3 1 2.2 2.2 2.2 1.4 0 2.4-1 2.4-2.7V3h3z"/></svg></a>
+  </div>
+</div>
 </footer>
 
 <div class="modal" id="modal"><div class="scrim" data-close></div><div class="sheet"><button type="button" class="close" data-close aria-label="Close">✕</button><div id="sheetContent"></div></div></div>
@@ -808,7 +819,7 @@ const T = {
     modal_highlights:"Career Highlights",modal_season_stats:"Season Stats",modal_teams:"Teams & Affiliations",
     modal_contact_h:"Interested in this player?",modal_contact_p:"You have full roster access. Get in touch and we'll connect you with this athlete directly.",modal_contact_btn:"Contact ESM about this player",
     band_h2:"Are you the next great addition?",band_p:"Get seen, get signed, get developed — start the conversation with Elite Sports Management.",band_btn:"Apply Now",
-    foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",ceasai_cta:"Website built by CeasAI — Create your own site like this →",
+    foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",ceasai_cta:"Website built by CeasAI — Create your own site like this →",ceasai_ig:"Follow CeasAI on Instagram",ceasai_email:"Email CeasAI",ceasai_tiktok:"Follow CeasAI on TikTok",
     install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install",
     admin_link:"Admin",login_h:"Admin Login",login_sub:"Manage athletes, stats & photos",login_email:"Email",login_pass:"Password",login_btn:"Log in"},
   es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_collab:"Colaboradores",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_signin:"Entrar",nav_signin_create:"Crear Cuenta",nav_signin_player:"Portal Jugador",nav_signin_scout:"Portal Scout",nav_signin_admin:"Portal Admin",nav_cta:"Aplica Ahora",
@@ -883,7 +894,7 @@ const T = {
     modal_highlights:"Destacados de Carrera",modal_season_stats:"Estadísticas por Temporada",modal_teams:"Equipos y Afiliaciones",
     modal_contact_h:"¿Interesado en este jugador?",modal_contact_p:"Tienes acceso completo al roster. Escríbenos y te conectamos directamente con este atleta.",modal_contact_btn:"Contactar a ESM sobre este jugador",
     band_h2:"¿Eres la próxima gran incorporación?",band_p:"Que te vean, que te firmen, que te desarrollen — inicia la conversación con Elite Sports Management.",band_btn:"Aplica Ahora",
-    foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",ceasai_cta:"Sitio web creado por CeasAI — Crea tu propio sitio como este →",
+    foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",ceasai_cta:"Sitio web creado por CeasAI — Crea tu propio sitio como este →",ceasai_ig:"Sigue a CeasAI en Instagram",ceasai_email:"Escríbele un correo a CeasAI",ceasai_tiktok:"Sigue a CeasAI en TikTok",
     install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar",
     admin_link:"Admin",login_h:"Acceso Admin",login_sub:"Gestiona atletas, estadísticas y fotos",login_email:"Correo",login_pass:"Contraseña",login_btn:"Entrar"},
   it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_collab:"Collaboratori",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_signin:"Accedi",nav_signin_create:"Crea Account",nav_signin_player:"Portale Giocatore",nav_signin_scout:"Portale Scout",nav_signin_admin:"Portale Admin",nav_cta:"Candidati",
@@ -958,7 +969,7 @@ const T = {
     modal_highlights:"Carriera in Evidenza",modal_season_stats:"Statistiche per Stagione",modal_teams:"Squadre e Affiliazioni",
     modal_contact_h:"Interessato a questo giocatore?",modal_contact_p:"Hai accesso completo al roster. Scrivici e ti mettiamo in contatto direttamente con questo atleta.",modal_contact_btn:"Contatta ESM per questo atleta",
     band_h2:"Sei la prossima grande aggiunta?",band_p:"Farti notare, firmare e crescere — inizia la conversazione con Elite Sports Management.",band_btn:"Candidati",
-    foot_tagline:"Unisciti a festeggiare",foot_rights:"Tutti i diritti riservati.",ceasai_cta:"Sito web realizzato da CeasAI — Crea il tuo sito come questo →",
+    foot_tagline:"Unisciti a festeggiare",foot_rights:"Tutti i diritti riservati.",ceasai_cta:"Sito web realizzato da CeasAI — Crea il tuo sito come questo →",ceasai_ig:"Segui CeasAI su Instagram",ceasai_email:"Invia un'email a CeasAI",ceasai_tiktok:"Segui CeasAI su TikTok",
     install_t:"Installa l'app ESM",install_d:"Aggiungila alla schermata Home",install_btn:"Installa",
     admin_link:"Admin",login_h:"Accesso Admin",login_sub:"Gestisci atleti, statistiche e foto",login_email:"Email",login_pass:"Password",login_btn:"Accedi"}
 };
@@ -1312,6 +1323,7 @@ function applyI18n(){
   document.documentElement.lang=lang;
   document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
   document.querySelectorAll("[data-i18n-html]").forEach(el=>el.innerHTML=t(el.dataset.i18nHtml));
+  document.querySelectorAll("[data-i18n-aria]").forEach(el=>el.setAttribute("aria-label",t(el.dataset.i18nAria)));
   document.querySelectorAll("#lang button").forEach(b=>b.classList.toggle("on",b.dataset.l===lang));
 }
 function setLang(l){lang=l;applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();}
