@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Tenerife Winter League Registration — Elite Sports Management</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
+<link rel="shortcut icon" href="../icons/icon-192.png" />
+<meta name="theme-color" content="#081a33" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{--navy:#081a33;--navy-2:#06142a;--gold:#d9b154;--gold-soft:#e7c878;--teal:#3a9aa6;--teal-soft:#5fb8c2;--ink:#eaf0fa;--muted:#9fb1cc;--line:rgba(217,177,84,.22);--card:#0c2143;--red:#e05d5d}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--navy-2);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(900px 500px at 78% -10%,rgba(217,177,84,.16),transparent 60%),radial-gradient(800px 600px at 8% 110%,rgba(20,70,140,.30),transparent 55%),linear-gradient(180deg,var(--navy),var(--navy-2))}
+  .display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase}
+  a{color:var(--gold-soft);text-decoration:none}
+  .wrap{max-width:600px;margin:0 auto;padding:26px 22px 90px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .logo-img{height:40px;width:auto;display:block}
+  header b{font-size:14px;display:block}
+  header small{display:block;font-size:8.5px;letter-spacing:.3em;color:var(--gold-soft);font-weight:700}
+  .btn{padding:12px 22px;border-radius:999px;font-weight:700;font-size:15px;cursor:pointer;border:0;transition:.2s;display:inline-block;font-family:inherit;text-align:center}
+  .btn-gold{background:var(--gold);color:#05101f}
+  .btn-gold:hover{background:var(--gold-soft)}
+  .btn[disabled]{opacity:.55;cursor:wait}
+  .card{border:1px solid var(--line);border-radius:16px;padding:26px 24px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));margin-bottom:16px}
+  h1.display{font-size:26px;margin-bottom:6px}
+  h1.display em{color:var(--gold);font-style:normal}
+  .lead{color:var(--muted);font-size:14.5px;margin-bottom:20px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--ink);font-size:15px;font-family:inherit}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:0;border-color:var(--gold)}
+  .field textarea{resize:vertical}
+  .phone-row{display:flex;gap:8px}
+  .phone-row .phone-cc{flex:0 0 auto;width:auto;max-width:142px}
+  .phone-row .phone-num{flex:1;min-width:0}
+  .msg{display:none;margin-top:14px;font-size:13.5px;color:var(--red);padding:11px 14px;border:1px solid rgba(224,93,93,.4);border-radius:10px;background:rgba(224,93,93,.08)}
+  .msg.show{display:block}
+  .note{font-size:13px;color:var(--muted);margin-top:16px;text-align:center}
+  .pay-steps{list-style:none;margin:14px 0 4px;padding:0}
+  .pay-steps li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(217,177,84,.12);font-size:14.5px;color:var(--ink)}
+  .pay-steps li:last-child{border-bottom:0}
+  .pay-steps .n{flex:0 0 26px;height:26px;border-radius:50%;background:rgba(217,177,84,.15);color:var(--gold-soft);display:grid;place-items:center;font-weight:800;font-size:13px}
+  .pay-service{border:1px solid var(--line);border-radius:12px;padding:16px 16px 6px;background:rgba(6,20,42,.4);margin:4px 0 16px}
+  .pay-service .ps-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+  .pay-service .ps-title{font-weight:800;font-size:15px}
+  .pay-service .ps-price{font-family:'Anton',sans-serif;font-size:26px;color:var(--gold);flex:0 0 auto}
+  .pay-service ul{list-style:none;margin:0 0 6px;padding:0}
+  .pay-service li{display:flex;gap:9px;align-items:flex-start;font-size:14px;color:var(--ink);padding:5px 0}
+  .pay-service li::before{content:"✓";color:var(--teal-soft);font-weight:800;flex:0 0 auto}
+  #booting{color:var(--muted);text-align:center;padding:30px}
+  .hide{display:none}
+  @media(max-width:560px){ .wrap{padding:18px 14px 80px} .grid2{grid-template-columns:1fr} .field input,.field select,.field textarea{font-size:16px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="../index.html"><img class="logo-img" src="../logo.png" alt="Elite Sports Management" /></a>
+    <div><b>Elite Sports Management</b><small>WINTER LEAGUE · TENERIFE</small></div>
+  </header>
+
+  <div id="booting">Loading…</div>
+
+  <!-- STEP 1 — registration form -->
+  <div id="step1" class="card hide">
+    <h1 class="display">Register for <em>Tenerife</em></h1>
+    <p class="lead">Winter League 2025 · Tenerife, Spain. Fill in your details and complete your registration payment on the next step.</p>
+    <form id="regForm">
+      <div class="field"><label for="t-name">Full name</label><input id="t-name" autocomplete="name" required /></div>
+      <div class="grid2">
+        <div class="field"><label for="t-email">Email</label><input type="email" id="t-email" autocomplete="email" required /></div>
+        <div class="field"><label for="t-country">Country</label><input id="t-country" placeholder="e.g. Italy" /></div>
+      </div>
+      <div class="field"><label for="t-phone">Phone</label><div class="phone-row"><select class="phone-cc" id="t-cc" aria-label="Country dialing code"></select><input class="phone-num" id="t-phone" inputmode="tel" placeholder="Phone number" /></div></div>
+      <div class="grid2">
+        <div class="field"><label for="t-sport">Sport</label><select id="t-sport"><option>Baseball</option><option>Softball</option></select></div>
+        <div class="field"><label for="t-position">Position</label><input id="t-position" placeholder="e.g. Catcher / RHP" /></div>
+      </div>
+      <div class="field"><label for="t-notes">Anything else? (optional)</label><textarea id="t-notes" rows="3" placeholder="Dietary needs, travel questions, level of play…"></textarea></div>
+      <button class="btn btn-gold" type="submit" style="width:100%">Register &amp; continue to payment</button>
+      <div class="msg" id="regMsg" role="alert" aria-live="assertive"></div>
+    </form>
+    <p class="note">Questions? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Tenerife%20Winter%20League">Email us</a>.</p>
+  </div>
+
+  <!-- STEP 2 — payment -->
+  <div id="step2" class="card hide">
+    <h1 class="display">Complete your <em>registration</em></h1>
+    <p class="lead">Thanks — your registration has been received. Secure your spot with the payment below.</p>
+    <div class="pay-service">
+      <div class="ps-top"><span class="ps-title">Tenerife Winter League</span><span class="ps-price">€559.99</span></div>
+      <ul>
+        <li>Your spot in the ESM Winter League roster in Tenerife</li>
+        <li>Coaching, development and game exposure across the event</li>
+        <li>Visibility to the scouts and coaches ESM works with</li>
+      </ul>
+    </div>
+    <ol class="pay-steps">
+      <li><span class="n">1</span><span>Complete your payment using the secure link below.</span></li>
+      <li><span class="n">2</span><span>Elite Sports Management verifies your payment and confirms your spot.</span></li>
+      <li><span class="n">3</span><span>We'll email you with the next steps and event details.</span></li>
+    </ol>
+    <a class="btn btn-gold" id="payBtn" style="width:100%;margin-top:16px" target="_blank" rel="noopener">Continue to Secure Payment →</a>
+    <p class="note">You can close this page after paying. We'll be in touch to confirm your registration.</p>
+  </div>
+</div>
+
+<script type="module">
+/* Off-site payment (Wise). €559.99 Tenerife Winter League registration. */
+const PAYMENT_URL = "https://wise.com/pay/r/f9KLiw__7mOkDTI";
+
+const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+// No auth needed — this is an anonymous, insert-only event signup.
+const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } });
+
+const $ = id => document.getElementById(id);
+function show(id){ ["booting","step1","step2"].forEach(v => $(v).classList.toggle("hide", v !== id)); }
+
+/* Country-code phone input (same curated list as the rest of the site). */
+const DIAL_CODES=[
+  {c:"IT",n:"Italy",d:"+39",f:"🇮🇹"},{c:"US",n:"United States",d:"+1",f:"🇺🇸"},
+  {c:"DO",n:"Dominican Republic",d:"+1",f:"🇩🇴"},{c:"VE",n:"Venezuela",d:"+58",f:"🇻🇪"},
+  {c:"CO",n:"Colombia",d:"+57",f:"🇨🇴"},{c:"MX",n:"Mexico",d:"+52",f:"🇲🇽"},
+  {c:"CU",n:"Cuba",d:"+53",f:"🇨🇺"},{c:"PR",n:"Puerto Rico",d:"+1",f:"🇵🇷"},
+  {c:"PA",n:"Panama",d:"+507",f:"🇵🇦"},{c:"NI",n:"Nicaragua",d:"+505",f:"🇳🇮"},
+  {c:"CR",n:"Costa Rica",d:"+506",f:"🇨🇷"},{c:"ES",n:"Spain",d:"+34",f:"🇪🇸"},
+  {c:"CA",n:"Canada",d:"+1",f:"🇨🇦"},{c:"DE",n:"Germany",d:"+49",f:"🇩🇪"},
+  {c:"PT",n:"Portugal",d:"+351",f:"🇵🇹"},{c:"FR",n:"France",d:"+33",f:"🇫🇷"},
+  {c:"GB",n:"United Kingdom",d:"+44",f:"🇬🇧"},{c:"NL",n:"Netherlands",d:"+31",f:"🇳🇱"},
+  {c:"AU",n:"Australia",d:"+61",f:"🇦🇺"},{c:"JP",n:"Japan",d:"+81",f:"🇯🇵"},
+  {c:"KR",n:"South Korea",d:"+82",f:"🇰🇷"},{c:"BR",n:"Brazil",d:"+55",f:"🇧🇷"},
+  {c:"AR",n:"Argentina",d:"+54",f:"🇦🇷"},{c:"CW",n:"Curaçao",d:"+599",f:"🇨🇼"},
+  {c:"AW",n:"Aruba",d:"+297",f:"🇦🇼"},
+];
+function fillCC(id, def){ const sel=$(id); if(!sel)return; sel.innerHTML=DIAL_CODES.map(x=>`<option value="${x.d}"${x.c===def?" selected":""}>${x.f} ${x.n} ${x.d}</option>`).join(""); }
+function combinePhone(ccId, numId){ const cc=$(ccId), num=$(numId); const n=((num&&num.value)||"").trim(); return n?(((cc&&cc.value)||"")+" "+n).trim():""; }
+
+$("payBtn").href = PAYMENT_URL;
+fillCC("t-cc","IT");
+show("step1");
+
+$("regForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const m = $("regMsg"); m.classList.remove("show");
+  const name = $("t-name").value.trim();
+  if (!name){ m.textContent = "Please enter your name."; m.classList.add("show"); $("t-name").focus(); return; }
+  const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+  try {
+    // Insert-only (no .select()): anon has INSERT but not SELECT on this table.
+    const { error } = await SB.from("tenerife_registrations").insert({
+      name,
+      email:    $("t-email").value.trim() || null,
+      phone:    combinePhone("t-cc","t-phone") || null,
+      country:  $("t-country").value.trim() || null,
+      position: $("t-position").value.trim() || null,
+      sport:    $("t-sport").value,
+      notes:    $("t-notes").value.trim() || null,
+      status: "pending", payment_status: "unpaid",
+    });
+    if (error) throw error;
+    show("step2");
+  } catch (err){
+    m.textContent = "Couldn't submit your registration: " + (err?.message || err);
+    m.classList.add("show");
+  } finally { btn.disabled = false; }
+});
+</script>
+</body>
+</html>
