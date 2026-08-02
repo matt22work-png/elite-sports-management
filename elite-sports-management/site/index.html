@@ -364,12 +364,22 @@
   .sub-label{font-size:11.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-soft);margin:32px 0 14px}
   .lightbox img{width:100%;border-radius:12px;display:block}
 
-  /* ===== roster paywall ===== */
+  /* ===== roster paywall ($49.99 unlock-code gate) ===== */
   .roster-wrap{position:relative}
+  /* The locked gate overlay is position:absolute;inset:0, so it takes the wrap's
+     height. A sport/position filter matching few or zero athletes would otherwise
+     shrink the wrap below the gate card, letting the gate spill over the sections
+     above/below (the "filter tabs break the layout" bug). A min-height reserves room
+     for the overlay no matter how many cards match; a larger reserve on narrow screens
+     covers the taller stacked gate card. Only applies while locked. */
+  .roster-wrap.is-locked{min-height:560px}
+  @media(max-width:560px){.roster-wrap.is-locked{min-height:660px}}
   .roster-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:34px 12px;font-size:15px}
-  /* Coaches/teams CTA below the (now public) roster → the paid account flow. */
-  .roster-cta{text-align:center;margin-top:34px;border-top:1px solid var(--line);padding-top:28px}
-  .roster-cta p{color:var(--muted);font-size:15px;max-width:54ch;margin:0 auto 16px}
+  .roster-wrap.is-locked .roster{filter:blur(9px) saturate(.55);pointer-events:none;user-select:none;max-height:600px;overflow:hidden}
+  .roster-wrap.is-locked::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,20,42,.3),rgba(6,20,42,.93));pointer-events:none;border-radius:18px}
+  .gate{display:none}
+  .roster-wrap.is-locked .gate{display:flex;position:absolute;inset:0;align-items:center;justify-content:center;z-index:3;padding:18px}
+  .gate-pay-note{color:var(--muted);font-size:12.5px;margin-top:12px;line-height:1.5}
   .gate-in{max-width:520px;width:100%;text-align:center;border:1px solid var(--gold);border-radius:20px;padding:32px 28px;background:linear-gradient(180deg,rgba(12,33,67,.97),rgba(6,20,42,.99));box-shadow:0 26px 60px rgba(0,0,0,.55)}
   .gate-lock{font-size:25px;margin-bottom:10px}
   .gate-in h3{font-family:'Anton';font-size:23px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px}
@@ -564,19 +574,32 @@
 
 <section class="sec" id="roster" style="padding-top:10px"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="roster_kicker"></div><h2 class="display" data-i18n="roster_h2"></h2><p data-i18n="roster_p"></p></div>
+  <div class="unlocked-note" id="unlockedNote">✓ <span data-i18n="gate_unlocked"></span></div>
   <div class="filters" id="sportFilters"></div>
   <div class="filters" id="filters"></div>
 
-  <div class="roster-wrap" id="rosterWrap">
+  <!-- Roster paywall ($49.99): the public roster is blurred behind a client-side
+       unlock-code gate. A buyer pays Samuele directly via Wise and enters the code he
+       sends them (validated by SHA-256 against localStorage). This is scoped to the
+       roster ONLY — the €124.99 profile and €559.99 Tenerife flows stay account-based. -->
+  <div class="roster-wrap is-locked" id="rosterWrap">
     <div class="roster" id="rosterList"></div>
-  </div>
-
-  <!-- Full roster access (athlete contact details) is the paid product now — coaches
-       and teams register + pay via the account flow at /register/ (Phase 2). The old
-       SHA-256 blur gate on the public roster was removed. -->
-  <div class="roster-cta">
-    <p data-i18n="roster_cta_p"></p>
-    <a class="btn btn-gold" href="register/" data-i18n="roster_cta_btn"></a>
+    <div class="gate">
+      <div class="gate-in">
+        <div class="gate-lock">🔒</div>
+        <h3 data-i18n="gate_h"></h3>
+        <p data-i18n="gate_p"></p>
+        <div class="gate-price">$49.99<small data-i18n="gate_price_note"></small></div>
+        <a class="btn btn-gold" href="https://wise.com/pay/r/Zhxkm7xyYL04RjA" target="_blank" rel="noopener" style="margin-top:18px" data-i18n="gate_btn"></a>
+        <p class="gate-pay-note" data-i18n="gate_pay_note"></p>
+        <div class="gate-or" data-i18n="gate_or"></div>
+        <form class="gate-code" id="gateForm">
+          <input id="gateInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="gate_ph" aria-label="Unlock code" />
+          <button type="submit" data-i18n="gate_unlock"></button>
+        </form>
+        <div class="gate-err" id="gateErr" data-i18n="gate_err"></div>
+      </div>
+    </div>
   </div>
 </div></section>
 
@@ -694,13 +717,14 @@ const FALLBACK_EMAIL      = "mailto:elitesportsmanagement50@gmail.com";
    Empty → falls back to an email enquiry (no per-player fee). */
 const STRIPE_CONTACT_URL = "";
 
-/* Roster access ($49.99) is no longer a client-side SHA-256 code gate — the public
-   roster is open, and full contact access is the scout account flow (/register/ →
-   /scout/). The old ROSTER_CODE_HASHES/UNLOCK_KEY gate was removed in Phase 2.
-   Profile creation (€124.99) is no longer a client-side code gate either — it now runs
-   through the real account flow at /register/ (sign up → profile + stats → Wise
-   payment → admin approval → portal). The old SHA-256 profile gate was removed in
-   Phase 1; the roster gate above stays until Phase 2 replaces it the same way. */
+/* Roster paywall ($49.99): RESTORED 2026-08 to the original client-side unlock-code
+   gate (SHA-256 + localStorage) per Sam. A buyer pays Samuele via Wise and enters the
+   code he sends them. Scoped to the roster ONLY — profile creation (€124.99) and
+   Tenerife (€559.99) stay on the account + admin-approval + Wise flow at /register/
+   and /tenerife/. Same hash as the pre-rework version, so codes already handed out
+   still work. */
+const ROSTER_CODE_HASHES = ["99b2bfb3a4ac35e32491d22207e082500404dbbd30f0cd8a5152cd6185c3cc58"];
+const UNLOCK_KEY = "esm_roster_unlock_v1";
 
 /* ===== Media (Tenerife Winter League) ===== */
 const GALLERY = [
@@ -768,12 +792,14 @@ const T = {
     col_cta_h:"Start your college recruiting",
     col_cta_p:"Send us your details to get connected and set up an evaluation of your options — no obligation.",
     col_price:"Pricing on request",col_cta_btn:"Get connected →",
-    gate_h:"The roster is for scouts & teams",
+    gate_h:"Full roster access for coaches & teams",
     gate_p:"Unlock every ESM athlete — full profiles, career history and playing experience.",
-    gate_price_note:"One-time · Lifetime access",
-    gate_btn:"Unlock the roster — $49.99",
-    gate_or:"Already paid?",gate_unlock:"Unlock",
-    gate_err:"That code isn't right. Check the email from your purchase, or contact us.",
+    gate_price_note:"1 year + 1 year free",
+    gate_btn:"Pay $49.99 via Wise →",
+    gate_pay_note:"Pay Samuele directly through Wise, then enter the unlock code he sends you.",
+    gate_ph:"UNLOCK CODE",
+    gate_or:"Already have your code?",gate_unlock:"Unlock",
+    gate_err:"That code isn't right. Check the code Sam sent you, or contact us.",
     gate_unlocked:"Roster unlocked — thanks for your support.",
     pg_kicker:"Create Your Profile",pg_h2:"Get Represented by ESM",pg_p2:"Create your official athlete profile and start your journey with Elite Sports Management.",
     pg_h:"Create Your Player Profile",pg_p:"Get a professional athlete profile on the official ESM roster — built with you and put in front of the scouts, coaches and teams in our network.",
@@ -843,12 +869,14 @@ const T = {
     col_cta_h:"Empieza tu reclutamiento",
     col_cta_p:"Envíanos tus datos para conectarte y organizar una evaluación de tus opciones — sin compromiso.",
     col_price:"Precio a consultar",col_cta_btn:"Conéctate →",
-    gate_h:"El roster es para scouts y equipos",
+    gate_h:"Acceso completo al roster para entrenadores y equipos",
     gate_p:"Desbloquea a todos los atletas de ESM — perfiles completos, trayectoria y experiencia.",
-    gate_price_note:"Pago único · Acceso de por vida",
-    gate_btn:"Desbloquear el roster — $49.99",
-    gate_or:"¿Ya pagaste?",gate_unlock:"Desbloquear",
-    gate_err:"Ese código no es correcto. Revisa el correo de tu compra o contáctanos.",
+    gate_price_note:"1 año + 1 año gratis",
+    gate_btn:"Paga $49.99 con Wise →",
+    gate_pay_note:"Paga a Samuele directamente por Wise y luego introduce el código de desbloqueo que te envíe.",
+    gate_ph:"CÓDIGO DE DESBLOQUEO",
+    gate_or:"¿Ya tienes tu código?",gate_unlock:"Desbloquear",
+    gate_err:"Ese código no es correcto. Revisa el código que te envió Sam o contáctanos.",
     gate_unlocked:"Roster desbloqueado — gracias por tu apoyo.",
     pg_kicker:"Crea Tu Perfil",pg_h2:"Hazte Representar por ESM",pg_p2:"Crea tu perfil oficial de atleta y comienza tu camino con Elite Sports Management.",
     pg_h:"Crea Tu Perfil de Jugador",pg_p:"Consigue un perfil profesional de atleta en el roster oficial de ESM — creado contigo y presentado a los scouts, entrenadores y equipos de nuestra red.",
@@ -918,12 +946,14 @@ const T = {
     col_cta_h:"Inizia il tuo recruiting",
     col_cta_p:"Inviaci i tuoi dati per metterti in contatto e organizzare una valutazione delle tue opzioni — senza impegno.",
     col_price:"Prezzo su richiesta",col_cta_btn:"Mettiti in contatto →",
-    gate_h:"Il roster è per scout e club",
+    gate_h:"Accesso completo al roster per allenatori e squadre",
     gate_p:"Sblocca tutti gli atleti ESM — profili completi, carriera ed esperienza.",
-    gate_price_note:"Pagamento unico · Accesso a vita",
-    gate_btn:"Sblocca il roster — $49.99",
-    gate_or:"Hai già pagato?",gate_unlock:"Sblocca",
-    gate_err:"Il codice non è corretto. Controlla l'email dell'acquisto o contattaci.",
+    gate_price_note:"1 anno + 1 anno gratis",
+    gate_btn:"Paga $49.99 con Wise →",
+    gate_pay_note:"Paga Samuele direttamente tramite Wise, poi inserisci il codice di sblocco che ti invia.",
+    gate_ph:"CODICE DI SBLOCCO",
+    gate_or:"Hai già il codice?",gate_unlock:"Sblocca",
+    gate_err:"Il codice non è corretto. Controlla il codice che ti ha inviato Sam o contattaci.",
     gate_unlocked:"Roster sbloccato — grazie del supporto.",
     pg_kicker:"Crea il Tuo Profilo",pg_h2:"Fatti Rappresentare da ESM",pg_p2:"Crea il tuo profilo ufficiale da atleta e inizia il tuo percorso con Elite Sports Management.",
     pg_h:"Crea il Tuo Profilo da Giocatore",pg_p:"Ottieni un profilo professionale da atleta nel roster ufficiale ESM — creato insieme a te e presentato agli scout, agli allenatori e alle squadre della nostra rete.",
@@ -1335,6 +1365,7 @@ function applyI18n(){
   document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
   document.querySelectorAll("[data-i18n-html]").forEach(el=>el.innerHTML=t(el.dataset.i18nHtml));
   document.querySelectorAll("[data-i18n-aria]").forEach(el=>el.setAttribute("aria-label",t(el.dataset.i18nAria)));
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>el.setAttribute("placeholder",t(el.dataset.i18nPh)));
   document.querySelectorAll("#lang button").forEach(b=>b.classList.toggle("on",b.dataset.l===lang));
 }
 function setLang(l){lang=l;applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();}
@@ -1515,12 +1546,46 @@ function openModal(slug){
     </div>`;
   document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
 }
-/* The public roster is no longer paywalled — the SHA-256 blur gate was removed in
-   Phase 2. Full roster access (athlete contact details) is now the paid product,
-   delivered through the scout account flow at /register/ → /scout/. The €124.99
-   profile-creation gate was likewise removed in Phase 1 — profile creation now
-   runs through the real account flow at /register/. The #profile section is a plain
-   marketing card with a CTA to that page (no client-side code/localStorage gate). */
+/* ===== roster paywall ($49.99) =====
+   Client-side unlock gate: the valid code's SHA-256 lives in ROSTER_CODE_HASHES and the
+   unlock is remembered in localStorage, so a buyer who paid Sam via Wise enters the code
+   he sends them just once. Deliberately NOT tied to account creation or admin approval —
+   that flow stays on /register/ (€124.99 profile) and /tenerife/ (€559.99) only. */
+function isUnlocked(){try{return localStorage.getItem(UNLOCK_KEY)==="1"}catch(e){return false}}
+async function sha256Hex(str){
+  const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function applyLockState(){
+  const wrap=document.getElementById("rosterWrap");
+  const note=document.getElementById("unlockedNote");
+  const open=isUnlocked();
+  if(wrap)wrap.classList.toggle("is-locked",!open);
+  if(note)note.classList.toggle("show",open);
+}
+function unlockRoster(){
+  try{localStorage.setItem(UNLOCK_KEY,"1")}catch(e){}
+  applyLockState();
+  renderRoster();
+}
+const gateForm=document.getElementById("gateForm");
+if(gateForm)gateForm.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const err=document.getElementById("gateErr");
+  const val=(document.getElementById("gateInput").value||"").trim().toUpperCase();
+  err.classList.remove("show");
+  if(!val)return;
+  let hash="";
+  try{hash=await sha256Hex(val);}
+  catch(ex){console.warn("crypto.subtle unavailable",ex);err.classList.add("show");return;}
+  if(ROSTER_CODE_HASHES.includes(hash)){
+    unlockRoster();
+    document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
+  }else{
+    err.classList.add("show");
+  }
+});
+applyLockState();
 
 /* Service cards (College, Indy Ball, Winter League, Representation) drop the athlete
    into the Join form with their service already chosen, so the application says what
@@ -1634,6 +1699,7 @@ async function boot(){
   PLAYERS=PLAYERS.map(p=>({...p,image:p.image||LOCAL_PHOTOS[p.slug]||null}));
   wireServiceSignups();
   applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();
+  applyLockState();
 }
 // Wire the pay buttons synchronously too: their hrefs come only from top-level
 // constants (no network), so doing this before boot()'s async import+fetch means the
