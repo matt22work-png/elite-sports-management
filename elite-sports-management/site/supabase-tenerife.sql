@@ -32,8 +32,11 @@ alter table public.tenerife_registrations enable row level security;
 revoke all on public.tenerife_registrations from anon;
 grant insert on public.tenerife_registrations to anon, authenticated;
 
+-- Register policy is anon-only: the /tenerife/ form always inserts as anon
+-- (persistSession:false), so this avoids a second permissive policy on
+-- authenticated INSERT (admin manages via "admin all tenerife").
 drop policy if exists "register tenerife" on public.tenerife_registrations;
-create policy "register tenerife" on public.tenerife_registrations for insert to anon, authenticated
+create policy "register tenerife" on public.tenerife_registrations for insert to anon
   with check (status = 'pending' and payment_status = 'unpaid');
 
 drop policy if exists "admin all tenerife" on public.tenerife_registrations;
