@@ -11,6 +11,51 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Baseball-Reference "Register" stats system (batting / pitching / fielding)
+Full raw-entry stat system replicating baseball-reference.com's Register format. Three
+layers, validated each before the next.
+
+**Schema** (`site/supabase-bbref-stats.sql`, migrations `bbref_register_stats`,
+`bbref_stats_anon_select_grant`, `bbref_stats_fn_search_path`,
+`bbref_batting_ops_full_precision`, `grant_anon_players_id_for_stats_join` — ALL APPLIED to prod):
+- 3 tables `player_batting_stats` / `player_pitching_stats` / `player_fielding_stats`.
+  PK `id` (bigint identity), FK `player_id → players(id) on delete cascade`, `sort_order`
+  (multiple rows per year allowed, e.g. "2 Teams" aggregate + per-team rows).
+- Raw columns per the schema spec (batting: g,pa,ab,r,h,doubles,triples,hr,rbi,sb,cs,bb,so,hbp,sh,sf,ibb,gdp
+  + year,age,age_dif,tm,lg,lev,aff; pitching: w,l,g,gs,gf,cg,sho,sv,ip,h,r,er,hr,bb,ibb,so,hbp,bk,wp,bf;
+  fielding: g,gs,cg,inn,ch,po,a,e,dp,pb,wp,sb,cs,position,lg_cs_pct). `age_dif` and `lg_cs_pct`
+  are manual text.
+- **Denormalized calc columns** maintained by BEFORE INSERT/UPDATE triggers
+  (`private.calc_batting/pitching/fielding`): batting tb,ba,obp,slg,ops; pitching w_l_pct,era,ra9,
+  whip,h9,hr9,bb9,so9,so_w; fielding fld_pct,rf9,rf_g,cs_pct. OPS uses FULL-precision OBP+SLG
+  (matches bbref, .869 not .870). IP/INN stored in baseball notation (0.2 = 2 outs); rate math
+  converts via `private.ip_to_real` (outs = floor*3 + fracDigit, real = outs/3).
+- **RLS**: admins (`private.is_esm_admin`) full CRUD; logged-in player reads only own rows
+  (`private.owns_stats_player`); anon + authenticated read only APPROVED players' rows
+  (`private.stats_player_approved`); anon has SELECT grant only (no writes). Verified live:
+  admin JWT insert OK, non-admin insert → 42501, anon insert → 42501, anon sees approved (1)
+  not pending (0). Also granted anon `select(id)` on players so public pages map slug→id.
+- Math validated live against the sample: AB 82 / H 26 → **BA .317**, OBP .394, SLG .476, OPS .869,
+  TB 39; IP 5.2 → ERA 3.18 / WHIP 1.235; totals recompute from summed raw (IP summed via outs).
+
+**Shared module** `site/bbref-stats.js` (`window.BBREF`): column layout (bbref order), calc
+(mirrors SQL), "All Levels (N Seasons)" totals (sum raw → recompute), read-only renderer +
+injected CSS. Single source of truth for admin editor, homepage modal, static pages.
+
+**Admin UI** (`site/admin/index.html`): 3 add/edit tables per player inside the Edit editor
+(lazy-loaded on open). Raw inputs only; BA/ERA/Fld%/totals recompute live on input; totals
+row recomputed from summed raw. Save = insert new / update existing (by id) / delete removed
+(identity PK so no upsert). Mobile: horizontal scroll, 16px inputs.
+
+**Public display**: homepage player modal (`openModal` → `loadPublicBbref`, needs `id` in the
+roster select) + all 17 static player pages (`players/*.html`, bulk-patched: `#ppRegister`
+section before `.pp-contact` + a slug-scoped anon Supabase fetch/render, hidden until rows exist).
+
+Commits: `b8cfc16` (schema), `6819254` (shared module + OPS precision), `669d2f1` (admin UI),
++ public-display commit. Stat header abbreviations (AB/OBP/…) intentionally NOT translated;
+section labels are EN/ES/IT. Open: old `players.season_stats` jsonb editor + this new register
+coexist in admin (didn't remove the legacy one to avoid data loss — flag for Matt).
+
 ### Feature/content batch (pre-autonomous)
 - **5a59be3** Dropdown restructure (Baseball/Softball Representation, College Placement, Coaching; legacy options commented, i18n kept), tagline rewrite ("from the young", pathways expanded), banner quote (`join_pitch`). EN/ES/IT.
 - **f063ac6** Gate Winter League Tenerife gallery behind event click — removed `#media` section + nav link + `renderMedia()`; added `openEventModal()` (reel+gallery inside the shared modal), `media:true` flag, `ev_gallery` keys EN/ES/IT.

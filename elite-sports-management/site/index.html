@@ -718,6 +718,8 @@
 
 <div class="install" id="install"><div class="box"><div><b data-i18n="install_t"></b><span data-i18n="install_d"></span></div><button type="button" id="installBtn" data-i18n="install_btn"></button><button type="button" class="x" id="installX" aria-label="Dismiss">✕</button></div></div>
 
+<!-- Shared Baseball-Reference stats module (read-only render on player modals). -->
+<script src="bbref-stats.js"></script>
 <script>
 /* ===== CONFIG: Supabase (live roster + applications) =====
    The anon key is browser-safe: RLS only allows reading approved players and
@@ -869,7 +871,7 @@ const T = {
     f_why:"Why do you want to start? / Your goals",f_other:"Anything else?",f_submit:"Submit application",
     f_success:"Thanks! Your application has been received — we'll review it and be in touch.",
     f_error:"Sorry, something went wrong sending your application. Please try again.",
-    modal_highlights:"Career Highlights",modal_season_stats:"Season Stats",modal_teams:"Teams & Affiliations",
+    modal_highlights:"Career Highlights",modal_season_stats:"Season Stats",modal_teams:"Teams & Affiliations",modal_register:"Career Register",modal_bat:"Batting",modal_pit:"Pitching",modal_fld:"Fielding",
     modal_contact_h:"Interested in this player?",modal_contact_p:"You have full roster access. Get in touch and we'll connect you with this athlete directly.",modal_contact_btn:"Contact ESM about this player",
     band_h2:"Are you the next great addition?",band_p:"Get seen, get signed, get developed — start the conversation with Elite Sports Management.",band_btn:"Apply Now",
     foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",ceasai_cta:"Website built by CeasAI — Create your own site like this →",ceasai_ig:"Follow CeasAI on Instagram",ceasai_email:"Email CeasAI",ceasai_tiktok:"Follow CeasAI on TikTok",
@@ -946,7 +948,7 @@ const T = {
     f_why:"¿Por qué quieres empezar? / Tus objetivos",f_other:"¿Algo más?",f_submit:"Enviar solicitud",
     f_success:"¡Gracias! Hemos recibido tu solicitud — la revisaremos y te contactaremos.",
     f_error:"Lo sentimos, hubo un problema al enviar tu solicitud. Inténtalo de nuevo.",
-    modal_highlights:"Destacados de Carrera",modal_season_stats:"Estadísticas por Temporada",modal_teams:"Equipos y Afiliaciones",
+    modal_highlights:"Destacados de Carrera",modal_season_stats:"Estadísticas por Temporada",modal_teams:"Equipos y Afiliaciones",modal_register:"Registro de Carrera",modal_bat:"Bateo",modal_pit:"Pitcheo",modal_fld:"Defensa",
     modal_contact_h:"¿Interesado en este jugador?",modal_contact_p:"Tienes acceso completo al roster. Escríbenos y te conectamos directamente con este atleta.",modal_contact_btn:"Contactar a ESM sobre este jugador",
     band_h2:"¿Eres la próxima gran incorporación?",band_p:"Que te vean, que te firmen, que te desarrollen — inicia la conversación con Elite Sports Management.",band_btn:"Aplica Ahora",
     foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",ceasai_cta:"Sitio web creado por CeasAI — Crea tu propio sitio como este →",ceasai_ig:"Sigue a CeasAI en Instagram",ceasai_email:"Escríbele un correo a CeasAI",ceasai_tiktok:"Sigue a CeasAI en TikTok",
@@ -1023,7 +1025,7 @@ const T = {
     f_why:"Perché vuoi iniziare? / I tuoi obiettivi",f_other:"Altro?",f_submit:"Invia candidatura",
     f_success:"Grazie! Abbiamo ricevuto la tua candidatura — la esamineremo e ti contatteremo.",
     f_error:"Spiacenti, qualcosa è andato storto nell'invio della candidatura. Riprova.",
-    modal_highlights:"Carriera in Evidenza",modal_season_stats:"Statistiche per Stagione",modal_teams:"Squadre e Affiliazioni",
+    modal_highlights:"Carriera in Evidenza",modal_season_stats:"Statistiche per Stagione",modal_teams:"Squadre e Affiliazioni",modal_register:"Registro di Carriera",modal_bat:"Battuta",modal_pit:"Lancio",modal_fld:"Difesa",
     modal_contact_h:"Interessato a questo giocatore?",modal_contact_p:"Hai accesso completo al roster. Scrivici e ti mettiamo in contatto direttamente con questo atleta.",modal_contact_btn:"Contatta ESM per questo atleta",
     band_h2:"Sei la prossima grande aggiunta?",band_p:"Farti notare, firmare e crescere — inizia la conversazione con Elite Sports Management.",band_btn:"Candidati",
     foot_tagline:"Unisciti a festeggiare",foot_rights:"Tutti i diritti riservati.",ceasai_cta:"Sito web realizzato da CeasAI — Crea il tuo sito come questo →",ceasai_ig:"Segui CeasAI su Instagram",ceasai_email:"Invia un'email a CeasAI",ceasai_tiktok:"Segui CeasAI su TikTok",
@@ -1548,6 +1550,20 @@ function seasonStatsHTML(seasonStats){
   return out;
 }
 
+/* Fetch + render a player's Baseball-Reference register (read-only) into `el`.
+   Uses the shared BBREF module; RLS returns rows only for approved players. */
+async function loadPublicBbref(playerId,el){
+  if(!el||!SB||!playerId||typeof BBREF==="undefined")return;
+  try{
+    const kinds=["batting","pitching","fielding"],data={};
+    for(const k of kinds){
+      const {data:rows}=await SB.from(BBREF.TABLES[k]).select("*").eq("player_id",playerId).order("year").order("sort_order").order("id");
+      data[k]=rows||[];
+    }
+    const html=BBREF.renderAll(data,{batting:t("modal_bat"),pitching:t("modal_pit"),fielding:t("modal_fld")});
+    if(html){BBREF.injectCss();el.innerHTML=`<div class="sh-label">${t("modal_register")}</div>${html}`;}
+  }catch(e){/* stats are optional; ignore load errors */}
+}
 function openModal(slug){
   const p=PLAYERS.find(x=>x.slug===slug);if(!p)return;
   const meta=[p.born?("Born "+p.born):null,p.birthplace,p.bats?("Bats "+p.bats):null].filter(Boolean).join("  ·  ");
@@ -1558,6 +1574,7 @@ function openModal(slug){
     <div class="sh-body"><p class="bio">${esc(p.bio)}</p>
       ${p.stats&&p.stats.length?`<div class="sh-label">${t("modal_highlights")}</div><div class="sh-stats">${p.stats.map(s=>`<div class="sh-stat"><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join("")}</div>`:""}
       ${(()=>{const ss=seasonStatsHTML(p.season_stats);return ss?`<div class="sh-label">${t("modal_season_stats")}</div>${ss}`:"";})()}
+      <div id="modalBbref"></div>
       ${p.teams&&p.teams.length?`<div class="sh-label">${t("modal_teams")}</div><div class="team-chips">${p.teams.map(x=>`<span class="team-chip">${esc(x)}</span>`).join("")}</div>`:""}
       <div class="sh-contact">
         <div class="sh-label">${t("modal_contact_h")}</div>
@@ -1566,6 +1583,7 @@ function openModal(slug){
       </div>
     </div>`;
   document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
+  loadPublicBbref(p.id,document.getElementById("modalBbref"));
 }
 /* ===== roster paywall ($49.99) =====
    Client-side unlock gate: the valid code's SHA-256 lives in ROSTER_CODE_HASHES and the
@@ -1706,7 +1724,7 @@ async function boot(){
       // just the public display columns — NOT the intake PII (age/phone/email/instagram/
       // message) — so an approved athlete's contact details are never sent to the browser.
       const {data,error}=await SB.from("players")
-        .select("slug,name,group,position,country,flag,heritage,born,birthplace,tier,bats,bio,teams,stats,season_stats,image_url,sport,sort_order")
+        .select("id,slug,name,group,position,country,flag,heritage,born,birthplace,tier,bats,bio,teams,stats,season_stats,image_url,sport,sort_order")
         .eq("status","approved").order("sort_order");
       if(error)throw error;
       // Supabase stores the photo in `image_url`; the renderer reads `image`.

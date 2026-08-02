@@ -352,6 +352,11 @@
 
   <div class="pp-section"><h2>Playing Experience</h2><div class="pp-exp-list"><div class="pp-exp-row"><b>Sunrise Mountain HS</b></div><div class="pp-exp-row"><b>College of the Desert</b></div></div></div>
 
+  <div class="pp-section" id="ppRegister" style="display:none">
+    <h2>Career Register</h2>
+    <div id="ppRegisterBody"></div>
+  </div>
+
   <div class="pp-contact">
     <h2>Interested in Adam Moser?</h2>
     <p>You have full roster access. Get in touch and we'll connect you with this athlete directly.</p>
@@ -371,6 +376,24 @@
   </div>
 </div></footer>
 
-<script>document.getElementById("yr").textContent=new Date().getFullYear();</script>
+<script src="../bbref-stats.js"></script>
+<script type="module">
+document.getElementById("yr").textContent=new Date().getFullYear();
+(async function(){
+  const SLUG="adam-moser";
+  const SB_URL="https://sbexwyvsgqayxrsrlrpm.supabase.co";
+  const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
+  try{
+    const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
+    const SB=createClient(SB_URL,SB_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+    const {data:pl}=await SB.from("players").select("id").eq("slug",SLUG).eq("status","approved").maybeSingle();
+    if(!pl||!pl.id||typeof BBREF==="undefined")return;
+    const kinds=["batting","pitching","fielding"],data={};
+    for(const k of kinds){const {data:rows}=await SB.from(BBREF.TABLES[k]).select("*").eq("player_id",pl.id).order("year").order("sort_order").order("id");data[k]=rows||[];}
+    const html=BBREF.renderAll(data);
+    if(html){BBREF.injectCss();document.getElementById("ppRegisterBody").innerHTML=html;document.getElementById("ppRegister").style.display="";}
+  }catch(e){}
+})();
+</script>
 </body>
 </html>
