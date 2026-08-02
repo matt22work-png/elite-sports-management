@@ -265,9 +265,15 @@ const DIAL_CODES=[
   {c:"AR",n:"Argentina",d:"+54",f:"🇦🇷"},{c:"CW",n:"Curaçao",d:"+599",f:"🇨🇼"},
   {c:"AW",n:"Aruba",d:"+297",f:"🇦🇼"},
 ];
-function fillCC(id, def){ const sel=document.getElementById(id); if(!sel)return; sel.innerHTML=DIAL_CODES.map(x=>`<option value="${x.d}"${x.c===def?" selected":""}>${x.f} ${x.n} ${x.d}</option>`).join(""); }
-function combinePhone(ccId, numId){ const cc=document.getElementById(ccId), num=document.getElementById(numId); const n=((num&&num.value)||"").trim(); return n?(((cc&&cc.value)||"")+" "+n).trim():""; }
-fillCC("p-cc","IT"); fillCC("s-cc","US");
+// No pre-selected default: the dial-code list opens on a disabled "Select country
+// code" placeholder so the user actively chooses (no Italy/US assumption baked in).
+function fillCC(id, def){ const sel=document.getElementById(id); if(!sel)return;
+  const ph=`<option value="" disabled${def?"":" selected"}>Select country code</option>`;
+  sel.innerHTML=ph+DIAL_CODES.map(x=>`<option value="${x.d}"${x.c===def?" selected":""}>${x.f} ${x.n} ${x.d}</option>`).join(""); }
+// Combine to "+1 5551234567". If no code was chosen we store just the number rather
+// than a stray leading space, so no default dial code is ever assumed.
+function combinePhone(ccId, numId){ const cc=document.getElementById(ccId), num=document.getElementById(numId); const n=((num&&num.value)||"").trim(); const c=((cc&&cc.value)||"").trim(); return n?((c?c+" ":"")+n):""; }
+fillCC("p-cc"); fillCC("s-cc");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

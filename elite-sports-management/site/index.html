@@ -615,44 +615,18 @@
   <div class="join">
     <div class="tagline" data-i18n="join_tagline"></div>
     <p class="join-pitch" data-i18n="join_pitch"></p>
+    <!-- Trimmed to 3 fields per Sam (2026-08): what they're applying for + goals +
+         anything else. Name/age/phone/email/IG/country/sport/position were removed
+         from THIS form. (Full contact + stats are captured on the /register/ account
+         flow instead.) -->
     <form id="applyForm" novalidate>
-      <div class="grid2">
-        <div class="field"><label data-i18n="f_name"></label><input name="name" required /></div>
-        <div class="field"><label data-i18n="f_age"></label><input name="age" inputmode="numeric" /></div>
-        <div class="field"><label data-i18n="f_phone"></label><div class="phone-row"><select class="phone-cc" id="joinCC" aria-label="Country dialing code"></select><input class="phone-num" id="joinPhone" name="phone" inputmode="tel" /></div></div>
-        <div class="field"><label data-i18n="f_email"></label><input name="email" type="email" /></div>
-        <div class="field"><label data-i18n="f_ig"></label><input name="ig" placeholder="@" /></div>
-        <div class="field"><label data-i18n="f_country"></label><input name="country" /></div>
-        <div class="field"><label data-i18n="f_sport"></label>
-          <select name="sport">
-            <option value="Baseball" data-i18n="opt_baseball"></option>
-            <option value="Softball" data-i18n="opt_softball"></option>
-          </select></div>
-        <div class="field"><label data-i18n="f_position"></label>
-          <select name="position">
-            <option value="Pitcher" data-i18n="filter_pitcher"></option>
-            <option value="Catcher" data-i18n="filter_catcher"></option>
-            <option value="Infielder" data-i18n="filter_infielder"></option>
-            <option value="Two-Way" data-i18n="filter_twoway"></option>
-          </select></div>
-        <div class="field"><label data-i18n="f_applying"></label>
-          <select name="applying" id="applyingSelect">
-            <option value="Baseball Representation" data-i18n="opt_rep_baseball"></option>
-            <option value="Softball Representation" data-i18n="opt_rep_softball"></option>
-            <option value="College Placement" data-i18n="opt_college"></option>
-            <option value="Coaching" data-i18n="opt_coach"></option>
-            <!-- Preserved for revert (Matt): previous options, hidden from the UI per Sam's
-                 request. Their stored values ("Representation" / "Indy Ball" / "Winter League" /
-                 "Both") remain valid backend values — existing applications keep working and
-                 these can be re-enabled by un-commenting. Their i18n keys (opt_rep, opt_indy,
-                 opt_winter, opt_both) are intentionally kept in the dictionaries.
-            <option value="Representation" data-i18n="opt_rep"></option>
-            <option value="Indy Ball" data-i18n="opt_indy"></option>
-            <option value="Winter League" data-i18n="opt_winter"></option>
-            <option value="Both" data-i18n="opt_both"></option>
-            -->
-          </select></div>
-      </div>
+      <div class="field"><label data-i18n="f_applying"></label>
+        <select name="applying" id="applyingSelect">
+          <option value="Baseball Representation" data-i18n="opt_rep_baseball"></option>
+          <option value="Softball Representation" data-i18n="opt_rep_softball"></option>
+          <option value="College Placement" data-i18n="opt_college"></option>
+          <option value="Coaching" data-i18n="opt_coach"></option>
+        </select></div>
       <div class="field"><label data-i18n="f_why"></label><textarea name="why"></textarea></div>
       <div class="field"><label data-i18n="f_other"></label><textarea name="other"></textarea></div>
       <!-- Anti-spam honeypot — hidden from real users; must stay empty. -->
@@ -661,13 +635,6 @@
       <div class="form-msg" id="formMsg"></div>
     </form>
 
-    <div class="paypanel" id="payPanel">
-      <h3 data-i18n="pay_h"></h3>
-      <p data-i18n="pay_p"></p>
-      <div class="amt">$125</div>
-      <a class="btn btn-gold" id="joinPayBtn" href="#" target="_blank" rel="noopener" data-i18n="pay_btn"></a>
-      <p class="fine" data-i18n="pay_fine"></p>
-    </div>
   </div>
 </div></section>
 
@@ -834,8 +801,7 @@ const T = {
     join_kicker:"Join Us",join_h2:"Apply to Elite Sports Management",join_p:"Players, families and clubs — tell us about yourself and we'll create your athlete profile.",
     join_tagline:"Train like an athlete. Play like a pro.",
     join_pitch:"Talent alone rarely opens the door. The right agent turns tryouts into contracts — negotiating your deals, opening leagues at home and abroad, and putting your name in front of the scouts and coaches who decide careers.",
-    f_name:"Full name *",f_age:"Age",f_phone:"Phone number",f_email:"Email",f_ig:"Instagram profile",f_country:"Country",
-    f_sport:"Sport",opt_baseball:"Baseball",opt_softball:"Softball",f_position:"Position",f_applying:"I'm applying for",opt_rep:"Representation",opt_rep_baseball:"Baseball Representation",opt_rep_softball:"Softball Representation",opt_college:"College Placement",opt_indy:"Indy Ball",opt_winter:"Winter League",opt_coach:"Coaching",opt_both:"Both",
+    f_applying:"I'm applying for",opt_rep_baseball:"Baseball Representation",opt_rep_softball:"Softball Representation",opt_college:"College Placement",opt_coach:"Coaching",
     f_why:"Why do you want to start? / Your goals",f_other:"Anything else?",f_submit:"Submit application",
     f_success:"Thanks! Your application has been received — we'll review it and be in touch.",
     f_error:"Sorry, something went wrong sending your application. Please try again.",
@@ -910,8 +876,7 @@ const T = {
     join_kicker:"Únete",join_h2:"Aplica a Elite Sports Management",join_p:"Jugadores, familias y clubes — cuéntanos sobre ti y crearemos tu perfil de atleta.",
     join_tagline:"Entrena como un atleta. Juega como un profesional.",
     join_pitch:"El talento por sí solo casi nunca abre la puerta. El agente adecuado convierte las pruebas en contratos: negocia tus acuerdos, te abre ligas dentro y fuera del país y pone tu nombre frente a los scouts y entrenadores que deciden carreras.",
-    f_name:"Nombre y apellido *",f_age:"Edad",f_phone:"Número de teléfono",f_email:"Correo electrónico",f_ig:"Perfil de Instagram",f_country:"País",
-    f_sport:"Deporte",opt_baseball:"Béisbol",opt_softball:"Sóftbol",f_position:"Posición",f_applying:"Aplico para",opt_rep:"Representación",opt_rep_baseball:"Representación de Béisbol",opt_rep_softball:"Representación de Sóftbol",opt_college:"Colocación en College",opt_indy:"Indy Ball",opt_winter:"Liga de Invierno",opt_coach:"Coaching",opt_both:"Ambos",
+    f_applying:"Aplico para",opt_rep_baseball:"Representación de Béisbol",opt_rep_softball:"Representación de Sóftbol",opt_college:"Colocación en College",opt_coach:"Coaching",
     f_why:"¿Por qué quieres empezar? / Tus objetivos",f_other:"¿Algo más?",f_submit:"Enviar solicitud",
     f_success:"¡Gracias! Hemos recibido tu solicitud — la revisaremos y te contactaremos.",
     f_error:"Lo sentimos, hubo un problema al enviar tu solicitud. Inténtalo de nuevo.",
@@ -986,8 +951,7 @@ const T = {
     join_kicker:"Unisciti",join_h2:"Candidati a Elite Sports Management",join_p:"Giocatori, famiglie e club — raccontaci di te e creeremo il tuo profilo da atleta.",
     join_tagline:"Allenati come un atleta. Gioca come un professionista.",
     join_pitch:"Il solo talento raramente apre le porte. L'agente giusto trasforma i provini in contratti: negozia i tuoi accordi, ti apre le leghe in patria e all'estero e mette il tuo nome davanti agli scout e agli allenatori che decidono le carriere.",
-    f_name:"Nome e cognome *",f_age:"Età",f_phone:"Numero di telefono",f_email:"Email",f_ig:"Profilo Instagram",f_country:"Paese",
-    f_sport:"Sport",opt_baseball:"Baseball",opt_softball:"Softball",f_position:"Ruolo",f_applying:"Mi candido per",opt_rep:"Rappresentanza",opt_rep_baseball:"Rappresentanza Baseball",opt_rep_softball:"Rappresentanza Softball",opt_college:"Collocamento College",opt_indy:"Indy Ball",opt_winter:"Winter League",opt_coach:"Coaching",opt_both:"Entrambi",
+    f_applying:"Mi candido per",opt_rep_baseball:"Rappresentanza Baseball",opt_rep_softball:"Rappresentanza Softball",opt_college:"Collocamento College",opt_coach:"Coaching",
     f_why:"Perché vuoi iniziare? / I tuoi obiettivi",f_other:"Altro?",f_submit:"Invia candidatura",
     f_success:"Grazie! Abbiamo ricevuto la tua candidatura — la esamineremo e ti contatteremo.",
     f_error:"Spiacenti, qualcosa è andato storto nell'invio della candidatura. Riprova.",
@@ -1548,8 +1512,6 @@ function wireServiceSignups(){
 
 /* Point each pay button at its Stripe link; fall back to email until they exist. */
 function wirePayButtons(){
-  const set=(id,url)=>{const el=document.getElementById(id);if(el)el.href=url||FALLBACK_EMAIL;};
-  set("joinPayBtn",STRIPE_REGISTER_URL);
   const col=document.getElementById("collegePayBtn");
   if(col)col.href=STRIPE_COLLEGE_URL||"#join";
 }
@@ -1569,16 +1531,10 @@ document.getElementById("yr").textContent=new Date().getFullYear();
 })();
 
 const form=document.getElementById("applyForm");
-fillCC(document.getElementById("joinCC"),"IT");   // populate the #join country-code select
 const FORM_T0=Date.now();   // page-load time, for the anti-spam time trap below
 form.addEventListener("submit",async e=>{
   e.preventDefault();
   const fd=new FormData(form);
-  const name=(fd.get("name")||"").trim();
-  if(!name){form.querySelector("[name=name]").focus();return;}
-  const role=fd.get("position")||"Infielder";   // Pitcher | Catcher | Infielder | Two-Way
-  const sport=fd.get("sport")||"Baseball";
-  const country=(fd.get("country")||"").trim();
   const btn=form.querySelector("button[type=submit]");
   const msg=document.getElementById("formMsg");
   msg.classList.remove("show","err");
@@ -1596,16 +1552,21 @@ form.addEventListener("submit",async e=>{
   if(!SB){msg.textContent=t("f_error");msg.classList.add("show","err");msg.scrollIntoView({behavior:"smooth",block:"center"});return;}
 
   btn.disabled=true;
-  // Saved as `pending` so an admin reviews it before it appears on the public roster.
+  // This form is now just 3 fields (applying for / goals / anything else) — no name,
+  // contact or sport is collected here. players.name and players."group" are NOT NULL,
+  // so we synthesize a human-readable label from the "applying for" value; the row is
+  // saved `pending` and is never shown on the public roster. The notify Edge Function
+  // still routes softball/college inquiries correctly off the applying_for text.
+  const applying=(fd.get("applying")||"").trim()||"General application";
   const {error}=await SB.from("players").insert({
-    slug:slugify(name)+"-"+Date.now().toString(36),
-    name,"group":role,position:role,sport,country,flag:FLAGS[country]||"🌎",tier:"New",
-    bio:(fd.get("why")||"").trim()||"—",teams:[],stats:[],
-    age:fd.get("age"),phone:combinePhone("joinCC","joinPhone"),email:fd.get("email"),
-    instagram:fd.get("ig"),applying_for:fd.get("applying"),message:fd.get("other"),
-    // General application from the public #join form. Paid profile creation now has
-    // its own account flow at /register/ (source:"registration"), so this is always
-    // a plain application.
+    slug:slugify(applying)+"-"+Date.now().toString(36),
+    name:applying,
+    "group":"Applicant",
+    bio:(fd.get("why")||"").trim()||"—",
+    applying_for:applying,
+    message:(fd.get("other")||"").trim(),
+    // General application from the public #join form. Paid profile creation + full
+    // contact/stats now have their own account flow at /register/ (source:"registration").
     source:"application",
     status:"pending",
   });
@@ -1613,10 +1574,7 @@ form.addEventListener("submit",async e=>{
   if(error){console.error("Application failed",error);msg.textContent=t("f_error");msg.classList.add("show","err");msg.scrollIntoView({behavior:"smooth",block:"center"});return;}
   form.reset();
   msg.textContent=t("f_success");msg.classList.add("show");
-  // The lead is saved as `pending` first. Only now do we ask for the $125.
-  const panel=document.getElementById("payPanel");
-  panel.classList.add("show");
-  panel.scrollIntoView({behavior:"smooth",block:"center"});
+  msg.scrollIntoView({behavior:"smooth",block:"center"});
 });
 
 /* install prompt */

@@ -142,11 +142,16 @@ const DIAL_CODES=[
   {c:"AR",n:"Argentina",d:"+54",f:"🇦🇷"},{c:"CW",n:"Curaçao",d:"+599",f:"🇨🇼"},
   {c:"AW",n:"Aruba",d:"+297",f:"🇦🇼"},
 ];
-function fillCC(id, def){ const sel=$(id); if(!sel)return; sel.innerHTML=DIAL_CODES.map(x=>`<option value="${x.d}"${x.c===def?" selected":""}>${x.f} ${x.n} ${x.d}</option>`).join(""); }
-function combinePhone(ccId, numId){ const cc=$(ccId), num=$(numId); const n=((num&&num.value)||"").trim(); return n?(((cc&&cc.value)||"")+" "+n).trim():""; }
+// No pre-selected default: opens on a disabled "Select country code" placeholder so
+// the user actively chooses (no Italy assumption baked in).
+function fillCC(id, def){ const sel=$(id); if(!sel)return;
+  const ph=`<option value="" disabled${def?"":" selected"}>Select country code</option>`;
+  sel.innerHTML=ph+DIAL_CODES.map(x=>`<option value="${x.d}"${x.c===def?" selected":""}>${x.f} ${x.n} ${x.d}</option>`).join(""); }
+// Combine to "+39 340…"; if no code was chosen, store just the number (no stray space).
+function combinePhone(ccId, numId){ const cc=$(ccId), num=$(numId); const n=((num&&num.value)||"").trim(); const c=((cc&&cc.value)||"").trim(); return n?((c?c+" ":"")+n):""; }
 
 $("payBtn").href = PAYMENT_URL;
-fillCC("t-cc","IT");
+fillCC("t-cc");
 show("step1");
 
 $("regForm").addEventListener("submit", async e => {
