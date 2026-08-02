@@ -336,17 +336,10 @@ function collectSeasonStats(){
   return out;
 }
 
-/* ---------- notification trigger point — STUB (Phase 6 wires this in) ----------
-   Does nothing yet. This is the single place a new submission should notify Sam.
-   Preferred Phase-6 implementation is a Supabase Edge Function fired by a DB
-   trigger on the insert (server-side, so it can't be skipped by a user who closes
-   the tab) delivering via Resend — routing per ENGINEERING_LOG Phase 6
-   (player/profile + scout + Tenerife → Sam; softball apps → Marianna). Kept as a
-   named call so the trigger sites are obvious and easy to wire without hunting. */
-function notifyNewSubmission(type, payload){
-  // TODO(Phase 6): POST to the ESM notify Edge Function. No-op placeholder for now.
-  try { console.info("[notify stub] new submission:", type, payload); } catch (_){}
-}
+/* Phase 6 note: new-submission emails are now sent SERVER-SIDE — a DB trigger on
+   the profiles/players insert POSTs to the `notify` Edge Function (see
+   supabase-notify.sql). No client call is needed here (a closed tab can't skip a
+   DB trigger), so the old client-side stub was removed. */
 
 /* ---------- role picker (step 1) ---------- */
 let chosenRole = null;
@@ -445,7 +438,6 @@ $("playerForm").addEventListener("submit", async e => {
       if (error.code === "23505"){ showPay("player"); return; }
       throw error;
     }
-    notifyNewSubmission("player_profile", { email: user.email, name: fullName });
     showPay("player");
   } catch (err){
     msg($("playerMsg"), "Couldn't save your profile: " + (err?.message || err));
@@ -470,7 +462,6 @@ $("scoutForm").addEventListener("submit", async e => {
       notes: $("s-notes").value.trim() || null,
     }, { onConflict: "id" });
     if (error) throw error;
-    notifyNewSubmission("scout_registration", { email: user.email });
     showPay("scout");
   } catch (err){
     msg($("scoutMsg"), "Couldn't save your details: " + (err?.message || err));

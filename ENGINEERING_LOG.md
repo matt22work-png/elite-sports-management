@@ -152,6 +152,14 @@ Commits `9c93dbf` → `e2ea38e`, each atomic. All copy EN/ES/IT (parity verified
 - **Items 8 (Tenerife gallery rename) + D/E (STOP&ASK) — SKIPPED** (blocked pending Sam's answers on the gallery "folder" UX and "take away picture").
 - Validation: index + register `node --check` clean each commit; EN/ES/IT parity scripted; testimonials anon-read verified via MCP. Not clicked-through live (forms/phone need a browser).
 
+### PHASE 6 — Email notifications (session 2026-08-01) — BUILT + DEPLOYED (activation is manual)
+Server-side, provider-agnostic (reacts to the submission row, not to how payment was taken — survives a Wise→Stripe switch).
+- **Edge Function `notify`** (`site/supabase/functions/notify/index.ts`) — DEPLOYED to prod (version 1, `verify_jwt=false`, does its own shared-secret auth). Routes: `players` INSERT `source='application'` → Softball(sport or applying_for)→Marianna, College/Baseball/else→Sam; `profiles` INSERT (player/scout registration)→Sam. Sends via Resend. **Closed by default:** returns 503 until `NOTIFY_SECRET` is set (verified live: POST → 503); then requires `x-notify-secret`; no-ops (logs) until `RESEND_API_KEY` is set.
+- **DB triggers** (`supabase-notify.sql`, APPLIED as `notify_submission_triggers`): enabled `pg_net` (0.20.3); `private.notify_submission()` (SECURITY DEFINER, search_path='') async-POSTs the new row via `net.http_post` with the secret header. Triggers `trg_notify_player`/`trg_notify_profile` AFTER INSERT. **Non-blocking + exception-safe + INERT until `app.notify_url` is set** — verified: pg_net present, both triggers present, notify_url unset, a test insert succeeded untouched (rolled back). players `source='registration'/'admin'` are skipped (profiles covers registrations; admin adds don't email).
+- **Client stub removed** from `register/index.html` (the `notifyNewSubmission` no-op) — superseded by the DB trigger (a closed tab can't skip a trigger).
+- **MANUAL ACTIVATION (Sam/Matt)** — full steps in `supabase-notify.sql` header: (1) Resend account + **verified sending domain** + API key (Gmail delivery needs a verified domain; onboarding@resend.dev only reaches the Resend owner). (2) Set function secrets `RESEND_API_KEY`, `NOTIFY_SECRET`, `NOTIFY_FROM` (dashboard/CLI — no MCP tool for function secrets). (3) `alter database postgres set app.notify_url=…` + `app.notify_secret=<same NOTIFY_SECRET>`. (4) Submit a test application. Disable anytime with `alter database postgres reset app.notify_url`.
+- Tenerife notifications (Phase 2) will ride the existing profiles path → Sam once that flow exists.
+
 ## In progress
 - Phase 1 (profile-creation flow) built + validated; awaiting Sam's live click-through review before Phase 2. Phases 3, 4, 7 done. STOP&ASK C/D/E open. Remaining roadmap: Phase 2 (roster/Tenerife — GATED on Sam's Phase-1 review; includes the Tenerife admin section), Phase 5 (pricing/copy incl. form-field reduction B), Phase 6 (email notifications).
 
