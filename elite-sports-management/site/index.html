@@ -724,7 +724,11 @@ const LOCAL_PHOTOS = { "jose-cedeno":"media/photos/jose-cedeno.jpg" };
 
 /* ===== EVENTS ===== */
 const EVENTS = [
-  { title:"Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", media:true, icon:"🏝️", image:"media/photos/twl-field-aerial-thumb.jpg", blurb:"Adult division winter league on the coast of Tenerife, Spain — Dec 8–15, 2026. Includes tournament entry, hotel with meals, transport to the seaside field, official jersey and cap, laundry service, and a showcase in front of MLB and college scouts. Registration is open; the first 20 players to sign up get a bonus surprise.", tags:"⚾ Adult Division  ·  🔭 MLB & College Scouts  ·  🎁 First 20 get a bonus", reg_url:"tenerife/" }
+  // Upcoming registration (item 14) — no inline gallery; the card links straight to /tenerife/.
+  { title:"Tenerife Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", icon:"🏝️", image:"media/photos/twl-field-aerial-thumb.jpg", blurb:"Adult division winter league on the coast of Tenerife, Spain — Dec 8–15, 2026. Includes tournament entry, hotel with meals, transport to the seaside field, official jersey and cap, laundry service, and a showcase in front of MLB and college scouts. Registration is open; the first 20 players to sign up get a bonus surprise.", tags:"⚾ Adult Division  ·  🔭 MLB & College Scouts  ·  🎁 First 20 get a bonus", reg_url:"tenerife/" },
+  // Past edition gallery (item 13) — clicking opens a dedicated modal titled "Tenerife 2025 Edition"
+  // with the video reel + photo gallery (not shown inline on the main page).
+  { title:"Tenerife 2025 Edition", date:"2025-12-13", loc:"Tenerife, Spain", status:"past", media:true, icon:"🏝️", image:"media/photos/twl-champions-thumb.jpg", blurb:"Photos and video from our 2025 Tenerife Winter League edition — champions, all-stars and life on the seaside field.", tags:"🏆 Champions  ·  ⭐ All-Stars  ·  🎥 Highlights" }
 ];
 
 /* ===== TESTIMONIALS =====
@@ -1383,6 +1387,7 @@ function renderEvents(){
         ${e.tags?`<div class="ev-tags">${esc(e.tags)}</div>`:""}
         <div class="ev-actions">
           ${e.media?`<button type="button" class="ev-link ev-media-btn" data-ev="${i}">${t("ev_gallery")} \u2192</button>`:""}
+          ${e.reg_url?`<a class="ev-link" href="${esc(e.reg_url)}">${t("ev_register")} \u2192</a>`:""}
           ${e.email?`<a class="ev-link" href="mailto:${e.email}">${t("ev_register")} \u2192</a>`:""}
         </div>
         </div></div>`).join("");
