@@ -174,6 +174,14 @@ Replicated the Phase 1 pattern (account/registration → external Wise payment �
 - **E. Gallery "folder" UX** ("Tenerife 2025 Edition") — intended interaction unclear (folder grid? accordion? separate page?). Not built. Awaiting Matt.
 These are the only outstanding master-prompt items; everything else is complete.
 
+### Fresh self-audit pass (session 2026-08-01, post-Phase-2)
+Priority order: security > correctness > reliability > a11y > perf > SEO > UX > maintainability.
+- **CORRECTNESS (fixed, `a774125`):** the 17 generated player pages had a head redirect `if(esm_roster_unlock_v1!=='1') location.replace('#roster')`. Phase 2 removed the roster gate so that key is never set → every player page bounced away (unreachable). Removed the redirect from all 17 → they load openly. **Follow-up:** `gen_player_pages.py` still emits it (+ dead roster-gate CSS) — update the generator (needs Python, unavailable here).
+- **SECURITY (verified, no change):** advisors clean of NEW issues (only the accepted esm_admins-INFO, scout_roster/update_my_profile SECURITY-DEFINER WARNs, leaked-password dashboard WARN). Now that the roster + player pages are open: confirmed the public `boot()` select carries no PII, anon column grants still block PII, and the 17 player pages expose ONLY agency contact (no athlete email/phone/IG). `tenerife_registrations` RLS re-verified live (anon insert 201 / approved 401 / read 42501).
+- **PERFORMANCE (fixed, `058c3b8`):** scoped the `register tenerife` policy to `anon` only (the form inserts as anon), clearing the new `multiple_permissive_policies` lint on tenerife INSERT.
+- **Full sweep:** all 6 app pages `node --check` clean; EN/ES/IT parity intact; all internal link targets exist.
+- **Known-minor / deferred (logged, not changed — low value vs. churn/risk):** dead `gate_*` i18n keys + a few dead gate-only CSS rules on index (kept `.gate-in/.gate-lock/.gate-price` — shared with the #profile card); player-page dead CSS + noindex (both need the Python generator to change cleanly; noindex→index is also a visibility decision for Sam).
+
 ## In progress
 - Phase 1 (profile-creation flow) built + validated; awaiting Sam's live click-through review before Phase 2. Phases 3, 4, 7 done. STOP&ASK C/D/E open. Remaining roadmap: Phase 2 (roster/Tenerife — GATED on Sam's Phase-1 review; includes the Tenerife admin section), Phase 5 (pricing/copy incl. form-field reduction B), Phase 6 (email notifications).
 
