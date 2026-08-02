@@ -55,6 +55,7 @@ create index if not exists idx_batting_player on public.player_batting_stats(pla
 create or replace function private.calc_batting() returns trigger
   language plpgsql set search_path = '' as $$
 declare v_ab numeric; v_h numeric; v_bb numeric; v_hbp numeric; v_sf numeric; v_tb numeric; v_den numeric;
+        v_obp numeric; v_slg numeric;
 begin
   v_ab:=coalesce(NEW.ab,0); v_h:=coalesce(NEW.h,0); v_bb:=coalesce(NEW.bb,0);
   v_hbp:=coalesce(NEW.hbp,0); v_sf:=coalesce(NEW.sf,0);
@@ -62,10 +63,13 @@ begin
   NEW.tb := v_tb;
   NEW.ba  := case when v_ab>0 then round(v_h/v_ab,3) else null end;
   v_den := v_ab+v_bb+v_hbp+v_sf;
-  NEW.obp := case when v_den>0 then round((v_h+v_bb+v_hbp)/v_den,3) else null end;
-  NEW.slg := case when v_ab>0 then round(v_tb/v_ab,3) else null end;
-  NEW.ops := case when NEW.obp is not null or NEW.slg is not null
-                  then round(coalesce(NEW.obp,0)+coalesce(NEW.slg,0),3) else null end;
+  v_obp := case when v_den>0 then (v_h+v_bb+v_hbp)/v_den else null end;
+  v_slg := case when v_ab>0 then v_tb/v_ab else null end;
+  NEW.obp := round(v_obp,3);
+  NEW.slg := round(v_slg,3);
+  -- OPS from FULL-precision OBP+SLG (matches Baseball-Reference), not the rounded pair.
+  NEW.ops := case when v_obp is not null or v_slg is not null
+                  then round(coalesce(v_obp,0)+coalesce(v_slg,0),3) else null end;
   NEW.updated_at := now();
   return NEW;
 end $$;
