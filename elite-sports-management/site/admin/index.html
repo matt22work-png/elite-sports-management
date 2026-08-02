@@ -92,6 +92,27 @@
   .season-block .mini input:focus{outline:0;border-color:var(--gold)}
   .season-derived{margin-top:9px;font-size:12.5px;font-weight:700;color:var(--teal-soft);letter-spacing:.02em}
   @media(max-width:560px){ input,textarea{font-size:16px} .wrap{padding:18px 14px 80px} .sb-meta{grid-template-columns:1fr} .season-grid{grid-template-columns:repeat(3,1fr)} .season-block .mini input{font-size:16px} }
+  /* Baseball-Reference register editor (batting/pitching/fielding wide tables) */
+  .bb-sec{margin:12px 0 18px;border:1px solid var(--line);border-radius:12px;padding:12px;background:rgba(6,20,42,.4)}
+  .bb-sec-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .bb-sec-t{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-soft)}
+  .bb-sec-btns{display:flex;gap:8px}
+  .bb-sec-btns .btn{padding:8px 12px;font-size:12.5px}
+  .bb-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:10px}
+  .bb-table{border-collapse:collapse;font-size:12.5px;min-width:max-content}
+  .bb-table th,.bb-table td{padding:4px 6px;text-align:center;white-space:nowrap;border-bottom:1px solid rgba(217,177,84,.1)}
+  .bb-table thead th{color:var(--gold-soft);font-weight:700;font-size:10px;letter-spacing:.03em;text-transform:uppercase;background:rgba(8,26,51,.85);position:sticky;top:0}
+  .bb-edit input{background:rgba(6,20,42,.85);border:1px solid var(--line);border-radius:6px;padding:5px 4px;color:var(--ink);font-size:13px;font-family:inherit;text-align:center}
+  .bb-edit input.bb-n{width:48px}
+  .bb-edit input.bb-t{width:84px}
+  .bb-edit input:focus{outline:0;border-color:var(--gold)}
+  .bb-table .bb-c{color:var(--teal-soft);font-weight:700}
+  .bb-table .bb-yr{text-align:left;font-weight:700}
+  .bb-del{background:none;border:1px solid rgba(224,93,93,.5);color:var(--red);border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:13px}
+  .bb-del:hover{background:rgba(224,93,93,.12)}
+  .bb-table .bb-tot td{font-weight:800;border-top:2px solid rgba(217,177,84,.35);background:rgba(217,177,84,.06)}
+  .bb-msg{margin-top:8px}
+  @media(max-width:560px){ .bb-edit input{font-size:16px} }
 </style>
 </head>
 <body>
@@ -181,6 +202,9 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- Shared Baseball-Reference stats module (column configs, calc, totals). Classic
+     script so window.BBREF is ready before the deferred module below runs. -->
+<script src="../bbref-stats.js"></script>
 <script type="module">
 const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
@@ -635,6 +659,9 @@ function cardPlayer(p){
         <button class="btn btn-ghost" data-addseason="${p.id}" data-kind="fielding" type="button">+ Fielding</button>
         <button class="btn btn-gold" data-saveseason="${p.id}" type="button">Save season stats</button>
       </div>
+
+      <div class="sub">Career register — Baseball-Reference format <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(enter raw stats only; BA/OBP/SLG/OPS · ERA/WHIP · Fld%/RF etc. auto-calc; "All Levels" totals recompute from summed raw)</span></div>
+      <div class="bbref-editor" id="bbref-${p.id}" data-pid="${p.id}" data-loaded="0"></div>
     </div>
   </div>`;
 }
@@ -711,7 +738,10 @@ function bindActions(){
   document.querySelectorAll("[data-approve]").forEach(b => b.onclick = () => setStatus(+b.dataset.approve, "approved", b));
   document.querySelectorAll("[data-reject]").forEach(b => b.onclick = () => setStatus(+b.dataset.reject, "rejected", b));
   document.querySelectorAll("[data-archive]").forEach(b => b.onclick = () => setStatus(+b.dataset.archive, "archived", b));
-  document.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => $("ed-" + b.dataset.edit).classList.toggle("open"));
+  document.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => {
+    const ed = $("ed-" + b.dataset.edit); ed.classList.toggle("open");
+    if (ed.classList.contains("open")) loadBbref(+b.dataset.edit);   // lazy-load the register on first open
+  });
   document.querySelectorAll("[data-delete]").forEach(b => b.onclick = async () => {
     const id = +b.dataset.delete;
     const p = PLAYERS.find(x => x.id === id);
@@ -881,6 +911,146 @@ $("pw-save").onclick = async () => {
   msg.classList.remove("err"); msg.classList.add("show", "ok");
   toast("Password updated ✓");
 };
+
+/* ---------- Baseball-Reference register editor (batting / pitching / fielding) ----------
+   Uses window.BBREF (bbref-stats.js) for the column layout + derived-stat math, so the
+   admin editor, the public display and the DB triggers all agree. Admin enters ONLY raw
+   stats; BA/ERA/Fld%/… cells and the "All Levels" totals row recompute live on input. */
+const BB_KINDS = [["batting","⚾ Batting"],["pitching","🎯 Pitching"],["fielding","🧤 Fielding"]];
+
+function bbRowHTML(kind, r){
+  r = r || {};
+  const comp = BBREF.calc(kind, r);
+  const cells = BBREF.COLUMNS[kind].map(c => {
+    if (c.type === "calc") return `<td class="bb-c" data-col="${c.k}">${c.fmt(comp[c.k])}</td>`;
+    const v = (r[c.k] != null ? String(r[c.k]) : "");
+    const cls = c.type === "num" ? "bb-n" : "bb-t";
+    const im = c.type === "num" ? 'inputmode="numeric"' : ((c.k === "ip" || c.k === "inn") ? 'inputmode="decimal"' : "");
+    return `<td><input class="${cls}" data-col="${c.k}" ${im} value="${esc(v)}" aria-label="${kind} ${c.h}" /></td>`;
+  }).join("");
+  return `<tr data-row-id="${r.id != null ? r.id : ""}">${cells}<td><button type="button" class="bb-del" title="Remove row" aria-label="Remove row">✕</button></td></tr>`;
+}
+function bbTotalsHTML(kind, rows){
+  const tot = BBREF.totals(kind, rows), nS = BBREF.distinctSeasons(rows);
+  const cells = BBREF.COLUMNS[kind].map((c,i) => {
+    if (i === 0) return `<td class="bb-yr">All Levels (${nS} Season${nS===1?"":"s"})</td>`;
+    if (c.type === "calc") return `<td class="bb-c">${c.fmt(tot.calc[c.k])}</td>`;
+    if (c.type === "num") return `<td>${tot.sum[c.k] ? tot.sum[c.k] : ""}</td>`;
+    if ((kind==="pitching"&&c.k==="ip")||(kind==="fielding"&&c.k==="inn")) return `<td>${BBREF.fmt.fIp(tot.ipNotation)}</td>`;
+    return `<td></td>`;
+  }).join("");
+  return `<tr class="bb-tot">${cells}<td></td></tr>`;
+}
+function bbSectionHTML(kind, label, pid, rows){
+  const head = BBREF.COLUMNS[kind].map(c => `<th>${c.h}</th>`).join("") + "<th></th>";
+  return `<div class="bb-sec" data-kind="${kind}" data-pid="${pid}">
+    <div class="bb-sec-head"><span class="bb-sec-t">${label}</span>
+      <span class="bb-sec-btns"><button type="button" class="btn btn-ghost bb-add">+ Add row</button>
+      <button type="button" class="btn btn-gold bb-save">Save</button></span></div>
+    <div class="bb-scroll"><table class="bb-table bb-edit">
+      <thead><tr>${head}</tr></thead>
+      <tbody>${rows.map(r => bbRowHTML(kind, r)).join("")}</tbody>
+      <tfoot>${bbTotalsHTML(kind, rows)}</tfoot>
+    </table></div>
+    <div class="msg err bb-msg" role="alert" aria-live="assertive"></div>
+  </div>`;
+}
+function bbReadRow(kind, tr){
+  const r = {};
+  BBREF.COLUMNS[kind].forEach(c => {
+    if (c.type === "calc") return;
+    const inp = tr.querySelector(`input[data-col="${c.k}"]`);
+    if (inp){ const v = inp.value.trim(); r[c.k] = v === "" ? null : v; }
+  });
+  return r;
+}
+function bbRecalc(sec){
+  const kind = sec.dataset.kind;
+  sec.querySelectorAll("tbody tr").forEach(tr => {
+    const comp = BBREF.calc(kind, bbReadRow(kind, tr));
+    BBREF.COLUMNS[kind].forEach(c => {
+      if (c.type !== "calc") return;
+      const cell = tr.querySelector(`[data-col="${c.k}"]`);
+      if (cell) cell.textContent = c.fmt(comp[c.k]);
+    });
+  });
+  const rows = [...sec.querySelectorAll("tbody tr")].map(tr => bbReadRow(kind, tr));
+  const tot = BBREF.totals(kind, rows), nS = BBREF.distinctSeasons(rows);
+  const tr = sec.querySelector("tfoot tr"); if (!tr) return;
+  BBREF.COLUMNS[kind].forEach((c,i) => {
+    const cell = tr.children[i]; if (!cell) return;
+    if (i === 0){ cell.textContent = `All Levels (${nS} Season${nS===1?"":"s"})`; return; }
+    if (c.type === "calc") cell.textContent = c.fmt(tot.calc[c.k]);
+    else if (c.type === "num") cell.textContent = tot.sum[c.k] ? tot.sum[c.k] : "";
+    else if ((kind==="pitching"&&c.k==="ip")||(kind==="fielding"&&c.k==="inn")) cell.textContent = BBREF.fmt.fIp(tot.ipNotation);
+    else cell.textContent = "";
+  });
+}
+function bbWireSection(sec){
+  sec._origIds = [...sec.querySelectorAll("tbody tr")].map(tr => tr.dataset.rowId).filter(Boolean).map(Number);
+  sec.addEventListener("input", e => { if (e.target.matches("input[data-col]")) bbRecalc(sec); });
+  sec.addEventListener("click", e => {
+    const del = e.target.closest(".bb-del");
+    if (del){ del.closest("tr").remove(); bbRecalc(sec); }
+  });
+  sec.querySelector(".bb-add").onclick = () => {
+    sec.querySelector("tbody").insertAdjacentHTML("beforeend", bbRowHTML(sec.dataset.kind, {}));
+    bbRecalc(sec);
+  };
+  sec.querySelector(".bb-save").onclick = () => bbSave(sec);
+}
+async function loadBbref(pid){
+  const host = document.getElementById("bbref-" + pid);
+  if (!host || host.dataset.loaded === "1") return;
+  if (typeof BBREF === "undefined"){ host.innerHTML = `<div class="empty">Stats module failed to load.</div>`; return; }
+  host.innerHTML = `<div class="empty">Loading register…</div>`;
+  const data = {};
+  for (const [kind] of BB_KINDS){
+    const { data: rows, error } = await SB.from(BBREF.TABLES[kind]).select("*")
+      .eq("player_id", pid).order("year").order("sort_order").order("id");
+    if (error){ host.innerHTML = `<div class="empty">Couldn't load ${kind} stats: ${esc(error.message)}</div>`; return; }
+    data[kind] = rows || [];
+  }
+  host.innerHTML = BB_KINDS.map(([kind,label]) => bbSectionHTML(kind, label, pid, data[kind])).join("");
+  host.dataset.loaded = "1";
+  host.querySelectorAll(".bb-sec").forEach(bbWireSection);
+}
+async function bbSave(sec){
+  const kind = sec.dataset.kind, pid = +sec.dataset.pid, table = BBREF.TABLES[kind];
+  const msg = sec.querySelector(".bb-msg"); msg.classList.remove("show");
+  const btn = sec.querySelector(".bb-save"); btn.disabled = true;
+  try {
+    const inserts = [], updates = [], keepIds = [];
+    [...sec.querySelectorAll("tbody tr")].forEach((tr, idx) => {
+      const rid = tr.dataset.rowId;
+      const rec = { player_id: pid, sort_order: idx };
+      let any = false;
+      BBREF.COLUMNS[kind].forEach(c => {
+        if (c.type === "calc") return;
+        const inp = tr.querySelector(`input[data-col="${c.k}"]`); if (!inp) return;
+        const v = inp.value.trim();
+        if (v === ""){ rec[c.k] = null; return; }
+        any = true;
+        rec[c.k] = (c.type === "num") ? (Number.isFinite(Number(v)) ? Number(v) : null) : v;
+      });
+      if (!any && !rid) return;              // skip fully-empty new rows
+      if (rid){ rec.id = +rid; keepIds.push(+rid); updates.push(rec); }
+      else inserts.push(rec);
+    });
+    const dels = (sec._origIds || []).filter(id => keepIds.indexOf(id) < 0);
+    if (dels.length){ const { error } = await SB.from(table).delete().in("id", dels); if (error) throw error; }
+    if (inserts.length){ const { error } = await SB.from(table).insert(inserts); if (error) throw error; }
+    for (const u of updates){ const { id, ...rest } = u; const { error } = await SB.from(table).update(rest).eq("id", id); if (error) throw error; }
+    toast(kind.charAt(0).toUpperCase() + kind.slice(1) + " stats saved ✓");
+    // reload the section to pick up server-computed values + freshly-assigned ids
+    const { data: rows } = await SB.from(table).select("*").eq("player_id", pid).order("year").order("sort_order").order("id");
+    sec.querySelector("tbody").innerHTML = (rows || []).map(r => bbRowHTML(kind, r)).join("");
+    sec.querySelector("tfoot").innerHTML = bbTotalsHTML(kind, rows || []);
+    sec._origIds = (rows || []).map(r => r.id).filter(v => v != null);
+    bbRecalc(sec);
+  } catch (err){ msg.textContent = "Save failed: " + (err.message || err); msg.classList.add("show"); }
+  finally { btn.disabled = false; }
+}
 
 /* ---------- pull-to-refresh (installed PWA only) ----------
    An installed PWA has no browser chrome, so it loses Safari's native pull-to-refresh.
