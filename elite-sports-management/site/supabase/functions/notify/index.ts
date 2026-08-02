@@ -76,6 +76,14 @@ function buildMessage(table: string, r: Record<string, unknown>) {
     ];
     return { to: SAM, subject: `${kind}: ${name}`, html: wrap(kind, rowsTable(rows)) };
   }
+  if (table === "tenerife_registrations") {
+    const rows: [string, unknown][] = [
+      ["Name", r.name], ["Email", r.email], ["Phone", r.phone], ["Country", r.country],
+      ["Position", r.position], ["Sport", r.sport], ["Notes", r.notes],
+    ];
+    const kind = "Tenerife Winter League registration";
+    return { to: SAM, subject: `New ${kind}: ${r.name ?? ""}`, html: wrap(kind, rowsTable(rows)) };
+  }
   return null;
 }
 
