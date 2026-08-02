@@ -744,7 +744,7 @@ const LOCAL_PHOTOS = { "jose-cedeno":"media/photos/jose-cedeno.jpg" };
 
 /* ===== EVENTS ===== */
 const EVENTS = [
-  { title:"Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", media:true, icon:"🏝️", image:"media/photos/twl-field-aerial-thumb.jpg", blurb:"Adult division winter league on the coast of Tenerife, Spain — Dec 8–15, 2026. Includes tournament entry, hotel with meals, transport to the seaside field, official jersey and cap, laundry service, and a showcase in front of MLB and college scouts. Registration is open; the first 20 players to sign up get a bonus surprise.", tags:"⚾ Adult Division  ·  🔭 MLB & College Scouts  ·  🎁 First 20 get a bonus", email:"elitesportsmanagement50@gmail.com" }
+  { title:"Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", media:true, icon:"🏝️", image:"media/photos/twl-field-aerial-thumb.jpg", blurb:"Adult division winter league on the coast of Tenerife, Spain — Dec 8–15, 2026. Includes tournament entry, hotel with meals, transport to the seaside field, official jersey and cap, laundry service, and a showcase in front of MLB and college scouts. Registration is open; the first 20 players to sign up get a bonus surprise.", tags:"⚾ Adult Division  ·  🔭 MLB & College Scouts  ·  🎁 First 20 get a bonus", reg_url:"tenerife/" }
 ];
 
 /* ===== TESTIMONIALS =====
@@ -1430,7 +1430,7 @@ function openEventModal(i){
       <p class="bio">${esc(e.blurb)}</p>
       ${e.tags?`<div class="ev-tags" style="margin:-10px 0 24px">${esc(e.tags)}</div>`:""}
       ${media}
-      ${e.email?`<div style="margin-top:28px"><a class="btn btn-gold" href="mailto:${e.email}?subject=${encodeURIComponent(e.title+" \u2014 Registration")}">${t("ev_register")} \u2192</a></div>`:""}
+      ${(e.reg_url||e.email)?`<div style="margin-top:28px"><a class="btn btn-gold" href="${e.reg_url?esc(e.reg_url):("mailto:"+e.email+"?subject="+encodeURIComponent(e.title+" \u2014 Registration"))}">${t("ev_register")} \u2192</a></div>`:""}
     </div>`;
   document.querySelectorAll("#sheetContent .gal button").forEach(b=>b.onclick=()=>openLightbox(b.dataset.full,b.dataset.cap));
   document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";

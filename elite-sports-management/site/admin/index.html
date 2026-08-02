@@ -162,6 +162,9 @@
     <div class="kicker">All accounts</div>
     <div id="allAccounts"></div>
 
+    <div class="kicker">Tenerife registrants<span class="count" id="tenCount">0</span></div>
+    <div id="tenList"></div>
+
     <div class="kicker">Your account</div>
     <div class="card">
       <div class="acct-meta" id="acctWho"></div>
@@ -306,6 +309,76 @@ async function load(){
   LOADED_ONCE = true;
   render();
   loadAccounts();
+  loadTenerife();
+}
+
+/* ---------- Tenerife Winter League registrants ---------- */
+let TENERIFE = [];
+async function loadTenerife(){
+  const { data, error } = await SB.from("tenerife_registrations").select("*").order("created_at", { ascending: false });
+  if (error){ $("tenList").innerHTML = `<div class="card empty">Couldn't load Tenerife registrants: ${esc(error.message)}</div>`; return; }
+  TENERIFE = data || [];
+  renderTenerife();
+}
+function cardTenerife(r){
+  const st = r.status;
+  const details = [
+    r.email ? `<b>Email:</b> ${esc(r.email)}` : "",
+    r.phone ? `<b>Phone:</b> ${esc(r.phone)}` : "",
+    r.country ? `<b>Country:</b> ${esc(r.country)}` : "",
+    r.sport ? `<b>Sport:</b> ${esc(r.sport)}` : "",
+    r.position ? `<b>Position:</b> ${esc(r.position)}` : "",
+  ].filter(Boolean).join(" &nbsp;·&nbsp; ");
+  const payOpts = ["unpaid","submitted","verified"].map(v => `<option value="${v}"${r.payment_status===v?" selected":""}>${v}</option>`).join("");
+  return `<div class="card" data-ten="${r.id}">
+    <div class="p-head"><span class="avatar">${esc(initials(r.name))}</span>
+      <div style="flex:1"><h3 class="display">${esc(r.name)}</h3>
+        <div class="chips-row" style="margin-top:4px">
+          <span class="chip ${esc(st)}">${esc(st)}</span>
+          <span class="chip pay-${esc(r.payment_status)}">💳 ${esc(r.payment_status)}</span>
+        </div>
+      </div>
+    </div>
+    ${details ? `<div class="acct-meta">${details}</div>` : ""}
+    ${r.notes ? `<div class="acct-meta"><b>Their notes:</b> ${esc(r.notes)}</div>` : ""}
+    <div class="acct-meta"><b>Registered:</b> ${esc(fmtDate(r.created_at))}</div>
+    <div class="pay-select"><label for="tenpay-${r.id}">Payment:</label>
+      <select id="tenpay-${r.id}" data-tenpay="${r.id}" aria-label="Payment status for ${esc(r.name)}">${payOpts}</select>
+    </div>
+    <div class="row-btns">
+      ${st !== "approved" ? `<button class="btn btn-teal" data-ten-approve="${r.id}">✓ Confirm spot</button>` : ""}
+      ${st !== "rejected" ? `<button class="btn btn-red" data-ten-reject="${r.id}">✕ Reject</button>` : ""}
+      ${st !== "archived" ? `<button class="btn btn-ghost" data-ten-archive="${r.id}">🗄 Archive</button>` : ""}
+    </div>
+  </div>`;
+}
+function renderTenerife(){
+  const pending = TENERIFE.filter(r => r.status === "pending").length;
+  $("tenCount").textContent = pending;
+  $("tenList").innerHTML = TENERIFE.length ? TENERIFE.map(cardTenerife).join("")
+    : `<div class="card empty">No Tenerife registrations yet.</div>`;
+  bindTenerifeActions();
+}
+async function setTenStatus(id, status, btn){
+  btn.disabled = true;
+  const { error } = await SB.from("tenerife_registrations").update({ status }).eq("id", id);
+  btn.disabled = false;
+  if (error){ toast("Update failed: " + error.message, true); return; }
+  const r = TENERIFE.find(x => x.id === id); if (r) r.status = status;
+  toast(status === "approved" ? "Spot confirmed ✓" : status === "rejected" ? "Registration rejected" : "Archived 🗄");
+  renderTenerife();
+}
+function bindTenerifeActions(){
+  document.querySelectorAll("[data-ten-approve]").forEach(b => b.onclick = () => setTenStatus(+b.dataset.tenApprove, "approved", b));
+  document.querySelectorAll("[data-ten-reject]").forEach(b => b.onclick = () => setTenStatus(+b.dataset.tenReject, "rejected", b));
+  document.querySelectorAll("[data-ten-archive]").forEach(b => b.onclick = () => setTenStatus(+b.dataset.tenArchive, "archived", b));
+  document.querySelectorAll("[data-tenpay]").forEach(sel => sel.onchange = async () => {
+    const id = +sel.dataset.tenpay;
+    const { error } = await SB.from("tenerife_registrations").update({ payment_status: sel.value }).eq("id", id);
+    if (error){ toast("Payment update failed: " + error.message, true); return; }
+    const r = TENERIFE.find(x => x.id === id); if (r) r.payment_status = sel.value;
+    toast("Payment marked " + sel.value);
+  });
 }
 
 /* ---------- registered accounts (profiles + scouts) ---------- */
