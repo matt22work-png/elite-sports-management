@@ -563,7 +563,7 @@ function cardPending(p){
   const isPaidProfile = ["registration","profile-gate"].includes(p.source);
   return `<div class="card" data-id="${p.id}">
     <div class="p-head">${avatar(p)}
-      <div style="flex:1"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position||p.group||"")} ${p.flag||""}</div></div>
+      <div style="flex:1"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position||p.group||"")} ${p.flag||""}${p.country?` <span style="color:var(--muted);font-weight:600">${esc(p.country)}</span>`:""}</div></div>
       ${isPaidProfile ? `<span class="chip paid" title="Self-created player profile (paid account flow)">💳 Paid profile</span>` : `<span class="chip" style="opacity:.6">Applicant</span>`}
     </div>
     ${contact ? `<div class="p-meta">${contact}</div>` : ""}
@@ -592,7 +592,7 @@ function cardPlayer(p){
   ].filter(Boolean).join("");
   return `<div class="card" data-id="${p.id}">
     <div class="p-head">${avatar(p)}
-      <div style="flex:1"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position||p.group||"")} ${p.flag||""}</div></div>
+      <div style="flex:1"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position||p.group||"")} ${p.flag||""}${p.country?` <span style="color:var(--muted);font-weight:600">${esc(p.country)}</span>`:""}</div></div>
       <span class="chip ${esc(p.status)}">${esc(p.status)}</span>
     </div>
     <div class="row-btns">

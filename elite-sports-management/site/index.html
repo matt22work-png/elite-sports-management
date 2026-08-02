@@ -198,6 +198,8 @@
   .pcard .body{padding:17px 18px 20px}
   .pcard .body h3{font-size:19px;line-height:1.15}
   .pcard .pos{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:3px}
+  .pcard .country{color:var(--muted);font-size:13px;margin-top:9px;display:flex;align-items:center;gap:6px}
+  .pcard .country .cflag{font-size:15px;line-height:1;flex:none}
   .pcard .team{color:var(--muted);font-size:13px;margin-top:11px;display:flex;align-items:center;gap:7px}
   .pcard .team::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--teal-soft);flex:none}
   .pcard .view{margin-top:14px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
@@ -998,6 +1000,11 @@ const DIAL_CODES=[
   {c:"AR",n:"Argentina",d:"+54",f:"🇦🇷"},{c:"CW",n:"Curaçao",d:"+599",f:"🇨🇼"},
   {c:"AW",n:"Aruba",d:"+297",f:"🇦🇼"},
 ];
+// Country → flag derived straight from the DIAL_CODES list above (single source of
+// truth, shared with the phone country-code input) — no second hardcoded mapping.
+// Unknown/unlisted country → "" so the card just shows the text with no flag.
+const CC_FLAG = DIAL_CODES.reduce((m,x)=>{ if(!(x.n in m)) m[x.n]=x.f; return m; }, {});
+const countryFlag = c => CC_FLAG[c] || "";
 function fillCC(sel, def){ if(!sel)return; sel.innerHTML=DIAL_CODES.map(x=>`<option value="${x.d}"${x.c===def?" selected":""}>${x.f} ${esc(x.n)} ${x.d}</option>`).join(""); }
 function combinePhone(ccId, numId){ const cc=document.getElementById(ccId), num=document.getElementById(numId); const n=((num&&num.value)||"").trim(); return n?(((cc&&cc.value)||"")+" "+n).trim():""; }
 
@@ -1352,6 +1359,7 @@ function renderRoster(){
       <div class="top" style="${bgImg(p.image)}"><span class="flag">${esc(flagFor(p))}${p.heritage?(" "+esc(p.heritage)):""}</span>
         ${p.tier?`<span class="tier">${esc(p.tier)}</span>`:""}${p.image?"":`<span class="mono">${initials(p.name)}</span>`}</div>
       <div class="body"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position)}</div>
+        ${p.country?`<div class="country">${countryFlag(p.country)?`<span class="cflag">${esc(countryFlag(p.country))}</span>`:""}${esc(p.country)}</div>`:""}
         ${p.teams&&p.teams[0]?`<div class="team">${esc(p.teams[0])}</div>`:""}<div class="view">${t("card_view")}</div></div>
     </${tag}>`;
   }).join("");
