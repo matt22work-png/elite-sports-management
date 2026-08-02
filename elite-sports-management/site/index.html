@@ -360,17 +360,10 @@
 
   /* ===== roster paywall ===== */
   .roster-wrap{position:relative}
-  /* The locked gate overlay is position:absolute;inset:0, so it takes the wrap's
-     height. A sport/position filter matching few or zero athletes would otherwise
-     shrink the wrap below the gate card, making the gate spill over the sections
-     above/below (the "filter tabs break the layout" bug). A min-height reserves
-     room for the overlay no matter how many cards match. Only applies while locked. */
-  .roster-wrap.is-locked{min-height:540px}
   .roster-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:34px 12px;font-size:15px}
-  .roster-wrap.is-locked .roster{filter:blur(9px) saturate(.55);pointer-events:none;user-select:none;max-height:600px;overflow:hidden}
-  .roster-wrap.is-locked::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,20,42,.3),rgba(6,20,42,.93));pointer-events:none;border-radius:18px}
-  .gate{display:none}
-  .roster-wrap.is-locked .gate{display:flex;position:absolute;inset:0;align-items:center;justify-content:center;z-index:3;padding:18px}
+  /* Coaches/teams CTA below the (now public) roster → the paid account flow. */
+  .roster-cta{text-align:center;margin-top:34px;border-top:1px solid var(--line);padding-top:28px}
+  .roster-cta p{color:var(--muted);font-size:15px;max-width:54ch;margin:0 auto 16px}
   .gate-in{max-width:520px;width:100%;text-align:center;border:1px solid var(--gold);border-radius:20px;padding:32px 28px;background:linear-gradient(180deg,rgba(12,33,67,.97),rgba(6,20,42,.99));box-shadow:0 26px 60px rgba(0,0,0,.55)}
   .gate-lock{font-size:25px;margin-bottom:10px}
   .gate-in h3{font-family:'Anton';font-size:23px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px}
@@ -565,27 +558,19 @@
 
 <section class="sec" id="roster" style="padding-top:10px"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="roster_kicker"></div><h2 class="display" data-i18n="roster_h2"></h2><p data-i18n="roster_p"></p></div>
-  <div class="unlocked-note" id="unlockedNote">✓ <span data-i18n="gate_unlocked"></span></div>
   <div class="filters" id="sportFilters"></div>
   <div class="filters" id="filters"></div>
 
-  <div class="roster-wrap is-locked" id="rosterWrap">
+  <div class="roster-wrap" id="rosterWrap">
     <div class="roster" id="rosterList"></div>
-    <div class="gate">
-      <div class="gate-in">
-        <div class="gate-lock">🔒</div>
-        <h3 data-i18n="gate_h"></h3>
-        <p data-i18n="gate_p"></p>
-        <div class="gate-price">$49.99<small data-i18n="gate_price_note"></small></div>
-        <a class="btn btn-gold" id="rosterPayBtn" href="#" target="_blank" rel="noopener" style="margin-top:18px" data-i18n="gate_btn"></a>
-        <div class="gate-or" data-i18n="gate_or"></div>
-        <form class="gate-code" id="gateForm">
-          <input id="gateInput" type="text" autocomplete="off" spellcheck="false" placeholder="ACCESS CODE" aria-label="Access code" />
-          <button type="submit" data-i18n="gate_unlock"></button>
-        </form>
-        <div class="gate-err" id="gateErr" data-i18n="gate_err"></div>
-      </div>
-    </div>
+  </div>
+
+  <!-- Full roster access (athlete contact details) is the paid product now — coaches
+       and teams register + pay via the account flow at /register/ (Phase 2). The old
+       SHA-256 blur gate on the public roster was removed. -->
+  <div class="roster-cta">
+    <p data-i18n="roster_cta_p"></p>
+    <a class="btn btn-gold" href="register/" data-i18n="roster_cta_btn"></a>
   </div>
 </div></section>
 
@@ -721,25 +706,18 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
    Create these in the Stripe Dashboard (see STRIPE-SETUP.md) and paste the URLs
    here. Until they're filled in, the pay buttons fall back to emailing ESM, so
    nothing on the site is a dead end. */
-const STRIPE_ROSTER_URL   = "";   // $49.99 — lifetime roster access (scouts & teams)
 const STRIPE_REGISTER_URL = "";   // $125   — athlete registration
 const STRIPE_COLLEGE_URL  = "";   // college placement — price TBD
 const FALLBACK_EMAIL      = "mailto:elitesportsmanagement50@gmail.com";
 
-/* Contact: a scout who bought roster access already paid, so the profile just
-   puts them in touch. If you ever want a separate per-player contact fee, put a
-   Stripe link in STRIPE_CONTACT_URL and the button starts charging again. */
+/* Contact button on a player modal — a nudge to reach ESM about the athlete.
+   Empty → falls back to an email enquiry (no per-player fee). */
 const STRIPE_CONTACT_URL = "";
 
-/* ===== Roster access code =====
-   The roster is gated client-side. We store the SHA-256 of each valid code, so
-   the code itself isn't sitting in plain sight in the page source.
-   Current code: ESM-SCOUT-2026   (to change it, see STRIPE-SETUP.md)
-   Honest limits: this stops casual sharing, not a determined person. The player
-   HTML still ships to the browser. Move to real logins when revenue justifies it. */
-const ROSTER_CODE_HASHES = ["99b2bfb3a4ac35e32491d22207e082500404dbbd30f0cd8a5152cd6185c3cc58"];
-const UNLOCK_KEY = "esm_roster_unlock_v1";
-/* Profile creation (€124.99) is no longer a client-side code gate — it now runs
+/* Roster access ($49.99) is no longer a client-side SHA-256 code gate — the public
+   roster is open, and full contact access is the scout account flow (/register/ →
+   /scout/). The old ROSTER_CODE_HASHES/UNLOCK_KEY gate was removed in Phase 2.
+   Profile creation (€124.99) is no longer a client-side code gate either — it now runs
    through the real account flow at /register/ (sign up → profile + stats → Wise
    payment → admin approval → portal). The old SHA-256 profile gate was removed in
    Phase 1; the roster gate above stays until Phase 2 replaces it the same way. */
@@ -848,7 +826,7 @@ const T = {
     mz_bio3:"She has competed in Italy's Serie A1, the country's highest level of softball, since 2020 and is entering her fourth season playing in the United States.",
     mz_cred1:"NASM Certified Personal Trainer",mz_cred2:"Italian National Team ×3",mz_cred3:"U22 European Champion · Gold 2026",mz_cred4:"LSC All-Conference Tournament Team 2026",mz_cred5:"Serie A1 · Italy's Top Level",mz_contact:"Contact Her",sam_contact:"Contact Him",
     roster_kicker:"The Roster",roster_h2:"A growing family of baseball players from around the world",
-    roster_p:"A growing family of ballplayers from the Dominican Republic, Venezuela, Spain, Colombia, Italy and the United States.",
+    roster_p:"A growing family of ballplayers from the Dominican Republic, Venezuela, Spain, Colombia, Italy and the United States.",roster_cta_p:"Are you a coach or team? Get full roster access with athlete contact details — 1 year, plus 1 year free.",roster_cta_btn:"Get roster access →",
     filter_all:"All",filter_pitcher:"Pitchers",filter_catcher:"Catchers",filter_infielder:"Infielders",filter_twoway:"Two-Way",card_view:"View profile →",roster_empty:"No athletes in this category yet.",
     events_kicker:"Events",events_h2:"Camps, Showcases & Tournaments",events_p:"Where Elite Sports Management athletes train, compete and get seen.",
     ev_upcoming:"Upcoming",ev_past:"Past",ev_register:"Register",ev_gallery:"View media & photos",
@@ -924,7 +902,7 @@ const T = {
     mz_bio3:"Compite en la Serie A1 de Italia, la máxima categoría del país, desde 2020 y está por comenzar su cuarta temporada jugando en Estados Unidos.",
     mz_cred1:"Entrenadora Personal Certificada NASM",mz_cred2:"Selección de Italia ×3",mz_cred3:"Campeona Europea U22 · Oro 2026",mz_cred4:"Equipo All-Conference del Torneo LSC 2026",mz_cred5:"Serie A1 · Máxima Categoría de Italia",mz_contact:"Contáctala",sam_contact:"Contáctalo",
     roster_kicker:"Los Jugadores",roster_h2:"Una familia creciente de jugadores de béisbol de todo el mundo",
-    roster_p:"Una familia creciente de peloteros de República Dominicana, Venezuela, España, Colombia, Italia y Estados Unidos.",
+    roster_p:"Una familia creciente de peloteros de República Dominicana, Venezuela, España, Colombia, Italia y Estados Unidos.",roster_cta_p:"¿Eres entrenador o equipo? Consigue acceso completo al roster con los datos de contacto de los atletas — 1 año, más 1 año gratis.",roster_cta_btn:"Consigue acceso al roster →",
     filter_all:"Todos",filter_pitcher:"Lanzadores",filter_catcher:"Receptores",filter_infielder:"Infielders",filter_twoway:"Dos Vías",card_view:"Ver perfil →",roster_empty:"Aún no hay atletas en esta categoría.",
     events_kicker:"Eventos",events_h2:"Camps, Showcases y Torneos",events_p:"Donde los atletas de Elite Sports Management entrenan, compiten y se hacen ver.",
     ev_upcoming:"Próximo",ev_past:"Pasado",ev_register:"Inscribirse",ev_gallery:"Ver fotos y videos",
@@ -1000,7 +978,7 @@ const T = {
     mz_bio3:"Gioca nella Serie A1, il massimo campionato italiano di softball, dal 2020 ed è pronta ad affrontare la sua quarta stagione negli Stati Uniti.",
     mz_cred1:"Personal Trainer Certificata NASM",mz_cred2:"Nazionale Italiana ×3",mz_cred3:"Campionessa Europea U22 · Oro 2026",mz_cred4:"Tournament Team All-Conference LSC 2026",mz_cred5:"Serie A1 · Massimo Campionato Italiano",mz_contact:"Contattala",sam_contact:"Contattalo",
     roster_kicker:"Il Roster",roster_h2:"Una famiglia in crescita di giocatori di baseball da tutto il mondo",
-    roster_p:"Una famiglia in crescita di giocatori da Repubblica Dominicana, Venezuela, Spagna, Colombia, Italia e Stati Uniti.",
+    roster_p:"Una famiglia in crescita di giocatori da Repubblica Dominicana, Venezuela, Spagna, Colombia, Italia e Stati Uniti.",roster_cta_p:"Sei un allenatore o una squadra? Ottieni l'accesso completo al roster con i contatti degli atleti — 1 anno, più 1 anno gratis.",roster_cta_btn:"Ottieni l'accesso al roster →",
     filter_all:"Tutti",filter_pitcher:"Lanciatori",filter_catcher:"Ricevitori",filter_infielder:"Interni",filter_twoway:"Due Ruoli",card_view:"Vedi profilo →",roster_empty:"Ancora nessun atleta in questa categoria.",
     events_kicker:"Eventi",events_h2:"Camp, Showcase e Tornei",events_p:"Dove gli atleti di Elite Sports Management si allenano, competono e si fanno notare.",
     ev_upcoming:"In arrivo",ev_past:"Passato",ev_register:"Iscriviti",ev_gallery:"Foto e video",
@@ -1548,46 +1526,10 @@ function openModal(slug){
     </div>`;
   document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
 }
-/* ===== roster paywall =====
-   Client-side gate: the valid code's SHA-256 lives in ROSTER_CODE_HASHES, and the
-   unlock is remembered in localStorage so a buyer only enters it once. */
-function isUnlocked(){try{return localStorage.getItem(UNLOCK_KEY)==="1"}catch(e){return false}}
-
-async function sha256Hex(str){
-  const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(str));
-  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
-}
-function applyLockState(){
-  const wrap=document.getElementById("rosterWrap");
-  const note=document.getElementById("unlockedNote");
-  const open=isUnlocked();
-  if(wrap)wrap.classList.toggle("is-locked",!open);
-  if(note)note.classList.toggle("show",open);
-}
-function unlockRoster(){
-  try{localStorage.setItem(UNLOCK_KEY,"1")}catch(e){}
-  applyLockState();
-  renderRoster();
-}
-const gateForm=document.getElementById("gateForm");
-if(gateForm)gateForm.addEventListener("submit",async e=>{
-  e.preventDefault();
-  const err=document.getElementById("gateErr");
-  const val=(document.getElementById("gateInput").value||"").trim().toUpperCase();
-  err.classList.remove("show");
-  if(!val)return;
-  let hash="";
-  try{hash=await sha256Hex(val);}
-  catch(ex){console.warn("crypto.subtle unavailable",ex);err.classList.add("show");return;}
-  if(ROSTER_CODE_HASHES.includes(hash)){
-    unlockRoster();
-    document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
-  }else{
-    err.classList.add("show");
-  }
-});
-
-/* The €124.99 profile-creation gate was removed in Phase 1 — profile creation now
+/* The public roster is no longer paywalled — the SHA-256 blur gate was removed in
+   Phase 2. Full roster access (athlete contact details) is now the paid product,
+   delivered through the scout account flow at /register/ → /scout/. The €124.99
+   profile-creation gate was likewise removed in Phase 1 — profile creation now
    runs through the real account flow at /register/. The #profile section is a plain
    marketing card with a CTA to that page (no client-side code/localStorage gate). */
 
@@ -1607,7 +1549,6 @@ function wireServiceSignups(){
 /* Point each pay button at its Stripe link; fall back to email until they exist. */
 function wirePayButtons(){
   const set=(id,url)=>{const el=document.getElementById(id);if(el)el.href=url||FALLBACK_EMAIL;};
-  set("rosterPayBtn",STRIPE_ROSTER_URL);
   set("joinPayBtn",STRIPE_REGISTER_URL);
   const col=document.getElementById("collegePayBtn");
   if(col)col.href=STRIPE_COLLEGE_URL||"#join";
@@ -1711,11 +1652,6 @@ async function boot(){
   wireServiceSignups();
   applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();
 }
-// Apply the roster lock state synchronously, before boot()'s async network work.
-// The lock depends only on localStorage; gating it behind the esm.sh import + Supabase
-// fetch made already-unlocked visitors see the "$49.99" gate flash on slow connections
-// (the roster ships with `is-locked` in the HTML and JS only removes it once unlocked).
-applyLockState();
 // Wire the pay buttons synchronously too: their hrefs come only from top-level
 // constants (no network), so doing this before boot()'s async import+fetch means the
 // "$49.99" roster button always has a working target even if the connection stalls —
