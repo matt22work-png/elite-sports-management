@@ -527,6 +527,29 @@ function avatar(p){
     : `<span class="avatar">${esc(initials(p.name))}</span>`;
 }
 
+/* Read-only summary of the stats a self-created applicant entered at signup, shown
+   right in the pending card so Sam can review them BEFORE approving. Raw totals +
+   the same auto-derived AVG/OBP/SLG · ERA/WHIP · Fld%. Full editing stays under the
+   "All players" editor, where the same pending row also appears. */
+function pendingStatsHTML(p){
+  const hi = (Array.isArray(p.stats) ? p.stats : []).filter(s => s && (s.label || s.value));
+  const ss = Array.isArray(p.season_stats) ? p.season_stats : [];
+  if (!hi.length && !ss.length) return "";
+  let out = `<div class="p-meta" style="margin-top:12px"><b>Stats they entered</b> <span style="color:var(--muted);font-weight:600">(review before approving)</span></div>`;
+  if (hi.length){
+    out += `<div class="p-meta">🏅 ${hi.map(s => `${esc(s.label)}${s.label && s.value ? ": " : ""}${esc(s.value)}`).join(" &nbsp;·&nbsp; ")}</div>`;
+  }
+  ss.forEach(r => {
+    const raw = (SEASON_FIELDS[r.kind] || [])
+      .map(f => (r[f] !== undefined && r[f] !== null && r[f] !== "") ? `${f} ${esc(String(r[f]))}` : null)
+      .filter(Boolean).join("&nbsp; ");
+    const head = [r.season, r.team, r.level].filter(Boolean).map(esc).join(" · ");
+    out += `<div class="p-meta">${SEASON_KIND[r.kind] || esc(r.kind)}${head ? " — " + head : ""}` +
+           `${raw ? `<br>${raw}` : ""}<span style="color:var(--teal-soft)"> &nbsp;${esc(seasonDerived(r.kind, r))}</span></div>`;
+  });
+  return out;
+}
+
 function cardPending(p){
   const contact = [
     p.age ? `<b>Age:</b> ${esc(p.age)}` : null,
@@ -535,14 +558,18 @@ function cardPending(p){
     p.instagram ? `<b>IG:</b> ${esc(p.instagram)}` : null,
     p.applying_for ? `<b>Applying for:</b> ${esc(p.applying_for)}` : null,
   ].filter(Boolean).join(" &nbsp;·&nbsp; ");
+  // Self-created paid profiles come through the /register/ account flow (source
+  // "registration"); "profile-gate" is the retired legacy source, kept for old rows.
+  const isPaidProfile = ["registration","profile-gate"].includes(p.source);
   return `<div class="card" data-id="${p.id}">
     <div class="p-head">${avatar(p)}
       <div style="flex:1"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position||p.group||"")} ${p.flag||""}</div></div>
-      ${p.source === "profile-gate" ? `<span class="chip paid" title="Paid €124.99 self-created profile">💳 Paid profile</span>` : `<span class="chip" style="opacity:.6">Applicant</span>`}
+      ${isPaidProfile ? `<span class="chip paid" title="Self-created player profile (paid account flow)">💳 Paid profile</span>` : `<span class="chip" style="opacity:.6">Applicant</span>`}
     </div>
     ${contact ? `<div class="p-meta">${contact}</div>` : ""}
     ${p.bio ? `<div class="p-meta">${esc(p.bio)}</div>` : ""}
     ${p.message ? `<div class="p-meta"><b>Message:</b> ${esc(p.message)}</div>` : ""}
+    ${pendingStatsHTML(p)}
     <div class="row-btns">
       <button class="btn btn-teal" data-approve="${p.id}">✓ Approve</button>
       <button class="btn btn-red" data-reject="${p.id}">✕ Reject</button>
