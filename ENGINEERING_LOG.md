@@ -160,6 +160,20 @@ Server-side, provider-agnostic (reacts to the submission row, not to how payment
 - **MANUAL ACTIVATION (Sam/Matt)** — full steps in `supabase-notify.sql` header: (1) Resend account + **verified sending domain** + API key (Gmail delivery needs a verified domain; onboarding@resend.dev only reaches the Resend owner). (2) Set function secrets `RESEND_API_KEY`, `NOTIFY_SECRET`, `NOTIFY_FROM` (dashboard/CLI — no MCP tool for function secrets). (3) `alter database postgres set app.notify_url=…` + `app.notify_secret=<same NOTIFY_SECRET>`. (4) Submit a test application. Disable anytime with `alter database postgres reset app.notify_url`.
 - Tenerife notifications (Phase 2) will ride the existing profiles path → Sam once that flow exists.
 
+### PHASE 2 — Roster $49.99 + Tenerife €559.99 (session 2026-08-01) — DONE + validated
+Replicated the Phase 1 pattern (account/registration → external Wise payment → admin approval), provider-agnostic.
+- **Roster $49.99** (`5de71d4`): removed the homepage SHA-256 blur gate entirely (HTML gate + `.is-locked` blur CSS + all JS: `isUnlocked`/`sha256Hex`/`applyLockState`/`unlockRoster`/`gateForm` + `ROSTER_CODE_HASHES`/`UNLOCK_KEY`/`STRIPE_ROSTER_URL`). Public roster is now OPEN (names/positions, still no PII). Added a coaches/teams CTA below it → `/register/` (full contact access = the scout account flow → `/scout/`, `scout_roster()` RPC). Scout registration payment → **Wise $49.99** (`Zhxkm7xyYL04RjA`) + roster service summary + "1 year + 1 year free". Copy: "coach or team" (was scouts & teams). Dead `gate_*` i18n keys left inert (unused).
+- **Tenerife €559.99 DB** (`02b71ad`, `supabase-tenerife.sql`, APPLIED as `tenerife_registrations`): one-time event signup, NO login account (unlike player/scout). Table + RLS: anon/authenticated INSERT pending+unpaid only, admin read/manage. **RLS verified two ways** — simulated roles (rolled back) AND a LIVE anon REST test: pending insert→201, approved insert→401 (blocked), anon read→42501 (denied); test rows deleted. Notify: extended `notify_submission()` + `trg_notify_tenerife` → Sam; redeployed the notify Edge Function (v2) with the Tenerife branch.
+- **Tenerife page** (`113a27b`, `/tenerife/index.html`): standalone anon form (name/email/phone[country-code]/country/sport/position/notes) → insert-only (return=minimal) → Wise €559.99 (`f9KLiw__7mOkDTI`) payment step. noindex; robots disallow.
+- **Tenerife admin + entry** (`6ea8d21`): admin "Tenerife registrants" section (confirm spot / reject / archive, payment selector, pending count). Winter League event modal "Register" → `/tenerife/` (new event `reg_url` field; email fallback for other events).
+- All pages `node --check` clean; advisors clean (no new issues). Not clicked-through in a browser (forms need a real session), but the anon insert path is LIVE-verified.
+
+### STOP & ASK C / D / E — BLOCKED pending Matt (do NOT re-ask; skip these sub-items)
+- **C. Bank info** — "add Samuele's bank info": purpose + location unclear. Wise links already route payment. NOT added (won't put banking details on the site without knowing why/where). Awaiting Matt.
+- **D. "Take away picture from the photos"** (Tenerife gallery) — ambiguous (remove which photo? the reel? a placeholder?). Gallery untouched. Awaiting Matt.
+- **E. Gallery "folder" UX** ("Tenerife 2025 Edition") — intended interaction unclear (folder grid? accordion? separate page?). Not built. Awaiting Matt.
+These are the only outstanding master-prompt items; everything else is complete.
+
 ## In progress
 - Phase 1 (profile-creation flow) built + validated; awaiting Sam's live click-through review before Phase 2. Phases 3, 4, 7 done. STOP&ASK C/D/E open. Remaining roadmap: Phase 2 (roster/Tenerife — GATED on Sam's Phase-1 review; includes the Tenerife admin section), Phase 5 (pricing/copy incl. form-field reduction B), Phase 6 (email notifications).
 
