@@ -167,6 +167,7 @@ const DICT = {
     p_questions:"Questions?", p_email_us:"Email us",
     p_loading:"Loading your profile…", p_load_fail:"Couldn't load your profile.",
     p_none_1:"No athlete profile found for", p_none_2:'If you applied with a different email, sign out and use that one. Otherwise <a href="../index.html#join">submit an application</a>.',
+    p_setup:"Your athlete profile is being set up. Your details and stats will appear here once Elite Sports Management adds them.",
     p_note_pending:"Your application is with Samuele for review. You'll hear from us soon.",
     p_note_approved:"You're live on the ESM roster.",
     p_note_rejected:"This profile isn't currently shown on the roster. Reach out if you think that's wrong.",
@@ -204,6 +205,7 @@ const DICT = {
     p_questions:"¿Preguntas?", p_email_us:"Escríbenos",
     p_loading:"Cargando tu perfil…", p_load_fail:"No pudimos cargar tu perfil.",
     p_none_1:"No se encontró ningún perfil de atleta para", p_none_2:'Si aplicaste con otro correo, cierra sesión y usa ese. Si no, <a href="../index.html#join">envía una solicitud</a>.',
+    p_setup:"Tu perfil de atleta se está preparando. Tus datos y estadísticas aparecerán aquí en cuanto Elite Sports Management los añada.",
     p_note_pending:"Tu solicitud está con Samuele para revisión. Pronto tendrás noticias.",
     p_note_approved:"Estás en el roster de ESM.",
     p_note_rejected:"Este perfil no se muestra actualmente en el roster. Contáctanos si crees que es un error.",
@@ -241,6 +243,7 @@ const DICT = {
     p_questions:"Domande?", p_email_us:"Scrivici",
     p_loading:"Caricamento del tuo profilo…", p_load_fail:"Impossibile caricare il tuo profilo.",
     p_none_1:"Nessun profilo atleta trovato per", p_none_2:'Se ti sei candidato con un\'altra email, esci e usa quella. Altrimenti <a href="../index.html#join">invia una candidatura</a>.',
+    p_setup:"Il tuo profilo atleta è in fase di creazione. I tuoi dati e le statistiche appariranno qui non appena Elite Sports Management li aggiunge.",
     p_note_pending:"La tua candidatura è in revisione da Samuele. Ti faremo sapere presto.",
     p_note_approved:"Sei sul roster ESM.",
     p_note_rejected:"Questo profilo al momento non è mostrato sul roster. Contattaci se pensi sia un errore.",
@@ -395,14 +398,21 @@ SB.auth.onAuthStateChange((evt, session) => {
   }
 })();
 
-/* View-only. RLS only returns the row whose `email` matches the signed-in user,
-   so an athlete physically cannot read anyone else's profile — this isn't just a
-   UI restriction. Editing of stats is deliberately not offered: the agency owns them
-   (only bio/contact/photo are self-editable, via the update_my_profile RPC). */
+/* Fully read-only. The row is matched by owner_id = auth.uid() (falling back to email),
+   and RLS ("athlete reads own row") only ever returns the signed-in athlete's own row —
+   this isn't just a UI restriction. No edit/upload controls: ESM (admin) owns all
+   corrections; the player requests changes by email (see p_help). */
 async function loadMe(session){
   const email = session?.user?.email || "";
+  const uid = session?.user?.id || "";
   $("profile").innerHTML = `<div class="card empty">${esc(t("p_loading"))}</div>`;
-  const { data, error } = await SB.from("players").select("*").eq("email", email).limit(1);
+  // Find the athlete's own roster row by owner_id first (set at registration), then by
+  // email. RLS ("athlete reads own row") only ever returns their own row regardless.
+  let resp = uid ? await SB.from("players").select("*").eq("owner_id", uid).limit(1) : { data: [], error: null };
+  if (!resp.error && !(resp.data && resp.data.length) && email){
+    resp = await SB.from("players").select("*").eq("email", email).limit(1);
+  }
+  const { data, error } = resp;
 
   if (error){
     $("profile").innerHTML = `<div class="card empty">${esc(t("p_load_fail"))}<br><small>${esc(error.message)}</small></div>`;
@@ -410,9 +420,16 @@ async function loadMe(session){
   }
   const p = (data || [])[0];
   if (!p){
-    $("profile").innerHTML = `<div class="card empty">
-      <p>${esc(t("p_none_1"))} <b>${esc(email)}</b>.</p>
-      <p class="note" style="margin-top:10px">${t("p_none_2")}</p>
+    // Signed in, but no roster row is linked to this account yet (e.g. the profile was
+    // approved before ESM built the roster entry). Show a clear, friendly state — never
+    // a blank/dead-end page.
+    let who = email;
+    try { const { data: pr } = await SB.from("profiles").select("first_name,last_name").eq("id", uid).maybeSingle();
+      if (pr){ who = [pr.first_name, pr.last_name].filter(Boolean).join(" ") || email; } } catch (e) {}
+    $("profile").innerHTML = `<div class="card">
+      <div class="p-head"><span class="avatar">👤</span><div style="flex:1"><h2 class="display">${esc(who)}</h2><div class="pos">${esc(email)}</div></div></div>
+      <p class="note" style="margin-top:6px">${esc(t("p_setup"))}</p>
+      <p class="note" style="margin-top:12px">${t("p_help")}</p>
     </div>`;
     return;
   }
@@ -449,6 +466,7 @@ async function loadMe(session){
       ${row(t("p_l_age"), p.age)}
       ${row(t("p_l_email"), p.email)}
       ${row(t("p_l_instagram"), p.instagram)}
+      ${row(t("p_l_phone"), p.phone)}
       ${row(t("p_l_applying"), p.applying_for)}
     </div>
 
@@ -466,21 +484,8 @@ async function loadMe(session){
       ${teams.map(t2 => `<div class="row"><span>${esc(t2)}</span></div>`).join("")}
     </div>` : ""}
 
-    <div class="kicker">${esc(t("p_k_edit"))}</div>
-    <div class="card">
-      <p class="note" style="margin-bottom:16px">${esc(t("p_edit_note"))}</p>
-      <div class="field"><label for="me-photo">${esc(t("p_l_photo"))}</label><input type="file" accept="image/*" id="me-photo" /></div>
-      <div class="field"><label for="me-bio">${esc(t("p_l_bio"))}</label><textarea id="me-bio" rows="4">${esc(p.bio || "")}</textarea></div>
-      <div class="field"><label for="me-instagram">${esc(t("p_l_instagram"))}</label><input id="me-instagram" value="${esc(p.instagram || "")}" placeholder="@yourhandle" /></div>
-      <div class="field"><label for="me-phone">${esc(t("p_l_phone"))}</label><input id="me-phone" value="${esc(p.phone || "")}" placeholder="+39 …" /></div>
-      <div class="field"><label for="me-age">${esc(t("p_l_age"))}</label><input id="me-age" inputmode="numeric" value="${esc(p.age || "")}" placeholder="e.g. 21" /></div>
-      <button class="btn btn-gold" style="width:100%" type="button" id="me-save">${esc(t("p_save"))}</button>
-      <div class="msg" id="me-msg" role="alert" aria-live="assertive"></div>
-    </div>
-
     <p class="note" style="margin-top:16px">${t("p_help")}</p>`;
 
-  bindEditor();
   loadRegister(p.id);
 }
 
@@ -503,45 +508,6 @@ async function loadRegister(pid){
       wrap.innerHTML = `<div class="kicker">${esc(t("p_k_register"))}</div><div class="card"><p class="ro-hint">${esc(t("p_stats_ro"))}</p>${html}</div>`;
     }
   } catch (err){ console.warn("Register load failed", err); }
-}
-
-/* Self-service edit. Writes go through the update_my_profile() RPC, which only
-   touches this athlete's own row and only the whitelisted columns — the browser
-   never gets to name a table, a row, or a status. */
-function bindEditor(){
-  const save = $("me-save"); if (!save) return;
-  save.onclick = async () => {
-    const m = $("me-msg"); m.classList.remove("show","ok");
-    save.disabled = true; save.textContent = t("p_saving");
-    try {
-      let image_url = null;
-      const file = $("me-photo").files?.[0];
-      if (file){
-        const uid = ME_SESSION?.user?.id;
-        if (!uid) throw new Error("Session expired — please sign in again.");
-        const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
-        const path = `self/${uid}/${Date.now()}.${ext}`;
-        const { error: upErr } = await SB.storage.from(PHOTO_BUCKET)
-          .upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
-        if (upErr) throw upErr;
-        image_url = SB.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
-      }
-      const { error } = await SB.rpc("update_my_profile", {
-        p_bio:       $("me-bio").value.trim(),
-        p_instagram: $("me-instagram").value.trim(),
-        p_phone:     $("me-phone").value.trim(),
-        p_age:       $("me-age").value.trim(),
-        p_image_url: image_url,   // null → keep current photo
-      });
-      if (error) throw error;
-      m.textContent = t("p_saved"); m.classList.add("show","ok");
-      loadMe(ME_SESSION);   // re-render with fresh data (incl. new photo)
-    } catch (err){
-      m.textContent = t("p_save_fail") + (err?.message || err); m.classList.add("show");
-    } finally {
-      save.disabled = false; save.textContent = t("p_save");
-    }
-  };
 }
 
 function row(label, value){

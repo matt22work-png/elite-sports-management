@@ -1755,7 +1755,8 @@ async function boot(){
    so a logged-in JWT never shrinks the public roster. applyI18n() (in boot) renders it. */
 (function reflectAuthInNav(){
   try{
-    const raw=localStorage.getItem("sb-sbexwyvsgqayxrsrlrpm-auth-token");
+    let raw=null;
+    for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && /^sb-.*-auth-token$/.test(k)){ raw=localStorage.getItem(k); break; } }
     if(!raw)return;
     const o=JSON.parse(raw), exp=o&&o.expires_at;
     if(!(o&&o.access_token))return;
