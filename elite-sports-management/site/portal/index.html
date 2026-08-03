@@ -101,8 +101,6 @@
       <div class="msg" id="loginMsg" role="alert" aria-live="assertive"></div>
     </form>
     <div style="text-align:center;margin-top:12px"><button type="button" id="forgotBtn" class="linklike" data-i18n="p_forgot">Forgot your password?</button></div>
-    <div style="text-align:center;margin:14px 0 4px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)" data-i18n="p_or">or</div>
-    <button class="btn btn-ghost" style="width:100%" type="button" id="magicBtn" data-i18n="p_magic">Email me a sign-in link</button>
     <p class="note" style="margin-top:16px" data-i18n-html="p_login_new">
       New here? <a href="../register/">Create an account</a>.
       Applied the old way? Use the sign-in link with your application email.
@@ -151,13 +149,11 @@ const DICT = {
     p_login_h:'Player <em style="color:var(--gold);font-style:normal">Portal</em>',
     p_login_note:"Sign in with the email & password you created at registration.",
     p_email:"Email", p_password:"Password", p_signin:"Sign in", p_forgot:"Forgot your password?",
-    p_or:"or", p_magic:"Email me a sign-in link",
     p_login_new:'New here? <a href="../register/">Create an account</a>. Applied the old way? Use the sign-in link with your application email.',
     p_reset_h:'Set a new <em style="color:var(--gold);font-style:normal">password</em>',
     p_reset_note:"Choose a new password for your account.", p_newpass:"New password",
     p_newpass_ph:"At least 8 characters", p_update_pw:"Update password",
-    p_enter_email:"Enter your email first.", p_sending:"Sending…",
-    p_magic_sent:"Check your inbox — we sent you a sign-in link.",
+    p_sending:"Sending…",
     p_forgot_enter:"Enter your email first, then tap “Forgot your password?”.",
     p_reset_sent:"Check your inbox — we sent a link to reset your password.",
     p_pw_updated:"Password updated — signing you in…",
@@ -190,13 +186,11 @@ const DICT = {
     p_login_h:'Portal <em style="color:var(--gold);font-style:normal">Jugador</em>',
     p_login_note:"Entra con el correo y la contraseña que creaste al registrarte.",
     p_email:"Correo", p_password:"Contraseña", p_signin:"Entrar", p_forgot:"¿Olvidaste tu contraseña?",
-    p_or:"o", p_magic:"Envíame un enlace de acceso",
     p_login_new:'¿Nuevo aquí? <a href="../register/">Crea una cuenta</a>. ¿Aplicaste antes? Usa el enlace de acceso con el correo de tu solicitud.',
     p_reset_h:'Establece una nueva <em style="color:var(--gold);font-style:normal">contraseña</em>',
     p_reset_note:"Elige una nueva contraseña para tu cuenta.", p_newpass:"Nueva contraseña",
     p_newpass_ph:"Al menos 8 caracteres", p_update_pw:"Actualizar contraseña",
-    p_enter_email:"Introduce tu correo primero.", p_sending:"Enviando…",
-    p_magic_sent:"Revisa tu correo — te enviamos un enlace de acceso.",
+    p_sending:"Enviando…",
     p_forgot_enter:"Introduce tu correo primero y luego pulsa “¿Olvidaste tu contraseña?”.",
     p_reset_sent:"Revisa tu correo — te enviamos un enlace para restablecer tu contraseña.",
     p_pw_updated:"Contraseña actualizada — iniciando sesión…",
@@ -229,13 +223,11 @@ const DICT = {
     p_login_h:'Portale <em style="color:var(--gold);font-style:normal">Giocatore</em>',
     p_login_note:"Accedi con l'email e la password create in fase di registrazione.",
     p_email:"Email", p_password:"Password", p_signin:"Accedi", p_forgot:"Password dimenticata?",
-    p_or:"oppure", p_magic:"Inviami un link di accesso",
     p_login_new:'Nuovo qui? <a href="../register/">Crea un account</a>. Ti sei candidato prima? Usa il link di accesso con l\'email della candidatura.',
     p_reset_h:'Imposta una nuova <em style="color:var(--gold);font-style:normal">password</em>',
     p_reset_note:"Scegli una nuova password per il tuo account.", p_newpass:"Nuova password",
     p_newpass_ph:"Almeno 8 caratteri", p_update_pw:"Aggiorna password",
-    p_enter_email:"Inserisci prima la tua email.", p_sending:"Invio…",
-    p_magic_sent:"Controlla la posta — ti abbiamo inviato un link di accesso.",
+    p_sending:"Invio…",
     p_forgot_enter:"Inserisci prima la tua email, poi tocca “Password dimenticata?”.",
     p_reset_sent:"Controlla la posta — ti abbiamo inviato un link per reimpostare la password.",
     p_pw_updated:"Password aggiornata — accesso in corso…",
@@ -317,19 +309,6 @@ $("pwForm").addEventListener("submit", async e => {
   if (error){ m.textContent = error.message; m.classList.add("show"); $("password").value = ""; return; }
   // onAuthStateChange("SIGNED_IN") runs gate().
 });
-
-/* Magic-link fallback (legacy applicants who never set a password). */
-$("magicBtn").onclick = async () => {
-  const m = $("loginMsg"); m.classList.remove("show","ok");
-  const email = $("email").value.trim();
-  if (!email){ m.textContent = t("p_enter_email"); m.classList.add("show"); $("email").focus(); return; }
-  const btn = $("magicBtn"); btn.disabled = true; btn.textContent = t("p_sending");
-  const { error } = await SB.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href.split("#")[0] } });
-  btn.disabled = false; btn.textContent = t("p_magic");
-  if (error){ m.textContent = error.message; m.classList.add("show"); return; }
-  m.textContent = t("p_magic_sent");
-  m.classList.add("show","ok");
-};
 
 $("signOut").onclick = async () => { await SB.auth.signOut(); };
 
