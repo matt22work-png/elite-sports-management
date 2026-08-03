@@ -23,9 +23,15 @@
   .logo-img{height:40px;width:auto;display:block}
   header b{font-size:14px;display:block}
   header small{display:block;font-size:8.5px;letter-spacing:.3em;color:var(--gold-soft);font-weight:700}
+  .spacer{flex:1}
+  .langsw{display:flex;gap:4px}
+  .langsw button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:5px 8px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;transition:.2s}
+  .langsw button.on{border-color:var(--gold);color:var(--gold-soft)}
   .btn{padding:12px 22px;border-radius:999px;font-weight:700;font-size:15px;cursor:pointer;border:0;transition:.2s;display:inline-block;font-family:inherit;text-align:center}
   .btn-gold{background:var(--gold);color:#05101f}
   .btn-gold:hover{background:var(--gold-soft)}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
   .btn[disabled]{opacity:.55;cursor:wait}
   .card{border:1px solid var(--line);border-radius:16px;padding:26px 24px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));margin-bottom:16px}
   h1.display{font-size:26px;margin-bottom:6px}
@@ -63,58 +69,60 @@
 <div class="wrap">
   <header>
     <a href="../index.html"><img class="logo-img" src="../logo.png" alt="Elite Sports Management" /></a>
-    <div><b>Elite Sports Management</b><small>WINTER LEAGUE · TENERIFE</small></div>
+    <div><b>Elite Sports Management</b><small data-i18n="te_kicker">WINTER LEAGUE · TENERIFE</small></div>
+    <div class="spacer"></div>
+    <div class="langsw" id="langsw" role="group" aria-label="Language"><button data-l="en" type="button">EN</button><button data-l="es" type="button">ES</button><button data-l="it" type="button">IT</button></div>
   </header>
 
-  <div id="booting">Loading…</div>
+  <div id="booting" data-i18n="te_loading">Loading…</div>
 
   <!-- STEP 1 — registration form -->
   <div id="step1" class="card hide">
-    <h1 class="display">Register for <em>Tenerife</em></h1>
-    <p class="lead">Winter League 2025 · Tenerife, Spain. Fill in your details and complete your registration payment on the next step.</p>
+    <h1 class="display" data-i18n-html="te_h1">Register for <em>Tenerife</em></h1>
+    <p class="lead" data-i18n="te_lead1">Winter League 2025 · Tenerife, Spain. Fill in your details and complete your registration payment on the next step.</p>
     <form id="regForm">
-      <div class="field"><label for="t-name">Full name</label><input id="t-name" autocomplete="name" required /></div>
+      <div class="field"><label for="t-name" data-i18n="te_name">Full name</label><input id="t-name" autocomplete="name" required /></div>
       <div class="grid2">
-        <div class="field"><label for="t-email">Email</label><input type="email" id="t-email" autocomplete="email" required /></div>
-        <div class="field"><label for="t-country">Country</label><input id="t-country" placeholder="e.g. Italy" /></div>
+        <div class="field"><label for="t-email" data-i18n="te_email">Email</label><input type="email" id="t-email" autocomplete="email" required /></div>
+        <div class="field"><label for="t-country" data-i18n="te_country">Country</label><input id="t-country" data-i18n-ph="te_country_ph" placeholder="e.g. Italy" /></div>
       </div>
-      <div class="field"><label for="t-phone">Phone</label><div class="phone-row"><select class="phone-cc" id="t-cc" aria-label="Country dialing code"></select><input class="phone-num" id="t-phone" inputmode="tel" placeholder="Phone number" /></div></div>
+      <div class="field"><label for="t-phone" data-i18n="te_phone">Phone</label><div class="phone-row"><select class="phone-cc" id="t-cc" aria-label="Country dialing code"></select><input class="phone-num" id="t-phone" inputmode="tel" data-i18n-ph="te_phone_ph" placeholder="Phone number" /></div></div>
       <div class="grid2">
-        <div class="field"><label for="t-sport">Sport</label><select id="t-sport"><option>Baseball</option><option>Softball</option></select></div>
-        <div class="field"><label for="t-position">Position</label><input id="t-position" placeholder="e.g. Catcher / RHP" /></div>
+        <div class="field"><label for="t-sport" data-i18n="te_sport">Sport</label><select id="t-sport"><option>Baseball</option><option>Softball</option></select></div>
+        <div class="field"><label for="t-position" data-i18n="te_position">Position</label><input id="t-position" data-i18n-ph="te_position_ph" placeholder="e.g. Catcher / RHP" /></div>
       </div>
-      <div class="field"><label for="t-notes">Anything else? (optional)</label><textarea id="t-notes" rows="3" placeholder="Dietary needs, travel questions, level of play…"></textarea></div>
-      <button class="btn btn-gold" type="submit" style="width:100%">Register &amp; continue to payment</button>
+      <div class="field"><label for="t-notes" data-i18n="te_other">Anything else? (optional)</label><textarea id="t-notes" rows="3" data-i18n-ph="te_other_ph" placeholder="Dietary needs, travel questions, level of play…"></textarea></div>
+      <button class="btn btn-gold" type="submit" style="width:100%" data-i18n="te_submit">Register &amp; continue to payment</button>
       <div class="msg" id="regMsg" role="alert" aria-live="assertive"></div>
     </form>
-    <p class="note">Questions? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Tenerife%20Winter%20League">Email us</a>.</p>
+    <p class="note"><span data-i18n="te_questions">Questions?</span> <a href="mailto:elitesportsmanagement50@gmail.com?subject=Tenerife%20Winter%20League" data-i18n="te_email_us">Email us</a>.</p>
   </div>
 
   <!-- STEP 2 — payment -->
   <div id="step2" class="card hide">
-    <h1 class="display">Complete your <em>registration</em></h1>
-    <p class="lead">Thanks — your registration has been received. Secure your spot with the payment below.</p>
+    <h1 class="display" data-i18n-html="te_h2">Complete your <em>registration</em></h1>
+    <p class="lead" data-i18n="te_lead2">Thanks — your registration has been received. Secure your spot with the payment below.</p>
     <div class="pay-service">
-      <div class="ps-top"><span class="ps-title">Tenerife Winter League</span><span class="ps-price">€599.99</span></div>
+      <div class="ps-top"><span class="ps-title" data-i18n="te_ps_title">Tenerife Winter League</span><span class="ps-price">€599.99</span></div>
       <ul>
-        <li>Your spot in the ESM Winter League roster in Tenerife</li>
-        <li>Coaching, development and game exposure across the event</li>
-        <li>Visibility to the scouts and coaches ESM works with</li>
+        <li data-i18n="te_inc1">Your spot in the ESM Winter League roster in Tenerife</li>
+        <li data-i18n="te_inc2">Coaching, development and game exposure across the event</li>
+        <li data-i18n="te_inc3">Visibility to the scouts and coaches ESM works with</li>
       </ul>
     </div>
     <ol class="pay-steps">
-      <li><span class="n">1</span><span>Complete your payment using the secure link below.</span></li>
-      <li><span class="n">2</span><span>Elite Sports Management verifies your payment and confirms your spot.</span></li>
-      <li><span class="n">3</span><span>We'll email you with the next steps and event details.</span></li>
+      <li><span class="n">1</span><span data-i18n="te_step1">Complete your payment using the secure link below.</span></li>
+      <li><span class="n">2</span><span data-i18n="te_step2">Elite Sports Management verifies your payment and confirms your spot.</span></li>
+      <li><span class="n">3</span><span data-i18n="te_step3">We'll email you with the next steps and event details.</span></li>
     </ol>
-    <a class="btn btn-gold" id="payBtn" style="width:100%;margin-top:16px" target="_blank" rel="noopener">Pay via PayPal →</a>
-    <a class="btn btn-ghost" id="payBtnWise" style="width:100%;margin-top:10px" target="_blank" rel="noopener">Pay via Wise →</a>
-    <p class="note">You can close this page after paying. We'll be in touch to confirm your registration.</p>
+    <a class="btn btn-gold" id="payBtn" style="width:100%;margin-top:16px" target="_blank" rel="noopener" data-i18n="te_pay_paypal">Pay via PayPal →</a>
+    <a class="btn btn-ghost" id="payBtnWise" style="width:100%;margin-top:10px" target="_blank" rel="noopener" data-i18n="te_pay_wise">Pay via Wise →</a>
+    <p class="note" data-i18n="te_note2">You can close this page after paying. We'll be in touch to confirm your registration.</p>
   </div>
 </div>
 
 <script type="module">
-/* Off-site payment (PayPal via py.pl). €599.99 Tenerife Winter League registration. */
+/* Off-site payment. €599.99 Tenerife Winter League registration — PayPal (py.pl) + Wise. */
 const PAYMENT_URL = "https://py.pl/vb5FrMNIJUumEiz9yXQL0A";
 const PAYMENT_URL_WISE = "https://wise.com/pay/r/f9KLiw__7mOkDTI";
 
@@ -127,6 +135,94 @@ const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSessio
 
 const $ = id => document.getElementById(id);
 function show(id){ ["booting","step1","step2"].forEach(v => $(v).classList.toggle("hide", v !== id)); }
+
+/* ---------- i18n (EN / ES / IT) — shared `esm_lang` key with the rest of the site. ---------- */
+const DICT = {
+  en:{
+    te_kicker:"WINTER LEAGUE · TENERIFE", te_loading:"Loading…",
+    te_h1:'Register for <em>Tenerife</em>',
+    te_lead1:"Winter League 2025 · Tenerife, Spain. Fill in your details and complete your registration payment on the next step.",
+    te_name:"Full name", te_email:"Email", te_country:"Country", te_country_ph:"e.g. Italy",
+    te_phone:"Phone", te_phone_ph:"Phone number", te_cc_ph:"Select country code",
+    te_sport:"Sport", te_position:"Position", te_position_ph:"e.g. Catcher / RHP",
+    te_other:"Anything else? (optional)", te_other_ph:"Dietary needs, travel questions, level of play…",
+    te_submit:"Register & continue to payment", te_questions:"Questions?", te_email_us:"Email us",
+    te_h2:'Complete your <em>registration</em>',
+    te_lead2:"Thanks — your registration has been received. Secure your spot with the payment below.",
+    te_ps_title:"Tenerife Winter League",
+    te_inc1:"Your spot in the ESM Winter League roster in Tenerife",
+    te_inc2:"Coaching, development and game exposure across the event",
+    te_inc3:"Visibility to the scouts and coaches ESM works with",
+    te_step1:"Complete your payment using the secure link below.",
+    te_step2:"Elite Sports Management verifies your payment and confirms your spot.",
+    te_step3:"We'll email you with the next steps and event details.",
+    te_pay_paypal:"Pay via PayPal →", te_pay_wise:"Pay via Wise →",
+    te_note2:"You can close this page after paying. We'll be in touch to confirm your registration.",
+    te_err_name:"Please enter your name.", te_err_submit:"Couldn't submit your registration: ",
+  },
+  es:{
+    te_kicker:"WINTER LEAGUE · TENERIFE", te_loading:"Cargando…",
+    te_h1:'Inscríbete en <em>Tenerife</em>',
+    te_lead1:"Winter League 2025 · Tenerife, España. Completa tus datos y realiza el pago de inscripción en el siguiente paso.",
+    te_name:"Nombre completo", te_email:"Correo", te_country:"País", te_country_ph:"p. ej. Italia",
+    te_phone:"Teléfono", te_phone_ph:"Número de teléfono", te_cc_ph:"Selecciona el código de país",
+    te_sport:"Deporte", te_position:"Posición", te_position_ph:"p. ej. Receptor / RHP",
+    te_other:"¿Algo más? (opcional)", te_other_ph:"Necesidades dietéticas, dudas de viaje, nivel de juego…",
+    te_submit:"Inscríbete y continúa al pago", te_questions:"¿Preguntas?", te_email_us:"Escríbenos",
+    te_h2:'Completa tu <em>inscripción</em>',
+    te_lead2:"Gracias — hemos recibido tu inscripción. Asegura tu plaza con el pago a continuación.",
+    te_ps_title:"Tenerife Winter League",
+    te_inc1:"Tu plaza en el roster de la Winter League de ESM en Tenerife",
+    te_inc2:"Entrenamiento, desarrollo y exposición en partidos durante el evento",
+    te_inc3:"Visibilidad ante los scouts y entrenadores con los que trabaja ESM",
+    te_step1:"Completa tu pago usando el enlace seguro de abajo.",
+    te_step2:"Elite Sports Management verifica tu pago y confirma tu plaza.",
+    te_step3:"Te enviaremos un correo con los siguientes pasos y los detalles del evento.",
+    te_pay_paypal:"Paga con PayPal →", te_pay_wise:"Paga con Wise →",
+    te_note2:"Puedes cerrar esta página después de pagar. Nos pondremos en contacto para confirmar tu inscripción.",
+    te_err_name:"Por favor, introduce tu nombre.", te_err_submit:"No pudimos enviar tu inscripción: ",
+  },
+  it:{
+    te_kicker:"WINTER LEAGUE · TENERIFE", te_loading:"Caricamento…",
+    te_h1:'Iscriviti a <em>Tenerife</em>',
+    te_lead1:"Winter League 2025 · Tenerife, Spagna. Inserisci i tuoi dati e completa il pagamento dell'iscrizione al passaggio successivo.",
+    te_name:"Nome completo", te_email:"Email", te_country:"Paese", te_country_ph:"es. Italia",
+    te_phone:"Telefono", te_phone_ph:"Numero di telefono", te_cc_ph:"Seleziona il prefisso",
+    te_sport:"Sport", te_position:"Ruolo", te_position_ph:"es. Ricevitore / RHP",
+    te_other:"Altro? (facoltativo)", te_other_ph:"Esigenze alimentari, domande di viaggio, livello di gioco…",
+    te_submit:"Iscriviti e continua al pagamento", te_questions:"Domande?", te_email_us:"Scrivici",
+    te_h2:'Completa la tua <em>iscrizione</em>',
+    te_lead2:"Grazie — abbiamo ricevuto la tua iscrizione. Assicurati il posto con il pagamento qui sotto.",
+    te_ps_title:"Tenerife Winter League",
+    te_inc1:"Il tuo posto nel roster della Winter League di ESM a Tenerife",
+    te_inc2:"Coaching, sviluppo ed esposizione nelle partite durante l'evento",
+    te_inc3:"Visibilità agli scout e agli allenatori con cui lavora ESM",
+    te_step1:"Completa il pagamento usando il link sicuro qui sotto.",
+    te_step2:"Elite Sports Management verifica il pagamento e conferma il tuo posto.",
+    te_step3:"Ti invieremo un'email con i prossimi passi e i dettagli dell'evento.",
+    te_pay_paypal:"Paga con PayPal →", te_pay_wise:"Paga con Wise →",
+    te_note2:"Puoi chiudere questa pagina dopo aver pagato. Ti contatteremo per confermare la tua iscrizione.",
+    te_err_name:"Inserisci il tuo nome.", te_err_submit:"Impossibile inviare la tua iscrizione: ",
+  },
+};
+const SUPPORTED = ["en","es","it"];
+let lang = (()=>{ try{ const l = localStorage.getItem("esm_lang"); return SUPPORTED.includes(l) ? l : "en"; }catch(e){ return "en"; } })();
+const t = k => (DICT[lang] && DICT[lang][k]) || DICT.en[k] || k;
+function applyStatic(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.setAttribute("placeholder", t(el.getAttribute("data-i18n-ph"))); });
+  document.querySelectorAll("#langsw button").forEach(b => b.classList.toggle("on", b.dataset.l === lang));
+}
+function setLang(l){
+  if (!SUPPORTED.includes(l) || l === lang){ document.querySelectorAll("#langsw button").forEach(b=>b.classList.toggle("on",b.dataset.l===lang)); return; }
+  lang = l; try{ localStorage.setItem("esm_lang", l); }catch(e){}
+  applyStatic();
+  // Re-fill the dial-code select so its placeholder is translated, preserving any choice.
+  const cc = $("t-cc"), cur = cc ? cc.value : ""; fillCC("t-cc"); if (cc && cur) cc.value = cur;
+}
+document.querySelectorAll("#langsw button").forEach(b => b.onclick = () => setLang(b.dataset.l));
 
 /* Country-code phone input (same curated list as the rest of the site). */
 const DIAL_CODES=[
@@ -144,14 +240,14 @@ const DIAL_CODES=[
   {c:"AR",n:"Argentina",d:"+54",f:"🇦🇷"},{c:"CW",n:"Curaçao",d:"+599",f:"🇨🇼"},
   {c:"AW",n:"Aruba",d:"+297",f:"🇦🇼"},
 ];
-// No pre-selected default: opens on a disabled "Select country code" placeholder so
-// the user actively chooses (no Italy assumption baked in).
+// No pre-selected default: opens on a disabled placeholder so the user actively chooses.
 function fillCC(id, def){ const sel=$(id); if(!sel)return;
-  const ph=`<option value="" disabled${def?"":" selected"}>Select country code</option>`;
+  const ph=`<option value="" disabled${def?"":" selected"}>${t("te_cc_ph")}</option>`;
   sel.innerHTML=ph+DIAL_CODES.map(x=>`<option value="${x.d}"${x.c===def?" selected":""}>${x.f} ${x.n} ${x.d}</option>`).join(""); }
 // Combine to "+39 340…"; if no code was chosen, store just the number (no stray space).
 function combinePhone(ccId, numId){ const cc=$(ccId), num=$(numId); const n=((num&&num.value)||"").trim(); const c=((cc&&cc.value)||"").trim(); return n?((c?c+" ":"")+n):""; }
 
+applyStatic();
 $("payBtn").href = PAYMENT_URL;
 $("payBtnWise").href = PAYMENT_URL_WISE;
 fillCC("t-cc");
@@ -161,7 +257,7 @@ $("regForm").addEventListener("submit", async e => {
   e.preventDefault();
   const m = $("regMsg"); m.classList.remove("show");
   const name = $("t-name").value.trim();
-  if (!name){ m.textContent = "Please enter your name."; m.classList.add("show"); $("t-name").focus(); return; }
+  if (!name){ m.textContent = t("te_err_name"); m.classList.add("show"); $("t-name").focus(); return; }
   const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
   try {
     // Insert-only (no .select()): anon has INSERT but not SELECT on this table.
@@ -178,7 +274,7 @@ $("regForm").addEventListener("submit", async e => {
     if (error) throw error;
     show("step2");
   } catch (err){
-    m.textContent = "Couldn't submit your registration: " + (err?.message || err);
+    m.textContent = t("te_err_submit") + (err?.message || err);
     m.classList.add("show");
   } finally { btn.disabled = false; }
 });
