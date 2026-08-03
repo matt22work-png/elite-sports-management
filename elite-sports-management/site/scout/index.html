@@ -24,6 +24,9 @@
   header b{font-size:14px;display:block}
   header small{display:block;font-size:8.5px;letter-spacing:.3em;color:var(--gold-soft);font-weight:700}
   .spacer{flex:1}
+  .langsw{display:flex;gap:4px}
+  .langsw button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:5px 8px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;transition:.2s}
+  .langsw button.on{border-color:var(--gold);color:var(--gold-soft)}
   .btn{padding:11px 20px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;border:0;transition:.2s;display:inline-block;font-family:inherit;text-align:center}
   .btn-gold{background:var(--gold);color:#05101f}.btn-gold:hover{background:var(--gold-soft)}
   .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
@@ -55,45 +58,51 @@
   .stat{font-size:12.5px;color:var(--ink);background:rgba(217,177,84,.08);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
   .stat b{color:var(--gold-soft)}
   .teams{margin-top:10px;font-size:13px;color:var(--muted)}
+  .reg-kicker{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-soft);margin:16px 0 8px}
   #booting,#loginBox,#resetBox,#statusBox,#app{display:none}
   .center{text-align:center}
   @media(max-width:560px){ .wrap{padding:18px 14px 80px} .field input,.toolbar input{font-size:16px} }
 </style>
 </head>
 <body>
+<!-- Shared Baseball-Reference read-only renderer (window.BBREF) — same career-register
+     tables the admin panel and public profile pages use. Classic script so the module
+     below can call BBREF.renderAll(). -->
+<script src="../bbref-stats.js"></script>
 <div class="wrap">
   <header>
     <a href="../index.html"><img class="logo-img" src="../logo.png" alt="Elite Sports Management" /></a>
-    <div><b>Elite Sports Management</b><small>SCOUT PORTAL</small></div>
+    <div><b>Elite Sports Management</b><small data-i18n="s_kicker">SCOUT PORTAL</small></div>
     <div class="spacer"></div>
-    <button class="btn btn-ghost" id="signOut" style="display:none">Sign out</button>
+    <div class="langsw" id="langsw" role="group" aria-label="Language"><button data-l="en" type="button">EN</button><button data-l="es" type="button">ES</button><button data-l="it" type="button">IT</button></div>
+    <button class="btn btn-ghost" id="signOut" style="display:none" data-i18n="s_signout">Sign out</button>
   </header>
 
-  <div id="booting" class="card center" style="max-width:420px;margin:8vh auto;color:var(--muted)">Checking session…</div>
+  <div id="booting" class="card center" style="max-width:420px;margin:8vh auto;color:var(--muted)" data-i18n="s_checking">Checking session…</div>
 
   <!-- LOGIN -->
   <div id="loginBox" class="card" style="max-width:420px;margin:8vh auto">
-    <h1 class="display" style="margin-bottom:6px">Scout <em>Portal</em></h1>
-    <p class="note" style="margin:0 0 18px">Sign in with the email &amp; password you created at registration.</p>
+    <h1 class="display" style="margin-bottom:6px" data-i18n-html="s_login_h">Scout <em>Portal</em></h1>
+    <p class="note" style="margin:0 0 18px" data-i18n="s_login_note">Sign in with the email &amp; password you created at registration.</p>
     <form id="pwForm">
-      <div class="field"><label for="email">Email</label><input type="email" id="email" autocomplete="username" required placeholder="you@email.com" /></div>
-      <div class="field"><label for="password">Password</label><input type="password" id="password" autocomplete="current-password" required /></div>
-      <button class="btn btn-gold" style="width:100%" type="submit">Sign in</button>
+      <div class="field"><label for="email" data-i18n="s_email">Email</label><input type="email" id="email" autocomplete="username" required placeholder="you@email.com" /></div>
+      <div class="field"><label for="password" data-i18n="s_password">Password</label><input type="password" id="password" autocomplete="current-password" required /></div>
+      <button class="btn btn-gold" style="width:100%" type="submit" data-i18n="s_signin">Sign in</button>
       <div class="msg" id="loginMsg" role="alert" aria-live="assertive"></div>
     </form>
-    <div style="text-align:center;margin-top:12px"><button type="button" id="forgotBtn" class="linklike">Forgot your password?</button></div>
-    <div style="text-align:center;margin:14px 0 4px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">or</div>
-    <button class="btn btn-ghost" style="width:100%" type="button" id="magicBtn">Email me a sign-in link</button>
-    <p class="note" style="margin-top:16px">New here? <a href="../register/">Create a scout account</a>.</p>
+    <div style="text-align:center;margin-top:12px"><button type="button" id="forgotBtn" class="linklike" data-i18n="s_forgot">Forgot your password?</button></div>
+    <div style="text-align:center;margin:14px 0 4px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)" data-i18n="s_or">or</div>
+    <button class="btn btn-ghost" style="width:100%" type="button" id="magicBtn" data-i18n="s_magic">Email me a sign-in link</button>
+    <p class="note" style="margin-top:16px" data-i18n-html="s_login_new">New here? <a href="../register/">Create a scout account</a>.</p>
   </div>
 
   <!-- RESET PASSWORD -->
   <div id="resetBox" class="card" style="max-width:420px;margin:8vh auto">
-    <h1 class="display" style="margin-bottom:6px">Set a new <em>password</em></h1>
-    <p class="note" style="margin:0 0 18px">Choose a new password for your account.</p>
+    <h1 class="display" style="margin-bottom:6px" data-i18n-html="s_reset_h">Set a new <em>password</em></h1>
+    <p class="note" style="margin:0 0 18px" data-i18n="s_reset_note">Choose a new password for your account.</p>
     <form id="resetForm">
-      <div class="field"><label for="newpass">New password</label><input type="password" id="newpass" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters" /></div>
-      <button class="btn btn-gold" style="width:100%" type="submit">Update password</button>
+      <div class="field"><label for="newpass" data-i18n="s_newpass">New password</label><input type="password" id="newpass" autocomplete="new-password" minlength="8" required data-i18n-ph="s_newpass_ph" placeholder="At least 8 characters" /></div>
+      <button class="btn btn-gold" style="width:100%" type="submit" data-i18n="s_update_pw">Update password</button>
       <div class="msg" id="resetMsg" role="alert" aria-live="assertive"></div>
     </form>
   </div>
@@ -103,9 +112,9 @@
 
   <!-- APP (roster) -->
   <div id="app">
-    <h1 class="display" style="margin-bottom:14px">Roster <em>— Scout Access</em></h1>
+    <h1 class="display" style="margin-bottom:14px" data-i18n-html="s_roster_h">Roster <em>— Scout Access</em></h1>
     <div class="toolbar">
-      <input id="search" type="search" placeholder="Search by name, position or country…" aria-label="Search roster" />
+      <input id="search" type="search" data-i18n-ph="s_search_ph" placeholder="Search by name, position or country…" aria-label="Search roster" />
       <span class="count" id="count"></span>
     </div>
     <div id="roster"></div>
@@ -123,11 +132,127 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const initials = n => (n||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
 
+/* ---------- i18n (EN / ES / IT) — shared `esm_lang` key with the rest of the site.
+   Universal baseball stat abbreviations (AVG/OBP/…) and BBREF section titles stay as-is,
+   matching the admin panel and public profile pages. ---------- */
+const DICT = {
+  en:{
+    s_kicker:"SCOUT PORTAL", s_signout:"Sign out", s_checking:"Checking session…",
+    s_login_h:'Scout <em>Portal</em>', s_login_note:"Sign in with the email & password you created at registration.",
+    s_email:"Email", s_password:"Password", s_signin:"Sign in", s_forgot:"Forgot your password?",
+    s_or:"or", s_magic:"Email me a sign-in link", s_login_new:'New here? <a href="../register/">Create a scout account</a>.',
+    s_reset_h:'Set a new <em>password</em>', s_reset_note:"Choose a new password for your account.",
+    s_newpass:"New password", s_newpass_ph:"At least 8 characters", s_update_pw:"Update password",
+    s_enter_email:"Enter your email first.", s_sending:"Sending…",
+    s_magic_sent:"Check your inbox — we sent you a sign-in link.",
+    s_forgot_enter:"Enter your email first, then tap “Forgot your password?”.",
+    s_reset_sent:"Check your inbox — we sent a link to reset your password.",
+    s_pw_updated:"Password updated — signing you in…",
+    s_roster_h:'Roster <em>— Scout Access</em>', s_search_ph:"Search by name, position or country…",
+    s_loading:"Loading roster…", s_load_fail:"Couldn't load the roster.",
+    s_count_one:"player", s_count_many:"players", s_no_match:"No players match",
+    s_age:"Age", s_teams:"Teams", s_reg_title:"Career stats",
+    s_questions:"Questions?", s_email_us:"Email Sam",
+    s_st_pending_t:"Almost there",
+    s_st_pending_b:"Your scout account is pending approval. Please make sure you've completed your payment — Elite Sports Management activates your roster access as soon as your payment is confirmed.",
+    s_st_rejected_t:"Let's talk",
+    s_st_rejected_b:"We're not able to activate your scout access right now. If you think this is a mistake or you'd like to know more, please email Sam directly.",
+    s_st_archived_t:"Account archived",
+    s_st_archived_b:"Your account is archived and access is paused. Contact us any time to reactivate it.",
+    s_st_notscout_t:"You're a player account", s_st_notscout_b:"This is the scout portal. Head to your Player Portal to see your profile.",
+    s_st_none_t:"No scout account yet", s_st_none_b:"We couldn't find a scout account for this login. Create one to request roster access.",
+    s_pay_paypal:"Pay €49.99 via PayPal →", s_pay_wise:"Pay €49.99 via Wise →",
+    s_pay_hint:"Haven't paid yet? Pay €49.99 via PayPal or Wise (brunosamuele56@gmail.com) to get roster access — Samuele approves your account once payment is confirmed.",
+    s_go_register:"Create a scout account", s_go_player:"Go to Player Portal",
+  },
+  es:{
+    s_kicker:"PORTAL SCOUT", s_signout:"Cerrar sesión", s_checking:"Verificando sesión…",
+    s_login_h:'Portal <em>Scout</em>', s_login_note:"Entra con el correo y la contraseña que creaste al registrarte.",
+    s_email:"Correo", s_password:"Contraseña", s_signin:"Entrar", s_forgot:"¿Olvidaste tu contraseña?",
+    s_or:"o", s_magic:"Envíame un enlace de acceso", s_login_new:'¿Nuevo aquí? <a href="../register/">Crea una cuenta de scout</a>.',
+    s_reset_h:'Establece una nueva <em>contraseña</em>', s_reset_note:"Elige una nueva contraseña para tu cuenta.",
+    s_newpass:"Nueva contraseña", s_newpass_ph:"Al menos 8 caracteres", s_update_pw:"Actualizar contraseña",
+    s_enter_email:"Introduce tu correo primero.", s_sending:"Enviando…",
+    s_magic_sent:"Revisa tu correo — te enviamos un enlace de acceso.",
+    s_forgot_enter:"Introduce tu correo primero y luego pulsa “¿Olvidaste tu contraseña?”.",
+    s_reset_sent:"Revisa tu correo — te enviamos un enlace para restablecer tu contraseña.",
+    s_pw_updated:"Contraseña actualizada — iniciando sesión…",
+    s_roster_h:'Jugadores <em>— Acceso Scout</em>', s_search_ph:"Busca por nombre, posición o país…",
+    s_loading:"Cargando jugadores…", s_load_fail:"No pudimos cargar la lista.",
+    s_count_one:"jugador", s_count_many:"jugadores", s_no_match:"Ningún jugador coincide con",
+    s_age:"Edad", s_teams:"Equipos", s_reg_title:"Estadísticas de carrera",
+    s_questions:"¿Preguntas?", s_email_us:"Escribe a Sam",
+    s_st_pending_t:"Ya casi",
+    s_st_pending_b:"Tu cuenta de scout está pendiente de aprobación. Asegúrate de haber completado el pago — Elite Sports Management activa tu acceso al roster en cuanto se confirme el pago.",
+    s_st_rejected_t:"Hablemos",
+    s_st_rejected_b:"No podemos activar tu acceso de scout en este momento. Si crees que es un error o quieres saber más, escribe a Sam directamente.",
+    s_st_archived_t:"Cuenta archivada",
+    s_st_archived_b:"Tu cuenta está archivada y el acceso está pausado. Contáctanos cuando quieras para reactivarla.",
+    s_st_notscout_t:"Tienes una cuenta de jugador", s_st_notscout_b:"Este es el portal de scouts. Ve a tu Portal de Jugador para ver tu perfil.",
+    s_st_none_t:"Aún no hay cuenta de scout", s_st_none_b:"No encontramos una cuenta de scout para este acceso. Crea una para solicitar acceso al roster.",
+    s_pay_paypal:"Paga €49.99 con PayPal →", s_pay_wise:"Paga €49.99 con Wise →",
+    s_pay_hint:"¿Aún no has pagado? Paga €49.99 con PayPal o Wise (brunosamuele56@gmail.com) para obtener acceso al roster — Samuele aprueba tu cuenta cuando se confirme el pago.",
+    s_go_register:"Crear una cuenta de scout", s_go_player:"Ir al Portal de Jugador",
+  },
+  it:{
+    s_kicker:"PORTALE SCOUT", s_signout:"Esci", s_checking:"Verifica sessione…",
+    s_login_h:'Portale <em>Scout</em>', s_login_note:"Accedi con l'email e la password create in fase di registrazione.",
+    s_email:"Email", s_password:"Password", s_signin:"Accedi", s_forgot:"Password dimenticata?",
+    s_or:"oppure", s_magic:"Inviami un link di accesso", s_login_new:'Nuovo qui? <a href="../register/">Crea un account scout</a>.',
+    s_reset_h:'Imposta una nuova <em>password</em>', s_reset_note:"Scegli una nuova password per il tuo account.",
+    s_newpass:"Nuova password", s_newpass_ph:"Almeno 8 caratteri", s_update_pw:"Aggiorna password",
+    s_enter_email:"Inserisci prima la tua email.", s_sending:"Invio…",
+    s_magic_sent:"Controlla la posta — ti abbiamo inviato un link di accesso.",
+    s_forgot_enter:"Inserisci prima la tua email, poi tocca “Password dimenticata?”.",
+    s_reset_sent:"Controlla la posta — ti abbiamo inviato un link per reimpostare la password.",
+    s_pw_updated:"Password aggiornata — accesso in corso…",
+    s_roster_h:'Roster <em>— Accesso Scout</em>', s_search_ph:"Cerca per nome, ruolo o paese…",
+    s_loading:"Caricamento roster…", s_load_fail:"Impossibile caricare il roster.",
+    s_count_one:"giocatore", s_count_many:"giocatori", s_no_match:"Nessun giocatore corrisponde a",
+    s_age:"Età", s_teams:"Squadre", s_reg_title:"Statistiche di carriera",
+    s_questions:"Domande?", s_email_us:"Scrivi a Sam",
+    s_st_pending_t:"Ci siamo quasi",
+    s_st_pending_b:"Il tuo account scout è in attesa di approvazione. Assicurati di aver completato il pagamento — Elite Sports Management attiva il tuo accesso al roster non appena il pagamento è confermato.",
+    s_st_rejected_t:"Parliamone",
+    s_st_rejected_b:"Al momento non possiamo attivare il tuo accesso scout. Se pensi sia un errore o vuoi saperne di più, scrivi direttamente a Sam.",
+    s_st_archived_t:"Account archiviato",
+    s_st_archived_b:"Il tuo account è archiviato e l'accesso è in pausa. Contattaci quando vuoi per riattivarlo.",
+    s_st_notscout_t:"Hai un account giocatore", s_st_notscout_b:"Questo è il portale scout. Vai al tuo Portale Giocatore per vedere il tuo profilo.",
+    s_st_none_t:"Nessun account scout", s_st_none_b:"Non abbiamo trovato un account scout per questo accesso. Creane uno per richiedere l'accesso al roster.",
+    s_pay_paypal:"Paga €49.99 con PayPal →", s_pay_wise:"Paga €49.99 con Wise →",
+    s_pay_hint:"Non hai ancora pagato? Paga €49.99 con PayPal o Wise (brunosamuele56@gmail.com) per ottenere l'accesso al roster — Samuele approva il tuo account una volta confermato il pagamento.",
+    s_go_register:"Crea un account scout", s_go_player:"Vai al Portale Giocatore",
+  },
+};
+const SUPPORTED = ["en","es","it"];
+let lang = (()=>{ try{ const l = localStorage.getItem("esm_lang"); return SUPPORTED.includes(l) ? l : "en"; }catch(e){ return "en"; } })();
+const t = k => (DICT[lang] && DICT[lang][k]) || DICT.en[k] || k;
+
+function applyStatic(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.setAttribute("placeholder", t(el.getAttribute("data-i18n-ph"))); });
+  document.querySelectorAll("#langsw button").forEach(b => b.classList.toggle("on", b.dataset.l === lang));
+}
+function setLang(l){
+  if (!SUPPORTED.includes(l) || l === lang){ document.querySelectorAll("#langsw button").forEach(b=>b.classList.toggle("on",b.dataset.l===lang)); return; }
+  lang = l; try{ localStorage.setItem("esm_lang", l); }catch(e){}
+  applyStatic();
+  // Re-render whichever dynamic view is on screen.
+  if (CUR.view === "status") showStatus(CUR.kind, CUR.link);
+  else if (CUR.view === "app") render();
+}
+document.querySelectorAll("#langsw button").forEach(b => b.onclick = () => setLang(b.dataset.l));
+
+let CUR = { view:null, kind:null, link:null };
+
 function showView(state){
   ["booting","loginBox","resetBox","statusBox","app"].forEach(v => $(v).style.display = "none");
   $({booting:"booting",login:"loginBox",reset:"resetBox",status:"statusBox",app:"app"}[state]).style.display = "block";
   $("signOut").style.display = (state === "app" || state === "status") ? "" : "none";
 }
+applyStatic();
 showView("booting");
 let RECOVERING = location.hash.includes("type=recovery");
 
@@ -142,24 +267,24 @@ $("pwForm").addEventListener("submit", async e => {
 $("magicBtn").onclick = async () => {
   const m = $("loginMsg"); m.classList.remove("show","ok");
   const email = $("email").value.trim();
-  if (!email){ m.textContent = "Enter your email first."; m.classList.add("show"); $("email").focus(); return; }
-  const btn = $("magicBtn"); btn.disabled = true; btn.textContent = "Sending…";
+  if (!email){ m.textContent = t("s_enter_email"); m.classList.add("show"); $("email").focus(); return; }
+  const btn = $("magicBtn"); btn.disabled = true; btn.textContent = t("s_sending");
   const { error } = await SB.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href.split("#")[0] } });
-  btn.disabled = false; btn.textContent = "Email me a sign-in link";
+  btn.disabled = false; btn.textContent = t("s_magic");
   if (error){ m.textContent = error.message; m.classList.add("show"); return; }
-  m.textContent = "Check your inbox — we sent you a sign-in link."; m.classList.add("show","ok");
+  m.textContent = t("s_magic_sent"); m.classList.add("show","ok");
 };
 $("signOut").onclick = async () => { await SB.auth.signOut(); };
 
 $("forgotBtn").onclick = async () => {
   const m = $("loginMsg"); m.classList.remove("show","ok");
   const email = $("email").value.trim();
-  if (!email){ m.textContent = "Enter your email first, then tap “Forgot your password?”."; m.classList.add("show"); $("email").focus(); return; }
-  const btn = $("forgotBtn"); btn.disabled = true; btn.textContent = "Sending…";
+  if (!email){ m.textContent = t("s_forgot_enter"); m.classList.add("show"); $("email").focus(); return; }
+  const btn = $("forgotBtn"); btn.disabled = true; btn.textContent = t("s_sending");
   const { error } = await SB.auth.resetPasswordForEmail(email, { redirectTo: location.href.split("#")[0] });
-  btn.disabled = false; btn.textContent = "Forgot your password?";
+  btn.disabled = false; btn.textContent = t("s_forgot");
   if (error){ m.textContent = error.message; m.classList.add("show"); return; }
-  m.textContent = "Check your inbox — we sent a link to reset your password."; m.classList.add("show","ok");
+  m.textContent = t("s_reset_sent"); m.classList.add("show","ok");
 };
 $("resetForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -169,33 +294,29 @@ $("resetForm").addEventListener("submit", async e => {
   btn.disabled = false;
   if (error){ m.textContent = error.message; m.classList.add("show"); return; }
   RECOVERING = false;
-  m.textContent = "Password updated — signing you in…"; m.classList.add("show","ok");
+  m.textContent = t("s_pw_updated"); m.classList.add("show","ok");
   const { data: { session } } = await SB.auth.getSession();
   if (session) gate(session); else showView("login");
 });
 
-const STATUS_COPY = {
-  pending:  { icon:"⏳", title:"Almost there", body:"Your registration has been received and we're verifying your payment. Your roster access unlocks automatically as soon as Elite Sports Management approves your account. We'll email you the moment it's ready." },
-  rejected: { icon:"✉️", title:"Let's talk", body:"We're not able to activate your scout access right now. If you think this is a mistake or you'd like to know more, please reach out." },
-  archived: { icon:"📁", title:"Account archived", body:"Your account is archived and access is paused. Contact us any time to reactivate it." },
-  notscout: { icon:"⚾", title:"You're a player account", body:"This is the scout portal. Head to your Player Portal to see your profile." },
-  none:     { icon:"🔎", title:"No scout account yet", body:"We couldn't find a scout account for this login. Create one to request roster access." },
-};
+/* Non-approved states. A pending scout may just not have paid — show clear payment
+   instructions (same €49.99 PayPal/Wise as the roster gate) plus a direct line to Sam,
+   never a dead-end. Roster access is unlocked only after Sam confirms payment. */
 function showStatus(kind, link){
-  const c = STATUS_COPY[kind] || STATUS_COPY.pending;
-  // A pending scout may simply not have paid yet — show clear payment instructions
-  // rather than a dead-end "we're verifying" message. Same €49.99 PayPal (py.pl) link
-  // as the roster gate; Sam approves once he confirms payment.
-  const payHtml = kind === "pending" ? `
-    <a class="btn btn-gold" href="https://py.pl/GJ510klc0XW6dsbZ68gg1yg" target="_blank" rel="noopener" style="margin-top:16px;display:inline-block">Pay €49.99 via PayPal →</a>
-    <a class="btn btn-ghost" href="https://wise.com/pay/r/Zhxkm7xyYL04RjA" target="_blank" rel="noopener" style="margin-top:10px;display:inline-block">Pay €49.99 via Wise →</a>
-    <p class="note" style="margin-top:12px">Haven't paid yet? Pay €49.99 via PayPal or Wise (brunosamuele56@gmail.com) to get roster access — Samuele approves your account once payment is confirmed.</p>` : "";
+  CUR = { view:"status", kind, link };
+  const icons = { pending:"⏳", rejected:"✉️", archived:"📁", notscout:"⚾", none:"🔎" };
+  const key = icons[kind] ? kind : "pending";
+  const payHtml = key === "pending" ? `
+    <a class="btn btn-gold" href="https://py.pl/GJ510klc0XW6dsbZ68gg1yg" target="_blank" rel="noopener" style="margin-top:16px;display:inline-block">${esc(t("s_pay_paypal"))}</a>
+    <a class="btn btn-ghost" href="https://wise.com/pay/r/Zhxkm7xyYL04RjA" target="_blank" rel="noopener" style="margin-top:10px;display:inline-block">${esc(t("s_pay_wise"))}</a>
+    <p class="note" style="margin-top:12px">${esc(t("s_pay_hint"))}</p>` : "";
   $("statusBox").innerHTML = `<div class="center">
-    <div style="font-size:40px;margin-bottom:10px">${c.icon}</div>
-    <h2 class="display" style="font-size:22px;margin-bottom:10px">${esc(c.title)}</h2>
-    <p class="note" style="font-size:14.5px;line-height:1.6">${esc(c.body)}</p>
+    <div style="font-size:40px;margin-bottom:10px">${icons[key]}</div>
+    <h2 class="display" style="font-size:22px;margin-bottom:10px">${esc(t("s_st_"+key+"_t"))}</h2>
+    <p class="note" style="font-size:14.5px;line-height:1.6">${esc(t("s_st_"+key+"_b"))}</p>
     ${payHtml}
-    ${link || `<p class="note" style="margin-top:18px">Questions? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Scout%20account">Email us</a>.</p>`}
+    ${link || ""}
+    <p class="note" style="margin-top:18px">${esc(t("s_questions"))} <a href="mailto:elitesportsmanagement50@gmail.com?subject=Scout%20account">${esc(t("s_email_us"))}</a>.</p>
   </div>`;
   showView("status");
 }
@@ -204,9 +325,10 @@ async function gate(session){
   if (RECOVERING){ showView("reset"); return; }
   const user = session?.user; if (!user){ showView("login"); return; }
   const { data: prof } = await SB.from("profiles").select("role,account_status").eq("id", user.id).maybeSingle();
-  if (!prof){ showStatus("none", `<p class="note" style="margin-top:18px"><a class="btn btn-gold" href="../register/">Create a scout account</a></p>`); return; }
-  if (prof.role !== "scout"){ showStatus("notscout", `<p class="note" style="margin-top:18px"><a class="btn btn-gold" href="../portal/">Go to Player Portal</a></p>`); return; }
+  if (!prof){ showStatus("none", `<p class="note" style="margin-top:14px"><a class="btn btn-gold" href="../register/">${esc(t("s_go_register"))}</a></p>`); return; }
+  if (prof.role !== "scout"){ showStatus("notscout", `<p class="note" style="margin-top:14px"><a class="btn btn-gold" href="../portal/">${esc(t("s_go_player"))}</a></p>`); return; }
   if (prof.account_status !== "approved"){ showStatus(prof.account_status); return; }
+  CUR = { view:"app", kind:null, link:null };
   showView("app"); loadRoster();
 }
 
@@ -220,12 +342,26 @@ SB.auth.onAuthStateChange((evt, session) => {
   catch (err){ console.error(err); showView("login"); }
 })();
 
-/* Elevated roster — the RPC returns rows only for approved scouts (DB-enforced). */
-let ROSTER = [];
+/* Elevated roster — scout_roster() returns rows ONLY for approved scouts (it checks
+   private.is_approved_scout() in the DB, so an unapproved scout gets nothing even if they
+   call the RPC directly). Full career-register stats are read separately per the public
+   "approved stats" RLS (the same data shown on public profile pages). */
+let ROSTER = [], STATS = {};
+async function loadStats(){
+  STATS = {};
+  for (const k of ["batting","pitching","fielding"]){
+    if (typeof BBREF === "undefined") break;
+    const { data } = await SB.from(BBREF.TABLES[k]).select("*").order("year").order("sort_order").order("id");
+    (data || []).forEach(r => { (STATS[r.player_id] = STATS[r.player_id] || {batting:[],pitching:[],fielding:[]})[k].push(r); });
+  }
+}
 async function loadRoster(){
-  $("roster").innerHTML = `<div class="card" style="color:var(--muted)">Loading roster…</div>`;
-  const { data, error } = await SB.rpc("scout_roster");
-  if (error){ $("roster").innerHTML = `<div class="card">Couldn't load the roster.<br><small>${esc(error.message)}</small></div>`; return; }
+  $("roster").innerHTML = `<div class="card" style="color:var(--muted)">${esc(t("s_loading"))}</div>`;
+  const rosterP = SB.rpc("scout_roster");
+  await loadStats();
+  const { data, error } = await rosterP;
+  if (error){ $("roster").innerHTML = `<div class="card">${esc(t("s_load_fail"))}<br><small>${esc(error.message)}</small></div>`; return; }
+  if (typeof BBREF !== "undefined") BBREF.injectCss();
   ROSTER = data || [];
   render();
 }
@@ -235,9 +371,9 @@ function render(){
   const q = $("search").value.trim().toLowerCase();
   const rows = ROSTER.filter(p => !q ||
     [p.name, p.position, p.group, p.country, p.sport].some(v => String(v||"").toLowerCase().includes(q)));
-  $("count").textContent = `${rows.length} player${rows.length===1?"":"s"}`;
+  $("count").textContent = `${rows.length} ${rows.length===1 ? t("s_count_one") : t("s_count_many")}`;
   $("roster").innerHTML = rows.length ? rows.map(card).join("")
-    : `<div class="card" style="color:var(--muted)">No players match “${esc(q)}”.</div>`;
+    : `<div class="card" style="color:var(--muted)">${esc(t("s_no_match"))} “${esc(q)}”.</div>`;
 }
 
 function card(p){
@@ -247,8 +383,10 @@ function card(p){
     p.email ? `<a href="mailto:${esc(p.email)}">✉️ ${esc(p.email)}</a>` : "",
     p.phone ? `<a href="tel:${esc(String(p.phone).replace(/[^+0-9]/g,''))}">📞 ${esc(p.phone)}</a>` : "",
     p.instagram ? `<a href="https://instagram.com/${esc(String(p.instagram).replace(/^@/,''))}" target="_blank" rel="noopener">📷 ${esc(p.instagram)}</a>` : "",
-    p.age ? `<span>Age ${esc(p.age)}</span>` : "",
+    p.age ? `<span>${esc(t("s_age"))} ${esc(p.age)}</span>` : "",
   ].filter(Boolean).join("");
+  // Read-only career register (batting/pitching/fielding), same renderer as admin/public.
+  const reg = (typeof BBREF !== "undefined" && STATS[p.id]) ? BBREF.renderAll(STATS[p.id]) : "";
   return `<div class="card">
     <div class="p-head">
       <span class="avatar" ${p.image_url ? `style="background-image:url('${esc(p.image_url)}')"` : ""}>${p.image_url ? "" : esc(initials(p.name))}</span>
@@ -260,7 +398,8 @@ function card(p){
     ${contact ? `<div class="contact">${contact}</div>` : ""}
     ${p.bio ? `<div class="bio">${esc(p.bio)}</div>` : ""}
     ${stats.length ? `<div class="stats">${stats.map(s => `<span class="stat"><b>${esc(s.label)}:</b> ${esc(s.value)}</span>`).join("")}</div>` : ""}
-    ${teams.length ? `<div class="teams"><b>Teams:</b> ${teams.map(esc).join(" · ")}</div>` : ""}
+    ${teams.length ? `<div class="teams"><b>${esc(t("s_teams"))}:</b> ${teams.map(esc).join(" · ")}</div>` : ""}
+    ${reg ? `<div class="reg-kicker">${esc(t("s_reg_title"))}</div>${reg}` : ""}
   </div>`;
 }
 </script>
