@@ -1,5 +1,5 @@
 -- ============================================================================
--- ESM — Phase 2: Tenerife Winter League registrations (€559.99)
+-- ESM — Phase 2: Tenerife Winter League registrations (€599.99)
 -- ============================================================================
 -- A one-time event signup — no login account (unlike player/scout). The public
 -- /tenerife/ form inserts a pending/unpaid row (session-less anon client, like the

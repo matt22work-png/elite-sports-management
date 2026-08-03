@@ -399,7 +399,7 @@
   .gate-code input:focus{outline:0;border-color:var(--gold)}
   .gate-code button{background:transparent;border:1px solid var(--gold);color:var(--gold-soft);border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer;font-size:14px;white-space:nowrap}
   .gate-code button:hover{background:var(--gold);color:#05101f}
-  /* Profile-creation section (€124.99) — a marketing card that links to the real
+  /* Profile-creation section (€129.99) — a marketing card that links to the real
      account flow at /register/. (Was a client-side code gate before Phase 1.) */
   .pcreate{display:flex;justify-content:center}
   .pc-includes{list-style:none;text-align:left;margin:6px auto 18px;max-width:380px;display:grid;gap:9px}
@@ -595,9 +595,9 @@
   <div class="filters" id="filters"></div>
 
   <!-- Roster paywall ($49.99): the public roster is blurred behind a client-side
-       unlock-code gate. A buyer pays Samuele directly via Wise and enters the code he
+       unlock-code gate. A buyer pays Samuele directly via PayPal and enters the code he
        sends them (validated by SHA-256 against localStorage). This is scoped to the
-       roster ONLY — the €124.99 profile and €559.99 Tenerife flows stay account-based. -->
+       roster ONLY — the €129.99 profile and €599.99 Tenerife flows stay account-based. -->
   <div class="roster-wrap is-locked" id="rosterWrap">
     <div class="roster" id="rosterList"></div>
     <div class="gate">
@@ -606,8 +606,7 @@
         <h3 data-i18n="gate_h"></h3>
         <p data-i18n="gate_p"></p>
         <div class="gate-price">€49.99<small data-i18n="gate_price_note"></small></div>
-        <a class="btn btn-gold" href="https://wise.com/pay/r/Zhxkm7xyYL04RjA" target="_blank" rel="noopener" style="margin-top:18px" data-i18n="gate_btn"></a>
-        <a class="btn btn-ghost" href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&amp;business=brunosamuele56@gmail.com&amp;item_name=ESM%20Roster%20Access&amp;amount=49.99&amp;currency_code=EUR" target="_blank" rel="noopener" style="margin-top:10px" data-i18n="gate_btn_paypal"></a>
+        <a class="btn btn-gold" href="https://py.pl/GJ510klc0XW6dsbZ68gg1yg" target="_blank" rel="noopener" style="margin-top:18px" data-i18n="gate_btn"></a>
         <p class="gate-pay-note" data-i18n="gate_pay_note"></p>
         <div class="gate-or" data-i18n="gate_or"></div>
         <form class="gate-code" id="gateForm">
@@ -634,7 +633,7 @@
   <div style="text-align:center;margin-top:28px"><button type="button" id="testiAll" class="btn btn-gold" style="display:none" data-i18n="testi_seeall"></button></div>
 </div></section>
 
-<!-- Profile-creation gate (€124.99). Independent second instance of the roster paywall:
+<!-- Profile-creation gate (€129.99). Independent second instance of the roster paywall:
      its own code hash, its own localStorage key, and it directs to #join once unlocked. -->
 <section class="sec" id="profile" style="padding-top:10px"><div class="wrap">
   <div class="sec-head"><div class="kicker" data-i18n="pg_kicker"></div><h2 class="display" data-i18n="pg_h2"></h2><p data-i18n="pg_p2"></p></div>
@@ -649,7 +648,7 @@
         <li data-i18n="pg_i3"></li>
         <li data-i18n="pg_i4"></li>
       </ul>
-      <div class="gate-price">€124.99<small data-i18n="pg_price_note"></small></div>
+      <div class="gate-price">€129.99<small data-i18n="pg_price_note"></small></div>
       <div class="pc-access" data-i18n="pg_access"></div>
       <a class="btn btn-gold" href="register/" style="margin-top:18px" data-i18n="pg_btn"></a>
     </div>
@@ -737,9 +736,9 @@ const FALLBACK_EMAIL      = "mailto:elitesportsmanagement50@gmail.com";
 const STRIPE_CONTACT_URL = "";
 
 /* Roster paywall ($49.99): RESTORED 2026-08 to the original client-side unlock-code
-   gate (SHA-256 + localStorage) per Sam. A buyer pays Samuele via Wise and enters the
-   code he sends them. Scoped to the roster ONLY — profile creation (€124.99) and
-   Tenerife (€559.99) stay on the account + admin-approval + Wise flow at /register/
+   gate (SHA-256 + localStorage) per Sam. A buyer pays Samuele via PayPal and enters the
+   code he sends them. Scoped to the roster ONLY — profile creation (€129.99) and
+   Tenerife (€599.99) stay on the account + admin-approval + PayPal flow at /register/
    and /tenerife/. Same hash as the pre-rework version, so codes already handed out
    still work. */
 const ROSTER_CODE_HASHES = ["99b2bfb3a4ac35e32491d22207e082500404dbbd30f0cd8a5152cd6185c3cc58"];
@@ -814,8 +813,8 @@ const T = {
     gate_h:"Full roster access for coaches & teams",
     gate_p:"Unlock every ESM athlete — full profiles, career history and playing experience.",
     gate_price_note:"1 year + 1 year free",
-    gate_btn:"Pay €49.99 via Wise →",gate_btn_paypal:"Pay €49.99 via PayPal →",
-    gate_pay_note:"Pay Samuele directly via Wise or PayPal, then enter the code he sends you.",
+    gate_btn:"Pay €49.99 via PayPal →",
+    gate_pay_note:"Pay Samuele directly via PayPal, then enter the code he sends you.",
     gate_ph:"Code",gate_aria:"Code",
     gate_or:"Already have your code?",gate_unlock:"Unlock",
     gate_err:"That code isn't right. Check the code Sam sent you, or contact us.",
@@ -891,8 +890,8 @@ const T = {
     gate_h:"Acceso completo al roster para entrenadores y equipos",
     gate_p:"Desbloquea a todos los atletas de ESM — perfiles completos, trayectoria y experiencia.",
     gate_price_note:"1 año + 1 año gratis",
-    gate_btn:"Paga €49.99 con Wise →",gate_btn_paypal:"Paga €49.99 con PayPal →",
-    gate_pay_note:"Paga a Samuele directamente por Wise o PayPal y luego introduce el código que te envíe.",
+    gate_btn:"Paga €49.99 con PayPal →",
+    gate_pay_note:"Paga a Samuele directamente por PayPal y luego introduce el código que te envíe.",
     gate_ph:"Código",gate_aria:"Código",
     gate_or:"¿Ya tienes tu código?",gate_unlock:"Desbloquear",
     gate_err:"Ese código no es correcto. Revisa el código que te envió Sam o contáctanos.",
@@ -968,8 +967,8 @@ const T = {
     gate_h:"Accesso completo al roster per allenatori e squadre",
     gate_p:"Sblocca tutti gli atleti ESM — profili completi, carriera ed esperienza.",
     gate_price_note:"1 anno + 1 anno gratis",
-    gate_btn:"Paga €49.99 con Wise →",gate_btn_paypal:"Paga €49.99 con PayPal →",
-    gate_pay_note:"Paga Samuele direttamente tramite Wise o PayPal, poi inserisci il codice che ti invia.",
+    gate_btn:"Paga €49.99 con PayPal →",
+    gate_pay_note:"Paga Samuele direttamente tramite PayPal, poi inserisci il codice che ti invia.",
     gate_ph:"Codice",gate_aria:"Codice",
     gate_or:"Hai già il codice?",gate_unlock:"Sblocca",
     gate_err:"Il codice non è corretto. Controlla il codice che ti ha inviato Sam o contattaci.",
@@ -1583,9 +1582,9 @@ function openModal(slug){
 }
 /* ===== roster paywall ($49.99) =====
    Client-side unlock gate: the valid code's SHA-256 lives in ROSTER_CODE_HASHES and the
-   unlock is remembered in localStorage, so a buyer who paid Sam via Wise enters the code
+   unlock is remembered in localStorage, so a buyer who paid Sam via PayPal enters the code
    he sends them just once. Deliberately NOT tied to account creation or admin approval —
-   that flow stays on /register/ (€124.99 profile) and /tenerife/ (€559.99) only. */
+   that flow stays on /register/ (€129.99 profile) and /tenerife/ (€599.99) only. */
 function isUnlocked(){try{return localStorage.getItem(UNLOCK_KEY)==="1"}catch(e){return false}}
 async function sha256Hex(str){
   const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(str));

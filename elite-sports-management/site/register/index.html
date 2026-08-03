@@ -200,16 +200,16 @@
 <script type="module">
 /* =====================================================================
    Off-site payment, per account role. Payment is handled entirely OFF-SITE.
-   - player: €124.99 profile creation — LIVE (Phase 1), Wise.
+   - player: €129.99 profile creation — LIVE (Phase 1), PayPal (py.pl).
    - scout:  $49.99 roster access   — Phase 2 (still the old placeholder
      link until that flow is built; do not point users here yet).
-   Kept role-keyed so the roster ($49.99) and Tenerife (€559.99) flows can
+   Kept role-keyed so the roster (€49.99) and Tenerife (€599.99) flows can
    drop in without reworking this step.
    ===================================================================== */
 const PAY = {
   player: {
-    url: "https://wise.com/pay/r/NKJf01HKt8PuX2s",
-    price: "€124.99",
+    url: "https://py.pl/zN5DhqAoS3GziqI35iqiUQ",
+    price: "€129.99",
     title: "Official Player Profile",
     // Placeholder service copy — reasonable professional draft, Sam to finalize.
     includes: [
@@ -221,7 +221,7 @@ const PAY = {
     access: "1 year of profile access + 1 year free — 2 years total.",
   },
   scout: {
-    url: "https://wise.com/pay/r/Zhxkm7xyYL04RjA",
+    url: "https://py.pl/GJ510klc0XW6dsbZ68gg1yg",
     price: "$49.99",
     title: "Roster Access",
     // Placeholder service copy — Sam to finalize.
