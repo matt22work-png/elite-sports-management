@@ -192,7 +192,8 @@
       <li><span class="n">3</span><span>Once approved, simply sign in with the same email &amp; password you just created — no additional registration needed.</span></li>
     </ol>
     <a class="btn btn-gold" id="payBtn" style="width:100%;margin-top:16px" target="_blank" rel="noopener">Pay via PayPal →</a>
-    <p class="note">Payment goes to Samuele's PayPal (brunosamuele56@gmail.com). You can close this page after paying — we'll email you once he confirms payment and approves your account.</p>
+    <a class="btn btn-ghost" id="payBtnWise" style="width:100%;margin-top:10px" target="_blank" rel="noopener">Pay via Wise →</a>
+    <p class="note">Pay Samuele directly via PayPal (brunosamuele56@gmail.com) or Wise. You can close this page after paying — we'll email you once he confirms payment and approves your account.</p>
     <p class="note" id="payAppt" style="margin-top:8px"></p>
   </div>
 </div>
@@ -209,6 +210,7 @@
 const PAY = {
   player: {
     url: "https://py.pl/zN5DhqAoS3GziqI35iqiUQ",
+    wiseUrl: "https://wise.com/pay/r/NKJf01HKt8PuX2s",
     price: "€129.99",
     title: "Official Player Profile",
     // Placeholder service copy — reasonable professional draft, Sam to finalize.
@@ -222,6 +224,7 @@ const PAY = {
   },
   scout: {
     url: "https://py.pl/GJ510klc0XW6dsbZ68gg1yg",
+    wiseUrl: "https://wise.com/pay/r/Zhxkm7xyYL04RjA",
     price: "€49.99",
     title: "Roster Access",
     // Placeholder service copy — Sam to finalize.
@@ -284,6 +287,8 @@ function clearMsg(el){ el.classList.remove("show","ok"); }
 function renderPayStep(role){
   const cfg = PAY[role] || PAY.player;
   $("payBtn").href = cfg.url;
+  const wb = $("payBtnWise");
+  if (wb){ if (cfg.wiseUrl){ wb.href = cfg.wiseUrl; wb.style.display = ""; } else { wb.style.display = "none"; } }
   const svc = $("payService");
   if (cfg.includes && cfg.includes.length){
     svc.style.display = "";
