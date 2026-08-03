@@ -128,13 +128,6 @@
     <p class="note">Already registered? <a href="../portal/">Player sign in</a> · <a href="../scout/">Scout sign in</a></p>
   </div>
 
-  <!-- confirm-email interstitial (only if the project requires email confirmation) -->
-  <div id="confirmBox" class="card hide">
-    <h1 class="display">Confirm your <em>email</em></h1>
-    <p class="lead" id="confirmText"></p>
-    <p class="note">Once confirmed you'll return here automatically to finish your profile.</p>
-  </div>
-
   <!-- STEP 2 — profile (player) -->
   <div id="step2player" class="card hide">
     <div class="steps"><span class="dot done"></span><span class="dot on"></span><span class="dot"></span></div>
@@ -280,7 +273,7 @@ const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const $ = id => document.getElementById(id);
 const slugify = s => (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
-const VIEWS = ["booting","step1","confirmBox","step2player","step2scout","step3"];
+const VIEWS = ["booting","step1","step2player","step2scout","step3"];
 function show(id){ VIEWS.forEach(v => $(v).classList.toggle("hide", v !== id)); }
 function msg(el, text, ok){ el.textContent = text; el.classList.toggle("ok", !!ok); el.classList.add("show"); }
 function clearMsg(el){ el.classList.remove("show","ok"); }
@@ -396,9 +389,14 @@ $("acctForm").addEventListener("submit", async e => {
     await ensureProfile();
     routeAfterProfile();
   } else {
-    // Confirmation required — user must click the email link, then they return here.
-    $("confirmText").textContent = `We've sent a confirmation link to ${email}. Open it to verify your address and continue your registration.`;
-    show("confirmBox");
+    // Email confirmation is disabled project-wide, so signUp normally returns a session.
+    // If it didn't, sign in immediately with the same credentials (the account is auto-
+    // confirmed) so the user goes straight to their profile — never a "check your email"
+    // dead-end.
+    const { error: siErr } = await SB.auth.signInWithPassword({ email, password });
+    if (siErr){ msg($("acctMsg"), siErr.message); return; }
+    await ensureProfile();
+    routeAfterProfile();
   }
 });
 
