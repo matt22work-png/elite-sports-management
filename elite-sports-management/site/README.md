@@ -49,7 +49,7 @@ There is no PayPal anywhere. Stripe is the only payment method.
 The roster is gated client-side:
 
 1. Roster renders **blurred** behind a lock card with the $49.99 Stripe button.
-2. Buyer pays → Stripe's confirmation page shows them the **access code**.
+2. Buyer pays → the seller sends them the **code**.
 3. They type it into the "Already paid?" box → unlocked, and remembered in
    `localStorage` (`esm_roster_unlock_v1`) so they only enter it once.
 
