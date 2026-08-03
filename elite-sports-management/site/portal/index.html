@@ -168,6 +168,8 @@ const DICT = {
     p_loading:"Loading your profile…", p_load_fail:"Couldn't load your profile.",
     p_none_1:"No athlete profile found for", p_none_2:'If you applied with a different email, sign out and use that one. Otherwise <a href="../index.html#join">submit an application</a>.',
     p_setup:"Your athlete profile is being set up. Your details and stats will appear here once Elite Sports Management adds them.",
+    p_pay_btn:"Pay €129.99 via PayPal →",
+    p_pay_hint:"Haven't paid yet? Pay €129.99 via PayPal (brunosamuele56@gmail.com) to activate your profile — Elite Sports Management approves your account once payment is confirmed.",
     p_note_pending:"Your application is with Samuele for review. You'll hear from us soon.",
     p_note_approved:"You're live on the ESM roster.",
     p_note_rejected:"This profile isn't currently shown on the roster. Reach out if you think that's wrong.",
@@ -206,6 +208,8 @@ const DICT = {
     p_loading:"Cargando tu perfil…", p_load_fail:"No pudimos cargar tu perfil.",
     p_none_1:"No se encontró ningún perfil de atleta para", p_none_2:'Si aplicaste con otro correo, cierra sesión y usa ese. Si no, <a href="../index.html#join">envía una solicitud</a>.',
     p_setup:"Tu perfil de atleta se está preparando. Tus datos y estadísticas aparecerán aquí en cuanto Elite Sports Management los añada.",
+    p_pay_btn:"Paga €129.99 con PayPal →",
+    p_pay_hint:"¿Aún no has pagado? Paga €129.99 con PayPal (brunosamuele56@gmail.com) para activar tu perfil — Elite Sports Management aprueba tu cuenta cuando se confirme el pago.",
     p_note_pending:"Tu solicitud está con Samuele para revisión. Pronto tendrás noticias.",
     p_note_approved:"Estás en el roster de ESM.",
     p_note_rejected:"Este perfil no se muestra actualmente en el roster. Contáctanos si crees que es un error.",
@@ -244,6 +248,8 @@ const DICT = {
     p_loading:"Caricamento del tuo profilo…", p_load_fail:"Impossibile caricare il tuo profilo.",
     p_none_1:"Nessun profilo atleta trovato per", p_none_2:'Se ti sei candidato con un\'altra email, esci e usa quella. Altrimenti <a href="../index.html#join">invia una candidatura</a>.',
     p_setup:"Il tuo profilo atleta è in fase di creazione. I tuoi dati e le statistiche appariranno qui non appena Elite Sports Management li aggiunge.",
+    p_pay_btn:"Paga €129.99 con PayPal →",
+    p_pay_hint:"Non hai ancora pagato? Paga €129.99 con PayPal (brunosamuele56@gmail.com) per attivare il tuo profilo — Elite Sports Management approva il tuo account una volta confermato il pagamento.",
     p_note_pending:"La tua candidatura è in revisione da Samuele. Ti faremo sapere presto.",
     p_note_approved:"Sei sul roster ESM.",
     p_note_rejected:"Questo profilo al momento non è mostrato sul roster. Contattaci se pensi sia un errore.",
@@ -352,6 +358,8 @@ function showStatus(status){
       <div style="font-size:40px;margin-bottom:10px">${icons[key]}</div>
       <h2 class="display" style="font-size:22px;margin-bottom:10px">${esc(t("p_st_"+key+"_t"))}</h2>
       <p class="note" style="font-size:14.5px;line-height:1.6">${esc(t("p_st_"+key+"_b"))}</p>
+      ${key==="pending" ? `<a class="btn btn-gold" href="https://py.pl/zN5DhqAoS3GziqI35iqiUQ" target="_blank" rel="noopener" style="margin-top:16px;display:inline-block">${esc(t("p_pay_btn"))}</a>
+      <p class="note" style="margin-top:12px">${esc(t("p_pay_hint"))}</p>` : ""}
       <p class="note" style="margin-top:18px">${esc(t("p_questions"))} <a href="mailto:elitesportsmanagement50@gmail.com?subject=My%20ESM%20account">${esc(t("p_email_us"))}</a>.</p>
     </div>`;
   showView("status");

@@ -183,10 +183,17 @@ const STATUS_COPY = {
 };
 function showStatus(kind, link){
   const c = STATUS_COPY[kind] || STATUS_COPY.pending;
+  // A pending scout may simply not have paid yet — show clear payment instructions
+  // rather than a dead-end "we're verifying" message. Same €49.99 PayPal (py.pl) link
+  // as the roster gate; Sam approves once he confirms payment.
+  const payHtml = kind === "pending" ? `
+    <a class="btn btn-gold" href="https://py.pl/GJ510klc0XW6dsbZ68gg1yg" target="_blank" rel="noopener" style="margin-top:16px;display:inline-block">Pay €49.99 via PayPal →</a>
+    <p class="note" style="margin-top:12px">Haven't paid yet? Pay €49.99 via PayPal (brunosamuele56@gmail.com) to get roster access — Samuele approves your account once payment is confirmed.</p>` : "";
   $("statusBox").innerHTML = `<div class="center">
     <div style="font-size:40px;margin-bottom:10px">${c.icon}</div>
     <h2 class="display" style="font-size:22px;margin-bottom:10px">${esc(c.title)}</h2>
     <p class="note" style="font-size:14.5px;line-height:1.6">${esc(c.body)}</p>
+    ${payHtml}
     ${link || `<p class="note" style="margin-top:18px">Questions? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Scout%20account">Email us</a>.</p>`}
   </div>`;
   showView("status");

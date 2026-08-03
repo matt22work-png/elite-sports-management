@@ -191,8 +191,8 @@
       <li><span class="n">2</span><span>Elite Sports Management verifies your payment and reviews your account.</span></li>
       <li><span class="n">3</span><span>Once approved, simply sign in with the same email &amp; password you just created — no additional registration needed.</span></li>
     </ol>
-    <a class="btn btn-gold" id="payBtn" style="width:100%;margin-top:16px" target="_blank" rel="noopener">Continue to Secure Payment →</a>
-    <p class="note">You can close this page after paying. We'll email you once your account is approved.</p>
+    <a class="btn btn-gold" id="payBtn" style="width:100%;margin-top:16px" target="_blank" rel="noopener">Pay via PayPal →</a>
+    <p class="note">Payment goes to Samuele's PayPal (brunosamuele56@gmail.com). You can close this page after paying — we'll email you once he confirms payment and approves your account.</p>
     <p class="note" id="payAppt" style="margin-top:8px"></p>
   </div>
 </div>
@@ -201,8 +201,8 @@
 /* =====================================================================
    Off-site payment, per account role. Payment is handled entirely OFF-SITE.
    - player: €129.99 profile creation — LIVE (Phase 1), PayPal (py.pl).
-   - scout:  $49.99 roster access   — Phase 2 (still the old placeholder
-     link until that flow is built; do not point users here yet).
+   - scout:  €49.99 roster access   — self-service; PayPal (py.pl); Sam approves after
+     payment is confirmed (no code-gate on this account-creation flow).
    Kept role-keyed so the roster (€49.99) and Tenerife (€599.99) flows can
    drop in without reworking this step.
    ===================================================================== */
@@ -222,7 +222,7 @@ const PAY = {
   },
   scout: {
     url: "https://py.pl/GJ510klc0XW6dsbZ68gg1yg",
-    price: "$49.99",
+    price: "€49.99",
     title: "Roster Access",
     // Placeholder service copy — Sam to finalize.
     includes: [
