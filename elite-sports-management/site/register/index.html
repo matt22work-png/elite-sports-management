@@ -24,6 +24,9 @@
   header b{font-size:14px;display:block}
   header small{display:block;font-size:8.5px;letter-spacing:.3em;color:var(--gold-soft);font-weight:700}
   .spacer{flex:1}
+  .langsw{display:flex;gap:4px}
+  .langsw button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:5px 8px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;transition:.2s}
+  .langsw button.on{border-color:var(--gold);color:var(--gold-soft)}
   .btn{padding:12px 22px;border-radius:999px;font-weight:700;font-size:15px;cursor:pointer;border:0;transition:.2s;display:inline-block;font-family:inherit;text-align:center}
   .btn-gold{background:var(--gold);color:#05101f}
   .btn-gold:hover{background:var(--gold-soft)}
@@ -96,69 +99,70 @@
 <div class="wrap">
   <header>
     <a href="../index.html"><img class="logo-img" src="../logo.png" alt="Elite Sports Management" /></a>
-    <div><b>Elite Sports Management</b><small>CREATE ACCOUNT</small></div>
+    <div><b>Elite Sports Management</b><small data-i18n="r_kicker">CREATE ACCOUNT</small></div>
     <div class="spacer"></div>
-    <button class="btn btn-ghost" id="signOut" style="display:none">Sign out</button>
+    <div class="langsw" id="langsw" role="group" aria-label="Language"><button data-l="en" type="button">EN</button><button data-l="es" type="button">ES</button><button data-l="it" type="button">IT</button></div>
+    <button class="btn btn-ghost" id="signOut" style="display:none" data-i18n="r_signout">Sign out</button>
   </header>
 
-  <div id="booting">Loading…</div>
+  <div id="booting" data-i18n="r_loading">Loading…</div>
 
   <!-- STEP 1 — account -->
   <div id="step1" class="card hide">
     <div class="steps"><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
-    <h1 class="display">Create your <em>account</em></h1>
-    <p class="lead">Set up your login first — you'll complete your profile and payment on the next steps.</p>
+    <h1 class="display" data-i18n-html="r_s1_h">Create your <em>account</em></h1>
+    <p class="lead" data-i18n="r_s1_lead">Set up your login first — you'll complete your profile and payment on the next steps.</p>
     <form id="acctForm">
       <div class="grid2">
-        <div class="field"><label for="first">First name</label><input id="first" autocomplete="given-name" required /></div>
-        <div class="field"><label for="last">Last name</label><input id="last" autocomplete="family-name" required /></div>
+        <div class="field"><label for="first" data-i18n="r_first">First name</label><input id="first" autocomplete="given-name" required /></div>
+        <div class="field"><label for="last" data-i18n="r_last">Last name</label><input id="last" autocomplete="family-name" required /></div>
       </div>
-      <div class="field"><label for="email">Email</label><input type="email" id="email" autocomplete="email" required /></div>
-      <div class="field"><label for="password">Password</label><input type="password" id="password" autocomplete="new-password" minlength="8" required /><div class="hint">At least 8 characters. You'll use this email + password to sign in after approval.</div></div>
-      <div class="field"><label for="password2">Confirm password</label><input type="password" id="password2" autocomplete="new-password" minlength="8" required /></div>
+      <div class="field"><label for="email" data-i18n="r_email">Email</label><input type="email" id="email" autocomplete="email" required /></div>
+      <div class="field"><label for="password" data-i18n="r_password">Password</label><input type="password" id="password" autocomplete="new-password" minlength="8" required /><div class="hint" data-i18n="r_password_hint">At least 8 characters. You'll use this email + password to sign in after approval.</div></div>
+      <div class="field"><label for="password2" data-i18n="r_password2">Confirm password</label><input type="password" id="password2" autocomplete="new-password" minlength="8" required /></div>
 
-      <label class="field" style="margin-bottom:6px">I am a…</label>
+      <label class="field" style="margin-bottom:6px" data-i18n="r_iam">I am a…</label>
       <div class="role-pick" id="rolePick" role="radiogroup" aria-label="Account type">
-        <div class="role-opt" data-role="player" role="radio" aria-checked="false" tabindex="0"><span class="ic">⚾</span><b>Player</b><span>Athlete seeking representation</span></div>
-        <div class="role-opt" data-role="scout" role="radio" aria-checked="false" tabindex="0"><span class="ic">🔎</span><b>Scout / Recruiter</b><span>Roster &amp; recruiting access</span></div>
+        <div class="role-opt" data-role="player" role="radio" aria-checked="false" tabindex="0"><span class="ic">⚾</span><b data-i18n="r_role_player">Player</b><span data-i18n="r_role_player_desc">Athlete seeking representation</span></div>
+        <div class="role-opt" data-role="scout" role="radio" aria-checked="false" tabindex="0"><span class="ic">🔎</span><b data-i18n="r_role_scout">Scout / Recruiter</b><span data-i18n="r_role_scout_desc">Roster &amp; recruiting access</span></div>
       </div>
 
-      <button class="btn btn-gold" type="submit" style="width:100%">Create account &amp; continue</button>
+      <button class="btn btn-gold" type="submit" style="width:100%" data-i18n="r_create_continue">Create account &amp; continue</button>
       <div class="msg" id="acctMsg" role="alert" aria-live="assertive"></div>
     </form>
-    <p class="note">Already registered? <a href="../portal/">Player sign in</a> · <a href="../scout/">Scout sign in</a></p>
+    <p class="note" data-i18n-html="r_already">Already registered? <a href="../portal/">Player sign in</a> · <a href="../scout/">Scout sign in</a></p>
   </div>
 
   <!-- STEP 2 — profile (player) -->
   <div id="step2player" class="card hide">
     <div class="steps"><span class="dot done"></span><span class="dot on"></span><span class="dot"></span></div>
-    <h1 class="display">Your player <em>profile</em></h1>
-    <p class="lead">This is what Elite Sports Management reviews. You can refine it later in your portal.</p>
+    <h1 class="display" data-i18n-html="r_s2p_h">Your player <em>profile</em></h1>
+    <p class="lead" data-i18n="r_s2p_lead">This is what Elite Sports Management reviews. You can refine it later in your portal.</p>
     <form id="playerForm">
-      <div class="field"><label for="p-position">Position</label><input id="p-position" placeholder="e.g. Catcher / RHP" /></div>
-      <div class="field"><label for="p-sport">Sport</label><select id="p-sport"><option>Baseball</option><option>Softball</option></select></div>
+      <div class="field"><label for="p-position" data-i18n="r_p_position">Position</label><input id="p-position" data-i18n-ph="r_p_position_ph" placeholder="e.g. Catcher / RHP" /></div>
+      <div class="field"><label for="p-sport" data-i18n="r_p_sport">Sport</label><select id="p-sport"><option>Baseball</option><option>Softball</option></select></div>
       <div class="grid2">
-        <div class="field"><label for="p-country">Country</label><input id="p-country" placeholder="e.g. Italy" /></div>
-        <div class="field"><label for="p-age">Age</label><input id="p-age" inputmode="numeric" placeholder="e.g. 21" /></div>
+        <div class="field"><label for="p-country" data-i18n="r_p_country">Country</label><input id="p-country" data-i18n-ph="r_p_country_ph" placeholder="e.g. Italy" /></div>
+        <div class="field"><label for="p-age" data-i18n="r_p_age">Age</label><input id="p-age" inputmode="numeric" data-i18n-ph="r_p_age_ph" placeholder="e.g. 21" /></div>
       </div>
-      <div class="field"><label for="p-bio">Short bio</label><textarea id="p-bio" rows="4" placeholder="Tell your story — background, achievements, goals…"></textarea></div>
-      <div class="field"><label for="p-teams">Teams &amp; affiliations (one per line)</label><textarea id="p-teams" rows="3" placeholder="Cleveland Guardians org.&#10;Dominican Summer League"></textarea></div>
+      <div class="field"><label for="p-bio" data-i18n="r_p_bio">Short bio</label><textarea id="p-bio" rows="4" data-i18n-ph="r_p_bio_ph" placeholder="Tell your story — background, achievements, goals…"></textarea></div>
+      <div class="field"><label for="p-teams" data-i18n="r_p_teams">Teams &amp; affiliations (one per line)</label><textarea id="p-teams" rows="3" data-i18n-ph="r_p_teams_ph" placeholder="Cleveland Guardians org.&#10;Dominican Summer League"></textarea></div>
 
       <div class="field">
-        <label style="margin-bottom:8px">Season stats <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(optional)</span></label>
-        <p class="hint" style="margin:-2px 0 12px">Add a line per season — batting, pitching and/or fielding. Enter raw totals; we calculate AVG / OBP / SLG, ERA / WHIP and Fielding % for you. You can refine these later in your portal.</p>
+        <label style="margin-bottom:8px" data-i18n-html="r_p_seasonstats">Season stats <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <p class="hint" style="margin:-2px 0 12px" data-i18n="r_p_seasonstats_hint">Add a line per season — batting, pitching and/or fielding. Enter raw totals; we calculate AVG / OBP / SLG, ERA / WHIP and Fielding % for you. You can refine these later in your portal.</p>
         <div id="statRows"></div>
         <div class="stat-add">
-          <button type="button" class="btn btn-ghost mini-add" data-add="batting">+ Batting season</button>
-          <button type="button" class="btn btn-ghost mini-add" data-add="pitching">+ Pitching season</button>
-          <button type="button" class="btn btn-ghost mini-add" data-add="fielding">+ Fielding season</button>
+          <button type="button" class="btn btn-ghost mini-add" data-add="batting" data-i18n="r_add_batting">+ Batting season</button>
+          <button type="button" class="btn btn-ghost mini-add" data-add="pitching" data-i18n="r_add_pitching">+ Pitching season</button>
+          <button type="button" class="btn btn-ghost mini-add" data-add="fielding" data-i18n="r_add_fielding">+ Fielding season</button>
         </div>
       </div>
 
-      <div class="field"><label for="p-instagram">Instagram</label><input id="p-instagram" placeholder="@handle" /></div>
-      <div class="field"><label for="p-phone">Phone</label><div class="phone-row"><select class="phone-cc" id="p-cc" aria-label="Country dialing code"></select><input class="phone-num" id="p-phone" inputmode="tel" placeholder="Phone number" /></div></div>
-      <div class="field"><label for="p-photo">Profile photo (optional)</label><input type="file" accept="image/*" id="p-photo" /></div>
-      <button class="btn btn-gold" type="submit" style="width:100%">Save profile &amp; continue</button>
+      <div class="field"><label for="p-instagram" data-i18n="r_p_instagram">Instagram</label><input id="p-instagram" placeholder="@handle" /></div>
+      <div class="field"><label for="p-phone" data-i18n="r_p_phone">Phone</label><div class="phone-row"><select class="phone-cc" id="p-cc" aria-label="Country dialing code"></select><input class="phone-num" id="p-phone" inputmode="tel" data-i18n-ph="r_phone_ph" placeholder="Phone number" /></div></div>
+      <div class="field"><label for="p-photo" data-i18n="r_p_photo">Profile photo (optional)</label><input type="file" accept="image/*" id="p-photo" /></div>
+      <button class="btn btn-gold" type="submit" style="width:100%" data-i18n="r_save_profile">Save profile &amp; continue</button>
       <div class="msg" id="playerMsg" role="alert" aria-live="assertive"></div>
     </form>
   </div>
@@ -166,16 +170,16 @@
   <!-- STEP 2 — profile (scout) -->
   <div id="step2scout" class="card hide">
     <div class="steps"><span class="dot done"></span><span class="dot on"></span><span class="dot"></span></div>
-    <h1 class="display">Your scout <em>details</em></h1>
-    <p class="lead">Just what we need to grant roster access.</p>
+    <h1 class="display" data-i18n-html="r_s2s_h">Your scout <em>details</em></h1>
+    <p class="lead" data-i18n="r_s2s_lead">Just what we need to grant roster access.</p>
     <form id="scoutForm">
-      <div class="field"><label for="s-org">Organization</label><input id="s-org" placeholder="e.g. Cleveland Guardians" /></div>
-      <div class="field"><label for="s-title">Position / Title</label><input id="s-title" placeholder="e.g. Area Scout" /></div>
-      <div class="field"><label for="s-school">School / Team (if applicable)</label><input id="s-school" placeholder="e.g. Hastings College" /></div>
-      <div class="field"><label for="s-country">Country</label><input id="s-country" placeholder="e.g. USA" /></div>
-      <div class="field"><label for="s-phone">Phone</label><div class="phone-row"><select class="phone-cc" id="s-cc" aria-label="Country dialing code"></select><input class="phone-num" id="s-phone" inputmode="tel" placeholder="Phone number" /></div></div>
-      <div class="field"><label for="s-notes">Notes (optional)</label><textarea id="s-notes" rows="3" placeholder="Anything we should know about your interest…"></textarea></div>
-      <button class="btn btn-gold" type="submit" style="width:100%">Save details &amp; continue</button>
+      <div class="field"><label for="s-org" data-i18n="r_s_org">Organization</label><input id="s-org" data-i18n-ph="r_s_org_ph" placeholder="e.g. Cleveland Guardians" /></div>
+      <div class="field"><label for="s-title" data-i18n="r_s_title">Position / Title</label><input id="s-title" data-i18n-ph="r_s_title_ph" placeholder="e.g. Area Scout" /></div>
+      <div class="field"><label for="s-school" data-i18n="r_s_school">School / Team (if applicable)</label><input id="s-school" data-i18n-ph="r_s_school_ph" placeholder="e.g. Hastings College" /></div>
+      <div class="field"><label for="s-country" data-i18n="r_s_country">Country</label><input id="s-country" data-i18n-ph="r_s_country_ph" placeholder="e.g. USA" /></div>
+      <div class="field"><label for="s-phone" data-i18n="r_s_phone">Phone</label><div class="phone-row"><select class="phone-cc" id="s-cc" aria-label="Country dialing code"></select><input class="phone-num" id="s-phone" inputmode="tel" data-i18n-ph="r_phone_ph" placeholder="Phone number" /></div></div>
+      <div class="field"><label for="s-notes" data-i18n="r_s_notes">Notes (optional)</label><textarea id="s-notes" rows="3" data-i18n-ph="r_s_notes_ph" placeholder="Anything we should know about your interest…"></textarea></div>
+      <button class="btn btn-gold" type="submit" style="width:100%" data-i18n="r_save_details">Save details &amp; continue</button>
       <div class="msg" id="scoutMsg" role="alert" aria-live="assertive"></div>
     </form>
   </div>
@@ -183,17 +187,17 @@
   <!-- STEP 3 — payment -->
   <div id="step3" class="card hide">
     <div class="steps"><span class="dot done"></span><span class="dot done"></span><span class="dot on"></span></div>
-    <h1 class="display">Activate your <em>account</em></h1>
-    <p class="lead" id="payLead">Thank you for completing your registration. Your account has been created successfully.</p>
+    <h1 class="display" data-i18n-html="r_s3_h">Activate your <em>account</em></h1>
+    <p class="lead" id="payLead" data-i18n="r_s3_lead">Thank you for completing your registration. Your account has been created successfully.</p>
     <div id="payService" class="pay-service"></div>
     <ol class="pay-steps">
-      <li><span class="n">1</span><span>Complete your payment using the secure link below.</span></li>
-      <li><span class="n">2</span><span>Elite Sports Management verifies your payment and reviews your account.</span></li>
-      <li><span class="n">3</span><span>Once approved, simply sign in with the same email &amp; password you just created — no additional registration needed.</span></li>
+      <li><span class="n">1</span><span data-i18n="r_s3_step1">Complete your payment using the secure link below.</span></li>
+      <li><span class="n">2</span><span data-i18n="r_s3_step2">Elite Sports Management verifies your payment and reviews your account.</span></li>
+      <li><span class="n">3</span><span data-i18n="r_s3_step3">Once approved, simply sign in with the same email &amp; password you just created — no additional registration needed.</span></li>
     </ol>
-    <a class="btn btn-gold" id="payBtn" style="width:100%;margin-top:16px" target="_blank" rel="noopener">Pay via PayPal →</a>
-    <a class="btn btn-ghost" id="payBtnWise" style="width:100%;margin-top:10px" target="_blank" rel="noopener">Pay via Wise →</a>
-    <p class="note">Pay Samuele directly via PayPal (brunosamuele56@gmail.com) or Wise. You can close this page after paying — we'll email you once he confirms payment and approves your account.</p>
+    <a class="btn btn-gold" id="payBtn" style="width:100%;margin-top:16px" target="_blank" rel="noopener" data-i18n="r_pay_paypal">Pay via PayPal →</a>
+    <a class="btn btn-ghost" id="payBtnWise" style="width:100%;margin-top:10px" target="_blank" rel="noopener" data-i18n="r_pay_wise">Pay via Wise →</a>
+    <p class="note" data-i18n="r_s3_note">Pay Samuele directly via PayPal (brunosamuele56@gmail.com) or Wise. You can close this page after paying — we'll email you once he confirms payment and approves your account.</p>
     <p class="note" id="payAppt" style="margin-top:8px"></p>
   </div>
 </div>
@@ -207,34 +211,24 @@
    Kept role-keyed so the roster (€49.99) and Tenerife (€599.99) flows can
    drop in without reworking this step.
    ===================================================================== */
+/* URLs and prices are fixed; all display copy (title/includes/access) is resolved
+   per-role via t() at render time so it follows the chosen language. */
 const PAY = {
   player: {
     url: "https://py.pl/zN5DhqAoS3GziqI35iqiUQ",
     wiseUrl: "https://wise.com/pay/r/NKJf01HKt8PuX2s",
     price: "€129.99",
-    title: "Official Player Profile",
-    // Placeholder service copy — reasonable professional draft, Sam to finalize.
-    includes: [
-      "A professionally built athlete profile on the ESM roster",
-      "Your bio, photo and season-by-season stats, presented properly",
-      "Exposure to the scouts, coaches and teams in the ESM network",
-      "Your own portal to keep your profile up to date",
-    ],
-    access: "1 year of profile access + 1 year free — 2 years total.",
+    titleKey: "r_pay_player_title",
+    incKeys: ["r_pay_player_inc1","r_pay_player_inc2","r_pay_player_inc3","r_pay_player_inc4"],
+    accessKey: "r_pay_player_access",
   },
   scout: {
     url: "https://py.pl/GJ510klc0XW6dsbZ68gg1yg",
     wiseUrl: "https://wise.com/pay/r/Zhxkm7xyYL04RjA",
     price: "€49.99",
-    title: "Roster Access",
-    // Placeholder service copy — Sam to finalize.
-    includes: [
-      "Full ESM roster with athlete contact details",
-      "Search and filter the roster by sport and position",
-      "Reach out directly to the athletes you're scouting",
-      "Your own portal to browse the roster anytime",
-    ],
-    access: "1 year of access + 1 year free — 2 years total.",
+    titleKey: "r_pay_scout_title",
+    incKeys: ["r_pay_scout_inc1","r_pay_scout_inc2","r_pay_scout_inc3","r_pay_scout_inc4"],
+    accessKey: "r_pay_scout_access",
   },
 };
 
@@ -264,8 +258,11 @@ const DIAL_CODES=[
 ];
 // No pre-selected default: the dial-code list opens on a disabled "Select country
 // code" placeholder so the user actively chooses (no Italy/US assumption baked in).
+// The placeholder option is tagged data-cc-ph so applyStatic() can (re)translate its
+// text; DICT/t aren't defined yet at first fillCC() call, so we seed the English text
+// here and applyStatic() localizes it right after.
 function fillCC(id, def){ const sel=document.getElementById(id); if(!sel)return;
-  const ph=`<option value="" disabled${def?"":" selected"}>Select country code</option>`;
+  const ph=`<option value="" disabled${def?"":" selected"} data-cc-ph>Select country code</option>`;
   sel.innerHTML=ph+DIAL_CODES.map(x=>`<option value="${x.d}"${x.c===def?" selected":""}>${x.f} ${x.n} ${x.d}</option>`).join(""); }
 // Combine to "+1 5551234567". If no code was chosen we store just the number rather
 // than a stray leading space, so no default dial code is ever assumed.
@@ -276,11 +273,223 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const slugify = s => (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
 const VIEWS = ["booting","step1","step2player","step2scout","step3"];
-function show(id){ VIEWS.forEach(v => $(v).classList.toggle("hide", v !== id)); }
+function show(id){ VIEWS.forEach(v => $(v).classList.toggle("hide", v !== id)); if (id !== "step3") CUR = { view:id, role:null }; }
 function msg(el, text, ok){ el.textContent = text; el.classList.toggle("ok", !!ok); el.classList.add("show"); }
 function clearMsg(el){ el.classList.remove("show","ok"); }
+
+/* ---------- i18n (EN / ES / IT) — shared `esm_lang` key with the rest of the site.
+   Universal baseball stat abbreviations (G/AB/H/HR/AVG/…) stay as-is, matching the
+   player portal + admin panel. ---------- */
+const DICT = {
+  en:{
+    r_kicker:"CREATE ACCOUNT", r_signout:"Sign out", r_loading:"Loading…",
+    r_s1_h:'Create your <em>account</em>',
+    r_s1_lead:"Set up your login first — you'll complete your profile and payment on the next steps.",
+    r_first:"First name", r_last:"Last name", r_email:"Email", r_password:"Password",
+    r_password_hint:"At least 8 characters. You'll use this email + password to sign in after approval.",
+    r_password2:"Confirm password", r_iam:"I am a…",
+    r_role_player:"Player", r_role_player_desc:"Athlete seeking representation",
+    r_role_scout:"Scout / Recruiter", r_role_scout_desc:"Roster & recruiting access",
+    r_create_continue:"Create account & continue",
+    r_already:'Already registered? <a href="../portal/">Player sign in</a> · <a href="../scout/">Scout sign in</a>',
+    r_s2p_h:'Your player <em>profile</em>',
+    r_s2p_lead:"This is what Elite Sports Management reviews. You can refine it later in your portal.",
+    r_p_position:"Position", r_p_position_ph:"e.g. Catcher / RHP", r_p_sport:"Sport",
+    r_p_country:"Country", r_p_country_ph:"e.g. Italy", r_p_age:"Age", r_p_age_ph:"e.g. 21",
+    r_p_bio:"Short bio", r_p_bio_ph:"Tell your story — background, achievements, goals…",
+    r_p_teams:"Teams & affiliations (one per line)", r_p_teams_ph:"Cleveland Guardians org.\nDominican Summer League",
+    r_p_seasonstats:'Season stats <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(optional)</span>',
+    r_p_seasonstats_hint:"Add a line per season — batting, pitching and/or fielding. Enter raw totals; we calculate AVG / OBP / SLG, ERA / WHIP and Fielding % for you. You can refine these later in your portal.",
+    r_add_batting:"+ Batting season", r_add_pitching:"+ Pitching season", r_add_fielding:"+ Fielding season",
+    r_p_instagram:"Instagram", r_p_phone:"Phone", r_phone_ph:"Phone number", r_cc_ph:"Select country code", r_p_photo:"Profile photo (optional)",
+    r_save_profile:"Save profile & continue",
+    r_s2s_h:'Your scout <em>details</em>', r_s2s_lead:"Just what we need to grant roster access.",
+    r_s_org:"Organization", r_s_org_ph:"e.g. Cleveland Guardians",
+    r_s_title:"Position / Title", r_s_title_ph:"e.g. Area Scout",
+    r_s_school:"School / Team (if applicable)", r_s_school_ph:"e.g. Hastings College",
+    r_s_country:"Country", r_s_country_ph:"e.g. USA",
+    r_s_phone:"Phone", r_s_notes:"Notes (optional)", r_s_notes_ph:"Anything we should know about your interest…",
+    r_save_details:"Save details & continue",
+    r_s3_h:'Activate your <em>account</em>',
+    r_s3_lead:"Thank you for completing your registration. Your account has been created successfully.",
+    r_s3_step1:"Complete your payment using the secure link below.",
+    r_s3_step2:"Elite Sports Management verifies your payment and reviews your account.",
+    r_s3_step3:"Once approved, simply sign in with the same email & password you just created — no additional registration needed.",
+    r_pay_paypal:"Pay via PayPal →", r_pay_wise:"Pay via Wise →",
+    r_s3_note:"Pay Samuele directly via PayPal (brunosamuele56@gmail.com) or Wise. You can close this page after paying — we'll email you once he confirms payment and approves your account.",
+    // Payment service card — player
+    r_pay_player_title:"Official Player Profile",
+    r_pay_player_inc1:"A professionally built athlete profile on the ESM roster",
+    r_pay_player_inc2:"Your bio, photo and season-by-season stats, presented properly",
+    r_pay_player_inc3:"Exposure to the scouts, coaches and teams in the ESM network",
+    r_pay_player_inc4:"Your own portal to keep your profile up to date",
+    r_pay_player_access:"1 year of profile access + 1 year free — 2 years total.",
+    // Payment service card — scout
+    r_pay_scout_title:"Roster Access",
+    r_pay_scout_inc1:"Full ESM roster with athlete contact details",
+    r_pay_scout_inc2:"Search and filter the roster by sport and position",
+    r_pay_scout_inc3:"Reach out directly to the athletes you're scouting",
+    r_pay_scout_inc4:"Your own portal to browse the roster anytime",
+    r_pay_scout_access:"1 year of access + 1 year free — 2 years total.",
+    // season-stats builder kind labels + meta fields
+    r_sb_batting:"⚾ Batting", r_sb_pitching:"🎯 Pitching", r_sb_fielding:"🧤 Fielding",
+    r_sb_season:"Season", r_sb_team:"Team", r_sb_level:"Level",
+    r_sb_season_ph:"2024", r_sb_team_ph:"Team / club", r_sb_level_ph:"e.g. NAIA",
+    r_sb_remove:"Remove this season",
+    // JS messages
+    r_err_role:"Please choose whether you're a Player or a Scout.",
+    r_err_pwmatch:"Passwords don't match. Please re-enter them.",
+    r_err_session:"Your session expired — please sign in again.",
+    r_err_save_profile:"Couldn't save your profile: ",
+    r_err_save_details:"Couldn't save your details: ",
+  },
+  es:{
+    r_kicker:"CREAR CUENTA", r_signout:"Cerrar sesión", r_loading:"Cargando…",
+    r_s1_h:'Crea tu <em>cuenta</em>',
+    r_s1_lead:"Primero configura tu acceso — completarás tu perfil y el pago en los siguientes pasos.",
+    r_first:"Nombre", r_last:"Apellido", r_email:"Correo", r_password:"Contraseña",
+    r_password_hint:"Al menos 8 caracteres. Usarás este correo + contraseña para entrar tras la aprobación.",
+    r_password2:"Confirmar contraseña", r_iam:"Soy…",
+    r_role_player:"Jugador", r_role_player_desc:"Atleta que busca representación",
+    r_role_scout:"Scout / Reclutador", r_role_scout_desc:"Acceso al roster y reclutamiento",
+    r_create_continue:"Crear cuenta y continuar",
+    r_already:'¿Ya estás registrado? <a href="../portal/">Acceso jugador</a> · <a href="../scout/">Acceso scout</a>',
+    r_s2p_h:'Tu perfil de <em>jugador</em>',
+    r_s2p_lead:"Esto es lo que revisa Elite Sports Management. Podrás afinarlo más tarde en tu portal.",
+    r_p_position:"Posición", r_p_position_ph:"ej. Receptor / RHP", r_p_sport:"Deporte",
+    r_p_country:"País", r_p_country_ph:"ej. Italia", r_p_age:"Edad", r_p_age_ph:"ej. 21",
+    r_p_bio:"Biografía breve", r_p_bio_ph:"Cuenta tu historia — trayectoria, logros, objetivos…",
+    r_p_teams:"Equipos y afiliaciones (uno por línea)", r_p_teams_ph:"Cleveland Guardians org.\nDominican Summer League",
+    r_p_seasonstats:'Estadísticas por temporada <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(opcional)</span>',
+    r_p_seasonstats_hint:"Añade una línea por temporada — bateo, pitcheo y/o defensa. Introduce los totales; nosotros calculamos AVG / OBP / SLG, ERA / WHIP y % de fildeo por ti. Podrás afinarlas más tarde en tu portal.",
+    r_add_batting:"+ Temporada de bateo", r_add_pitching:"+ Temporada de pitcheo", r_add_fielding:"+ Temporada de defensa",
+    r_p_instagram:"Instagram", r_p_phone:"Teléfono", r_phone_ph:"Número de teléfono", r_cc_ph:"Elige el código de país", r_p_photo:"Foto de perfil (opcional)",
+    r_save_profile:"Guardar perfil y continuar",
+    r_s2s_h:'Tus datos de <em>scout</em>', r_s2s_lead:"Solo lo que necesitamos para darte acceso al roster.",
+    r_s_org:"Organización", r_s_org_ph:"ej. Cleveland Guardians",
+    r_s_title:"Posición / Cargo", r_s_title_ph:"ej. Area Scout",
+    r_s_school:"Escuela / Equipo (si aplica)", r_s_school_ph:"ej. Hastings College",
+    r_s_country:"País", r_s_country_ph:"ej. EE. UU.",
+    r_s_phone:"Teléfono", r_s_notes:"Notas (opcional)", r_s_notes_ph:"Algo que debamos saber sobre tu interés…",
+    r_save_details:"Guardar datos y continuar",
+    r_s3_h:'Activa tu <em>cuenta</em>',
+    r_s3_lead:"Gracias por completar tu registro. Tu cuenta se ha creado correctamente.",
+    r_s3_step1:"Completa tu pago con el enlace seguro de abajo.",
+    r_s3_step2:"Elite Sports Management verifica tu pago y revisa tu cuenta.",
+    r_s3_step3:"Una vez aprobado, simplemente entra con el mismo correo y contraseña que acabas de crear — sin registro adicional.",
+    r_pay_paypal:"Paga con PayPal →", r_pay_wise:"Paga con Wise →",
+    r_s3_note:"Paga a Samuele directamente con PayPal (brunosamuele56@gmail.com) o Wise. Puedes cerrar esta página tras pagar — te avisaremos por correo en cuanto confirme el pago y apruebe tu cuenta.",
+    r_pay_player_title:"Perfil Oficial de Jugador",
+    r_pay_player_inc1:"Un perfil de atleta creado profesionalmente en el roster de ESM",
+    r_pay_player_inc2:"Tu biografía, foto y estadísticas temporada a temporada, presentadas como corresponde",
+    r_pay_player_inc3:"Exposición ante los scouts, entrenadores y equipos de la red ESM",
+    r_pay_player_inc4:"Tu propio portal para mantener tu perfil al día",
+    r_pay_player_access:"1 año de acceso al perfil + 1 año gratis — 2 años en total.",
+    r_pay_scout_title:"Acceso al Roster",
+    r_pay_scout_inc1:"Roster completo de ESM con datos de contacto de los atletas",
+    r_pay_scout_inc2:"Busca y filtra el roster por deporte y posición",
+    r_pay_scout_inc3:"Contacta directamente con los atletas que estás scouteando",
+    r_pay_scout_inc4:"Tu propio portal para explorar el roster cuando quieras",
+    r_pay_scout_access:"1 año de acceso + 1 año gratis — 2 años en total.",
+    r_sb_batting:"⚾ Bateo", r_sb_pitching:"🎯 Pitcheo", r_sb_fielding:"🧤 Defensa",
+    r_sb_season:"Temporada", r_sb_team:"Equipo", r_sb_level:"Nivel",
+    r_sb_season_ph:"2024", r_sb_team_ph:"Equipo / club", r_sb_level_ph:"ej. NAIA",
+    r_sb_remove:"Eliminar esta temporada",
+    r_err_role:"Elige si eres Jugador o Scout.",
+    r_err_pwmatch:"Las contraseñas no coinciden. Vuelve a introducirlas.",
+    r_err_session:"Tu sesión expiró — vuelve a iniciar sesión.",
+    r_err_save_profile:"No se pudo guardar tu perfil: ",
+    r_err_save_details:"No se pudieron guardar tus datos: ",
+  },
+  it:{
+    r_kicker:"CREA ACCOUNT", r_signout:"Esci", r_loading:"Caricamento…",
+    r_s1_h:'Crea il tuo <em>account</em>',
+    r_s1_lead:"Configura prima il tuo accesso — completerai profilo e pagamento nei passaggi successivi.",
+    r_first:"Nome", r_last:"Cognome", r_email:"Email", r_password:"Password",
+    r_password_hint:"Almeno 8 caratteri. Userai questa email + password per accedere dopo l'approvazione.",
+    r_password2:"Conferma password", r_iam:"Sono un…",
+    r_role_player:"Giocatore", r_role_player_desc:"Atleta in cerca di rappresentanza",
+    r_role_scout:"Scout / Recruiter", r_role_scout_desc:"Accesso al roster e al recruiting",
+    r_create_continue:"Crea account e continua",
+    r_already:'Già registrato? <a href="../portal/">Accesso giocatore</a> · <a href="../scout/">Accesso scout</a>',
+    r_s2p_h:'Il tuo profilo <em>giocatore</em>',
+    r_s2p_lead:"È ciò che Elite Sports Management esamina. Potrai perfezionarlo più tardi nel tuo portale.",
+    r_p_position:"Ruolo", r_p_position_ph:"es. Ricevitore / RHP", r_p_sport:"Sport",
+    r_p_country:"Paese", r_p_country_ph:"es. Italia", r_p_age:"Età", r_p_age_ph:"es. 21",
+    r_p_bio:"Breve biografia", r_p_bio_ph:"Racconta la tua storia — percorso, traguardi, obiettivi…",
+    r_p_teams:"Squadre e affiliazioni (una per riga)", r_p_teams_ph:"Cleveland Guardians org.\nDominican Summer League",
+    r_p_seasonstats:'Statistiche per stagione <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(facoltativo)</span>',
+    r_p_seasonstats_hint:"Aggiungi una riga per stagione — battuta, lancio e/o difesa. Inserisci i totali grezzi; calcoliamo noi AVG / OBP / SLG, ERA / WHIP e % di difesa per te. Potrai perfezionarle più tardi nel tuo portale.",
+    r_add_batting:"+ Stagione in battuta", r_add_pitching:"+ Stagione in lancio", r_add_fielding:"+ Stagione in difesa",
+    r_p_instagram:"Instagram", r_p_phone:"Telefono", r_phone_ph:"Numero di telefono", r_cc_ph:"Scegli il prefisso internazionale", r_p_photo:"Foto profilo (facoltativo)",
+    r_save_profile:"Salva profilo e continua",
+    r_s2s_h:'I tuoi dati <em>scout</em>', r_s2s_lead:"Solo ciò che ci serve per concederti l'accesso al roster.",
+    r_s_org:"Organizzazione", r_s_org_ph:"es. Cleveland Guardians",
+    r_s_title:"Posizione / Ruolo", r_s_title_ph:"es. Area Scout",
+    r_s_school:"Scuola / Squadra (se applicabile)", r_s_school_ph:"es. Hastings College",
+    r_s_country:"Paese", r_s_country_ph:"es. USA",
+    r_s_phone:"Telefono", r_s_notes:"Note (facoltativo)", r_s_notes_ph:"Qualcosa che dovremmo sapere sul tuo interesse…",
+    r_save_details:"Salva dati e continua",
+    r_s3_h:'Attiva il tuo <em>account</em>',
+    r_s3_lead:"Grazie per aver completato la registrazione. Il tuo account è stato creato con successo.",
+    r_s3_step1:"Completa il pagamento tramite il link sicuro qui sotto.",
+    r_s3_step2:"Elite Sports Management verifica il pagamento ed esamina il tuo account.",
+    r_s3_step3:"Una volta approvato, accedi semplicemente con la stessa email e password appena create — nessuna registrazione aggiuntiva.",
+    r_pay_paypal:"Paga con PayPal →", r_pay_wise:"Paga con Wise →",
+    r_s3_note:"Paga Samuele direttamente con PayPal (brunosamuele56@gmail.com) o Wise. Puoi chiudere questa pagina dopo il pagamento — ti avviseremo via email non appena conferma il pagamento e approva il tuo account.",
+    r_pay_player_title:"Profilo Ufficiale Giocatore",
+    r_pay_player_inc1:"Un profilo atleta costruito professionalmente sul roster ESM",
+    r_pay_player_inc2:"La tua biografia, foto e statistiche stagione per stagione, presentate come si deve",
+    r_pay_player_inc3:"Visibilità presso gli scout, gli allenatori e le squadre della rete ESM",
+    r_pay_player_inc4:"Il tuo portale personale per tenere aggiornato il profilo",
+    r_pay_player_access:"1 anno di accesso al profilo + 1 anno gratis — 2 anni in totale.",
+    r_pay_scout_title:"Accesso al Roster",
+    r_pay_scout_inc1:"Roster ESM completo con i contatti degli atleti",
+    r_pay_scout_inc2:"Cerca e filtra il roster per sport e ruolo",
+    r_pay_scout_inc3:"Contatta direttamente gli atleti che stai seguendo",
+    r_pay_scout_inc4:"Il tuo portale personale per consultare il roster quando vuoi",
+    r_pay_scout_access:"1 anno di accesso + 1 anno gratis — 2 anni in totale.",
+    r_sb_batting:"⚾ Battuta", r_sb_pitching:"🎯 Lancio", r_sb_fielding:"🧤 Difesa",
+    r_sb_season:"Stagione", r_sb_team:"Squadra", r_sb_level:"Livello",
+    r_sb_season_ph:"2024", r_sb_team_ph:"Squadra / club", r_sb_level_ph:"es. NAIA",
+    r_sb_remove:"Rimuovi questa stagione",
+    r_err_role:"Scegli se sei un Giocatore o uno Scout.",
+    r_err_pwmatch:"Le password non coincidono. Reinseriscile.",
+    r_err_session:"La tua sessione è scaduta — accedi di nuovo.",
+    r_err_save_profile:"Impossibile salvare il tuo profilo: ",
+    r_err_save_details:"Impossibile salvare i tuoi dati: ",
+  },
+};
+const SUPPORTED = ["en","es","it"];
+let lang = (()=>{ try{ const l = localStorage.getItem("esm_lang"); return SUPPORTED.includes(l) ? l : "en"; }catch(e){ return "en"; } })();
+const t = k => (DICT[lang] && DICT[lang][k]) || DICT.en[k] || k;
+
+/* Track the current dynamic view so a language switch re-renders it in place. */
+let CUR = { view:null, role:null };
+
+function applyStatic(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.setAttribute("placeholder", t(el.getAttribute("data-i18n-ph"))); });
+  document.querySelectorAll("[data-cc-ph]").forEach(el => { el.textContent = t("r_cc_ph"); });
+  document.querySelectorAll("#langsw button").forEach(b => b.classList.toggle("on", b.dataset.l === lang));
+}
+function setLang(l){
+  if (!SUPPORTED.includes(l) || l === lang){ document.querySelectorAll("#langsw button").forEach(b=>b.classList.toggle("on",b.dataset.l===lang)); return; }
+  lang = l; try{ localStorage.setItem("esm_lang", l); }catch(e){}
+  applyStatic();
+  // Re-label the labels/placeholders inside any season-stat blocks already added,
+  // then re-render the current dynamic view (the payment service card).
+  relabelStatBlocks();
+  if (CUR.view === "pay") renderPayStep(CUR.role);
+}
+document.querySelectorAll("#langsw button").forEach(b => b.onclick = () => setLang(b.dataset.l));
+// Translate the static markup once on load (before any view is revealed).
+applyStatic();
 
 /* Populate + reveal the payment step for a given role (price, service summary,
    access duration, and the correct off-site link). */
@@ -290,17 +499,18 @@ function renderPayStep(role){
   const wb = $("payBtnWise");
   if (wb){ if (cfg.wiseUrl){ wb.href = cfg.wiseUrl; wb.style.display = ""; } else { wb.style.display = "none"; } }
   const svc = $("payService");
-  if (cfg.includes && cfg.includes.length){
+  const includes = (cfg.incKeys || []).map(k => t(k));
+  if (includes.length){
     svc.style.display = "";
     svc.innerHTML =
-      `<div class="ps-top"><span class="ps-title">${cfg.title}</span>${cfg.price ? `<span class="ps-price">${cfg.price}</span>` : ""}</div>` +
-      `<ul>${cfg.includes.map(i => `<li>${i}</li>`).join("")}</ul>` +
-      (cfg.access ? `<div class="ps-access">${cfg.access}</div>` : "");
+      `<div class="ps-top"><span class="ps-title">${esc(t(cfg.titleKey))}</span>${cfg.price ? `<span class="ps-price">${esc(cfg.price)}</span>` : ""}</div>` +
+      `<ul>${includes.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` +
+      (cfg.accessKey ? `<div class="ps-access">${esc(t(cfg.accessKey))}</div>` : "");
   } else {
     svc.style.display = "none"; svc.innerHTML = "";
   }
 }
-function showPay(role){ renderPayStep(role); show("step3"); }
+function showPay(role){ CUR = { view:"pay", role }; renderPayStep(role); show("step3"); }
 
 $("signOut").onclick = async () => { await SB.auth.signOut(); localStorage.removeItem(STASH_KEY); location.reload(); };
 
@@ -312,22 +522,35 @@ const STAT_FIELDS = {
   pitching: ["W","L","G","GS","IP","H","R","ER","BB","SO"],
   fielding: ["G","PO","A","E"],
 };
-const KIND_LABEL = { batting:"⚾ Batting", pitching:"🎯 Pitching", fielding:"🧤 Fielding" };
+const KIND_LABEL_KEY = { batting:"r_sb_batting", pitching:"r_sb_pitching", fielding:"r_sb_fielding" };
 function addStatBlock(kind){
   const block = document.createElement("div");
   block.className = "stat-block"; block.dataset.kind = kind;
+  // Stat-column headers are universal baseball abbreviations (G/AB/H/HR/…) — never translated.
   const fields = (STAT_FIELDS[kind] || []).map(f =>
-    `<div class="mini"><label>${f}</label><input inputmode="${f === "IP" ? "decimal" : "numeric"}" data-stat="${f}" aria-label="${kind} ${f}" /></div>`).join("");
+    `<div class="mini"><label>${f}</label><input inputmode="${f === "IP" ? "decimal" : "numeric"}" data-stat="${f}" aria-label="${esc(kind)} ${esc(f)}" /></div>`).join("");
   block.innerHTML =
-    `<div class="sb-head"><span class="sb-kind">${KIND_LABEL[kind] || kind}</span>` +
-    `<button type="button" class="sb-del" aria-label="Remove this season">✕</button></div>` +
+    `<div class="sb-head"><span class="sb-kind" data-sb-kind>${esc(t(KIND_LABEL_KEY[kind] || kind))}</span>` +
+    `<button type="button" class="sb-del" data-sb-remove aria-label="${esc(t("r_sb_remove"))}">✕</button></div>` +
     `<div class="sb-meta">` +
-      `<div class="mini"><label>Season</label><input data-meta="season" placeholder="2024" inputmode="numeric" /></div>` +
-      `<div class="mini"><label>Team</label><input data-meta="team" placeholder="Team / club" /></div>` +
-      `<div class="mini"><label>Level</label><input data-meta="level" placeholder="e.g. NAIA" /></div>` +
+      `<div class="mini"><label data-sb-lbl="r_sb_season">${esc(t("r_sb_season"))}</label><input data-meta="season" data-sb-ph="r_sb_season_ph" placeholder="${esc(t("r_sb_season_ph"))}" inputmode="numeric" /></div>` +
+      `<div class="mini"><label data-sb-lbl="r_sb_team">${esc(t("r_sb_team"))}</label><input data-meta="team" data-sb-ph="r_sb_team_ph" placeholder="${esc(t("r_sb_team_ph"))}" /></div>` +
+      `<div class="mini"><label data-sb-lbl="r_sb_level">${esc(t("r_sb_level"))}</label><input data-meta="level" data-sb-ph="r_sb_level_ph" placeholder="${esc(t("r_sb_level_ph"))}" /></div>` +
     `</div><div class="stat-grid">${fields}</div>`;
   block.querySelector(".sb-del").onclick = () => block.remove();
   $("statRows").appendChild(block);
+}
+/* Re-translate the labels/placeholders inside every already-added season-stat block
+   when the language changes (their inputs keep the user's values). */
+function relabelStatBlocks(){
+  document.querySelectorAll("#statRows .stat-block").forEach(block => {
+    const kindEl = block.querySelector("[data-sb-kind]");
+    if (kindEl) kindEl.textContent = t(KIND_LABEL_KEY[block.dataset.kind] || block.dataset.kind);
+    const rm = block.querySelector("[data-sb-remove]");
+    if (rm) rm.setAttribute("aria-label", t("r_sb_remove"));
+    block.querySelectorAll("[data-sb-lbl]").forEach(l => { l.textContent = t(l.getAttribute("data-sb-lbl")); });
+    block.querySelectorAll("[data-sb-ph]").forEach(i => { i.setAttribute("placeholder", t(i.getAttribute("data-sb-ph"))); });
+  });
 }
 document.querySelectorAll("[data-add]").forEach(b => b.onclick = () => addStatBlock(b.dataset.add));
 
@@ -370,11 +593,11 @@ document.querySelectorAll("#rolePick .role-opt").forEach(o => {
 $("acctForm").addEventListener("submit", async e => {
   e.preventDefault();
   clearMsg($("acctMsg"));
-  if (!chosenRole){ msg($("acctMsg"), "Please choose whether you're a Player or a Scout."); return; }
+  if (!chosenRole){ msg($("acctMsg"), t("r_err_role")); return; }
   const first = $("first").value.trim(), last = $("last").value.trim();
   const email = $("email").value.trim(), password = $("password").value;
   // Require the two password fields to match before creating the account.
-  if (password !== $("password2").value){ msg($("acctMsg"), "Passwords don't match. Please re-enter them."); $("password2").focus(); return; }
+  if (password !== $("password2").value){ msg($("acctMsg"), t("r_err_pwmatch")); $("password2").focus(); return; }
   const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
   // Stash identity so we can finalize the profile after (a possible) email confirmation.
   localStorage.setItem(STASH_KEY, JSON.stringify({ first, last, email, role: chosenRole }));
@@ -440,7 +663,7 @@ $("playerForm").addEventListener("submit", async e => {
   const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
   try {
     const { data: sess } = await SB.auth.getSession();
-    const user = sess?.session?.user; if (!user) throw new Error("Your session expired — please sign in again.");
+    const user = sess?.session?.user; if (!user) throw new Error(t("r_err_session"));
     const stash = JSON.parse(localStorage.getItem(STASH_KEY) || "{}");
     const fullName = [stash.first, stash.last].filter(Boolean).join(" ").trim() || (user.email.split("@")[0]);
     // optional photo
@@ -472,7 +695,7 @@ $("playerForm").addEventListener("submit", async e => {
     }
     showPay("player");
   } catch (err){
-    msg($("playerMsg"), "Couldn't save your profile: " + (err?.message || err));
+    msg($("playerMsg"), t("r_err_save_profile") + (err?.message || err));
   } finally { btn.disabled = false; }
 });
 
@@ -483,7 +706,7 @@ $("scoutForm").addEventListener("submit", async e => {
   const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
   try {
     const { data: sess } = await SB.auth.getSession();
-    const user = sess?.session?.user; if (!user) throw new Error("Your session expired — please sign in again.");
+    const user = sess?.session?.user; if (!user) throw new Error(t("r_err_session"));
     const { error } = await SB.from("scouts").upsert({
       id: user.id,
       organization: $("s-org").value.trim() || null,
@@ -496,7 +719,7 @@ $("scoutForm").addEventListener("submit", async e => {
     if (error) throw error;
     showPay("scout");
   } catch (err){
-    msg($("scoutMsg"), "Couldn't save your details: " + (err?.message || err));
+    msg($("scoutMsg"), t("r_err_save_details") + (err?.message || err));
   } finally { btn.disabled = false; }
 });
 
