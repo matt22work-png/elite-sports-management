@@ -643,6 +643,7 @@ function cardPlayer(p){
       <div class="field"><label>Age</label><input class="pf-age" data-id="${p.id}" value="${esc(p.age||"")}" placeholder="e.g. 21" aria-label="Age" /></div>
       <div class="field"><label>Instagram</label><input class="pf-instagram" data-id="${p.id}" value="${esc(p.instagram||"")}" placeholder="@handle" aria-label="Instagram" /></div>
       <div class="field"><label>Phone</label><input class="pf-phone" data-id="${p.id}" value="${esc(p.phone||"")}" placeholder="+39 …" aria-label="Phone" /></div>
+      <div class="field"><label>Email <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(contact info — does not change their login email)</span></label><input class="pf-email" data-id="${p.id}" type="email" value="${esc(p.email||"")}" placeholder="name@email.com" aria-label="Contact email" /></div>
       <div class="field"><label>Bio</label><textarea class="pf-bio" data-id="${p.id}" rows="4" placeholder="Short bio…" aria-label="Bio">${esc(p.bio||"")}</textarea></div>
       <div class="field"><label>Teams &amp; affiliations (one per line)</label><textarea class="pf-teams" data-id="${p.id}" rows="3" placeholder="Cleveland Guardians org.&#10;Dominican Summer League" aria-label="Teams and affiliations, one per line">${esc((Array.isArray(p.teams)?p.teams:[]).join("\n"))}</textarea></div>
       <div class="row-btns"><button class="btn btn-gold" data-saveprofile="${p.id}" type="button">Save profile</button></div>
@@ -860,6 +861,9 @@ function bindActions(){
       age:       box.querySelector(".pf-age").value.trim() || null,
       instagram: box.querySelector(".pf-instagram").value.trim() || null,
       phone:     box.querySelector(".pf-phone").value.trim() || null,
+      // Contact-info only. This is the players-table email shown to scouts; it is NOT
+      // the athlete's Supabase Auth login (changing that requires an auth.users update).
+      email:     box.querySelector(".pf-email").value.trim() || null,
       bio:       box.querySelector(".pf-bio").value.trim(),
       teams,
     };

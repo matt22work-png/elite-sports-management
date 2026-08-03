@@ -377,6 +377,14 @@ $("acctForm").addEventListener("submit", async e => {
   const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
   // Stash identity so we can finalize the profile after (a possible) email confirmation.
   localStorage.setItem(STASH_KEY, JSON.stringify({ first, last, email, role: chosenRole }));
+  // Clean slate: if a DIFFERENT account is still signed in here (e.g. an admin who was
+  // testing this flow, or a stale session), sign it out first. With email confirmation
+  // ON, signUp() does NOT replace the current session, so without this a new signup could
+  // otherwise attach to whoever was already logged in. See ensureProfile()'s guard too.
+  const { data: cur } = await SB.auth.getSession();
+  if (cur?.session && (cur.session.user.email||"").toLowerCase() !== email.toLowerCase()){
+    await SB.auth.signOut();
+  }
   const { data, error } = await SB.auth.signUp({
     email, password,
     options: { emailRedirectTo: location.href.split("#")[0], data: { first_name: first, last_name: last, role: chosenRole } }
@@ -401,6 +409,12 @@ async function ensureProfile(){
   let { data: prof } = await SB.from("profiles").select("*").eq("id", user.id).maybeSingle();
   if (prof) return prof;
   const stash = JSON.parse(localStorage.getItem(STASH_KEY) || "{}");
+  // Session-bleed guard: only create a registration profile when the ACTIVE session is
+  // the very account that signed up here (its email matches the one entered at step 1).
+  // Otherwise a different logged-in user — e.g. an admin testing the flow — would get a
+  // player/scout "account" bound to THEIR auth id and email (exactly the mixup we hit:
+  // a player profile landed on an admin account). Bail so the caller restarts cleanly.
+  if (!stash.email || !user.email || stash.email.toLowerCase() !== user.email.toLowerCase()) return null;
   const role = stash.role || user.user_metadata?.role;
   if (!role) return null;
   const { data: created, error } = await SB.from("profiles").insert({
@@ -506,7 +520,17 @@ SB.auth.onAuthStateChange((evt, session) => {
 (async function boot(){
   try {
     const { data: { session } } = await SB.auth.getSession();
-    if (session){ $("signOut").style.display = ""; await routeAfterProfile(); }
+    if (session){
+      // Distinguish a real registrant (has, or just signed up for, a profile) from a
+      // stray login — e.g. an admin still signed in from /admin/ in another tab. Only
+      // continue registration for a registrant; otherwise sign the stray session out so
+      // a fresh signup can't attach to it, and start at step 1.
+      const stash = JSON.parse(localStorage.getItem(STASH_KEY) || "{}");
+      const { data: prof } = await SB.from("profiles").select("id").eq("id", session.user.id).maybeSingle();
+      const isRegistrant = prof || (stash.email && (session.user.email||"").toLowerCase() === stash.email.toLowerCase());
+      if (isRegistrant){ $("signOut").style.display = ""; await routeAfterProfile(); }
+      else { await SB.auth.signOut(); localStorage.removeItem(STASH_KEY); show("step1"); }
+    }
     else { show("step1"); }
   } catch (err){ console.error(err); show("step1"); }
 })();
