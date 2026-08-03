@@ -296,3 +296,32 @@ Priority order: security > correctness > reliability > a11y > perf > SEO > UX > 
 - Enable Supabase Auth leaked-password protection (dashboard).
 - Provide a real 1200×630 branded OG share image (placeholder team photo in use).
 - Supabase free tier PAUSES when idle — restore project `sbexwyvsgqayxrsrlrpm` if the site/portal "won't load".
+
+---
+
+## Session 2026-08-03 — scout full roster + site-wide trilingual retrofit
+
+**Part 1 — Scout portal (`/scout/`) approved vs pending, full read-only detail.**
+- Approved scouts now see the FULL admin-equivalent roster read-only: photo, name/position/country/sport, contact (email/phone/IG/age), bio, career-highlight pills, teams, AND the full **Baseball-Reference career register (batting/pitching/fielding)** — rendered with the shared `window.BBREF.renderAll()` (same renderer as the admin panel + public profile pages, `bbref-stats.js`), NOT a re-implemented table. Stats are fetched in bulk from `player_batting/pitching/fielding_stats` and grouped by `player_id`; no admin-only content (internal notes / edit controls) is ever rendered.
+- Pending scouts get payment instructions (€49.99 PayPal py.pl + Wise) + a "make sure you've paid" message + a clickable `mailto:elitesportsmanagement50@gmail.com`. Never a dead-end.
+- **RLS (DB-enforced, verified live):** roster/contact comes only via `public.scout_roster()` (SETOF players, `SECURITY DEFINER`), gated by `private.is_approved_scout()` = `exists(profiles where id=auth.uid() and role='scout' and account_status='approved')`. Test (throwaway scout, cleaned up): UNAPPROVED → `scout_roster()` returns `[]`; after approval → 18 players with contact. BBREF stat tables are public for approved players by design (same data the public profile pages show), so surfacing them to scouts adds no new exposure.
+
+**Part 2 — Full-site EN/ES/IT trilingual audit + retrofit.** Established pattern (from `index.html`/`portal/`): `DICT{en,es,it}` + `t()` + `applyStatic()` for `[data-i18n]`/`[data-i18n-html]`/`[data-i18n-ph]` + `#langsw` switcher + `esm_lang` localStorage (shared across all pages; homepage writes it too).
+
+| Page | Final i18n state |
+|------|------------------|
+| `index.html` | ✅ already trilingual (151 keys) |
+| `portal/` (player) | ✅ already trilingual |
+| `scout/` | ✅ **retrofitted this session** (25 keys) |
+| `tenerife/` | ✅ **retrofitted this session** (36 keys) + fixed missing `.btn-ghost` CSS (Wise button was unstyled) |
+| `register/` | ✅ **retrofitted this session** (70 keys; PAY copy moved to per-role i18n keys; season-stats builder + all JS messages translated) |
+| `admin/` | ⬜ **intentionally EN-only** — internal staff tool (Sam/Marianna/Matt), not customer-facing. Out of scope. |
+| `players/*.html` (17) | ⬜ **remaining** — public profile pages have vestigial `.lang` CSS but no functional i18n. Bulk content (bios/stats) is English data entered by Sam (not auto-translatable); only chrome (nav/section headings) is translatable, which requires editing `gen_player_pages.py` and regenerating all 17. Recommended as a follow-up. |
+
+**Universal strings left untranslated on purpose:** baseball stat abbreviations (G/AB/H/HR/AVG/OBP/SLG/ERA/WHIP…) and the `Baseball`/`Softball` `<option>` values (they are DB `sport` field values feeding FLAGS/roster consistency).
+
+**Commits (newest last):** `4357fae` scout roster+trilingual → `3536329` tenerife trilingual+btn-ghost fix → `fed225e` register trilingual. (Also earlier this day: signup-robustness trigger + self-heal, read-only portal owner_id fix, py.pl↔Wise dual payment buttons — see git log.)
+
+**Validation:** every module script syntax-checked via `new Function()` (register done by hand + re-checked here); scout approved/pending RLS proven live against the API with a throwaway account (deleted); all 5 apps carry `#langsw` + `esm_lang`. **Not done headless:** actual browser click-through of every page in all 3 languages (login/session/storage can't be driven headless) — recommend a manual pass.
+
+**Remaining i18n follow-up:** `players/*.html` chrome via `gen_player_pages.py` (the long-standing "player-page generator" maintenance item — now also the i18n gap).
