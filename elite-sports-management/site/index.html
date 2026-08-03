@@ -796,7 +796,7 @@ const TESTIMONIALS = [
 const STATIC_PLAYER_PAGES = new Set(["brayan-hernandez", "gianni-westphal", "jose-cedeno", "danyer-sanabria", "francesco-mazzei", "anderson-pena", "jesus-delgado", "lorenzo-gonzalez", "jaider-morelos", "bret-bowers", "osiris-german", "adam-moser", "yerardo-ciofani", "javier-useche", "david-chavez", "matteo-colalucci", "anthony-quattrocchi"]);
 
 const T = {
-  en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_collab:"Collaborators",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_signin:"Sign In",nav_signin_create:"Create Account",nav_signin_player:"Player Portal",nav_signin_scout:"Scout Portal",nav_signin_admin:"Admin Portal",nav_cta:"Apply Now",
+  en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_collab:"Collaborators",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_signin:"Sign In",nav_myprofile:"My Profile",nav_signin_create:"Create Account",nav_signin_player:"Player Portal",nav_signin_scout:"Scout Portal",nav_signin_admin:"Admin Portal",nav_cta:"Apply Now",
     contracts_h2:'50+ contracts signed <em>since 2025</em>',
     contracts_sub:'Our athletes have signed contracts in <b>7 different countries</b> to date.',
     feat_role:"Former Cleveland Indians organization",
@@ -873,7 +873,7 @@ const T = {
     foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",ceasai_cta:"Website built by CeasAI — Create your own site like this →",ceasai_ig:"Follow CeasAI on Instagram",ceasai_email:"Email CeasAI",ceasai_tiktok:"Follow CeasAI on TikTok",
     install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install",
     admin_link:"Admin",login_h:"Admin Login",login_sub:"Manage athletes, stats & photos",login_email:"Email",login_pass:"Password",login_btn:"Log in"},
-  es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_collab:"Colaboradores",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_signin:"Entrar",nav_signin_create:"Crear Cuenta",nav_signin_player:"Portal Jugador",nav_signin_scout:"Portal Scout",nav_signin_admin:"Portal Admin",nav_cta:"Aplica Ahora",
+  es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_collab:"Colaboradores",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_signin:"Entrar",nav_myprofile:"Mi Perfil",nav_signin_create:"Crear Cuenta",nav_signin_player:"Portal Jugador",nav_signin_scout:"Portal Scout",nav_signin_admin:"Portal Admin",nav_cta:"Aplica Ahora",
     contracts_h2:'Más de 50 contratos firmados <em>desde 2025</em>',
     contracts_sub:'Nuestros atletas han firmado contratos en <b>7 países diferentes</b> hasta la fecha.',
     feat_role:"Ex organización de los Cleveland Indians",
@@ -950,7 +950,7 @@ const T = {
     foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",ceasai_cta:"Sitio web creado por CeasAI — Crea tu propio sitio como este →",ceasai_ig:"Sigue a CeasAI en Instagram",ceasai_email:"Escríbele un correo a CeasAI",ceasai_tiktok:"Sigue a CeasAI en TikTok",
     install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar",
     admin_link:"Admin",login_h:"Acceso Admin",login_sub:"Gestiona atletas, estadísticas y fotos",login_email:"Correo",login_pass:"Contraseña",login_btn:"Entrar"},
-  it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_collab:"Collaboratori",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_signin:"Accedi",nav_signin_create:"Crea Account",nav_signin_player:"Portale Giocatore",nav_signin_scout:"Portale Scout",nav_signin_admin:"Portale Admin",nav_cta:"Candidati",
+  it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_collab:"Collaboratori",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_signin:"Accedi",nav_myprofile:"Il Mio Profilo",nav_signin_create:"Crea Account",nav_signin_player:"Portale Giocatore",nav_signin_scout:"Portale Scout",nav_signin_admin:"Portale Admin",nav_cta:"Candidati",
     contracts_h2:'Oltre 50 contratti firmati <em>dal 2025</em>',
     contracts_sub:'I nostri atleti hanno firmato contratti in <b>7 paesi diversi</b> a oggi.',
     feat_role:"Ex organizzazione Cleveland Indians",
@@ -1367,7 +1367,7 @@ let PLAYERS = [
     ]
   }
 ];
-let lang="en", active="All", activeSport="All", SB=null;
+let lang=(()=>{try{const l=localStorage.getItem("esm_lang");return["en","es","it"].includes(l)?l:"en";}catch(e){return "en";}})(), active="All", activeSport="All", SB=null;
 
 const initials=n=>n.replace(/[^A-Za-zÀ-ÿ ]/g,"").split(" ").filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 const t=k=>(T[lang][k]??k);
@@ -1387,7 +1387,7 @@ function applyI18n(){
   document.querySelectorAll("[data-i18n-ph]").forEach(el=>el.setAttribute("placeholder",t(el.dataset.i18nPh)));
   document.querySelectorAll("#lang button").forEach(b=>b.classList.toggle("on",b.dataset.l===lang));
 }
-function setLang(l){lang=l;applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();}
+function setLang(l){lang=l;try{localStorage.setItem("esm_lang",l);}catch(e){}applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();}
 
 const SPORT_FILTERS=["All","Baseball","Softball"];
 function renderSportFilters(){
@@ -1749,6 +1749,21 @@ async function boot(){
 // constants (no network), so doing this before boot()'s async import+fetch means the
 // "$49.99" roster button always has a working target even if the connection stalls —
 // previously it stayed href="#" until boot() finished (a tap-does-nothing race on slow iOS).
+/* If a player/scout is already signed in (a Supabase session is stored in this browser),
+   relabel the "Sign In" nav dropdown to "My Profile" so the nav reflects their state.
+   We only READ the stored token — the roster client stays anonymous (persistSession:false)
+   so a logged-in JWT never shrinks the public roster. applyI18n() (in boot) renders it. */
+(function reflectAuthInNav(){
+  try{
+    const raw=localStorage.getItem("sb-sbexwyvsgqayxrsrlrpm-auth-token");
+    if(!raw)return;
+    const o=JSON.parse(raw), exp=o&&o.expires_at;
+    if(!(o&&o.access_token))return;
+    if(exp && exp*1000<=Date.now())return;   // session expired → leave as "Sign In"
+    const s=document.querySelector('#signin summary span[data-i18n="nav_signin"]');
+    if(s)s.setAttribute("data-i18n","nav_myprofile");
+  }catch(e){}
+})();
 wirePayButtons();
 boot();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}

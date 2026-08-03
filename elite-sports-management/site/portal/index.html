@@ -23,6 +23,9 @@
   header b{font-size:14px;display:block}
   header small{display:block;font-size:8.5px;letter-spacing:.3em;color:var(--gold-soft);font-weight:700}
   .spacer{flex:1}
+  .langsw{display:flex;gap:4px}
+  .langsw button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:5px 8px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;transition:.2s}
+  .langsw button.on{border-color:var(--gold);color:var(--gold-soft)}
   .btn{padding:11px 20px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;border:0;transition:.2s;display:inline-block}
   .btn-gold{background:var(--gold);color:#05101f}
   .btn-gold:hover{background:var(--gold-soft)}
@@ -55,6 +58,7 @@
   .row b{font-weight:600;text-align:right}
   .note{font-size:13.5px;color:var(--muted);margin-top:6px}
   .empty{color:var(--muted);text-align:center;padding:30px 10px}
+  .ro-hint{font-size:12px;color:var(--muted);margin:-4px 0 12px;font-style:italic}
   #booting,#loginBox,#app{display:none}
   /* self-entered per-season stats tables (derived AVG/OBP/SLG · ERA/WHIP · Fld%) */
   .ss-block{margin-bottom:16px}
@@ -71,30 +75,35 @@
 </style>
 </head>
 <body>
+<!-- Shared Baseball-Reference config + read-only table renderer (window.BBREF). Loaded as
+     a classic script so the module below can render the player's own career register
+     exactly like the admin panel and public profile pages do. -->
+<script src="../bbref-stats.js"></script>
 <div class="wrap">
   <header>
     <a href="../index.html"><img class="logo-img" src="../logo.png" alt="Elite Sports Management" /></a>
-    <div><b>Elite Sports Management</b><small>PLAYER PORTAL</small></div>
+    <div><b>Elite Sports Management</b><small data-i18n="p_kicker">PLAYER PORTAL</small></div>
     <div class="spacer"></div>
-    <button class="btn btn-ghost" id="signOut" style="display:none">Sign out</button>
+    <div class="langsw" id="langsw" role="group" aria-label="Language"><button data-l="en" type="button">EN</button><button data-l="es" type="button">ES</button><button data-l="it" type="button">IT</button></div>
+    <button class="btn btn-ghost" id="signOut" style="display:none" data-i18n="p_signout">Sign out</button>
   </header>
 
-  <div id="booting" class="card" style="max-width:420px;margin:8vh auto;text-align:center;color:var(--muted)">Checking session…</div>
+  <div id="booting" class="card" style="max-width:420px;margin:8vh auto;text-align:center;color:var(--muted)" data-i18n="p_checking">Checking session…</div>
 
   <!-- LOGIN -->
   <div id="loginBox" class="card" style="max-width:420px;margin:8vh auto">
-    <h2 class="display" style="font-size:22px;margin-bottom:6px">Player <em style="color:var(--gold);font-style:normal">Portal</em></h2>
-    <p class="note" style="margin-bottom:18px">Sign in with the email &amp; password you created at registration.</p>
+    <h2 class="display" style="font-size:22px;margin-bottom:6px" data-i18n-html="p_login_h">Player <em style="color:var(--gold);font-style:normal">Portal</em></h2>
+    <p class="note" style="margin-bottom:18px" data-i18n="p_login_note">Sign in with the email &amp; password you created at registration.</p>
     <form id="pwForm">
-      <div class="field"><label for="email">Email</label><input type="email" id="email" autocomplete="username" required placeholder="you@email.com" /></div>
-      <div class="field"><label for="password">Password</label><input type="password" id="password" autocomplete="current-password" required /></div>
-      <button class="btn btn-gold" style="width:100%" type="submit">Sign in</button>
+      <div class="field"><label for="email" data-i18n="p_email">Email</label><input type="email" id="email" autocomplete="username" required placeholder="you@email.com" /></div>
+      <div class="field"><label for="password" data-i18n="p_password">Password</label><input type="password" id="password" autocomplete="current-password" required /></div>
+      <button class="btn btn-gold" style="width:100%" type="submit" data-i18n="p_signin">Sign in</button>
       <div class="msg" id="loginMsg" role="alert" aria-live="assertive"></div>
     </form>
-    <div style="text-align:center;margin-top:12px"><button type="button" id="forgotBtn" class="linklike">Forgot your password?</button></div>
-    <div style="text-align:center;margin:14px 0 4px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">or</div>
-    <button class="btn btn-ghost" style="width:100%" type="button" id="magicBtn">Email me a sign-in link</button>
-    <p class="note" style="margin-top:16px">
+    <div style="text-align:center;margin-top:12px"><button type="button" id="forgotBtn" class="linklike" data-i18n="p_forgot">Forgot your password?</button></div>
+    <div style="text-align:center;margin:14px 0 4px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)" data-i18n="p_or">or</div>
+    <button class="btn btn-ghost" style="width:100%" type="button" id="magicBtn" data-i18n="p_magic">Email me a sign-in link</button>
+    <p class="note" style="margin-top:16px" data-i18n-html="p_login_new">
       New here? <a href="../register/">Create an account</a>.
       Applied the old way? Use the sign-in link with your application email.
     </p>
@@ -102,11 +111,11 @@
 
   <!-- RESET PASSWORD (shown when arriving from a reset email) -->
   <div id="resetBox" class="card" style="max-width:420px;margin:8vh auto;display:none">
-    <h2 class="display" style="font-size:22px;margin-bottom:6px">Set a new <em style="color:var(--gold);font-style:normal">password</em></h2>
-    <p class="note" style="margin-bottom:18px">Choose a new password for your account.</p>
+    <h2 class="display" style="font-size:22px;margin-bottom:6px" data-i18n-html="p_reset_h">Set a new <em style="color:var(--gold);font-style:normal">password</em></h2>
+    <p class="note" style="margin-bottom:18px" data-i18n="p_reset_note">Choose a new password for your account.</p>
     <form id="resetForm">
-      <div class="field"><label for="newpass">New password</label><input type="password" id="newpass" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters" /></div>
-      <button class="btn btn-gold" style="width:100%" type="submit">Update password</button>
+      <div class="field"><label for="newpass" data-i18n="p_newpass">New password</label><input type="password" id="newpass" autocomplete="new-password" minlength="8" required data-i18n-ph="p_newpass_ph" placeholder="At least 8 characters" /></div>
+      <button class="btn btn-gold" style="width:100%" type="submit" data-i18n="p_update_pw">Update password</button>
       <div class="msg" id="resetMsg" role="alert" aria-live="assertive"></div>
     </form>
   </div>
@@ -132,6 +141,157 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const initials = n => (n||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
 
+/* ---------- i18n (EN / ES / IT) ----------
+   Chrome + labels are translated; universal baseball stat abbreviations (AVG, OBP, …)
+   stay as-is, matching the admin panel and public profile pages. Language preference is
+   shared site-wide via the `esm_lang` localStorage key (the homepage writes it too). */
+const DICT = {
+  en:{
+    p_kicker:"PLAYER PORTAL", p_signout:"Sign out", p_checking:"Checking session…",
+    p_login_h:'Player <em style="color:var(--gold);font-style:normal">Portal</em>',
+    p_login_note:"Sign in with the email & password you created at registration.",
+    p_email:"Email", p_password:"Password", p_signin:"Sign in", p_forgot:"Forgot your password?",
+    p_or:"or", p_magic:"Email me a sign-in link",
+    p_login_new:'New here? <a href="../register/">Create an account</a>. Applied the old way? Use the sign-in link with your application email.',
+    p_reset_h:'Set a new <em style="color:var(--gold);font-style:normal">password</em>',
+    p_reset_note:"Choose a new password for your account.", p_newpass:"New password",
+    p_newpass_ph:"At least 8 characters", p_update_pw:"Update password",
+    p_enter_email:"Enter your email first.", p_sending:"Sending…",
+    p_magic_sent:"Check your inbox — we sent you a sign-in link.",
+    p_forgot_enter:"Enter your email first, then tap “Forgot your password?”.",
+    p_reset_sent:"Check your inbox — we sent a link to reset your password.",
+    p_pw_updated:"Password updated — signing you in…",
+    p_scout_t:"You're a scout account", p_scout_b:'This is the player portal. Head to the <a href="../scout/">Scout Portal</a> to view the roster.',
+    p_st_pending_t:"Almost there",
+    p_st_pending_b:"Your registration has been received and we're verifying your payment. Your player portal unlocks automatically as soon as Elite Sports Management approves your account — there's nothing more you need to do. We'll email you the moment it's ready.",
+    p_st_rejected_t:"Let's talk",
+    p_st_rejected_b:"We're not able to activate your account right now. If you think this is a mistake or you'd like to know more, please reach out and we'll be glad to help.",
+    p_st_archived_t:"Account archived",
+    p_st_archived_b:"Your account is currently archived and access is paused. Contact us any time to reactivate it.",
+    p_questions:"Questions?", p_email_us:"Email us",
+    p_loading:"Loading your profile…", p_load_fail:"Couldn't load your profile.",
+    p_none_1:"No athlete profile found for", p_none_2:'If you applied with a different email, sign out and use that one. Otherwise <a href="../index.html#join">submit an application</a>.',
+    p_note_pending:"Your application is with Samuele for review. You'll hear from us soon.",
+    p_note_approved:"You're live on the ESM roster.",
+    p_note_rejected:"This profile isn't currently shown on the roster. Reach out if you think that's wrong.",
+    p_status_pending:"pending", p_status_approved:"approved", p_status_rejected:"rejected", p_status_archived:"archived",
+    p_k_bio:"Bio", p_k_details:"Details", p_k_highlights:"Career highlights",
+    p_k_register:"Career stats", p_k_season:"Season stats", p_k_teams:"Teams & affiliations", p_k_edit:"Edit my details",
+    p_l_sport:"Sport", p_l_position:"Position", p_l_country:"Country", p_l_age:"Age", p_l_email:"Email", p_l_instagram:"Instagram", p_l_applying:"Applying for",
+    p_stats_ro:"Your stats and career record are maintained by Elite Sports Management.",
+    p_edit_note:"Update your own bio, contact details and photo below. Your career stats, position and roster status are managed by Elite Sports Management.",
+    p_l_photo:"Profile photo", p_l_bio:"Bio", p_l_phone:"Phone",
+    p_save:"Save my changes", p_saving:"Saving…", p_saved:"Saved ✓", p_save_fail:"Couldn't save: ",
+    p_help:'Need a stat or your position updated? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Profile%20update%20request">Email us</a>.',
+    p_batting:"Batting", p_pitching:"Pitching", p_fielding:"Fielding",
+  },
+  es:{
+    p_kicker:"PORTAL JUGADOR", p_signout:"Cerrar sesión", p_checking:"Verificando sesión…",
+    p_login_h:'Portal <em style="color:var(--gold);font-style:normal">Jugador</em>',
+    p_login_note:"Entra con el correo y la contraseña que creaste al registrarte.",
+    p_email:"Correo", p_password:"Contraseña", p_signin:"Entrar", p_forgot:"¿Olvidaste tu contraseña?",
+    p_or:"o", p_magic:"Envíame un enlace de acceso",
+    p_login_new:'¿Nuevo aquí? <a href="../register/">Crea una cuenta</a>. ¿Aplicaste antes? Usa el enlace de acceso con el correo de tu solicitud.',
+    p_reset_h:'Establece una nueva <em style="color:var(--gold);font-style:normal">contraseña</em>',
+    p_reset_note:"Elige una nueva contraseña para tu cuenta.", p_newpass:"Nueva contraseña",
+    p_newpass_ph:"Al menos 8 caracteres", p_update_pw:"Actualizar contraseña",
+    p_enter_email:"Introduce tu correo primero.", p_sending:"Enviando…",
+    p_magic_sent:"Revisa tu correo — te enviamos un enlace de acceso.",
+    p_forgot_enter:"Introduce tu correo primero y luego pulsa “¿Olvidaste tu contraseña?”.",
+    p_reset_sent:"Revisa tu correo — te enviamos un enlace para restablecer tu contraseña.",
+    p_pw_updated:"Contraseña actualizada — iniciando sesión…",
+    p_scout_t:"Tienes una cuenta de scout", p_scout_b:'Este es el portal del jugador. Ve al <a href="../scout/">Portal Scout</a> para ver el roster.',
+    p_st_pending_t:"Ya casi",
+    p_st_pending_b:"Hemos recibido tu registro y estamos verificando tu pago. Tu portal de jugador se activa automáticamente en cuanto Elite Sports Management apruebe tu cuenta — no tienes que hacer nada más. Te avisaremos por correo en cuanto esté listo.",
+    p_st_rejected_t:"Hablemos",
+    p_st_rejected_b:"No podemos activar tu cuenta en este momento. Si crees que es un error o quieres saber más, contáctanos y con gusto te ayudamos.",
+    p_st_archived_t:"Cuenta archivada",
+    p_st_archived_b:"Tu cuenta está archivada y el acceso está pausado. Contáctanos cuando quieras para reactivarla.",
+    p_questions:"¿Preguntas?", p_email_us:"Escríbenos",
+    p_loading:"Cargando tu perfil…", p_load_fail:"No pudimos cargar tu perfil.",
+    p_none_1:"No se encontró ningún perfil de atleta para", p_none_2:'Si aplicaste con otro correo, cierra sesión y usa ese. Si no, <a href="../index.html#join">envía una solicitud</a>.',
+    p_note_pending:"Tu solicitud está con Samuele para revisión. Pronto tendrás noticias.",
+    p_note_approved:"Estás en el roster de ESM.",
+    p_note_rejected:"Este perfil no se muestra actualmente en el roster. Contáctanos si crees que es un error.",
+    p_status_pending:"pendiente", p_status_approved:"aprobado", p_status_rejected:"rechazado", p_status_archived:"archivado",
+    p_k_bio:"Bio", p_k_details:"Detalles", p_k_highlights:"Momentos destacados",
+    p_k_register:"Estadísticas de carrera", p_k_season:"Estadísticas por temporada", p_k_teams:"Equipos y afiliaciones", p_k_edit:"Editar mis datos",
+    p_l_sport:"Deporte", p_l_position:"Posición", p_l_country:"País", p_l_age:"Edad", p_l_email:"Correo", p_l_instagram:"Instagram", p_l_applying:"Solicita para",
+    p_stats_ro:"Tus estadísticas y tu historial de carrera los gestiona Elite Sports Management.",
+    p_edit_note:"Actualiza tu bio, datos de contacto y foto abajo. Tus estadísticas de carrera, posición y estado en el roster los gestiona Elite Sports Management.",
+    p_l_photo:"Foto de perfil", p_l_bio:"Bio", p_l_phone:"Teléfono",
+    p_save:"Guardar mis cambios", p_saving:"Guardando…", p_saved:"Guardado ✓", p_save_fail:"No se pudo guardar: ",
+    p_help:'¿Necesitas actualizar una estadística o tu posición? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Profile%20update%20request">Escríbenos</a>.',
+    p_batting:"Bateo", p_pitching:"Pitcheo", p_fielding:"Defensa",
+  },
+  it:{
+    p_kicker:"PORTALE GIOCATORE", p_signout:"Esci", p_checking:"Verifica sessione…",
+    p_login_h:'Portale <em style="color:var(--gold);font-style:normal">Giocatore</em>',
+    p_login_note:"Accedi con l'email e la password create in fase di registrazione.",
+    p_email:"Email", p_password:"Password", p_signin:"Accedi", p_forgot:"Password dimenticata?",
+    p_or:"oppure", p_magic:"Inviami un link di accesso",
+    p_login_new:'Nuovo qui? <a href="../register/">Crea un account</a>. Ti sei candidato prima? Usa il link di accesso con l\'email della candidatura.',
+    p_reset_h:'Imposta una nuova <em style="color:var(--gold);font-style:normal">password</em>',
+    p_reset_note:"Scegli una nuova password per il tuo account.", p_newpass:"Nuova password",
+    p_newpass_ph:"Almeno 8 caratteri", p_update_pw:"Aggiorna password",
+    p_enter_email:"Inserisci prima la tua email.", p_sending:"Invio…",
+    p_magic_sent:"Controlla la posta — ti abbiamo inviato un link di accesso.",
+    p_forgot_enter:"Inserisci prima la tua email, poi tocca “Password dimenticata?”.",
+    p_reset_sent:"Controlla la posta — ti abbiamo inviato un link per reimpostare la password.",
+    p_pw_updated:"Password aggiornata — accesso in corso…",
+    p_scout_t:"Hai un account scout", p_scout_b:'Questo è il portale giocatore. Vai al <a href="../scout/">Portale Scout</a> per vedere il roster.',
+    p_st_pending_t:"Ci siamo quasi",
+    p_st_pending_b:"Abbiamo ricevuto la tua registrazione e stiamo verificando il pagamento. Il tuo portale giocatore si sblocca automaticamente non appena Elite Sports Management approva il tuo account — non devi fare altro. Ti avviseremo via email appena è pronto.",
+    p_st_rejected_t:"Parliamone",
+    p_st_rejected_b:"Al momento non possiamo attivare il tuo account. Se pensi sia un errore o vuoi saperne di più, contattaci e saremo felici di aiutarti.",
+    p_st_archived_t:"Account archiviato",
+    p_st_archived_b:"Il tuo account è archiviato e l'accesso è in pausa. Contattaci quando vuoi per riattivarlo.",
+    p_questions:"Domande?", p_email_us:"Scrivici",
+    p_loading:"Caricamento del tuo profilo…", p_load_fail:"Impossibile caricare il tuo profilo.",
+    p_none_1:"Nessun profilo atleta trovato per", p_none_2:'Se ti sei candidato con un\'altra email, esci e usa quella. Altrimenti <a href="../index.html#join">invia una candidatura</a>.',
+    p_note_pending:"La tua candidatura è in revisione da Samuele. Ti faremo sapere presto.",
+    p_note_approved:"Sei sul roster ESM.",
+    p_note_rejected:"Questo profilo al momento non è mostrato sul roster. Contattaci se pensi sia un errore.",
+    p_status_pending:"in attesa", p_status_approved:"approvato", p_status_rejected:"rifiutato", p_status_archived:"archiviato",
+    p_k_bio:"Bio", p_k_details:"Dettagli", p_k_highlights:"Momenti salienti",
+    p_k_register:"Statistiche di carriera", p_k_season:"Statistiche per stagione", p_k_teams:"Squadre e affiliazioni", p_k_edit:"Modifica i miei dati",
+    p_l_sport:"Sport", p_l_position:"Ruolo", p_l_country:"Paese", p_l_age:"Età", p_l_email:"Email", p_l_instagram:"Instagram", p_l_applying:"Candidatura per",
+    p_stats_ro:"Le tue statistiche e il tuo record di carriera sono gestiti da Elite Sports Management.",
+    p_edit_note:"Aggiorna qui la tua bio, i contatti e la foto. Le tue statistiche di carriera, il ruolo e lo stato sul roster sono gestiti da Elite Sports Management.",
+    p_l_photo:"Foto profilo", p_l_bio:"Bio", p_l_phone:"Telefono",
+    p_save:"Salva le modifiche", p_saving:"Salvataggio…", p_saved:"Salvato ✓", p_save_fail:"Impossibile salvare: ",
+    p_help:'Serve aggiornare una statistica o il tuo ruolo? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Profile%20update%20request">Scrivici</a>.',
+    p_batting:"Battuta", p_pitching:"Lancio", p_fielding:"Difesa",
+  },
+};
+const SUPPORTED = ["en","es","it"];
+let lang = (()=>{ try{ const l = localStorage.getItem("esm_lang"); return SUPPORTED.includes(l) ? l : "en"; }catch(e){ return "en"; } })();
+const t = k => (DICT[lang] && DICT[lang][k]) || DICT.en[k] || k;
+
+/* Apply translations to the static markup (login / reset / header). */
+function applyStatic(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.setAttribute("placeholder", t(el.getAttribute("data-i18n-ph"))); });
+  document.querySelectorAll("#langsw button").forEach(b => b.classList.toggle("on", b.dataset.l === lang));
+}
+function setLang(l){
+  if (!SUPPORTED.includes(l) || l === lang) { document.querySelectorAll("#langsw button").forEach(b=>b.classList.toggle("on",b.dataset.l===lang)); return; }
+  lang = l; try{ localStorage.setItem("esm_lang", l); }catch(e){}
+  applyStatic();
+  rerenderDynamic();   // re-render whatever dynamic view is currently on screen
+}
+document.querySelectorAll("#langsw button").forEach(b => b.onclick = () => setLang(b.dataset.l));
+
+/* Remember the current dynamic view so a language switch can re-render it in place. */
+let CUR = { view:null, status:null };
+function rerenderDynamic(){
+  if (CUR.view === "status" && CUR.status) showStatus(CUR.status);
+  else if (CUR.view === "scout") showScout();
+  else if (CUR.view === "app" && ME_SESSION) loadMe(ME_SESSION);
+}
+
 function showView(state){
   $("booting").style.display   = state === "booting" ? "block" : "none";
   $("loginBox").style.display  = state === "login"   ? "block" : "none";
@@ -140,6 +300,7 @@ function showView(state){
   $("app").style.display       = state === "app"     ? "block" : "none";
   $("signOut").style.display   = (state === "app" || state === "status") ? "" : "none";
 }
+applyStatic();
 showView("booting");
 
 /* True while handling a password-reset link, so the normal session routing
@@ -161,12 +322,12 @@ $("pwForm").addEventListener("submit", async e => {
 $("magicBtn").onclick = async () => {
   const m = $("loginMsg"); m.classList.remove("show","ok");
   const email = $("email").value.trim();
-  if (!email){ m.textContent = "Enter your email first."; m.classList.add("show"); $("email").focus(); return; }
-  const btn = $("magicBtn"); btn.disabled = true; btn.textContent = "Sending…";
+  if (!email){ m.textContent = t("p_enter_email"); m.classList.add("show"); $("email").focus(); return; }
+  const btn = $("magicBtn"); btn.disabled = true; btn.textContent = t("p_sending");
   const { error } = await SB.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href.split("#")[0] } });
-  btn.disabled = false; btn.textContent = "Email me a sign-in link";
+  btn.disabled = false; btn.textContent = t("p_magic");
   if (error){ m.textContent = error.message; m.classList.add("show"); return; }
-  m.textContent = "Check your inbox — we sent you a sign-in link.";
+  m.textContent = t("p_magic_sent");
   m.classList.add("show","ok");
 };
 
@@ -176,12 +337,12 @@ $("signOut").onclick = async () => { await SB.auth.signOut(); };
 $("forgotBtn").onclick = async () => {
   const m = $("loginMsg"); m.classList.remove("show","ok");
   const email = $("email").value.trim();
-  if (!email){ m.textContent = "Enter your email first, then tap “Forgot your password?”."; m.classList.add("show"); $("email").focus(); return; }
-  const btn = $("forgotBtn"); btn.disabled = true; btn.textContent = "Sending…";
+  if (!email){ m.textContent = t("p_forgot_enter"); m.classList.add("show"); $("email").focus(); return; }
+  const btn = $("forgotBtn"); btn.disabled = true; btn.textContent = t("p_sending");
   const { error } = await SB.auth.resetPasswordForEmail(email, { redirectTo: location.href.split("#")[0] });
-  btn.disabled = false; btn.textContent = "Forgot your password?";
+  btn.disabled = false; btn.textContent = t("p_forgot");
   if (error){ m.textContent = error.message; m.classList.add("show"); return; }
-  m.textContent = "Check your inbox — we sent a link to reset your password.";
+  m.textContent = t("p_reset_sent");
   m.classList.add("show","ok");
 };
 
@@ -194,34 +355,32 @@ $("resetForm").addEventListener("submit", async e => {
   btn.disabled = false;
   if (error){ m.textContent = error.message; m.classList.add("show"); return; }
   RECOVERING = false;
-  m.textContent = "Password updated — signing you in…"; m.classList.add("show","ok");
+  m.textContent = t("p_pw_updated"); m.classList.add("show","ok");
   const { data: { session } } = await SB.auth.getSession();
   if (session) gate(session); else showView("login");
 });
 
 /* Professional, non-technical status screens for unapproved accounts. */
-const STATUS_COPY = {
-  pending: {
-    icon: "⏳", title: "Almost there",
-    body: "Your registration has been received and we're verifying your payment. Your player portal unlocks automatically as soon as Elite Sports Management approves your account — there's nothing more you need to do. We'll email you the moment it's ready.",
-  },
-  rejected: {
-    icon: "✉️", title: "Let's talk",
-    body: "We're not able to activate your account right now. If you think this is a mistake or you'd like to know more, please reach out and we'll be glad to help.",
-  },
-  archived: {
-    icon: "📁", title: "Account archived",
-    body: "Your account is currently archived and access is paused. Contact us any time to reactivate it.",
-  },
-};
 function showStatus(status){
-  const c = STATUS_COPY[status] || STATUS_COPY.pending;
+  CUR = { view:"status", status };
+  const icons = { pending:"⏳", rejected:"✉️", archived:"📁" };
+  const key = ({pending:"pending",rejected:"rejected",archived:"archived"}[status]) || "pending";
   $("statusBox").innerHTML = `
     <div style="text-align:center">
-      <div style="font-size:40px;margin-bottom:10px">${c.icon}</div>
-      <h2 class="display" style="font-size:22px;margin-bottom:10px">${esc(c.title)}</h2>
-      <p class="note" style="font-size:14.5px;line-height:1.6">${esc(c.body)}</p>
-      <p class="note" style="margin-top:18px">Questions? <a href="mailto:elitesportsmanagement50@gmail.com?subject=My%20ESM%20account">Email us</a>.</p>
+      <div style="font-size:40px;margin-bottom:10px">${icons[key]}</div>
+      <h2 class="display" style="font-size:22px;margin-bottom:10px">${esc(t("p_st_"+key+"_t"))}</h2>
+      <p class="note" style="font-size:14.5px;line-height:1.6">${esc(t("p_st_"+key+"_b"))}</p>
+      <p class="note" style="margin-top:18px">${esc(t("p_questions"))} <a href="mailto:elitesportsmanagement50@gmail.com?subject=My%20ESM%20account">${esc(t("p_email_us"))}</a>.</p>
+    </div>`;
+  showView("status");
+}
+function showScout(){
+  CUR = { view:"scout", status:null };
+  $("statusBox").innerHTML = `
+    <div style="text-align:center">
+      <div style="font-size:40px;margin-bottom:10px">🔎</div>
+      <h2 class="display" style="font-size:22px;margin-bottom:10px">${esc(t("p_scout_t"))}</h2>
+      <p class="note" style="font-size:14.5px">${t("p_scout_b")}</p>
     </div>`;
   showView("status");
 }
@@ -233,27 +392,18 @@ async function gate(session){
   const user = session?.user; if (!user){ showView("login"); return; }
   const { data: prof } = await SB.from("profiles").select("role,account_status").eq("id", user.id).maybeSingle();
   if (prof){
-    if (prof.role === "scout"){
-      $("statusBox").innerHTML = `
-        <div style="text-align:center">
-          <div style="font-size:40px;margin-bottom:10px">🔎</div>
-          <h2 class="display" style="font-size:22px;margin-bottom:10px">You're a scout account</h2>
-          <p class="note" style="font-size:14.5px">This is the player portal. Head to the <a href="../scout/">Scout Portal</a> to view the roster.</p>
-        </div>`;
-      showView("status");
-      return;
-    }
+    if (prof.role === "scout"){ showScout(); return; }
     if (prof.account_status !== "approved"){ showStatus(prof.account_status); return; }
   }
   // Approved player, or a legacy applicant with no profiles row → show the profile.
-  ME_SESSION = session; showView("app"); loadMe(session);
+  ME_SESSION = session; CUR = { view:"app", status:null }; showView("app"); loadMe(session);
 }
 
 let ME_SESSION = null;   // kept so the edit form knows the user's id (photo path) + email
 SB.auth.onAuthStateChange((evt, session) => {
   if (evt === "PASSWORD_RECOVERY"){ RECOVERING = true; showView("reset"); }
   else if (evt === "SIGNED_IN" && session) { ME_SESSION = session; gate(session); }
-  else if (evt === "SIGNED_OUT") { ME_SESSION = null; showView("login"); }
+  else if (evt === "SIGNED_OUT") { ME_SESSION = null; CUR = { view:null, status:null }; showView("login"); }
 });
 
 (async function guard(){
@@ -268,22 +418,22 @@ SB.auth.onAuthStateChange((evt, session) => {
 
 /* View-only. RLS only returns the row whose `email` matches the signed-in user,
    so an athlete physically cannot read anyone else's profile — this isn't just a
-   UI restriction. Editing is deliberately not offered: the agency owns the stats. */
+   UI restriction. Editing of stats is deliberately not offered: the agency owns them
+   (only bio/contact/photo are self-editable, via the update_my_profile RPC). */
 async function loadMe(session){
   const email = session?.user?.email || "";
-  $("profile").innerHTML = `<div class="card empty">Loading your profile…</div>`;
+  $("profile").innerHTML = `<div class="card empty">${esc(t("p_loading"))}</div>`;
   const { data, error } = await SB.from("players").select("*").eq("email", email).limit(1);
 
   if (error){
-    $("profile").innerHTML = `<div class="card empty">Couldn't load your profile.<br><small>${esc(error.message)}</small></div>`;
+    $("profile").innerHTML = `<div class="card empty">${esc(t("p_load_fail"))}<br><small>${esc(error.message)}</small></div>`;
     return;
   }
   const p = (data || [])[0];
   if (!p){
     $("profile").innerHTML = `<div class="card empty">
-      <p>No athlete profile found for <b>${esc(email)}</b>.</p>
-      <p class="note" style="margin-top:10px">If you applied with a different email, sign out and use that one.
-      Otherwise <a href="../index.html#join">submit an application</a>.</p>
+      <p>${esc(t("p_none_1"))} <b>${esc(email)}</b>.</p>
+      <p class="note" style="margin-top:10px">${t("p_none_2")}</p>
     </div>`;
     return;
   }
@@ -291,10 +441,11 @@ async function loadMe(session){
   const teams = Array.isArray(p.teams) ? p.teams : [];
   const stats = Array.isArray(p.stats) ? p.stats : [];
   const statusNote = {
-    pending:  "Your application is with Samuele for review. You'll hear from us soon.",
-    approved: "You're live on the ESM roster.",
-    rejected: "This profile isn't currently shown on the roster. Reach out if you think that's wrong.",
+    pending:  t("p_note_pending"),
+    approved: t("p_note_approved"),
+    rejected: t("p_note_rejected"),
   }[p.status] || "";
+  const statusLabel = t("p_status_" + p.status) || p.status;
 
   $("profile").innerHTML = `
     <div class="card">
@@ -304,52 +455,75 @@ async function loadMe(session){
           <h2 class="display">${esc(p.name)}</h2>
           <div class="pos">${esc(p.position || p.group || "")} ${p.flag || ""}</div>
         </div>
-        <span class="chip ${esc(p.status)}">${esc(p.status)}</span>
+        <span class="chip ${esc(p.status)}">${esc(statusLabel)}</span>
       </div>
-      ${statusNote ? `<p class="note">${statusNote}</p>` : ""}
+      ${statusNote ? `<p class="note">${esc(statusNote)}</p>` : ""}
     </div>
 
-    ${p.bio ? `<div class="kicker">Bio</div><div class="card"><p>${esc(p.bio)}</p></div>` : ""}
+    ${p.bio ? `<div class="kicker">${esc(t("p_k_bio"))}</div><div class="card"><p>${esc(p.bio)}</p></div>` : ""}
 
-    <div class="kicker">Details</div>
+    <div class="kicker">${esc(t("p_k_details"))}</div>
     <div class="card">
-      ${row("Sport", p.sport)}
-      ${row("Position", p.position)}
-      ${row("Country", p.country)}
-      ${row("Age", p.age)}
-      ${row("Email", p.email)}
-      ${row("Instagram", p.instagram)}
-      ${row("Applying for", p.applying_for)}
+      ${row(t("p_l_sport"), p.sport)}
+      ${row(t("p_l_position"), p.position)}
+      ${row(t("p_l_country"), p.country)}
+      ${row(t("p_l_age"), p.age)}
+      ${row(t("p_l_email"), p.email)}
+      ${row(t("p_l_instagram"), p.instagram)}
+      ${row(t("p_l_applying"), p.applying_for)}
     </div>
 
-    ${stats.length ? `<div class="kicker">Career highlights</div><div class="card">
+    ${stats.length ? `<div class="kicker">${esc(t("p_k_highlights"))}</div><div class="card">
       ${stats.map(s => row(s.label, s.value)).join("")}
     </div>` : ""}
 
-    ${(() => { const ss = seasonStatsHTML(p.season_stats); return ss ? `<div class="kicker">Season stats</div><div class="card">${ss}</div>` : ""; })()}
+    <!-- Read-only career register (player_batting/pitching/fielding_stats), filled by
+         loadRegister() below. RLS returns only this athlete's own rows. -->
+    <div id="regWrap"></div>
 
-    ${teams.length ? `<div class="kicker">Teams &amp; affiliations</div><div class="card">
-      ${teams.map(t => `<div class="row"><span>${esc(t)}</span></div>`).join("")}
+    ${(() => { const ss = seasonStatsHTML(p.season_stats); return ss ? `<div class="kicker">${esc(t("p_k_season"))}</div><div class="card">${ss}</div>` : ""; })()}
+
+    ${teams.length ? `<div class="kicker">${esc(t("p_k_teams"))}</div><div class="card">
+      ${teams.map(t2 => `<div class="row"><span>${esc(t2)}</span></div>`).join("")}
     </div>` : ""}
 
-    <div class="kicker">Edit my details</div>
+    <div class="kicker">${esc(t("p_k_edit"))}</div>
     <div class="card">
-      <p class="note" style="margin-bottom:16px">Update your own bio, contact details and photo below. Your
-      career stats, position and roster status are managed by Elite Sports Management.</p>
-      <div class="field"><label for="me-photo">Profile photo</label><input type="file" accept="image/*" id="me-photo" /></div>
-      <div class="field"><label for="me-bio">Bio</label><textarea id="me-bio" rows="4" placeholder="Tell your story…">${esc(p.bio || "")}</textarea></div>
-      <div class="field"><label for="me-instagram">Instagram</label><input id="me-instagram" value="${esc(p.instagram || "")}" placeholder="@yourhandle" /></div>
-      <div class="field"><label for="me-phone">Phone</label><input id="me-phone" value="${esc(p.phone || "")}" placeholder="+39 …" /></div>
-      <div class="field"><label for="me-age">Age</label><input id="me-age" inputmode="numeric" value="${esc(p.age || "")}" placeholder="e.g. 21" /></div>
-      <button class="btn btn-gold" style="width:100%" type="button" id="me-save">Save my changes</button>
+      <p class="note" style="margin-bottom:16px">${esc(t("p_edit_note"))}</p>
+      <div class="field"><label for="me-photo">${esc(t("p_l_photo"))}</label><input type="file" accept="image/*" id="me-photo" /></div>
+      <div class="field"><label for="me-bio">${esc(t("p_l_bio"))}</label><textarea id="me-bio" rows="4">${esc(p.bio || "")}</textarea></div>
+      <div class="field"><label for="me-instagram">${esc(t("p_l_instagram"))}</label><input id="me-instagram" value="${esc(p.instagram || "")}" placeholder="@yourhandle" /></div>
+      <div class="field"><label for="me-phone">${esc(t("p_l_phone"))}</label><input id="me-phone" value="${esc(p.phone || "")}" placeholder="+39 …" /></div>
+      <div class="field"><label for="me-age">${esc(t("p_l_age"))}</label><input id="me-age" inputmode="numeric" value="${esc(p.age || "")}" placeholder="e.g. 21" /></div>
+      <button class="btn btn-gold" style="width:100%" type="button" id="me-save">${esc(t("p_save"))}</button>
       <div class="msg" id="me-msg" role="alert" aria-live="assertive"></div>
     </div>
 
-    <p class="note" style="margin-top:16px">
-      Need a stat or your position updated? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Profile%20update%20request">Email us</a>.
-    </p>`;
+    <p class="note" style="margin-top:16px">${t("p_help")}</p>`;
 
   bindEditor();
+  loadRegister(p.id);
+}
+
+/* Read-only Baseball-Reference career register for the signed-in athlete. Mirrors the
+   admin panel + public profile pages by reusing window.BBREF. RLS on the stats tables
+   returns only this player's own rows (private.owns_stats_player). */
+async function loadRegister(pid){
+  const wrap = $("regWrap");
+  if (!wrap || !pid || typeof BBREF === "undefined") return;
+  try {
+    const kinds = ["batting","pitching","fielding"];
+    const data = {};
+    for (const k of kinds){
+      const { data: rows } = await SB.from(BBREF.TABLES[k]).select("*").eq("player_id", pid).order("year").order("sort_order").order("id");
+      data[k] = rows || [];
+    }
+    const html = BBREF.renderAll(data);
+    if (html){
+      BBREF.injectCss();
+      wrap.innerHTML = `<div class="kicker">${esc(t("p_k_register"))}</div><div class="card"><p class="ro-hint">${esc(t("p_stats_ro"))}</p>${html}</div>`;
+    }
+  } catch (err){ console.warn("Register load failed", err); }
 }
 
 /* Self-service edit. Writes go through the update_my_profile() RPC, which only
@@ -359,7 +533,7 @@ function bindEditor(){
   const save = $("me-save"); if (!save) return;
   save.onclick = async () => {
     const m = $("me-msg"); m.classList.remove("show","ok");
-    save.disabled = true; save.textContent = "Saving…";
+    save.disabled = true; save.textContent = t("p_saving");
     try {
       let image_url = null;
       const file = $("me-photo").files?.[0];
@@ -381,12 +555,12 @@ function bindEditor(){
         p_image_url: image_url,   // null → keep current photo
       });
       if (error) throw error;
-      m.textContent = "Saved ✓"; m.classList.add("show","ok");
+      m.textContent = t("p_saved"); m.classList.add("show","ok");
       loadMe(ME_SESSION);   // re-render with fresh data (incl. new photo)
     } catch (err){
-      m.textContent = "Couldn't save: " + (err?.message || err); m.classList.add("show");
+      m.textContent = t("p_save_fail") + (err?.message || err); m.classList.add("show");
     } finally {
-      save.disabled = false; save.textContent = "Save my changes";
+      save.disabled = false; save.textContent = t("p_save");
     }
   };
 }
@@ -406,9 +580,9 @@ function seasonStatsHTML(seasonStats){
   const avg = x => (x===null||!isFinite(x)) ? "—" : x.toFixed(3).replace(/^0(?=\.)/,"");
   const two = x => (x===null||!isFinite(x)) ? "—" : x.toFixed(2);
   const META = {
-    batting:{label:"Batting",cols:["Season","Team","AB","H","HR","RBI","AVG","OBP","SLG"]},
-    pitching:{label:"Pitching",cols:["Season","Team","W","L","ERA","IP","SO","WHIP"]},
-    fielding:{label:"Fielding",cols:["Season","Team","G","E","FLD%"]},
+    batting:{label:t("p_batting"),cols:["Season","Team","AB","H","HR","RBI","AVG","OBP","SLG"]},
+    pitching:{label:t("p_pitching"),cols:["Season","Team","W","L","ERA","IP","SO","WHIP"]},
+    fielding:{label:t("p_fielding"),cols:["Season","Team","G","E","FLD%"]},
   };
   function cell(r,c){
     switch(c){
@@ -427,7 +601,7 @@ function seasonStatsHTML(seasonStats){
   for (const kind of ["batting","pitching","fielding"]){
     const list = rows.filter(r => r && r.kind === kind); if (!list.length) continue;
     const m = META[kind];
-    out += `<div class="ss-block"><div class="ss-title">${m.label}</div><div class="ss-scroll"><table class="ss-table"><thead><tr>${m.cols.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>` +
+    out += `<div class="ss-block"><div class="ss-title">${esc(m.label)}</div><div class="ss-scroll"><table class="ss-table"><thead><tr>${m.cols.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>` +
       list.map(r => `<tr>${m.cols.map(c=>`<td>${cell(r,c)}</td>`).join("")}</tr>`).join("") +
       `</tbody></table></div></div>`;
   }
