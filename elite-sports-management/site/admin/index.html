@@ -486,6 +486,13 @@ function cardAccount(a){
     <div class="sub note-lock" style="margin-top:14px">🔒 Internal notes — admins only</div>
     <div class="field"><textarea class="acct-note note-box" data-acct-note="${a.id}" rows="2" placeholder="Private notes about this account…" aria-label="Internal notes for ${esc(name)}">${esc(a._note || "")}</textarea></div>
     <div class="row-btns"><button class="btn btn-ghost" data-acct-savenote="${a.id}" type="button">Save note</button></div>
+    <div class="sub" style="margin-top:14px">🔑 Reset password <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(sets a new login password for this ${a.role === "scout" ? "scout" : "player"})</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input type="password" class="rp-new" placeholder="New password (min 8)" autocomplete="new-password" aria-label="New password for ${esc(name)}" style="flex:1;min-width:140px;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--ink);font-size:14px;font-family:inherit" />
+      <input type="password" class="rp-confirm" placeholder="Confirm password" autocomplete="new-password" aria-label="Confirm new password for ${esc(name)}" style="flex:1;min-width:140px;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--ink);font-size:14px;font-family:inherit" />
+      <button class="btn btn-ghost" data-acct-resetpw="${a.id}" type="button">Set password</button>
+    </div>
+    <div class="msg" data-rp-msg="${a.id}" role="alert" aria-live="assertive" style="margin-top:6px"></div>
   </div>`;
 }
 
@@ -518,6 +525,29 @@ function bindAccountActions(){
     if (error){ toast("Note save failed: " + error.message, true); return; }
     const a = ACCOUNTS.find(x => x.id === id); if (a) a._note = notes;
     toast("Internal note saved ✓");
+  });
+  // Reset a user's login password. The service-role update happens inside the
+  // admin-reset-user-password Edge Function, which re-checks that WE are an admin — the
+  // anon key here can never change another user's password on its own.
+  document.querySelectorAll("[data-acct-resetpw]").forEach(b => b.onclick = async () => {
+    const id = b.dataset.acctResetpw;
+    const card = document.querySelector(`[data-acct="${id}"]`);
+    const np = card.querySelector(".rp-new").value;
+    const cp = card.querySelector(".rp-confirm").value;
+    const m = card.querySelector(`[data-rp-msg="${id}"]`);
+    m.classList.remove("show","ok"); m.classList.add("err");
+    if (np.length < 8){ m.textContent = "Password must be at least 8 characters."; m.classList.add("show"); return; }
+    if (np !== cp){ m.textContent = "Passwords don't match. Please re-enter."; m.classList.add("show"); return; }
+    b.disabled = true;
+    const { data, error } = await SB.functions.invoke("admin-reset-user-password", { body: { user_id: id, new_password: np } });
+    b.disabled = false;
+    let detail = null;
+    if (error){ detail = error.message; try { const j = await error.context.json(); if (j && j.error) detail = j.error; } catch (e) {} }
+    else if (data && data.error){ detail = data.error; }
+    if (detail){ m.textContent = "Couldn't reset: " + detail; m.classList.add("show"); return; }
+    card.querySelector(".rp-new").value = ""; card.querySelector(".rp-confirm").value = "";
+    m.textContent = "Password updated ✓ They can sign in with it now."; m.classList.remove("err"); m.classList.add("show","ok");
+    toast("Password reset ✓");
   });
 }
 
