@@ -6,6 +6,14 @@
 <title>José Cedeño — Elite Sports Management</title>
 <meta name="description" content="A talented catcher developed in the Cleveland Guardians organization after signing as an international prospect. Recognized for his defense behind the plat" />
 <meta name="robots" content="noindex,nofollow" />
+<script>
+/* Roster paywall. Player profiles are part of the paid roster, so bounce anyone
+   who hasn't unlocked it back to the gate. Runs in <head>, before first paint.
+   Keep the localStorage key in sync with UNLOCK_KEY in index.html. */
+(function(){try{
+  if(localStorage.getItem("esm_roster_unlock_v1")!=="1"){location.replace("../index.html#roster");}
+}catch(e){}})();
+</script>
 <link rel="manifest" href="../manifest.json" />
 <link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
 <link rel="icon" type="image/png" sizes="512x512" href="../icons/icon-512.png" />
@@ -28,7 +36,10 @@
   .bg-fx::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 500px at 78% -10%,rgba(217,177,84,.16),transparent 60%),radial-gradient(800px 600px at 8% 110%,rgba(20,70,140,.30),transparent 55%),linear-gradient(180deg,var(--navy),var(--navy-2))}
   .bg-fx::after{content:"";position:absolute;inset:0;opacity:.04;background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 9px)}
 
-  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(6,20,42,.72);border-bottom:1px solid var(--line)}
+  /* iOS PWA: status-bar-style is black-translucent + viewport-fit=cover, so page
+     content draws UNDER the status bar. Pad the sticky header down by the top
+     safe-area inset (0px fallback off-notch) so the nav clears the clock/battery. */
+  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(6,20,42,.72);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
   .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px;gap:14px}
   .brand{display:flex;align-items:center;gap:11px;font-weight:800}
   .logo{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#10305c,#06142a);font-family:'Anton';font-size:13px;color:var(--gold);position:relative}
@@ -44,7 +55,33 @@
   .lang button.on{background:var(--gold);color:#05101f}
   .nav-cta{border:1px solid var(--gold);color:var(--gold-soft);padding:9px 15px;border-radius:999px;font-size:13px;font-weight:700;transition:.2s;white-space:nowrap}
   .nav-cta:hover{background:var(--gold);color:#05101f}
+  /* Sign In dropdown — native <details>, styled to sit between the language switch and the CTA */
+  .signin{position:relative}
+  .signin>summary{list-style:none;cursor:pointer;color:var(--muted);font-size:13px;font-weight:700;padding:9px 4px;transition:.2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;user-select:none}
+  .signin>summary::-webkit-details-marker{display:none}
+  .signin>summary::after{content:"";width:6px;height:6px;border-right:2px solid var(--gold-soft);border-bottom:2px solid var(--gold-soft);transform:rotate(45deg) translateY(-2px);transition:transform .2s;opacity:.8}
+  .signin[open]>summary::after{transform:rotate(-135deg) translateY(-1px)}
+  .signin>summary:hover,.signin[open]>summary{color:var(--gold-soft)}
+  .signin-menu{position:absolute;right:0;top:calc(100% + 10px);min-width:190px;display:flex;flex-direction:column;gap:2px;background:rgba(6,20,42,.98);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 14px 34px rgba(0,0,0,.45);z-index:60}
+  .signin-menu a{color:var(--muted);font-size:14px;font-weight:600;padding:10px 12px;border-radius:8px;transition:.15s;white-space:nowrap}
+  .signin-menu a:hover,.signin-menu a:focus-visible{background:rgba(217,177,84,.12);color:var(--gold-soft)}
   @media(max-width:860px){.nav-links{display:none}}
+  /* Small phones: with the nav links gone, the header holds brand + language +
+     Sign In + Apply. Tighten spacing/padding so it never overflows down to ~320px. */
+  @media(max-width:560px){
+    .nav-right{gap:9px}
+    .lang{padding:2px}
+    .lang button{padding:5px 7px;font-size:11px}
+    .signin>summary{font-size:12px;padding:8px 2px;gap:4px}
+    .nav-cta{padding:8px 11px;font-size:12px}
+    .signin-menu{min-width:172px}
+  }
+  @media(max-width:380px){
+    .logo-img{height:32px}
+    .nav-right{gap:7px}
+    .lang button{padding:5px 6px}
+    .nav-cta{padding:7px 9px}
+  }
 
   .hero{position:relative;z-index:1;padding:58px 0 46px}
   .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--gold-soft);border:1px solid var(--line);padding:7px 14px;border-radius:999px;margin-bottom:26px}
@@ -55,6 +92,8 @@
   .btn{padding:14px 26px;border-radius:999px;font-weight:700;font-size:15px;transition:.22s;cursor:pointer;border:0;display:inline-block}
   .btn-gold{background:var(--gold);color:#05101f}.btn-gold:hover{background:var(--gold-soft);transform:translateY(-2px)}
   .btn-ghost{border:1px solid var(--line);color:var(--ink)}.btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+  /* Keyboard focus indicator — visible for keyboard/AT users, not on mouse click. */
+  a:focus-visible,button:focus-visible,.chip:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
 
   .stats{position:relative;z-index:1;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(8,26,51,.5)}
   .stats-in{display:grid;grid-template-columns:repeat(3,1fr)}
@@ -68,12 +107,23 @@
   .sec-head h2{font-size:clamp(32px,5.5vw,58px);margin-top:12px;max-width:20ch}
   .sec-head p{color:var(--muted);max-width:62ch;margin-top:14px;font-size:16.5px}
 
-  .do-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
-  .do{padding:24px 20px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));transition:.25s}
+  /* Fixed 3-up so the 6 services land as a clean 3 + 3 instead of 5 + an orphan. */
+  .do-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:860px){.do-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.do-grid{grid-template-columns:1fr}}
+  .do{padding:24px 20px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--card),rgba(8,26,51,.4));transition:.25s;display:flex;flex-direction:column}
   .do:hover{transform:translateY(-4px);border-color:var(--gold)}
   .do .ic{font-size:22px;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:rgba(217,177,84,.12);border:1px solid var(--line);margin-bottom:15px}
   .do h3{font-size:17px;margin-bottom:7px}.do p{color:var(--muted);font-size:14px}
-  .svc-pay{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.03em}
+  .do-price{margin:12px 0 8px;font-size:13.5px;color:var(--muted)}
+  .do-price b{font-family:'Anton';font-size:22px;color:var(--gold);letter-spacing:.01em;margin-right:5px}
+  .do-bul{list-style:none;margin:0 0 4px;padding:0;display:grid;gap:6px}
+  .do-bul li{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--muted)}
+  .do-bul li::before{content:"✓";color:var(--teal-soft);font-weight:800;flex:none}
+  .do-hl{margin-top:12px;padding:10px 12px;border:1px solid rgba(217,177,84,.35);border-radius:10px;background:rgba(217,177,84,.07)}
+  .do-hl b{display:block;color:var(--gold-soft);font-size:12px;font-weight:800;letter-spacing:.03em;margin-bottom:3px}
+  .do-hl span{color:var(--muted);font-size:12.5px;line-height:1.5}
+  .svc-pay{display:inline-block;margin-top:auto;padding-top:14px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.03em;align-self:flex-start}
   .svc-pay:hover{color:var(--gold-soft)}
 
   .founder{display:grid;grid-template-columns:200px 1fr;gap:34px;align-items:center;border:1px solid var(--line);border-radius:20px;padding:34px;background:radial-gradient(circle at 12% 20%,rgba(217,177,84,.10),transparent 55%),linear-gradient(180deg,var(--card),var(--navy-2))}
@@ -85,6 +135,16 @@
   .creds{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
   @media(max-width:640px){.creds{justify-content:center}}
   .cred{font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:999px;border:1px solid var(--line);color:#cdd9ec;background:rgba(8,26,51,.5)}
+  .founder-contact{display:inline-flex;align-items:center;gap:9px;margin-top:20px;padding:11px 20px;border-radius:999px;border:1px solid var(--line);color:var(--gold-soft);font-weight:700;font-size:13.5px;transition:.22s}
+  .founder-contact:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+  .founder-contact .ic{font-size:15px;line-height:1}
+  /* Collaborators/Staff cover — reuses .founder so it has the SAME footprint as
+     Marianna's card; clicking it reveals her real card (#collabCard) in place. */
+  .collab-cover{cursor:pointer;transition:.25s}
+  .collab-cover:hover{border-color:var(--gold);transform:translateY(-3px)}
+  .collab-cover:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .collab-cover .collab-cover-cta{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:11px 20px;border-radius:999px;border:1px solid var(--gold);color:var(--gold-soft);font-weight:700;font-size:13.5px}
+  .collab-cover:hover .collab-cover-cta{background:rgba(217,177,84,.08)}
 
   .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px}
   .chip{padding:9px 17px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;cursor:pointer;transition:.18s}
@@ -102,6 +162,8 @@
   .pcard .body{padding:17px 18px 20px}
   .pcard .body h3{font-size:19px;line-height:1.15}
   .pcard .pos{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:3px}
+  .pcard .country{color:var(--muted);font-size:13px;margin-top:9px;display:flex;align-items:center;gap:6px}
+  .pcard .country .cflag{font-size:15px;line-height:1;flex:none}
   .pcard .team{color:var(--muted);font-size:13px;margin-top:11px;display:flex;align-items:center;gap:7px}
   .pcard .team::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--teal-soft);flex:none}
   .pcard .view{margin-top:14px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
@@ -119,10 +181,15 @@
   .ev-meta{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
   .ev-body p{color:var(--muted);font-size:14px;margin-top:10px}
   .ev-body .ev-tags{color:var(--teal-soft);font-size:12.5px;margin-top:8px;line-height:1.5}
-  .ev-body .ev-link{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
+  .ev-body .ev-link{display:inline-block;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
+  .ev-actions{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:12px}
+  .ev-media-btn{background:none;border:0;padding:0;cursor:pointer;font-family:inherit}
+  .ev-card.has-media{cursor:pointer}
+  .ev-card.has-media:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
   /* testimonials */
   .testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+  .testi-all{display:grid;gap:16px}
   .testi{border:1px solid var(--line);border-radius:18px;padding:26px 24px;background:linear-gradient(180deg,var(--card),var(--navy-2));position:relative}
   .testi .q{font-size:40px;font-family:'Anton';color:rgba(217,177,84,.4);line-height:.6}
   .testi p{font-size:16px;color:#d6e1f2;margin:8px 0 18px}
@@ -131,7 +198,11 @@
   .testi .nm{font-weight:700;font-size:14.5px}.testi .rl{color:var(--muted);font-size:12.5px}
 
   .join{border:1px solid var(--line);border-radius:20px;padding:34px;background:linear-gradient(180deg,var(--card),var(--navy-2))}
-  .join .tagline{font-family:'Anton';text-transform:uppercase;color:var(--gold);font-size:clamp(18px,3vw,26px);margin-bottom:24px;letter-spacing:.02em}
+  .join .tagline{font-family:'Anton';text-transform:uppercase;color:var(--gold);font-size:clamp(18px,3vw,26px);margin-bottom:16px;letter-spacing:.02em}
+  .join-pitch{color:var(--muted);font-size:15px;line-height:1.65;max-width:64ch;margin:0 0 26px}
+  /* Honeypot: off-screen (not display:none, so bots still auto-fill it) — a real
+     visitor never sees or fills it, so any value means the submission is a bot. */
+  .hp{position:absolute!important;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;opacity:0}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   @media(max-width:560px){.grid2{grid-template-columns:1fr}}
   .field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
@@ -139,6 +210,9 @@
   .field input,.field select,.field textarea{background:rgba(6,20,42,.6);border:1px solid var(--line);border-radius:11px;padding:13px 14px;color:var(--ink);font-family:inherit;font-size:15px;outline:none;transition:.18s}
   .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
   .field textarea{resize:vertical;min-height:90px}.field select{appearance:none;cursor:pointer}
+  .phone-row{display:flex;gap:8px}
+  .phone-row .phone-cc{flex:0 0 auto;width:auto;max-width:142px}
+  .phone-row .phone-num{flex:1;min-width:0}
   .form-msg{display:none;margin-top:14px;padding:14px 16px;border-radius:12px;background:rgba(217,177,84,.12);border:1px solid var(--gold);color:var(--gold-soft);font-weight:600}
   .form-msg.show{display:block}
 
@@ -153,6 +227,15 @@
   @media(max-width:560px){.foot-links{align-items:flex-start}}
   .pill{display:inline-flex;align-items:center;gap:9px;color:var(--gold-soft);font-weight:700;border:1px solid var(--line);padding:10px 16px;border-radius:999px;transition:.2s}
   .pill:hover{border-color:var(--gold);background:rgba(217,177,84,.08)}
+  /* CeasAI cross-promo strip at the very bottom of the footer (subtle credit) */
+  .ceasai{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);text-align:center}
+  .ceasai a{font-size:12.5px;color:var(--muted);transition:.2s;display:inline-flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+  .ceasai a:hover{color:var(--gold-soft)}
+  .ceasai-logo{width:34px;height:34px;border-radius:8px;display:block;flex:none}
+  /* CeasAI social icons — small square icon buttons matching the footer aesthetic. */
+  .ceasai-social{display:inline-flex;gap:10px;align-items:center;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .ceasai-social a{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;border:1px solid var(--line);color:var(--muted);transition:.2s}
+  .ceasai-social a:hover{border-color:var(--gold);color:var(--gold-soft);background:rgba(217,177,84,.08)}
 
   .modal{position:fixed;inset:0;z-index:100;display:none;align-items:flex-end;justify-content:center}
   .modal.open{display:flex}
@@ -164,7 +247,9 @@
   .sh-mono{font-family:'Anton';font-size:40px;color:var(--gold);width:88px;height:88px;flex:none;border-radius:50%;border:2px solid rgba(217,177,84,.4);display:grid;place-items:center;background:rgba(6,20,42,.5);background-size:cover;background-position:center}
   .sheet h3{font-size:clamp(24px,5vw,34px)}
   .sh-pos{color:var(--gold-soft);font-weight:700;margin-top:4px}.sh-meta{color:var(--muted);font-size:14px;margin-top:8px}
-  .sh-body{padding:26px 28px 34px}.sh-body p.bio{font-size:16px;color:#d6e1f2;margin-bottom:24px}
+  /* Bottom-sheet modal is flush to the screen bottom on mobile, so pad its body
+     past the iOS home indicator (0 fallback elsewhere) — matches footer/install. */
+  .sh-body{padding:26px 28px calc(34px + env(safe-area-inset-bottom,0px))}.sh-body p.bio{font-size:16px;color:#d6e1f2;margin-bottom:24px}
   .sh-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
   .sh-stat{flex:1;min-width:120px;border:1px solid var(--line);border-radius:13px;padding:14px 16px;background:rgba(8,26,51,.5)}
   .sh-stat b{font-family:'Anton';font-size:22px;color:var(--gold);display:block;line-height:1.1}
@@ -174,6 +259,16 @@
   .sh-contact{margin-top:28px;padding-top:24px;border-top:1px solid var(--line)}
   .sh-contact-p{color:var(--muted);font-size:14px;margin:6px 0 16px}
   .team-chip{font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid var(--line);color:#cdd9ec;background:rgba(8,26,51,.5)}
+  /* self-entered per-season stats (derived AVG/OBP/SLG · ERA/WHIP · Fld% computed on render) */
+  .ss-block{margin-bottom:18px}
+  .ss-title{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft);font-weight:700;margin-bottom:8px}
+  .ss-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:12px}
+  .ss-table{width:100%;border-collapse:collapse;font-size:13px;min-width:max-content}
+  .ss-table th,.ss-table td{padding:8px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid rgba(217,177,84,.1)}
+  .ss-table th:first-child,.ss-table td:first-child,.ss-table th:nth-child(2),.ss-table td:nth-child(2){text-align:left}
+  .ss-table thead th{color:var(--gold-soft);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:rgba(8,26,51,.6)}
+  .ss-table tbody tr:last-child td{border-bottom:0}
+  .ss-table tbody td{color:#d6e1f2}
   .close{position:absolute;top:16px;right:16px;z-index:3;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(6,20,42,.7);color:var(--ink);font-size:18px;cursor:pointer;display:grid;place-items:center}
   .close:hover{border-color:var(--gold);color:var(--gold)}
 
@@ -208,15 +303,16 @@
   .contracts .sub{margin-top:15px;color:var(--muted);font-size:clamp(14px,1.9vw,17px)}
   .contracts .sub b{color:var(--gold-soft);font-weight:700}
   .contracts .rule{width:110px;height:2px;background:var(--gold);margin:26px auto 0;opacity:.75}
-  .feature-grid{display:grid;grid-template-columns:1fr;gap:22px;margin:38px auto 0;text-align:left;max-width:640px}
+  .feature-grid{display:grid;grid-template-columns:1fr;gap:22px;margin:38px auto 0;text-align:left;max-width:720px}
   .stats-in{grid-template-columns:repeat(2,1fr) !important}
 
-  .tcard{display:flex;gap:18px;align-items:flex-start;border:1px solid var(--line);border-radius:18px;padding:24px;background:linear-gradient(180deg,var(--card),var(--navy-2))}
-  .tcard .shot{width:96px;min-width:96px;height:128px;border-radius:12px;background-size:cover;background-position:center 22%;border:1px solid var(--line)}
-  .tcard .qt{font-size:15.5px;line-height:1.65;color:#d6e1f2;font-style:italic}
+  .tcard{display:flex;gap:24px;align-items:flex-start;border:1px solid var(--line);border-radius:18px;padding:30px;background:linear-gradient(180deg,var(--card),var(--navy-2))}
+  /* Tall portrait crop, like the reference card — noticeably taller than it is wide. */
+  .tcard .shot{width:140px;min-width:140px;height:230px;border-radius:12px;background-size:cover;background-position:center 20%;border:1px solid var(--line)}
+  .tcard .qt{font-size:16.5px;line-height:1.7;color:#d6e1f2;font-style:italic}
   .tcard .nm{margin-top:14px;font-family:'Anton';letter-spacing:.09em;font-size:15px;color:var(--gold-soft);text-transform:uppercase}
   .tcard .rl{font-size:12.5px;color:var(--muted);margin-top:3px}
-  @media(max-width:480px){.tcard{flex-direction:column}.tcard .shot{width:100%;height:210px}}
+  @media(max-width:520px){.tcard{flex-direction:column;padding:24px}.tcard .shot{width:100%;height:280px;background-position:center 18%}}
 
   /* ===== media / gallery ===== */
   .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:12px}
@@ -232,12 +328,22 @@
   .sub-label{font-size:11.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-soft);margin:32px 0 14px}
   .lightbox img{width:100%;border-radius:12px;display:block}
 
-  /* ===== roster paywall ===== */
+  /* ===== roster paywall ($49.99 unlock-code gate) ===== */
   .roster-wrap{position:relative}
+  /* The locked gate overlay is position:absolute;inset:0, so it takes the wrap's
+     height. A sport/position filter matching few or zero athletes would otherwise
+     shrink the wrap below the gate card, letting the gate spill over the sections
+     above/below (the "filter tabs break the layout" bug). A min-height reserves room
+     for the overlay no matter how many cards match; a larger reserve on narrow screens
+     covers the taller stacked gate card. Only applies while locked. */
+  .roster-wrap.is-locked{min-height:560px}
+  @media(max-width:560px){.roster-wrap.is-locked{min-height:660px}}
+  .roster-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:34px 12px;font-size:15px}
   .roster-wrap.is-locked .roster{filter:blur(9px) saturate(.55);pointer-events:none;user-select:none;max-height:600px;overflow:hidden}
   .roster-wrap.is-locked::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,20,42,.3),rgba(6,20,42,.93));pointer-events:none;border-radius:18px}
   .gate{display:none}
   .roster-wrap.is-locked .gate{display:flex;position:absolute;inset:0;align-items:center;justify-content:center;z-index:3;padding:18px}
+  .gate-pay-note{color:var(--muted);font-size:12.5px;margin-top:12px;line-height:1.5}
   .gate-in{max-width:520px;width:100%;text-align:center;border:1px solid var(--gold);border-radius:20px;padding:32px 28px;background:linear-gradient(180deg,rgba(12,33,67,.97),rgba(6,20,42,.99));box-shadow:0 26px 60px rgba(0,0,0,.55)}
   .gate-lock{font-size:25px;margin-bottom:10px}
   .gate-in h3{font-family:'Anton';font-size:23px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px}
@@ -250,6 +356,13 @@
   .gate-code input:focus{outline:0;border-color:var(--gold)}
   .gate-code button{background:transparent;border:1px solid var(--gold);color:var(--gold-soft);border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer;font-size:14px;white-space:nowrap}
   .gate-code button:hover{background:var(--gold);color:#05101f}
+  /* Profile-creation section (€129.99) — a marketing card that links to the real
+     account flow at /register/. (Was a client-side code gate before Phase 1.) */
+  .pcreate{display:flex;justify-content:center}
+  .pc-includes{list-style:none;text-align:left;margin:6px auto 18px;max-width:380px;display:grid;gap:9px}
+  .pc-includes li{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:#d6e1f2}
+  .pc-includes li::before{content:"✓";color:var(--teal-soft);font-weight:800;flex:none}
+  .pc-access{margin-top:12px;font-size:13px;font-weight:700;color:var(--gold-soft);letter-spacing:.02em}
   .gate-err{margin-top:11px;font-size:13px;color:#ff9c9c;display:none}
   .gate-err.show{display:block}
   .unlocked-note{display:none;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--teal-soft);margin-bottom:16px;font-weight:700;letter-spacing:.03em}
@@ -320,18 +433,19 @@
   <a class="brand" href="../index.html#top"><img class="logo-img" src="../logo.png" alt="Elite Sports Management" /></a>
   <div class="nav-right">
     <nav class="nav-links">
-      <a href="../index.html#about">What We Do</a>
-      <a href="../index.html#who">Who I Am</a>
-      <a href="../index.html#roster">Roster</a>
-      <a href="../index.html#events">Events</a>
-      <a href="../index.html#join">Join Us</a>
+      <a href="../index.html#about" data-i18n="pp_nav_about">What We Do</a>
+      <a href="../index.html#who" data-i18n="pp_nav_who">Who I Am</a>
+      <a href="../index.html#roster" data-i18n="pp_nav_roster">Roster</a>
+      <a href="../index.html#events" data-i18n="pp_nav_events">Events</a>
+      <a href="../index.html#join" data-i18n="pp_nav_join">Join Us</a>
     </nav>
-    <a class="nav-cta" href="../index.html#join">Apply Now</a>
+    <div class="lang" id="lang"><button type="button" data-l="en" aria-label="English">EN</button><button type="button" data-l="es" aria-label="Español">ES</button><button type="button" data-l="it" aria-label="Italiano">IT</button></div>
+    <a class="nav-cta" href="../index.html#join" data-i18n="pp_nav_cta">Apply Now</a>
   </div>
 </div></header>
 
 <main class="pp-wrap">
-  <a class="pp-back" href="../index.html#roster">&larr; Back to Roster</a>
+  <a class="pp-back" href="../index.html#roster" data-i18n="pp_back">&larr; Back to Roster</a>
 
   <div class="pp-hero">
     <div class="pp-tier-row">
@@ -340,35 +454,30 @@
       <span class="pp-sport">Baseball</span>
     </div>
     <h1 class="display pp-headline"><span class="pp-name-line">José Cedeño</span>Professional Catcher — Cleveland Guardians org.</h1>
-    <div class="pp-meta-list"><div><b>Birthplace:</b> Venezuela</div></div>
+    <div class="pp-meta-list"><div><b><span data-i18n="pp_birthplace">Birthplace</span>:</b> Venezuela</div></div>
   </div>
 
   <div class="pp-section">
-    <h2>Bio</h2>
+    <h2 data-i18n="pp_bio">Bio</h2>
     <p class="pp-bio">A talented catcher developed in the Cleveland Guardians organization after signing as an international prospect. Recognized for his defense behind the plate and a mature approach at a young age.</p>
   </div>
 
-  <div class="pp-section"><h2>Career Highlights</h2><p style="color:var(--muted);font-size:14px">Stats coming soon.</p></div>
+  <div class="pp-section"><h2 data-i18n="pp_highlights">Career Highlights</h2><p style="color:var(--muted);font-size:14px" data-i18n="pp_stats_soon">Stats coming soon.</p></div>
 
-  <div class="pp-section"><h2>Playing Experience</h2><div class="pp-exp-list"><div class="pp-exp-row"><b>Cleveland Guardians org.</b></div><div class="pp-exp-row"><b>Dominican Summer League</b></div><div class="pp-exp-row"><b>Arizona Complex League</b></div></div></div>
-
-  <div class="pp-section" id="ppRegister" style="display:none">
-    <h2>Career Register</h2>
-    <div id="ppRegisterBody"></div>
-  </div>
+  <div class="pp-section"><h2 data-i18n="pp_experience">Playing Experience</h2><div class="pp-exp-list"><div class="pp-exp-row"><b>Cleveland Guardians org.</b></div><div class="pp-exp-row"><b>Dominican Summer League</b></div><div class="pp-exp-row"><b>Arizona Complex League</b></div></div></div>
 
   <div class="pp-contact">
-    <h2>Interested in José Cedeño?</h2>
-    <p>You have full roster access. Get in touch and we'll connect you with this athlete directly.</p>
-    <a class="btn btn-gold" href="mailto:elitesportsmanagement50@gmail.com?subject=Enquiry:%20Jos%C3%A9%20Cede%C3%B1o%20%E2%80%94%20ESM%20Roster">Contact ESM about this player</a>
+    <h2 data-i18n-tpl="pp_interested" data-name="José Cedeño">Interested in José Cedeño?</h2>
+    <p data-i18n="pp_contact_p">You have full roster access. Get in touch and we'll connect you with this athlete directly.</p>
+    <a class="btn btn-gold" href="mailto:elitesportsmanagement50@gmail.com?subject=Enquiry:%20Jos%C3%A9%20Cede%C3%B1o%20%E2%80%94%20ESM%20Roster" data-i18n="pp_contact_btn">Contact ESM about this player</a>
   </div>
 </main>
 
 <footer><div class="wrap foot">
   <div>
     <a class="brand" href="../index.html#top"><img class="logo-img foot-logo" src="../logo.png" alt="Elite Sports Management" /></a>
-    <p class="muted">&copy; <span id="yr"></span> Elite Sports Management. All rights reserved.</p>
-    <a class="foot-admin" href="../admin/">Admin</a>
+    <p class="muted">&copy; <span id="yr"></span> Elite Sports Management. <span data-i18n="pp_rights">All rights reserved.</span></p>
+    <a class="foot-admin" href="../admin/" data-i18n="pp_admin">Admin</a>
   </div>
   <div class="foot-links">
     <a class="pill" href="https://instagram.com/elite_sports_management__" target="_blank" rel="noopener">&#9678; @elite_sports_management__</a>
@@ -376,23 +485,28 @@
   </div>
 </div></footer>
 
-<script src="../bbref-stats.js"></script>
-<script type="module">
-document.getElementById("yr").textContent=new Date().getFullYear();
-(async function(){
-  const SLUG="jose-cedeno";
-  const SB_URL="https://sbexwyvsgqayxrsrlrpm.supabase.co";
-  const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
-  try{
-    const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
-    const SB=createClient(SB_URL,SB_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
-    const {data:pl}=await SB.from("players").select("id").eq("slug",SLUG).eq("status","approved").maybeSingle();
-    if(!pl||!pl.id||typeof BBREF==="undefined")return;
-    const kinds=["batting","pitching","fielding"],data={};
-    for(const k of kinds){const {data:rows}=await SB.from(BBREF.TABLES[k]).select("*").eq("player_id",pl.id).order("year").order("sort_order").order("id");data[k]=rows||[];}
-    const html=BBREF.renderAll(data);
-    if(html){BBREF.injectCss();document.getElementById("ppRegisterBody").innerHTML=html;document.getElementById("ppRegister").style.display="";}
-  }catch(e){}
+<script>document.getElementById("yr").textContent=new Date().getFullYear();</script>
+<script>
+/* Player-page chrome i18n (EN/ES/IT). Shares the site-wide esm_lang localStorage key.
+   Only chrome is translated; the athlete's entered content stays as-is. */
+(function(){
+  var DICT={
+    en:{pp_nav_about:"What We Do",pp_nav_who:"Who I Am",pp_nav_roster:"Roster",pp_nav_events:"Events",pp_nav_join:"Join Us",pp_nav_cta:"Apply Now",pp_back:"← Back to Roster",pp_bio:"Bio",pp_highlights:"Career Highlights",pp_experience:"Playing Experience",pp_stats_soon:"Stats coming soon.",pp_exp_soon:"Details coming soon.",pp_birthplace:"Birthplace",pp_born:"Born",pp_bats:"Bats",pp_interested:"Interested in {name}?",pp_contact_p:"You have full roster access. Get in touch and we'll connect you with this athlete directly.",pp_contact_btn:"Contact ESM about this player",pp_rights:"All rights reserved.",pp_admin:"Admin"},
+    es:{pp_nav_about:"Qué Hacemos",pp_nav_who:"Quién Soy",pp_nav_roster:"Jugadores",pp_nav_events:"Eventos",pp_nav_join:"Únete",pp_nav_cta:"Aplica Ahora",pp_back:"← Volver a Jugadores",pp_bio:"Bio",pp_highlights:"Momentos Destacados",pp_experience:"Experiencia Deportiva",pp_stats_soon:"Estadísticas próximamente.",pp_exp_soon:"Detalles próximamente.",pp_birthplace:"Lugar de nacimiento",pp_born:"Nacimiento",pp_bats:"Batea",pp_interested:"¿Te interesa {name}?",pp_contact_p:"Tienes acceso completo al roster. Ponte en contacto y te conectamos directamente con este atleta.",pp_contact_btn:"Contacta con ESM sobre este jugador",pp_rights:"Todos los derechos reservados.",pp_admin:"Admin"},
+    it:{pp_nav_about:"Cosa Facciamo",pp_nav_who:"Chi Sono",pp_nav_roster:"Roster",pp_nav_events:"Eventi",pp_nav_join:"Unisciti",pp_nav_cta:"Candidati",pp_back:"← Torna al Roster",pp_bio:"Bio",pp_highlights:"Momenti Salienti",pp_experience:"Esperienza Sportiva",pp_stats_soon:"Statistiche in arrivo.",pp_exp_soon:"Dettagli in arrivo.",pp_birthplace:"Luogo di nascita",pp_born:"Nascita",pp_bats:"Batte",pp_interested:"Ti interessa {name}?",pp_contact_p:"Hai accesso completo al roster. Mettiti in contatto e ti collegheremo direttamente con questo atleta.",pp_contact_btn:"Contatta ESM per questo giocatore",pp_rights:"Tutti i diritti riservati.",pp_admin:"Admin"}
+  };
+  var SUP=["en","es","it"];
+  var lang=(function(){try{var l=localStorage.getItem("esm_lang");return SUP.indexOf(l)>=0?l:"en";}catch(e){return "en";}})();
+  function t(k){return (DICT[lang]&&DICT[lang][k])||DICT.en[k]||k;}
+  function applyStatic(){
+    document.documentElement.lang=lang;
+    document.querySelectorAll("[data-i18n]").forEach(function(el){el.textContent=t(el.getAttribute("data-i18n"));});
+    document.querySelectorAll("[data-i18n-tpl]").forEach(function(el){el.textContent=t(el.getAttribute("data-i18n-tpl")).replace("{name}",el.getAttribute("data-name")||"");});
+    document.querySelectorAll("#lang button").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-l")===lang);});
+  }
+  function setLang(l){if(SUP.indexOf(l)<0||l===lang){return;}lang=l;try{localStorage.setItem("esm_lang",l);}catch(e){}applyStatic();}
+  document.querySelectorAll("#lang button").forEach(function(b){b.onclick=function(){setLang(b.getAttribute("data-l"));};});
+  applyStatic();
 })();
 </script>
 </body>
