@@ -11,6 +11,75 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Targeted troubleshooting pass on reported bugs + Jesús Delgado de-duplication (2026-08-04, session 3)
+
+Live reproduction pass over the recently-reported bug categories (signup/RLS, session-independence,
+roster filters, access). Tested actual behavior — real signups against prod, headless-browser
+screenshots, live edge-function calls — not code reads. **Result: every reported category is solid;
+one real production-data bug (a duplicate roster entry) found and fixed.**
+
+- ✅ **Player signup → portal linking.** Ran a REAL end-to-end signup against prod Supabase (anon
+  key, exactly like the browser): signup returns an **immediate session** (email confirmation is
+  **OFF** — no confirm-block), the `on_auth_user_created` trigger auto-creates the profile, the
+  `players` insert **succeeds (201)** with `owner_id = auth.uid()` (**user_id linking, not email
+  strings**) and **season stats saved** (RLS race fix holds), immediate password login works
+  (`uid` matches), and the user reads their own real data. Test accounts deleted after.
+- ✅ **Session-independence.** Same live test created a player AND a scout → **distinct uids**, both
+  independent (201). Reinforced in code: register signs out a different active session before
+  `signUp` (register/index.html:604-611) and `ensureProfile()` has a **session-bleed guard** —
+  only creates a profile when the active session's email matches the stashed signup email
+  (register/index.html:640-646). No attachment to an admin session possible.
+- ✅ **Roster access.** Gate shows €49.99 with **both** buttons — PayPal (`py.pl/GJ510klc…`) + Wise
+  (`wise.com/pay/r/Zhxkm…`). Submit handler accepts per-user SHA-256 codes AND **ESM13**
+  case-insensitively (`.trim().toUpperCase()`, checked before the hash).
+- ✅ **Scout flow end-to-end.** Live scout signup inserted (201). Pending state shows €49.99
+  PayPal+Wise + Sam's email (`brunosamuele56@gmail.com` hint + `elitesportsmanagement50@gmail.com`
+  mailto), trilingual. Approval trigger `trg_sync_player_status` + `scout_roster()` gating
+  re-confirmed (approved → full read-only roster w/ contact; rejected/anon → none).
+- ✅ **Accessibility.** Prod `https://elite-sports-management.vercel.app/` fetched from an external
+  cloud IP (an "outside visitor") returned the **real homepage** — no Vercel SSO/password wall.
+  Supabase `sbexwyvsgqayxrsrlrpm` is **ACTIVE_HEALTHY** (not paused).
+- ✅ **Roster filter tabs (thorough — this was the recurring layout bug).** Drove **headless Chrome
+  via CDP** over the live local page (real Supabase data, roster unlocked) and screenshotted **all
+  7 filter states × desktop(1440) + mobile(390)**. Ran a **geometric overlap check** (every
+  card-rectangle pair) in each state: **ZERO overlaps anywhere**; no chip overflow on mobile; empty
+  Softball state renders the centered "no athletes" message (grid-column:1/-1), not a broken grid.
+  Visually confirmed edge cases (1-card Catcher, empty Softball, 7-card Pitcher, mobile stack).
+  `.filters` is `flex-wrap`, `.roster` is a responsive 3→2→1 grid — no overlap mechanism exists.
+- ✅ **Password reset + confirmation.** Signup password-mismatch guard verified (register:600,
+  trilingual `r_err_pwmatch` + HTML5 required/minlength). Admin reset edge function
+  `admin-reset-user-password` is ACTIVE + source correct (verify_jwt, `is_admin_email` gate,
+  8-char min); tested its security path **live**: anon token → `401 "Not signed in"`, no auth →
+  `401 Missing authorization header`. Full admin happy-path click needs Matt's actual admin login.
+- ✅ **Trilingual.** `node validate_i18n.mjs` → 0 hard problems; heuristic English "hits" on
+  register/scout/portal/tenerife are all fallback text inside `data-i18n`/`data-i18n-html`
+  elements (replaced at runtime), not leftover strings.
+- 🔧 **Jesús Delgado — duplicate roster entry FIXED (DB data change, per Matt's decision).** He
+  existed as TWO approved rows: **id 7** (`jesus-delgado`, curated profile — LHP, real bio, static
+  stats page, but NO account/contact) and **id 68** (`player-f55ccca5c6`, his self-registration
+  account — owner_id/email/IG/phone, but sparse: no position/bio). He appeared **twice** on the
+  public roster. Neither row had any BBREF stats or notes. **Resolution (Matt chose "merge onto row
+  7, delete row 68"):** moved his account link + contact onto row 7 (`owner_id
+  f55ccca5-c6f7-4510-9bb8-e86763665354`, email `jesusdegado1509@gmail.com`, IG `@jesus_delgado2020`,
+  phone `+58 4125810866`), merged teams → `["Texas Rangers org.","Arizona Complex League",
+  "Montpellier"]`, and deleted row 68. **Verified:** one Jesús Delgado remains (keeps the
+  `jesus-delgado` slug + static stats page), and a simulated authenticated read as his uid returns
+  the consolidated row — so his **portal login links correctly** via `owner_id`. Roster count 23→22.
+  - **Deleted row 68's exact data (for reversibility):** name "JESUS DELGADO", slug
+    `player-f55ccca5c6`, group "Player", source "registration", owner_id
+    `f55ccca5-c6f7-4510-9bb8-e86763665354`, email `jesusdegado1509@gmail.com`, IG
+    `@jesus_delgado2020`, phone `+58 4125810866`, teams `["Texas Rangers org.","Montpellier"]`,
+    country Venezuela, no position/bio/age/photo/stats.
+- ❓ **Still missing for Jesús (can't infer — Sam to add via admin panel):** age, season/career
+  stats (BBREF register), and a photo. Bio + position are now present on the consolidated row.
+
+**Recommendation (not actioned — Matt's call):** the duplicate arose because a curated roster player
+(added via "application") later self-registered, and the register flow always creates a new `players`
+row. A guard that links to an existing row on email match would prevent recurrence, but curated rows
+often have `email = NULL` (as row 7 did), so it wouldn't have caught this case — low priority, flagged
+only. **No code files changed this session** (all reported bugs were already solid); the only change
+is this DB de-duplication + this log entry.
+
 ### Full-site audit resume + handle_new_user API-exposure hardening (2026-08-04, session 2)
 
 **Context — recovering an interrupted session.** The prior session was killed when the terminal
