@@ -172,6 +172,14 @@
       </div>
     </div>
 
+    <div class="kicker">Roster access code</div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">Master code for the public <b style="color:var(--ink)">roster gate</b> — the single code you hand trusted people to unlock the roster (the “Code” box on the homepage). Case-insensitive. Personal per-player codes are separate and unaffected. Saving takes effect <b style="color:var(--ink)">immediately</b> — no deploy needed.</p>
+      <div class="field"><label for="rc-input">Current master code</label><input id="rc-input" placeholder="loading…" autocomplete="off" spellcheck="false" /></div>
+      <div class="row-btns"><button class="btn btn-gold" type="button" id="rc-save">Save code</button></div>
+      <div class="msg" id="rc-msg" role="status" aria-live="polite"></div>
+    </div>
+
     <div class="kicker">Roster</div>
     <div class="card">
       <div class="row-btns" id="sportFilter" role="group" aria-label="Filter roster by sport">
@@ -262,7 +270,7 @@ function showView(state){
 let ADMIN_EMAIL = "";
 async function admitOrReject(session){
   const email = session?.user?.email || "";
-  if (isAdminEmail(email)) { ADMIN_EMAIL = email.trim().toLowerCase(); $("acctWho").innerHTML = `Signed in as <b>${esc(ADMIN_EMAIL)}</b>`; showView("app"); load(); return true; }
+  if (isAdminEmail(email)) { ADMIN_EMAIL = email.trim().toLowerCase(); $("acctWho").innerHTML = `Signed in as <b>${esc(ADMIN_EMAIL)}</b>`; showView("app"); load(); loadRosterCode(); return true; }
   await SB.auth.signOut();
   showView("login");
   const m = $("loginMsg");
@@ -983,6 +991,35 @@ $("pw-save").onclick = async () => {
   msg.textContent = "Password updated ✓ Use it next time you sign in.";
   msg.classList.remove("err"); msg.classList.add("show", "ok");
   toast("Password updated ✓");
+};
+
+/* ---------- roster master access code (Sam-managed; stored in public.app_settings) ----------
+   Reads/writes the single master code the homepage roster gate accepts. RLS restricts the
+   app_settings row to admins; the public gate never reads the value — it calls the
+   verify_roster_code() RPC which returns only true/false. Changing it here is live at once. */
+async function loadRosterCode(){
+  const inp = $("rc-input"); if (!inp) return;
+  const { data, error } = await SB.from("app_settings").select("value").eq("key", "roster_master_code").maybeSingle();
+  if (error){ inp.placeholder = "Couldn't load"; toast("Access code load failed: " + error.message, true); return; }
+  inp.value = data?.value || "";
+  inp.placeholder = "e.g. ESM13";
+}
+$("rc-save").onclick = async () => {
+  const inp = $("rc-input"), msg = $("rc-msg");
+  msg.classList.remove("show", "ok", "err");
+  const val = (inp.value || "").trim();
+  if (!val){ msg.textContent = "The code can't be empty."; msg.classList.add("show", "err"); inp.focus(); return; }
+  const btn = $("rc-save"); btn.disabled = true;
+  const { data: { session } } = await SB.auth.getSession();
+  const { error } = await SB.from("app_settings")
+    .update({ value: val, updated_at: new Date().toISOString(), updated_by: session?.user?.id || null })
+    .eq("key", "roster_master_code");
+  btn.disabled = false;
+  if (error){ msg.textContent = "Save failed: " + error.message; msg.classList.add("show", "err"); return; }
+  inp.value = val;
+  msg.textContent = "Saved ✓ — the roster gate accepts this code immediately (the old one no longer works).";
+  msg.classList.add("show", "ok");
+  toast("Roster code updated ✓");
 };
 
 /* ---------- Baseball-Reference register editor (batting / pitching / fielding) ----------

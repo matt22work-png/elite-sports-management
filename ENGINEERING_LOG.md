@@ -11,6 +11,48 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Admin-managed roster access code — DB-backed, no-deploy (2026-08-04, session 4 — Part 2)
+
+Replaced the hardcoded `MASTER_ACCESS_CODE = "ESM13"` constant with a database-backed master code
+Sam manages from the admin panel. Changing it takes effect immediately, no deploy. Files:
+`site/index.html` (gate), `site/admin/index.html` (UI + load/save), `site/supabase-app-settings.sql`
+(migration snapshot). DB migration `roster_master_code_settings` (APPLIED to prod).
+
+**DB.** New table `public.app_settings(key pk, value, updated_at, updated_by)`, RLS **admin-only**
+(`"admin manage settings"` via `private.is_esm_admin()`); anon has NO access. Seeded
+`('roster_master_code','ESM13')` so rollout is behaviour-identical. New function
+`public.verify_roster_code(p_code text) returns boolean` — SECURITY DEFINER, `search_path=''`,
+case-insensitive + trims, granted to anon+authenticated. It returns only true/false, so the code
+value is **never exposed** to the browser (an improvement over ESM13, which was readable in page
+source). RLS on the table means even authenticated non-admins can't read or write it.
+
+**Client.** Gate (`#gateForm`) now: (1) checks per-user SHA-256 personal codes offline first
+(ROSTER_CODE_HASHES — unchanged); (2) else calls `SB.rpc('verify_roster_code', {p_code})` and
+unlocks on `true`. The old hardcoded ESM13 check is removed — the DB value (seeded ESM13) is the
+single source of truth, so when Sam changes it the new code works and the old one stops. Admin panel
+gained a **"Roster access code"** card (loads the current value via `loadRosterCode()`, saves via a
+standard `app_settings` update with `updated_by`) — EN-only, consistent with the rest of the admin UI.
+
+**Validation (all live):**
+- RPC (as anon): `ESM13`→true, `esm13`→true, `"  EsM13 "`→true (case-insensitive + trims),
+  wrong/empty→false.
+- RLS: non-admin authenticated can't UPDATE (0 rows) and can't read the value; anon has no table access.
+- Admin change (rolled back): after an admin sets `SUMMER-26!`, `verify_roster_code` returns true for
+  the new code and **false for ESM13** — immediate.
+- **Headless-Chrome gate test, real page:** with prod code ESM13 → `esm13` and `  ESM13  ` unlock, a
+  wrong code stays locked + shows the error. Then changed the prod code to `ROSTER-2026` (as an admin
+  would) → the gate immediately unlocked on `ROSTER-2026`/`roster-2026` and **rejected `ESM13`**;
+  reverted prod back to `ESM13` afterward.
+- Per-user SHA-256 codes unaffected (offline path unchanged, still checked first). Validator
+  (`node validate_i18n.mjs`) → 0 hard problems (scripts parse). Advisor WARN on `verify_roster_code`
+  (anon-executable SECURITY DEFINER) is **intentional/expected** — same reviewed pattern as
+  `scout_roster`; it returns only a boolean and never leaks the code.
+
+**Note:** `verify_roster_code` is convenience access, not a hardened secret — a brute-force guesser
+could still probe codes (same threat model as the old client-side ESM13, but now the value isn't in
+page source). One master code only, per Matt's scope; per-category codes remain a future option
+(app_settings can hold more keys).
+
 ### Full 3-portal live functionality sweep (2026-08-04, session 4 — Part 1)
 
 Tested each portal **live end-to-end** with real approved test accounts driven through headless

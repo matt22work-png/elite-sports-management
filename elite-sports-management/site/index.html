@@ -745,15 +745,12 @@ const STRIPE_CONTACT_URL = "";
 const ROSTER_CODE_HASHES = ["99b2bfb3a4ac35e32491d22207e082500404dbbd30f0cd8a5152cd6185c3cc58"];
 const UNLOCK_KEY = "esm_roster_unlock_v1";
 /* ===== UNIVERSAL MASTER ACCESS CODE ==========================================
-   Sam can hand this single code to trusted people (players / coaches / scouts) to
-   grant full roster access instantly, bypassing payment/accounts. It works in the
-   SAME roster "Code" field as the per-user SHA-256 codes above — an ADDITIONAL door,
-   nothing else changes. Matching is case-insensitive ("ESM13" / "esm13" both work).
-   To rotate it, just change the string below.
-   SECURITY: this is a shared, static string shipped in client-side JS — anyone who
-   reads the page source can find it. It's a convenience shortcut for trusted people,
-   NOT a real secret. Rotate here (and tell Sam) if it leaks widely. */
-const MASTER_ACCESS_CODE = "ESM13";
+   The single "trusted people" master code (players / coaches / scouts) now lives in the
+   DATABASE (public.app_settings, key 'roster_master_code', seeded "ESM13") and is managed
+   by Sam from the Admin panel → "Roster access code" — no code deploy needed to change it.
+   The gate (#gateForm submit) validates the entered value via the verify_roster_code() RPC,
+   which compares server-side (case-insensitive) and returns only true/false, so the current
+   code is never shipped in the page source. Per-user SHA-256 codes (above) are unaffected. */
 
 /* ===== Media (Tenerife Winter League) ===== */
 const GALLERY = [
@@ -1620,23 +1617,31 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
   const val=(document.getElementById("gateInput").value||"").trim().toUpperCase();
   err.classList.remove("show");
   if(!val)return;
-  // Universal master code (see MASTER_ACCESS_CODE above): a trusted-people shortcut that
-  // unlocks the roster the same way a valid personal code does. Case-insensitive (val is
-  // already upper-cased). Checked before hashing so it needs no entry in ROSTER_CODE_HASHES.
-  if(val===MASTER_ACCESS_CODE.toUpperCase()){
+  // 1) Per-user personal codes: SHA-256 checked offline against ROSTER_CODE_HASHES (unchanged).
+  let hash="";
+  try{hash=await sha256Hex(val);}
+  catch(ex){console.warn("crypto.subtle unavailable",ex);}
+  if(hash&&ROSTER_CODE_HASHES.includes(hash)){
     unlockRoster();
     document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
     return;
   }
-  let hash="";
-  try{hash=await sha256Hex(val);}
-  catch(ex){console.warn("crypto.subtle unavailable",ex);err.classList.add("show");return;}
-  if(ROSTER_CODE_HASHES.includes(hash)){
-    unlockRoster();
-    document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
-  }else{
-    err.classList.add("show");
-  }
+  // 2) Master roster code: Sam manages it in the admin panel (app_settings.roster_master_code,
+  //    seeded "ESM13"). We send the entered value to verify_roster_code(), which compares it
+  //    server-side (case-insensitive) and returns only true/false — the code itself is never
+  //    exposed to the browser. Changing it in admin takes effect IMMEDIATELY, no deploy: the
+  //    new code unlocks and the previous one stops working.
+  try{
+    if(SB){
+      const {data:ok,error}=await SB.rpc("verify_roster_code",{p_code:val});
+      if(!error&&ok===true){
+        unlockRoster();
+        document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
+        return;
+      }
+    }
+  }catch(ex){console.warn("verify_roster_code failed",ex);}
+  err.classList.add("show");
 });
 applyLockState();
 
