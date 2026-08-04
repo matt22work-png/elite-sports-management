@@ -11,6 +11,54 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Fix: RLS blocked legitimate player signup + ESM13 universal roster master code (2026-08-04)
+Two tasks in one commit.
+
+**(1) Signup RLS bug — "Impossibile salvare il tuo profilo: new row violates row-level
+security policy".** A real signup (Jesus Delgado, Venezuela, via /register/ IT flow with
+season stats) failed at step-2 "Salva profilo e continua". Root cause: the `public.players`
+INSERT policy **"player creates own row"** required `private.is_registered_player()` — a
+`public.profiles` row (role='player') visible at insert time. The profiles row is created by
+the exception-safe `on_auth_user_created` trigger, but that hard dependency is a race: when
+the row isn't present/visible at the exact insert moment, PostgREST rejects with `42501`.
+Reproduced exactly (authenticated user, no profile row → 42501).
+- **Fix (migration `fix_player_self_insert_rls_race`, APPLIED to prod):** policy WITH CHECK is
+  now `owner_id = auth.uid() AND status = 'pending'` — race-free, no profile dependency. Still
+  secure: verified legit self-insert (incl. season stats, no profile) SUCCEEDS; wrong-owner
+  impersonation BLOCKED (42501); self-approve (status='approved') BLOCKED (42501). Not weaker
+  than the pre-existing anon "public can apply" policy.
+- **Client hardening (`site/register/index.html`):** photo upload is now non-fatal (a photo
+  hiccup no longer loses the whole profile + season stats — logs and saves without image);
+  defensive idempotent `ensureProfile()` before the players insert.
+- **User recovery:** Jesus's rich step-2 data was lost (only a minimal self-heal row survived,
+  id 68, created when Sam later approved him). Restored VERIFIABLE fields into row 68 from the
+  screenshot: country Venezuela + 🇻🇪 flag, teams ["Texas Rangers org.","Montpellier"], IG
+  @jesus_delgado2020, phone +58 4125810866. **NOT guessed / still missing:** position, age, bio,
+  season-stats numbers — Sam should add these from the screenshot via the admin panel (Jesus
+  can't re-add via /register/ because his players row now exists → insert is idempotent). His
+  account is already `approved` and on the public roster.
+- **Flagged:** the anon `"public can apply"` INSERT policy on `players` still lets any anon key
+  holder insert `status='pending'` rows (spam vector) — pre-existing, left as-is (out of scope);
+  Matt may want to tighten/remove it if no public application path still uses it.
+
+**(2) ESM13 universal master roster code (`site/index.html`).** Added `const
+MASTER_ACCESS_CODE = "ESM13"` right below `ROSTER_CODE_HASHES`/`UNLOCK_KEY` (~line 746, clearly
+commented — change the string there to rotate). Wired into the existing roster code-gate
+(`#gateForm` submit): entering ESM13 unlocks full roster the same as a valid personal code,
+checked before the SHA-256 hash so it needs no hash entry. **Case-insensitive** (reuses the
+gate's existing `.trim().toUpperCase()`; "ESM13"/"esm13"/" esm13 " all work). Existing per-user
+SHA-256 codes unaffected; wrong codes still fail.
+- **Scope (ASSUMPTION — confirm with Matt):** ADDITIONAL access door alongside the code-gate,
+  scout/coach accounts, and player portal — replaces nothing. Deliberately scoped to the roster
+  code-gate ONLY (the one place a "code" concept exists in the UI). Did NOT add an ESM13 bypass
+  to /scout/ or /portal/ login — those already have account-based auth and a bypass there is a
+  bigger security decision for Matt to confirm separately.
+- **Security note:** ESM13 is a static string shipped in client-side JS — anyone reading the
+  page source can find it. Acceptable per Sam's "give it to trusted people" convenience intent;
+  it's a shortcut, NOT a secret. Rotate the constant (and tell Sam) if it leaks widely.
+- Gate copy (EN/ES/IT) reviewed — "enter the code he sends you" etc. is neutral, doesn't imply
+  codes are unique/per-user, so no copy changes. Validator (`node validate_i18n.mjs`) green.
+
 ### Baseball-Reference "Register" stats system (batting / pitching / fielding)
 Full raw-entry stat system replicating baseball-reference.com's Register format. Three
 layers, validated each before the next.

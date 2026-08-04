@@ -744,6 +744,16 @@ const STRIPE_CONTACT_URL = "";
    still work. */
 const ROSTER_CODE_HASHES = ["99b2bfb3a4ac35e32491d22207e082500404dbbd30f0cd8a5152cd6185c3cc58"];
 const UNLOCK_KEY = "esm_roster_unlock_v1";
+/* ===== UNIVERSAL MASTER ACCESS CODE ==========================================
+   Sam can hand this single code to trusted people (players / coaches / scouts) to
+   grant full roster access instantly, bypassing payment/accounts. It works in the
+   SAME roster "Code" field as the per-user SHA-256 codes above — an ADDITIONAL door,
+   nothing else changes. Matching is case-insensitive ("ESM13" / "esm13" both work).
+   To rotate it, just change the string below.
+   SECURITY: this is a shared, static string shipped in client-side JS — anyone who
+   reads the page source can find it. It's a convenience shortcut for trusted people,
+   NOT a real secret. Rotate here (and tell Sam) if it leaks widely. */
+const MASTER_ACCESS_CODE = "ESM13";
 
 /* ===== Media (Tenerife Winter League) ===== */
 const GALLERY = [
@@ -1610,6 +1620,14 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
   const val=(document.getElementById("gateInput").value||"").trim().toUpperCase();
   err.classList.remove("show");
   if(!val)return;
+  // Universal master code (see MASTER_ACCESS_CODE above): a trusted-people shortcut that
+  // unlocks the roster the same way a valid personal code does. Case-insensitive (val is
+  // already upper-cased). Checked before hashing so it needs no entry in ROSTER_CODE_HASHES.
+  if(val===MASTER_ACCESS_CODE.toUpperCase()){
+    unlockRoster();
+    document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
+    return;
+  }
   let hash="";
   try{hash=await sha256Hex(val);}
   catch(ex){console.warn("crypto.subtle unavailable",ex);err.classList.add("show");return;}
