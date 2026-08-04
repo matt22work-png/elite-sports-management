@@ -664,17 +664,28 @@ $("playerForm").addEventListener("submit", async e => {
   try {
     const { data: sess } = await SB.auth.getSession();
     const user = sess?.session?.user; if (!user) throw new Error(t("r_err_session"));
+    // Defensive: guarantee the profiles row exists before inserting the players row.
+    // The players INSERT is RLS-scoped to owner_id = auth.uid() (race-free), but the
+    // profiles row is what admin approval + the portal match on, so make sure it's there
+    // (idempotent — no-op if the on_auth_user_created trigger already created it).
+    await ensureProfile();
     const stash = JSON.parse(localStorage.getItem(STASH_KEY) || "{}");
     const fullName = [stash.first, stash.last].filter(Boolean).join(" ").trim() || (user.email.split("@")[0]);
-    // optional photo
+    // Optional photo. A photo hiccup must NEVER cost the athlete their whole profile +
+    // season stats, so an upload failure here is non-fatal: we log it and save the
+    // profile row without an image (they/an admin can add the photo later).
     let image_url = null;
     const file = $("p-photo").files?.[0];
     if (file){
-      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
-      const path = `self/${user.id}/${Date.now()}.${ext}`;
-      const { error: upErr } = await SB.storage.from(PHOTO_BUCKET).upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
-      if (upErr) throw upErr;
-      image_url = SB.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+      try {
+        const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
+        const path = `self/${user.id}/${Date.now()}.${ext}`;
+        const { error: upErr } = await SB.storage.from(PHOTO_BUCKET).upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
+        if (upErr) throw upErr;
+        image_url = SB.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+      } catch (photoErr){
+        console.warn("photo upload failed — saving profile without it", photoErr);
+      }
     }
     const teams = $("p-teams").value.split("\n").map(t => t.trim()).filter(Boolean);
     const position = $("p-position").value.trim();
