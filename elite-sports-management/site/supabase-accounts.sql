@@ -161,6 +161,14 @@ drop trigger if exists trg_sync_player_status on public.profiles;
 create trigger trg_sync_player_status after update on public.profiles
   for each row execute function private.sync_player_status();
 
+-- public.handle_new_user() is the AFTER INSERT ON auth.users trigger function that
+-- seeds a profiles row on signup. It is a trigger function only and must never be
+-- callable via the PostgREST RPC endpoint. Revoke API-role EXECUTE so it is not
+-- exposed at /rest/v1/rpc/handle_new_user (advisor lints 0028/0029). The trigger keeps
+-- firing regardless — triggers run as the table owner and need no EXECUTE grant.
+-- migration revoke_handle_new_user_api_exposure
+revoke execute on function public.handle_new_user() from anon, authenticated, public;
+
 -- ROLLBACK:
 --   drop trigger if exists trg_sync_player_status on public.profiles;
 --   drop function if exists private.sync_player_status();
