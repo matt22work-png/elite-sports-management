@@ -325,3 +325,16 @@ Priority order: security > correctness > reliability > a11y > perf > SEO > UX > 
 **Validation:** every module script syntax-checked via `new Function()` (register done by hand + re-checked here); scout approved/pending RLS proven live against the API with a throwaway account (deleted); all 5 apps carry `#langsw` + `esm_lang`. **Not done headless:** actual browser click-through of every page in all 3 languages (login/session/storage can't be driven headless) — recommend a manual pass.
 
 **Remaining i18n follow-up:** `players/*.html` chrome via `gen_player_pages.py` (the long-standing "player-page generator" maintenance item — now also the i18n gap).
+
+---
+
+## Session 2026-08-03 (cont.) — autonomous QA sweep (Parts 1–3)
+
+**Part 1 — Player pages (`players/*.html`) trilingual chrome. CLOSED.** Edited `gen_player_pages.py` to inject the site i18n system (DICT/t()/applyStatic/#lang switcher, shared `esm_lang`) with `data-i18n`/`data-i18n-tpl` on chrome only (nav, headings, meta labels, back link, contact block, footer). Athlete content (bios, team names, stats) left as-entered. The build env had **no Python** (Windows Store stub only), so a byte-identical Node port `gen_player_pages.mjs` was written and used to regenerate all 17 pages (`node gen_player_pages.mjs`). Both generators are kept in sync (same LANG_SWITCH + I18N_SCRIPT + template). Validated: all 17 pages' scripts parse, switcher present, all keys resolve EN/ES/IT, and **bio/team/stat data is byte-identical to players.json** (0 data-integrity problems). ⚠️ `gen_player_pages.py` itself could not be executed here (no Python) — its edits mirror the Node version but a **Python parity run should be confirmed by a human** when Python is available.
+
+**Part 2 — Automated validation pass. ALL GREEN.** Added a reusable headless validator `site/validate_i18n.mjs` (run `node validate_i18n.mjs`; exit 1 on any hard problem). Results across index/portal/scout/register/tenerife/player pages:
+- **Scripts parse:** every `<script>` block parses (module imports stubbed). 0 errors.
+- **i18n resolution:** every `data-i18n*` key used resolves in EN/ES/IT with full key parity; **0 missing keys, 0 key-name fallbacks**. (index 203 keys, register 91, portal 71, scout 50, tenerife 33, player 20.)
+- **Hardcoded English:** none genuine (the one heuristic hit — a "Scout sign in" `<a>` — is covered by its parent `data-i18n-html="r_already"`, translated in all 3 langs).
+- **Text-length overflow:** 7 advisory flags, ALL section headings/kickers/messages (e.g. "Career stats" → "Estadísticas de carrera") that wrap gracefully — none are tight buttons. Low risk; a mobile glance is optional, not required.
+- **RLS re-verify (direct anon API calls):** `scout_roster`, `profiles`, `scouts`, `account_notes`, `player_notes`, `tenerife_registrations` → all `42501 permission denied` for anon. `players` → anon reads only public columns of approved players (18 rows); **anon cannot select `email`/PII columns at all** (column-level grant). Contact info reachable only via `scout_roster()` for approved scouts. Authed side re-confirmed earlier this session (unapproved scout → `[]`, player reads only own row). **All unauthorized read paths blocked.**
