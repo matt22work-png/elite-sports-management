@@ -11,6 +11,69 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Full-site audit resume + handle_new_user API-exposure hardening (2026-08-04, session 2)
+
+**Context — recovering an interrupted session.** The prior session was killed when the terminal
+closed mid-task. On resume: `git status` **clean**, branch **up to date with origin/main**, no
+uncommitted/half-done work — the interrupted session had already committed AND pushed its two
+fixes (`1feb154` RLS signup race fix, `5d1a8af` ESM13 master code) and documented both (the entry
+directly below). Nothing to finish or roll back. So this session re-ran the **full live site
+audit** (testing flows against prod, not just reading code) and fixed what it surfaced.
+
+**Audit results — ✅ pass / 🔧 fixed this session / ❌ broken / ❓ needs a human:**
+- ✅ **Roster code-gate + ESM13.** `index.html` gate: ESM13 master code checked (case-insensitive,
+  `.trim().toUpperCase()`) BEFORE the SHA-256 hash path; per-user hashed codes unaffected; wrong
+  codes still fail. Account-based access (scout/player portals) is independent — ESM13 is roster-gate only.
+- ✅ **Payment links + pricing.** All py.pl + Wise pairs and prices consistent site-wide: roster/scout
+  **€49.99** (`py.pl/GJ510klc…` + `wise…/Zhxkm…`), profile **€129.99** (`py.pl/zN5Dh…` + `wise…/NKJf…`),
+  Tenerife **€599.99** (`py.pl/vb5Fr…` + `wise…/f9KLiw…`). Present on every surface (roster gate, register
+  pay step, tenerife, portal + scout pending reminders). Zero stale `$`/old-€ values.
+- ✅ **Player signup → portal (LIVE, rolled-back txns w/ simulated JWTs).** Fresh authenticated user
+  with **NO profiles row** inserts own `pending` players row → **SUCCEEDS** (id 77, rolled back) —
+  proves the race fix. Self-approve (`status='approved'`) → **BLOCKED 42501**. Impersonation
+  (`owner_id` = another user) → **BLOCKED 42501**. Portal read gated by `athlete reads own row` +
+  `own profile read` (own row only).
+- ✅ **Scout signup → approval → roster (LIVE).** Approved scout `scout_roster()` → **21 rows w/
+  contact** (5 email, 4 phone). Rejected scout → **0 rows**. Anon → **42501 permission denied**.
+  Approval trigger `trg_sync_player_status` tested live: flipping a profile to approved flips the
+  player's roster row to `approved`.
+- ✅ **Admin capabilities.** Client `ADMIN_EMAILS` == DB `private.esm_admins` exactly (brunosamuele48,
+  softball.esm, mattswagj, matt22work-png). Add-player / edit / notes / archive / delete / accounts
+  queue present. Both edge functions **ACTIVE** (`notify`, `admin-reset-user-password` verify_jwt=true).
+- ✅ **Password confirmation.** register `password`+`password2` w/ trilingual mismatch guard
+  (`r_err_pwmatch`, EN/ES/IT); admin self-reset (`pw-new`/`pw-confirm`) + per-user reset
+  (`rp-new`/`rp-confirm`). Register is the sole account-creation surface (role selector) — covered.
+- ✅ **Trilingual EN/ES/IT.** `node validate_i18n.mjs` → **0 hard problems**; every `data-i18n*` key
+  resolves in all 3 langs across index/portal/scout/register/tenerife/player pages. Only advisory
+  length flags (wrapping section headings, not tight buttons).
+- ✅ **Collaborators section.** `#collab` cover→reveal (Marianna Zumerle card), nav `nav_collab`,
+  full `collab_*`/`mz_*` keys EN/ES/IT.
+- ✅ **Copy fixes.** No stale `$49.99`/`€124.99`/`€559.99`, no `3/4 years`, no user-facing "access
+  code" (the lone "three years" hit is Samuele's real bio; "access code" only in a code comment).
+- 🔧 **Supabase health.** Project `sbexwyvsgqayxrsrlrpm` **ACTIVE_HEALTHY** (not paused). Advisors
+  reviewed. **Fixed one real item this session** (below). Remaining WARNs are all known/reviewed:
+  `scout_roster`/`update_my_profile` SECURITY DEFINER (intentional — must be authenticated-callable,
+  enforce own row/role boundaries), leaked-password protection OFF (dashboard-only), `esm_admins`
+  RLS-no-policy INFO (safe — private-schema deny-all). Performance WARNs are all "multiple permissive
+  policies" (admin + owner policy on the same table/action) — by-design, negligible on these tiny tables.
+
+**🔧 Fix applied — `handle_new_user()` API exposure (commit `f0ca1e2`).** Security advisor lints
+0028/0029 flagged `public.handle_new_user()` — the `AFTER INSERT ON auth.users` trigger that seeds a
+profiles row on signup — as executable by `anon` AND `authenticated` via `/rest/v1/rpc/handle_new_user`.
+It's a trigger function only (references `NEW`; a direct RPC call would error) with no business in the
+exposed API. **Migration `revoke_handle_new_user_api_exposure` (APPLIED to prod):**
+`revoke execute on function public.handle_new_user() from anon, authenticated, public;` — recorded in
+`site/supabase-accounts.sql`. **Verified:** advisor WARN cleared; only `service_role`/`postgres` retain
+EXECUTE; the `auth.users` trigger still fires (signup profile-seeding intact — triggers run as table
+owner, need no EXECUTE grant). Client never RPC'd it (only `scout_roster` is RPC'd), so zero client impact.
+
+**❓ Still needs a human (unchanged, can't be done headless):** visual browser click-through in all 3
+languages; clicking the 6 external py.pl/Wise buttons to confirm PayPal/Wise destinations + amounts;
+`python gen_player_pages.py` parity run (Node mirror produced the committed pages); enable Supabase
+leaked-password protection (dashboard); Jesus Delgado's missing fields (position/age/bio/season stats)
+added via admin panel from his screenshot. **Pre-existing flag left as-is:** anon `"public can apply"`
+INSERT policy on `players` (spam vector) — out of scope, Matt to decide.
+
 ### Fix: RLS blocked legitimate player signup + ESM13 universal roster master code (2026-08-04)
 Two tasks in one commit.
 
