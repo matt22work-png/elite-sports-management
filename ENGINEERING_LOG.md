@@ -11,6 +11,45 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Full 3-portal live functionality sweep (2026-08-04, session 4 — Part 1)
+
+Tested each portal **live end-to-end** with real approved test accounts driven through headless
+Chrome (CDP) — actual logins, rendered UI, console-error capture, mobile + desktop — plus RLS
+probes via simulated JWTs. **All three portals pass; no bugs found; no code changes needed.**
+Test accounts (player/scout/admin) + a leftover `esm-audit` test account from a prior session were
+all cleaned up afterward (DB back to 22 players / 8 profiles / 4 real admins, 0 `@example.com` users).
+
+- ✅ **Player portal (`/portal/`).** Live login as an approved test player rendered the full profile:
+  avatar, name, position+flag, APPROVED chip, "You're live on the ESM roster", bio, details
+  (sport/position/country/age/IG/phone), career highlights, and the **BBREF career register**
+  (batting/pitching/fielding) via the shared `window.BBREF.renderAll()` — same renderer/layout as
+  admin + public pages, with correct auto-calc (ERA 2.25 = 9·20/80, W-L% .800). **Fully read-only**
+  (no edit/upload controls; the edit-related dict keys are vestigial). **No console errors**; mobile
+  (390px) clean. Immediate login confirmed (email confirmation OFF — session-3 result).
+  - **Cross-player access BLOCKED at the API/RLS layer (not just UI):** `"read approved players"`
+    is scoped to `{anon}` only (and anon can't read email/phone via column grants); an authenticated
+    non-admin gets only `"athlete reads own row"` (own row). Simulated approved player querying OTHER
+    approved rows → **0 rows, 0 emails, 0 phones**. Own row matched by `owner_id` then `email`.
+  - Pending state shows €129.99 PayPal (`py.pl/zN5Dh…`) + Wise (`wise…/NKJf…`) + ESM email; trilingual.
+- ✅ **Scout portal (`/scout/`).** Live login as an approved test scout rendered **"ROSTER — SCOUT
+  ACCESS · 21 players"** — full read-only detail (photo, bio, teams, contact) + full BBREF career
+  tables, same data admins see. **No console errors.** Pending state (re-confirmed): €49.99
+  PayPal+Wise + Sam's email (`brunosamuele56@gmail.com` + `elitesportsmanagement50@gmail.com`).
+  Rejected/unapproved + anon **blocked via direct API** (`scout_roster()` → 0 rows / 401 — session-2/3).
+  Roster code-gate + ESM13 remain independent (homepage; re-verified session-3, and again in Part 2).
+- ✅ **Admin portal (`/admin/`).** Live login (test admin temporarily added to the LOCAL `ADMIN_EMAILS`
+  for the test, **edit reverted** — working tree clean) rendered the full panel with **no console
+  errors**: PENDING ACCOUNTS with payment verify toggle, Approve/Reject/Archive, internal notes,
+  and Reset-password field per account; ADD A PLAYER; ROSTER with the **All / ⚾ Baseball / 🥎 Softball**
+  filter; PENDING APPLICATIONS. The admin client gate is the hardcoded `ADMIN_EMAILS` constant (it
+  correctly rejected a DB-only admin), and the sport filter is `inSport = SPORT_FILTER==="All" ||
+  (p.sport||"Baseball")===SPORT_FILTER` — **sport-based, no admin-identity restriction**, so all
+  admins see all players. Edit/stats (BBREF register editor w/ auto-calc), approve/reject, password
+  reset edge fn — all present (edge-fn security path live-tested session-3).
+- ✅ **Languages / regressions.** Player portal trilingual EN/ES/IT (switcher live); scout/admin
+  EN-only **by design** (internal/roster tools) — unchanged, nothing regressed. No broken links or
+  console errors surfaced on any portal in the live runs.
+
 ### Targeted troubleshooting pass on reported bugs + Jesús Delgado de-duplication (2026-08-04, session 3)
 
 Live reproduction pass over the recently-reported bug categories (signup/RLS, session-independence,
