@@ -338,3 +338,19 @@ Priority order: security > correctness > reliability > a11y > perf > SEO > UX > 
 - **Hardcoded English:** none genuine (the one heuristic hit — a "Scout sign in" `<a>` — is covered by its parent `data-i18n-html="r_already"`, translated in all 3 langs).
 - **Text-length overflow:** 7 advisory flags, ALL section headings/kickers/messages (e.g. "Career stats" → "Estadísticas de carrera") that wrap gracefully — none are tight buttons. Low risk; a mobile glance is optional, not required.
 - **RLS re-verify (direct anon API calls):** `scout_roster`, `profiles`, `scouts`, `account_notes`, `player_notes`, `tenerife_registrations` → all `42501 permission denied` for anon. `players` → anon reads only public columns of approved players (18 rows); **anon cannot select `email`/PII columns at all** (column-level grant). Contact info reachable only via `scout_roster()` for approved scouts. Authed side re-confirmed earlier this session (unapproved scout → `[]`, player reads only own row). **All unauthorized read paths blocked.**
+
+**Part 3 — General QA sweep + fix-as-you-go. CLOSED.**
+- **Payment links/prices audit (code):** all three flows carry the correct py.pl + Wise pair and price — roster/scout €49.99 (`py.pl/GJ510klc…` + `wise…/Zhxkm…`), profile €129.99 (`py.pl/zN5Dh…` + `wise…/NKJf…`), Tenerife €599.99 (`py.pl/vb5Fr…` + `wise…/f9KLiw…`). Matches this log's documented values. Both buttons present on every surface (roster gate, register pay step, tenerife, portal & scout pending reminders).
+- **Old-copy sweep:** `access code` → **0**; old prices `€124.99`/`€559.99` → **0**; old durations `3 years`/`4 years total` → **0**. **Fixed:** stale `$49.99` in code comments (index.html ×6, and — via the shared CSS comment — all 17 player pages); regenerated the player pages so they're now `€49.99`. **0** `$NN.NN` remain site-wide. Note: `unlock-code` survives only in internal comments as the accurate name for the SHA-256 roster gate — user-facing copy correctly says "code" (not "unlock/access code").
+- **Admin stat editing verified intact** (parses; `battingCalc`/`derivedInner` auto-calc, season-stats save, BBREF register editor, `admin-reset-user-password`, contact-email edit all present).
+- **Portal/scout states** confirmed rendering (scripts parse + earlier live approved/pending tests).
+
+### FINAL STATE — what's closed vs. what needs a human in a browser
+**Fully closed (verified headless):** player-page trilingual chrome (17 pages regenerated + generator edited); i18n key resolution EN/ES/IT across all pages (0 missing, 0 fallbacks, via `node validate_i18n.mjs`); RLS on all read paths (anon + authed); payment links/prices; old-copy sweep; admin/portal/scout script integrity.
+
+**Needs a human (can't be done headless — flag before calling 100% done):**
+1. **`gen_player_pages.py` Python parity** — the build env had no Python, so the runnable **Node mirror `gen_player_pages.mjs`** produced the committed pages. The `.py` edits mirror it but were not executed. Run `python gen_player_pages.py` once Python is available and confirm `git diff` on `players/*.html` is empty.
+2. **Visual browser pass in all 3 languages** — headless checks can't see layout. Low-risk advisory: 7 ES/IT strings are longer than EN but all are wrapping section headings/messages (e.g. "Career stats" → "Estadísticas de carrera"), not tight buttons. Worth a mobile glance on scout/portal/register.
+3. **Click each of the 6 py.pl / Wise payment buttons** to confirm the external PayPal/Wise destinations + amounts (external redirects can't be followed headlessly).
+
+**Reusable tool added:** `site/validate_i18n.mjs` — re-run after any i18n change to catch missing keys/parse errors/length flags.

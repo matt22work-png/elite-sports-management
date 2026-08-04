@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<!-- iOS Safari auto-detects number strings (e.g. the "$49.99" roster price) as phone
+<!-- iOS Safari auto-detects number strings (e.g. the "€49.99" roster price) as phone
      numbers and turns them into tappable links; scrolling/tapping then surfaces an
      unwanted iOS action sheet. Disable data detectors so it never happens in any locale. -->
 <meta name="format-detection" content="telephone=no" />
@@ -371,7 +371,7 @@
   .sub-label{font-size:11.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-soft);margin:32px 0 14px}
   .lightbox img{width:100%;border-radius:12px;display:block}
 
-  /* ===== roster paywall ($49.99 unlock-code gate) ===== */
+  /* ===== roster paywall (€49.99 unlock-code gate) ===== */
   .roster-wrap{position:relative}
   /* The locked gate overlay is position:absolute;inset:0, so it takes the wrap's
      height. A sport/position filter matching few or zero athletes would otherwise
@@ -594,7 +594,7 @@
   <div class="filters" id="sportFilters"></div>
   <div class="filters" id="filters"></div>
 
-  <!-- Roster paywall ($49.99): the public roster is blurred behind a client-side
+  <!-- Roster paywall (€49.99): the public roster is blurred behind a client-side
        unlock-code gate. A buyer pays Samuele directly via PayPal and enters the code he
        sends them (validated by SHA-256 against localStorage). This is scoped to the
        roster ONLY — the €129.99 profile and €599.99 Tenerife flows stay account-based. -->
@@ -736,7 +736,7 @@ const FALLBACK_EMAIL      = "mailto:elitesportsmanagement50@gmail.com";
    Empty → falls back to an email enquiry (no per-player fee). */
 const STRIPE_CONTACT_URL = "";
 
-/* Roster paywall ($49.99): RESTORED 2026-08 to the original client-side unlock-code
+/* Roster paywall (€49.99): RESTORED 2026-08 to the original client-side unlock-code
    gate (SHA-256 + localStorage) per Sam. A buyer pays Samuele via PayPal and enters the
    code he sends them. Scoped to the roster ONLY — profile creation (€129.99) and
    Tenerife (€599.99) stay on the account + admin-approval + PayPal flow at /register/
@@ -1581,7 +1581,7 @@ function openModal(slug){
   document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
   loadPublicBbref(p.id,document.getElementById("modalBbref"));
 }
-/* ===== roster paywall ($49.99) =====
+/* ===== roster paywall (€49.99) =====
    Client-side unlock gate: the valid code's SHA-256 lives in ROSTER_CODE_HASHES and the
    unlock is remembered in localStorage, so a buyer who paid Sam via PayPal enters the code
    he sends them just once. Deliberately NOT tied to account creation or admin approval —
@@ -1747,7 +1747,7 @@ async function boot(){
 }
 // Wire the pay buttons synchronously too: their hrefs come only from top-level
 // constants (no network), so doing this before boot()'s async import+fetch means the
-// "$49.99" roster button always has a working target even if the connection stalls —
+// "€49.99" roster button always has a working target even if the connection stalls —
 // previously it stayed href="#" until boot() finished (a tap-does-nothing race on slow iOS).
 /* If a player/scout is already signed in (a Supabase session is stored in this browser),
    relabel the "Sign In" nav dropdown to "My Profile" so the nav reflects their state.
