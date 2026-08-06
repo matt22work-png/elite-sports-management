@@ -174,8 +174,9 @@
 
     <div class="kicker">Roster access code</div>
     <div class="card">
-      <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">Master code for the public <b style="color:var(--ink)">roster gate</b> — the single code you hand trusted people to unlock the roster (the “Code” box on the homepage). Case-insensitive. Personal per-player codes are separate and unaffected. Saving takes effect <b style="color:var(--ink)">immediately</b> — no deploy needed.</p>
-      <div class="field"><label for="rc-input">Current master code</label><input id="rc-input" placeholder="loading…" autocomplete="off" spellcheck="false" /></div>
+      <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">Master code for the public <b style="color:var(--ink)">roster gate</b> — the single code you hand trusted people to unlock the roster (the “Code” box on the homepage). Case-insensitive. Personal per-player codes are separate and unaffected. Saving takes effect <b style="color:var(--ink)">immediately</b> — no deploy needed (return visitors' browsers pick up the new code on their next page load).</p>
+      <div id="rc-current" style="font-size:14px;margin:0 0 14px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(6,20,42,.5)">Active code right now: <b id="rc-current-val" style="color:var(--gold);letter-spacing:.06em">loading…</b></div>
+      <div class="field"><label for="rc-input">Set a new code (or leave blank to retire it entirely)</label><input id="rc-input" placeholder="loading…" autocomplete="off" spellcheck="false" /></div>
       <div class="row-btns"><button class="btn btn-gold" type="button" id="rc-save">Save code</button></div>
       <div class="msg" id="rc-msg" role="status" aria-live="polite"></div>
     </div>
@@ -1002,20 +1003,34 @@ $("pw-save").onclick = async () => {
 
 /* ---------- roster master access code (Sam-managed; stored in public.app_settings) ----------
    Reads/writes the single master code the homepage roster gate accepts. RLS restricts the
-   app_settings row to admins; the public gate never reads the value — it calls the
-   verify_roster_code() RPC which returns only true/false. Changing it here is live at once. */
+   app_settings row to admins. The public gate no longer hardcodes any code: on each load it
+   caches the current value (via get_roster_code()) in localStorage and checks that cached value
+   synchronously, plus a live verify_roster_code() check — so changing the code here is live for
+   return visitors on their next page load, and blanking it retires the master code entirely. */
+function showActiveCode(v){
+  const el = $("rc-current-val"); if (!el) return;
+  const code = (v || "").trim();
+  el.textContent = code || "(none — master code retired; only per-player codes work)";
+  el.style.color = code ? "var(--gold)" : "var(--muted)";
+}
 async function loadRosterCode(){
   const inp = $("rc-input"); if (!inp) return;
   const { data, error } = await SB.from("app_settings").select("value").eq("key", "roster_master_code").maybeSingle();
-  if (error){ inp.placeholder = "Couldn't load"; toast("Access code load failed: " + error.message, true); return; }
-  inp.value = data?.value || "";
-  inp.placeholder = "e.g. ESM13";
+  if (error){ inp.placeholder = "Couldn't load"; showActiveCode(""); toast("Access code load failed: " + error.message, true); return; }
+  const code = data?.value || "";
+  inp.value = code;
+  inp.placeholder = "e.g. ESM13 — or blank to retire";
+  showActiveCode(code);
 }
 $("rc-save").onclick = async () => {
   const inp = $("rc-input"), msg = $("rc-msg");
   msg.classList.remove("show", "ok", "err");
   const val = (inp.value || "").trim();
-  if (!val){ msg.textContent = "The code can't be empty."; msg.classList.add("show", "err"); inp.focus(); return; }
+  // Empty = deliberately RETIRE the master code (stored as ''; verify_roster_code() returns
+  // false for blank, and get_roster_code() returns NULL so browsers clear their cached value).
+  if (!val && !confirm("Retire the master roster code entirely?\n\nThe roster gate will then only accept personal per-player codes until you set a new master code.")) {
+    inp.focus(); return;
+  }
   const btn = $("rc-save"); btn.disabled = true;
   const { data: { session } } = await SB.auth.getSession();
   const { error } = await SB.from("app_settings")
@@ -1024,9 +1039,12 @@ $("rc-save").onclick = async () => {
   btn.disabled = false;
   if (error){ msg.textContent = "Save failed: " + error.message; msg.classList.add("show", "err"); return; }
   inp.value = val;
-  msg.textContent = "Saved ✓ — the roster gate accepts this code immediately (the old one no longer works).";
+  showActiveCode(val);
+  msg.textContent = val
+    ? "Saved ✓ — the roster gate accepts “" + val + "” now. The previous code stops working once each visitor's browser reloads the page."
+    : "Master code retired ✓ — the roster gate now accepts only personal per-player codes.";
   msg.classList.add("show", "ok");
-  toast("Roster code updated ✓");
+  toast(val ? "Roster code updated ✓" : "Master code retired ✓");
 };
 
 /* ---------- Baseball-Reference register editor (batting / pitching / fielding) ----------

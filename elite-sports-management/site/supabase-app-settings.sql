@@ -7,12 +7,17 @@
 -- MASTER_ACCESS_CODE = "ESM13" constant in index.html.
 --
 -- Security model:
---   * app_settings is admin-only (RLS via private.is_esm_admin()). anon has NO access.
---   * The public gate never reads the code value. It calls verify_roster_code(entered),
---     a SECURITY DEFINER function that compares server-side (case-insensitive) and returns
---     only true/false — so the current code is never shipped to the browser (unlike ESM13,
---     which was readable in page source).
+--   * app_settings is admin-only for read/write (RLS via private.is_esm_admin()). anon has
+--     NO direct table access.
+--   * verify_roster_code(entered) — SECURITY DEFINER, compares server-side (case-insensitive),
+--     returns only true/false. Used for the live gate check.
+--   * get_roster_code() — SECURITY DEFINER, returns the current code TEXT (or NULL if retired),
+--     granted to anon. The homepage caches this in localStorage for a synchronous, network-free
+--     gate check (replacing the old hardcoded "ESM13" string). The master code is a soft
+--     convenience gate, NOT a secret (it was shipped in page source as ESM13 for most of its
+--     life), so exposing the current value to anon is consistent with its threat model.
 --   * Per-user SHA-256 personal codes (ROSTER_CODE_HASHES in index.html) are unaffected.
+--   * See add_get_roster_code_rpc migration / bottom of this file for get_roster_code().
 
 create table if not exists public.app_settings (
   key        text primary key,
@@ -54,7 +59,24 @@ $$;
 revoke all on function public.verify_roster_code(text) from public;
 grant execute on function public.verify_roster_code(text) to anon, authenticated;
 
+-- Public code READ RPC (migration add_get_roster_code_rpc): returns the current master code
+-- text so the homepage can cache it in localStorage for a synchronous, network-free gate check.
+-- Returns NULL when the code is empty/retired (browser then clears its stale cache).
+create or replace function public.get_roster_code()
+returns text
+language sql
+security definer
+set search_path = ''
+stable
+as $$
+  select nullif(btrim(value), '')
+  from public.app_settings
+  where key = 'roster_master_code';
+$$;
+revoke all on function public.get_roster_code() from public;
+grant execute on function public.get_roster_code() to anon, authenticated;
+
 -- ROLLBACK:
+--   drop function if exists public.get_roster_code();
 --   drop function if exists public.verify_roster_code(text);
 --   drop table if exists public.app_settings;
---   (and restore the hardcoded MASTER_ACCESS_CODE = "ESM13" gate check in index.html)

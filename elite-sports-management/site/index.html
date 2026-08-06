@@ -749,25 +749,36 @@ const STRIPE_CONTACT_URL = "";
    still work. */
 const ROSTER_CODE_HASHES = ["99b2bfb3a4ac35e32491d22207e082500404dbbd30f0cd8a5152cd6185c3cc58"];
 const UNLOCK_KEY = "esm_roster_unlock_v1";
-/* ===== UNIVERSAL MASTER ACCESS CODE ==========================================
-   "ESM13" is the always-on master code for trusted people (players / coaches / scouts).
-   It is checked SYNCHRONOUSLY as a hardcoded, case-insensitive, whitespace-trimmed string
-   in the #gateForm submit handler, with ZERO network/DB/async dependency — so it unlocks
-   the roster reliably even if the Supabase client hasn't finished loading, the esm.sh CDN
-   import failed, the device is offline, or the DB is momentarily unavailable.
+/* ===== MASTER ROSTER CODE — fully admin-managed, cached locally =================
+   The single "trusted people" master code (players / coaches / scouts) is set by Sam from
+   the Admin panel and lives ONLY in the database (public.app_settings, key
+   'roster_master_code'). There is NO hardcoded code in this file anymore — Sam can change it
+   or retire it entirely without a deploy.
 
-   On TOP of that, Sam can manage additional custom codes from the Admin panel: those live in
-   the DATABASE (public.app_settings, key 'roster_master_code') and are validated via the
-   verify_roster_code() RPC (server-side, case-insensitive, true/false only). That path is
-   BEST-EFFORT — when it works it lets Sam rotate/add a code with no deploy, but it is never
-   the only thing standing between a trusted user and the roster. Per-user SHA-256 codes
-   (above) are also unaffected.
+   Reliability is preserved by CACHING, not hardcoding: on every successful page load, boot()
+   calls the get_roster_code() RPC and stores the current value in localStorage
+   (MASTER_CODE_KEY). The gate then checks that cached value SYNCHRONOUSLY (network-free), so a
+   return visitor still unlocks instantly even if the esm.sh import is slow/blocked, the device
+   is offline, or the DB is momentarily unavailable — exactly the failure mode that took down
+   the old flow, now covered without pinning a fixed string. The cache self-updates: whenever
+   Sam changes the code, the next page load on any browser re-fetches and re-caches it (and
+   clears the cache when the code is retired), so the old value stops working after a reload.
 
-   HISTORY: ESM13 was briefly moved to be DB-RPC-ONLY (commit 2c39e13), which made it depend
-   on the async esm.sh import + a live network round-trip; a real user with ESM13 was rejected
-   because SB was still null when they submitted. The hardcoded fallback below restores the
-   original always-works behaviour while keeping the admin-managed custom-code feature. */
-const MASTER_ACCESS_CODE = "ESM13";
+   Narrow accepted edge case: a BRAND-NEW visitor (empty cache) on a blocked/slow network has
+   only the live RPC path — same as before the ESM13 hardcode ever existed. Acceptable because
+   caching covers the vast majority of return visits, and this window is not a regression.
+   Per-user SHA-256 personal codes (ROSTER_CODE_HASHES above) are entirely separate/unaffected. */
+const MASTER_CODE_KEY = "esm_roster_code_v1";
+// Read/normalize the cached master code. Stored normalized (trimmed + upper-cased) to match the
+// gate's `val`, so the comparison is inherently case-insensitive + whitespace-tolerant.
+function cachedMasterCode(){try{return localStorage.getItem(MASTER_CODE_KEY)||"";}catch(e){return "";}}
+function cacheMasterCode(v){
+  try{
+    const n=(v||"").trim().toUpperCase();
+    if(n)localStorage.setItem(MASTER_CODE_KEY,n);
+    else localStorage.removeItem(MASTER_CODE_KEY); // empty/retired -> drop stale cache
+  }catch(e){}
+}
 
 /* ===== Media (Tenerife Winter League) ===== */
 const GALLERY = [
@@ -1650,25 +1661,26 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
     document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
     return;
   }
-  // 2) Universal master code ESM13 — checked SYNCHRONOUSLY with no network/DB/async
-  //    dependency, so it ALWAYS unlocks for a trusted user even if SB never loaded (slow
-  //    device, esm.sh blocked, offline, DB paused). `val` is already trimmed + upper-cased,
-  //    and MASTER_ACCESS_CODE is upper-case, so this is inherently case-insensitive +
-  //    whitespace-tolerant. This is the reliable path; path 3 is a bonus, not a crutch.
-  if(val===MASTER_ACCESS_CODE.toUpperCase()){
+  // 2) Master roster code — FAST PATH: compare against the admin-set code this browser cached
+  //    on a previous successful load (boot() refreshes it via get_roster_code()). Synchronous
+  //    and network-free, so a return visitor unlocks instantly even if SB never loaded (slow
+  //    device, esm.sh blocked, offline, DB paused). Both sides are trimmed+upper-cased, so it's
+  //    case-insensitive + whitespace-tolerant. This replaces the old hardcoded "ESM13" string.
+  const cached=cachedMasterCode();
+  if(cached&&val===cached){
     unlockRoster();
     document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
     return;
   }
-  // 3) Admin-managed custom codes (BEST-EFFORT): Sam can add/rotate a code in the admin panel
-  //    (app_settings.roster_master_code) with no deploy. We send the entered value to
-  //    verify_roster_code(), which compares server-side (case-insensitive) and returns only
-  //    true/false — the code itself is never exposed to the browser. This runs only when SB
-  //    is available; if it isn't, ESM13 (path 2) has already handled trusted users.
+  // 3) Master roster code — LIVE PATH: verify against the DB in case Sam JUST changed the code
+  //    and this browser hasn't re-cached the new value yet. verify_roster_code() compares
+  //    server-side (case-insensitive) and returns only true/false. On success we cache the
+  //    value so this browser gets the fast path next time. Runs only when SB is available.
   try{
     if(SB){
       const {data:ok,error}=await SB.rpc("verify_roster_code",{p_code:val});
       if(!error&&ok===true){
+        cacheMasterCode(val); // val is confirmed-current -> seed the offline cache
         unlockRoster();
         document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
         return;
@@ -1782,6 +1794,11 @@ async function boot(){
       // would send their JWT and RLS would return only their own row, breaking the
       // public roster. persistSession:false keeps every request purely anon.
       SB=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+      // Refresh the cached master roster code FIRST (independent try), so the gate's fast
+      // synchronous path has the current value on the next interaction — and so a retired code
+      // clears the cache. Kept separate from the players fetch so a roster error can't skip it.
+      try{const {data:mc}=await SB.rpc("get_roster_code");cacheMasterCode(mc);}
+      catch(ex){console.warn("roster code cache refresh failed",ex);}
       // Only approved players are publicly readable (enforced by RLS too). We request
       // just the public display columns — NOT the intake PII (age/phone/email/instagram/
       // message) — so an approved athlete's contact details are never sent to the browser.
