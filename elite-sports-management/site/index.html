@@ -205,6 +205,11 @@
   .pcard .body{padding:17px 18px 20px}
   .pcard .body h3{font-size:19px;line-height:1.15}
   .pcard .pos{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:3px}
+  /* Level classification badge (College/International/Pro) — teal pill, distinct from the
+     gold position text. Used on the roster card body and inline in the detail modal. */
+  .lvl{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:rgba(45,150,160,.14);border:1px solid var(--teal-soft);color:var(--teal-soft);line-height:1.1;white-space:nowrap}
+  .pcard .lvl{margin-top:9px}
+  .sh-pos .lvl{margin-left:9px;vertical-align:middle}
   .pcard .country{color:var(--muted);font-size:13px;margin-top:9px;display:flex;align-items:center;gap:6px}
   .pcard .country .cflag{font-size:15px;line-height:1;flex:none}
   .pcard .team{color:var(--muted);font-size:13px;margin-top:11px;display:flex;align-items:center;gap:7px}
@@ -876,6 +881,7 @@ const T = {
     roster_kicker:"The Roster",roster_h2:"A growing family of baseball players from around the world",
     roster_p:"A growing family of baseball players from around the world.",roster_cta_p:"Are you a coach or team? Get full roster access with athlete contact details — 1 year, plus 1 year free.",roster_cta_btn:"Get roster access →",
     filter_all:"All",filter_pitcher:"Pitchers",filter_catcher:"Catchers",filter_infielder:"Infielders",filter_twoway:"Two-Way",card_view:"View profile →",roster_empty:"No athletes in this category yet.",
+    level_college:"College",level_international:"International",level_pro:"Pro",
     events_kicker:"Events",events_h2:"Camps, Showcases & Tournaments",events_p:"Where Elite Sports Management athletes train, compete and get seen.",
     ev_upcoming:"Upcoming",ev_past:"Past",ev_register:"Register",ev_gallery:"View media & photos",
     testi_kicker:"Testimonials",testi_h2:"What People Say",testi_p:"Voices from players, families and coaches in the ESM family.",testi_seeall:"See all testimonials →",testi_all_h:"All Testimonials",
@@ -953,6 +959,7 @@ const T = {
     roster_kicker:"Los Jugadores",roster_h2:"Una familia creciente de jugadores de béisbol de todo el mundo",
     roster_p:"Una familia creciente de jugadores de béisbol de todo el mundo.",roster_cta_p:"¿Eres entrenador o equipo? Consigue acceso completo al roster con los datos de contacto de los atletas — 1 año, más 1 año gratis.",roster_cta_btn:"Consigue acceso al roster →",
     filter_all:"Todos",filter_pitcher:"Lanzadores",filter_catcher:"Receptores",filter_infielder:"Infielders",filter_twoway:"Dos Vías",card_view:"Ver perfil →",roster_empty:"Aún no hay atletas en esta categoría.",
+    level_college:"Universitario",level_international:"Internacional",level_pro:"Profesional",
     events_kicker:"Eventos",events_h2:"Camps, Showcases y Torneos",events_p:"Donde los atletas de Elite Sports Management entrenan, compiten y se hacen ver.",
     ev_upcoming:"Próximo",ev_past:"Pasado",ev_register:"Inscribirse",ev_gallery:"Ver fotos y videos",
     testi_kicker:"Testimonios",testi_h2:"Lo Que Dicen",testi_p:"Voces de jugadores, familias y entrenadores de la familia ESM.",testi_seeall:"Ver todos los testimonios →",testi_all_h:"Todos los Testimonios",
@@ -1030,6 +1037,7 @@ const T = {
     roster_kicker:"Il Roster",roster_h2:"Una famiglia in crescita di giocatori di baseball da tutto il mondo",
     roster_p:"Una famiglia in crescita di giocatori di baseball da tutto il mondo.",roster_cta_p:"Sei un allenatore o una squadra? Ottieni l'accesso completo al roster con i contatti degli atleti — 1 anno, più 1 anno gratis.",roster_cta_btn:"Ottieni l'accesso al roster →",
     filter_all:"Tutti",filter_pitcher:"Lanciatori",filter_catcher:"Ricevitori",filter_infielder:"Interni",filter_twoway:"Due Ruoli",card_view:"Vedi profilo →",roster_empty:"Ancora nessun atleta in questa categoria.",
+    level_college:"Universitario",level_international:"Internazionale",level_pro:"Professionista",
     events_kicker:"Eventi",events_h2:"Camp, Showcase e Tornei",events_p:"Dove gli atleti di Elite Sports Management si allenano, competono e si fanno notare.",
     ev_upcoming:"In arrivo",ev_past:"Passato",ev_register:"Iscriviti",ev_gallery:"Foto e video",
     testi_kicker:"Testimonianze",testi_h2:"Cosa Dicono",testi_p:"Le voci di giocatori, famiglie e coach della famiglia ESM.",testi_seeall:"Vedi tutte le testimonianze →",testi_all_h:"Tutte le Testimonianze",
@@ -1390,6 +1398,9 @@ let lang=(()=>{try{const l=localStorage.getItem("esm_lang");return["en","es","it
 
 const initials=n=>n.replace(/[^A-Za-zÀ-ÿ ]/g,"").split(" ").filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 const t=k=>(T[lang][k]??k);
+// Player "Level" classification (College/International/Pro) — trilingual label for a DB
+// value; empty/unknown value renders nothing (nullable field, no badge when unset).
+const levelLabel=v=>{v=(v||"").toLowerCase();return ["college","international","pro"].includes(v)?t("level_"+v):"";};
 const groupKey=g=>({Pitcher:"pitcher",Catcher:"catcher",Infielder:"infielder","Two-Way":"twoway"}[g]||"infielder");
 const slugify=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const bgImg=u=>u?`background-image:url('${u}')`:"";
@@ -1432,6 +1443,7 @@ function renderRoster(){
       <div class="top" style="${bgImg(p.image)}"><span class="flag">${esc(flagFor(p))}${p.heritage?(" "+esc(p.heritage)):""}</span>
         ${p.tier?`<span class="tier">${esc(p.tier)}</span>`:""}${p.image?"":`<span class="mono">${initials(p.name)}</span>`}</div>
       <div class="body"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position)}</div>
+        ${levelLabel(p.level)?`<div class="lvl">${esc(levelLabel(p.level))}</div>`:""}
         ${p.country?`<div class="country">${countryFlag(p.country)?`<span class="cflag">${esc(countryFlag(p.country))}</span>`:""}${esc(p.country)}</div>`:""}
         ${p.teams&&p.teams[0]?`<div class="team">${esc(p.teams[0])}</div>`:""}<div class="view">${t("card_view")}</div></div>
     </${tag}>`;
@@ -1585,7 +1597,7 @@ function openModal(slug){
   document.getElementById("sheetContent").innerHTML=`
     <div class="sh-top"><span class="sh-mono" style="${bgImg(p.image)}">${p.image?"":initials(p.name)}</span>
       <div><h3 class="display">${esc(p.name)} <span style="font-size:.6em">${esc(flagFor(p))}${esc(p.heritage)}</span></h3>
-      <div class="sh-pos">${esc(p.position)}</div><div class="sh-meta">${esc(meta)}</div></div></div>
+      <div class="sh-pos">${esc(p.position)}${levelLabel(p.level)?` <span class="lvl">${esc(levelLabel(p.level))}</span>`:""}</div><div class="sh-meta">${esc(meta)}</div></div></div>
     <div class="sh-body"><p class="bio">${esc(p.bio)}</p>
       ${p.stats&&p.stats.length?`<div class="sh-label">${t("modal_highlights")}</div><div class="sh-stats">${p.stats.map(s=>`<div class="sh-stat"><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join("")}</div>`:""}
       ${(()=>{const ss=seasonStatsHTML(p.season_stats);return ss?`<div class="sh-label">${t("modal_season_stats")}</div>${ss}`:"";})()}
@@ -1774,7 +1786,7 @@ async function boot(){
       // just the public display columns — NOT the intake PII (age/phone/email/instagram/
       // message) — so an approved athlete's contact details are never sent to the browser.
       const {data,error}=await SB.from("players")
-        .select("id,slug,name,group,position,country,flag,heritage,born,birthplace,tier,bats,bio,teams,stats,season_stats,image_url,sport,sort_order")
+        .select("id,slug,name,group,position,country,flag,heritage,born,birthplace,tier,bats,bio,teams,stats,season_stats,image_url,sport,level,sort_order")
         .eq("status","approved").order("sort_order");
       if(error)throw error;
       // Supabase stores the photo in `image_url`; the renderer reads `image`.

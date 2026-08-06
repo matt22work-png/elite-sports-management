@@ -648,6 +648,11 @@ function cardPending(p){
 
 const sportOptions = sel => ["Baseball","Softball"]
   .map(s => `<option${(sel||"Baseball")===s?" selected":""}>${s}</option>`).join("");
+// Level is nullable — first option is an explicit "no level set". Values are the DB enum
+// (college/international/pro); labels are shown to Sam (admin panel is intentionally EN-only).
+const LEVELS = [["","— None —"],["college","College"],["international","International"],["pro","Pro"]];
+const levelOptions = sel => LEVELS
+  .map(([v,label]) => `<option value="${v}"${(sel||"")===v?" selected":""}>${label}</option>`).join("");
 
 function cardPlayer(p){
   const stats = Array.isArray(p.stats) ? p.stats : [];
@@ -677,6 +682,7 @@ function cardPlayer(p){
       <div class="field"><label>Full name</label><input class="pf-name" data-id="${p.id}" value="${esc(p.name||"")}" placeholder="Full name" aria-label="Full name" /></div>
       <div class="field"><label>Position</label><input class="pf-position" data-id="${p.id}" value="${esc(p.position||"")}" placeholder="e.g. Catcher" aria-label="Position" /></div>
       <div class="field"><label>Sport</label><select class="pf-sport" data-id="${p.id}" aria-label="Sport">${sportOptions(p.sport)}</select></div>
+      <div class="field"><label>Level</label><select class="pf-level" data-id="${p.id}" aria-label="Level">${levelOptions(p.level)}</select></div>
       <div class="field"><label>Country</label><input class="pf-country" data-id="${p.id}" value="${esc(p.country||"")}" placeholder="e.g. Italy" aria-label="Country" /></div>
       <div class="field"><label>Age</label><input class="pf-age" data-id="${p.id}" value="${esc(p.age||"")}" placeholder="e.g. 21" aria-label="Age" /></div>
       <div class="field"><label>Instagram</label><input class="pf-instagram" data-id="${p.id}" value="${esc(p.instagram||"")}" placeholder="@handle" aria-label="Instagram" /></div>
@@ -895,6 +901,7 @@ function bindActions(){
       name,
       position:  box.querySelector(".pf-position").value.trim(),
       sport:     box.querySelector(".pf-sport").value,
+      level:     box.querySelector(".pf-level").value || null,   // "" (None) -> NULL
       country:   box.querySelector(".pf-country").value.trim() || null,
       age:       box.querySelector(".pf-age").value.trim() || null,
       instagram: box.querySelector(".pf-instagram").value.trim() || null,
