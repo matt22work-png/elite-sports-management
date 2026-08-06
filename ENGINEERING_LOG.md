@@ -11,6 +11,69 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Master roster code is now FULLY admin-managed via cached lookup (2026-08-06, session 5) — SUPERSEDES "hardcoded ESM13, do not remove"
+
+**⚠️ Supersedes prior guidance.** Earlier this session the fix hardcoded `const
+MASTER_ACCESS_CODE = "ESM13"` as a synchronous fallback and the log/memory said "DO NOT
+re-remove the hardcoded ESM13 check." **That is no longer true.** There is NO hardcoded code in
+`index.html` anymore. The master code is 100% admin-controlled (DB `app_settings.roster_master_code`)
+and Sam can change OR retire it from the admin panel with no deploy. The reliability property is
+preserved by CACHING the admin-set code in localStorage instead of pinning a fixed string.
+
+**Why.** The hardcode made "ESM13" permanently unchangeable — retiring/rotating it required a code
+deploy, defeating the point of the admin-managed code. Goal: keep the "always works instantly, even
+if the esm.sh CDN import is slow/blocked" property WITHOUT a fixed string.
+
+**Mechanism.**
+- New RPC `public.get_roster_code()` (migration `add_get_roster_code_rpc`; SECURITY DEFINER,
+  `search_path=''`, granted to anon) returns the current master code TEXT, or NULL when
+  empty/retired. The code is a soft convenience gate, NOT a secret (it shipped in page source as
+  ESM13 for most of its life), so exposing the current value to anon is consistent. Kept
+  `verify_roster_code()` (true/false) for the live check. Snapshot: `site/supabase-app-settings.sql`.
+- `index.html` `boot()`: on every successful load, calls `get_roster_code()` and caches the value
+  in `localStorage['esm_roster_code_v1']` (normalized trim+UPPER). **Only mutates the cache when
+  the server actually answered (`!error`)** — on a network error the RPC resolves to
+  `{data:null,error}`, and writing that null would WIPE the last-known-good cache and destroy the
+  offline fallback exactly when the network is down; so on error the existing cache is preserved.
+  A retired code (server returns null, no error) clears the cache.
+- Gate handler (`#gateForm`): (1) per-user SHA-256 personal codes — offline, unchanged; (2) NEW
+  fast path — compare `val` against the cached value SYNCHRONOUSLY (network-free; replaces the
+  hardcoded ESM13); (3) live `verify_roster_code()` for a code Sam JUST changed that this browser
+  hasn't re-cached — and on success it seeds the cache with the confirmed-current value.
+- Admin (`admin/index.html`): "Roster access code" card now shows the ACTIVE code prominently
+  (`#rc-current-val`), and a BLANK save retires the master code entirely (confirm dialog; stores
+  '' → verify returns false, get_roster_code returns null → browsers clear their cache).
+
+**Self-update / rotation semantics.** Changing the code in admin is live for return visitors on
+their NEXT page load (boot re-caches). The old code stops working after that reload: cache holds
+only the new value (path 2 fails for the old code) and the live RPC (path 3) rejects it. Narrow
+accepted edge case (explicitly signed off in the task): a BRAND-NEW visitor with an empty cache AND
+a blocked/slow network has only the live RPC path — same as before the ESM13 hardcode ever existed;
+not a regression, since caching covers the vast majority of return visits.
+
+**Validation (headless puppeteer-core vs prod, after each deploy — 22/22 across 3 phases + DB
+checks).** Orchestrated by changing `app_settings` via SQL (identical to the admin Save's
+`app_settings` UPDATE; admin RLS write-path already verified in session 4):
+- Phase TEST99 (10/10): fresh session unlocks with the new code (desktop+mobile); `  test99  `
+  case/whitespace unlocks; OLD "ESM13" stays locked; garbage stays locked; per-user SHA-256 still
+  unlocks; **net-blocked (esm.sh + supabase.co both aborted) + cached code unlocks via cache
+  alone** (desktop+mobile) — the reliability test; net-blocked + OLD stays locked; net-blocked +
+  per-user SHA-256 unlocks offline.
+- Phase RETIRE (2/2): blank code → fresh visitor can't unlock; a stale-cache browser clears its
+  cache on reload and rejects the old code.
+- Phase RESTORE ESM13 (10/10): same battery, confirming the live site is back to the real
+  handed-out code ("ESM13"), fully working through the new mechanism.
+This run also CAUGHT AND FIXED a real bug: the first implementation cleared the cache on a
+network-error RPC (see boot() note above) — fixed in commit 4af31be before re-validating.
+
+**⚠️ Bug caught mid-validation** — see the cache-preservation note; do not reintroduce
+`cacheMasterCode(mc)` without the `!error` guard.
+
+Commits `e28b3b2` (feature) + `4af31be` (cache-preservation fix), pushed; Vercel auto-deployed and
+confirmed live before each test phase. Live master code left as "ESM13".
+
+---
+
 ### Add editable "Level" field (College/International/Pro) to players (2026-08-06, session 5)
 
 Sam-editable classification per player, managed live from the admin panel, shown publicly.
