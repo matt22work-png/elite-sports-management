@@ -745,12 +745,24 @@ const STRIPE_CONTACT_URL = "";
 const ROSTER_CODE_HASHES = ["99b2bfb3a4ac35e32491d22207e082500404dbbd30f0cd8a5152cd6185c3cc58"];
 const UNLOCK_KEY = "esm_roster_unlock_v1";
 /* ===== UNIVERSAL MASTER ACCESS CODE ==========================================
-   The single "trusted people" master code (players / coaches / scouts) now lives in the
-   DATABASE (public.app_settings, key 'roster_master_code', seeded "ESM13") and is managed
-   by Sam from the Admin panel → "Roster access code" — no code deploy needed to change it.
-   The gate (#gateForm submit) validates the entered value via the verify_roster_code() RPC,
-   which compares server-side (case-insensitive) and returns only true/false, so the current
-   code is never shipped in the page source. Per-user SHA-256 codes (above) are unaffected. */
+   "ESM13" is the always-on master code for trusted people (players / coaches / scouts).
+   It is checked SYNCHRONOUSLY as a hardcoded, case-insensitive, whitespace-trimmed string
+   in the #gateForm submit handler, with ZERO network/DB/async dependency — so it unlocks
+   the roster reliably even if the Supabase client hasn't finished loading, the esm.sh CDN
+   import failed, the device is offline, or the DB is momentarily unavailable.
+
+   On TOP of that, Sam can manage additional custom codes from the Admin panel: those live in
+   the DATABASE (public.app_settings, key 'roster_master_code') and are validated via the
+   verify_roster_code() RPC (server-side, case-insensitive, true/false only). That path is
+   BEST-EFFORT — when it works it lets Sam rotate/add a code with no deploy, but it is never
+   the only thing standing between a trusted user and the roster. Per-user SHA-256 codes
+   (above) are also unaffected.
+
+   HISTORY: ESM13 was briefly moved to be DB-RPC-ONLY (commit 2c39e13), which made it depend
+   on the async esm.sh import + a live network round-trip; a real user with ESM13 was rejected
+   because SB was still null when they submitted. The hardcoded fallback below restores the
+   original always-works behaviour while keeping the admin-managed custom-code feature. */
+const MASTER_ACCESS_CODE = "ESM13";
 
 /* ===== Media (Tenerife Winter League) ===== */
 const GALLERY = [
@@ -1626,11 +1638,21 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
     document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
     return;
   }
-  // 2) Master roster code: Sam manages it in the admin panel (app_settings.roster_master_code,
-  //    seeded "ESM13"). We send the entered value to verify_roster_code(), which compares it
-  //    server-side (case-insensitive) and returns only true/false — the code itself is never
-  //    exposed to the browser. Changing it in admin takes effect IMMEDIATELY, no deploy: the
-  //    new code unlocks and the previous one stops working.
+  // 2) Universal master code ESM13 — checked SYNCHRONOUSLY with no network/DB/async
+  //    dependency, so it ALWAYS unlocks for a trusted user even if SB never loaded (slow
+  //    device, esm.sh blocked, offline, DB paused). `val` is already trimmed + upper-cased,
+  //    and MASTER_ACCESS_CODE is upper-case, so this is inherently case-insensitive +
+  //    whitespace-tolerant. This is the reliable path; path 3 is a bonus, not a crutch.
+  if(val===MASTER_ACCESS_CODE.toUpperCase()){
+    unlockRoster();
+    document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
+    return;
+  }
+  // 3) Admin-managed custom codes (BEST-EFFORT): Sam can add/rotate a code in the admin panel
+  //    (app_settings.roster_master_code) with no deploy. We send the entered value to
+  //    verify_roster_code(), which compares server-side (case-insensitive) and returns only
+  //    true/false — the code itself is never exposed to the browser. This runs only when SB
+  //    is available; if it isn't, ESM13 (path 2) has already handled trusted users.
   try{
     if(SB){
       const {data:ok,error}=await SB.rpc("verify_roster_code",{p_code:val});
