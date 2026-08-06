@@ -1797,8 +1797,12 @@ async function boot(){
       // Refresh the cached master roster code FIRST (independent try), so the gate's fast
       // synchronous path has the current value on the next interaction — and so a retired code
       // clears the cache. Kept separate from the players fetch so a roster error can't skip it.
-      try{const {data:mc}=await SB.rpc("get_roster_code");cacheMasterCode(mc);}
-      catch(ex){console.warn("roster code cache refresh failed",ex);}
+      // CRITICAL: only mutate the cache when the server actually ANSWERED (no error). On a
+      // network error the RPC resolves to {data:null,error} — writing that null would WIPE the
+      // last-known-good cache and destroy the offline fallback exactly when it's needed, so we
+      // preserve the existing cache on error and only refresh/clear on a real response.
+      try{const {data:mc,error:mcErr}=await SB.rpc("get_roster_code");if(!mcErr)cacheMasterCode(mc);}
+      catch(ex){console.warn("roster code cache refresh failed (cache preserved)",ex);}
       // Only approved players are publicly readable (enforced by RLS too). We request
       // just the public display columns — NOT the intake PII (age/phone/email/instagram/
       // message) — so an approved athlete's contact details are never sent to the browser.
