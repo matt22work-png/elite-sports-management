@@ -11,6 +11,66 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### FIX: ESM13 master code not unlocking roster (2026-08-06, session 5)
+
+**Symptom (real user).** A real user typed `ESM13` (case-insensitive) into the roster gate's
+Code field and it did NOT unlock the roster — it showed the "that code isn't right" error.
+
+**Investigation.**
+1. Gate logic (`site/index.html` `#gateForm` submit, ~L1614) has two paths: (1) per-user
+   SHA-256 codes checked offline against `ROSTER_CODE_HASHES`, then (2) the DB-backed
+   `verify_roster_code()` RPC. I confirmed `SHA-256("ESM13") = 8225e2e0…`, which is **NOT** in
+   `ROSTER_CODE_HASHES` (only `99b2bfb3…` is). So **ESM13 was recognized ONLY by the RPC path.**
+2. DB state (prod `sbexwyvsgqayxrsrlrpm`, ACTIVE_HEALTHY — not paused): `app_settings` table
+   exists, `verify_roster_code(text)` exists, seed row `roster_master_code = 'ESM13'` present,
+   anon has EXECUTE, and the RPC returns `true` for `ESM13`/`esm13`/`  Esm13  `. **The DB
+   migration was fully complete and correct — the server side was never the problem.**
+3. **Root cause = client-side fragility introduced by commit `2c39e13` (session 4, Part 2).**
+   That commit deleted the synchronous hardcoded `MASTER_ACCESS_CODE = "ESM13"` constant and
+   made ESM13 depend on the RPC path. But the RPC path is guarded by `if(SB)`, and `SB` is
+   assigned only *after* `boot()` finishes an async dynamic `import()` from the external CDN
+   `esm.sh` (L1745). So whenever `SB` is still `null`, path 2 is silently skipped and — because
+   ESM13 isn't in the offline hash list — a valid ESM13 is REJECTED. `SB` is null when: the user
+   submits before the CDN import resolves (race — common on a fast typist / slow connection);
+   `esm.sh` is blocked or down (ad-blockers, corporate/school networks, CDN hiccup) — the
+   `catch` swallows it and `SB` stays null forever; the device is offline; or the DB was
+   momentarily paused. The pre-migration hardcoded string compare had none of these
+   dependencies, so it *always* worked. The migration regressed reliability for the exact
+   people (trusted players/coaches/scouts) the master code exists for.
+4. Caching: not the cause, but the SW (`sw.js`) is network-first for HTML so returning
+   visitors get new deploys; still bumped `CACHE` esm-v5→esm-v6 to purge any stale bundle.
+
+**Fix (simple, reliable — both paths work, per the "reliable fallback + DB on top" directive).**
+Restored a **synchronous, network-free hardcoded `ESM13` check** in the gate handler that always
+unlocks (case-insensitive + whitespace-trimmed; `val` is already `.trim().toUpperCase()` and is
+compared to `MASTER_ACCESS_CODE.toUpperCase()`), inserted as path 2 BEFORE the RPC call. The
+DB-backed `verify_roster_code()` RPC is KEPT as path 3 (best-effort) so Sam can still add/rotate
+admin-managed custom codes with no deploy — but ESM13 no longer depends on any async/network
+path. Per-user SHA-256 codes (path 1) are byte-for-byte untouched. Files: `site/index.html`
+(added `const MASTER_ACCESS_CODE = "ESM13"` + synchronous path-2 check), `site/sw.js` (cache bump).
+No DB change needed (migration was already correct).
+
+**Live validation (headless Chrome via puppeteer-core against prod, after deploy — 8/8 PASS).**
+Each case ran in a fresh incognito context with cache disabled, confirmed the roster started
+`is-locked`, then verified unlock via `#rosterWrap` losing `is-locked` + `localStorage
+esm_roster_unlock_v1==='1'` + the ✓ note:
+- A `ESM13`, B `esm13`, C `Esm13`, D `  esm13  ` → all UNLOCK (desktop 1280×900).
+- E per-user SHA-256 path (injected a test code's hash via the page's own `sha256Hex` into
+  `ROSTER_CODE_HASHES`, then unlocked with it) → UNLOCKS ⇒ SHA path unaffected.
+- F wrong code `NOPE123` → stays LOCKED + shows error (negative control).
+- G `ESM13` on MOBILE viewport (390×844) → UNLOCKS.
+- H `ESM13` with `esm.sh` request BLOCKED so `SB` stays **null** (reproduces the exact original
+  failure mode) → still UNLOCKS. This is the definitive proof the fix is independent of the
+  async/network/DB path.
+
+Commit `73d919e` "Fix ESM13 master code not unlocking roster access" (pushed to `main`; Vercel
+auto-deployed; new bundle confirmed live before testing). Assumption: the opaque plaintext of the
+existing `99b2bfb3…` per-user code is not recorded anywhere I could find, so path 1 was validated
+functionally (inject-hash-and-unlock) rather than with its real plaintext — acceptable because the
+path-1 code is unchanged in the diff.
+
+---
+
 ### Admin-managed roster access code — DB-backed, no-deploy (2026-08-04, session 4 — Part 2)
 
 Replaced the hardcoded `MASTER_ACCESS_CODE = "ESM13"` constant with a database-backed master code
