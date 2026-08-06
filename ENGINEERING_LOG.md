@@ -11,6 +11,58 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Add editable "Level" field (College/International/Pro) to players (2026-08-06, session 5)
+
+Sam-editable classification per player, managed live from the admin panel, shown publicly.
+
+**DB** (migration `add_player_level_field`, APPLIED to prod; snapshot `site/supabase-player-level.sql`).
+New nullable `public.players.level text` with `CHECK (level is null or level in
+('college','international','pro'))`. No default — a player with no level shows no badge. Grant:
+`grant select (level) on public.players to anon` — REQUIRED because anon reads `players` via
+COLUMN-LEVEL grants (table-level SELECT was revoked in supabase-harden-players-columns.sql), so
+new columns aren't auto-readable by the public site. `authenticated` has TABLE-LEVEL
+select/update/insert, so admin edits (as authenticated) cover the column with no extra grant.
+
+**Admin** (`site/admin/index.html`). Added `levelOptions()` helper (mirrors `sportOptions`; first
+option is `— None —` → NULL) and a "Level" `<select>` in the player edit form right after Sport.
+Save reuses the existing `[data-saveprofile]` handler — one line added to the patch:
+`level: box.querySelector(".pf-level").value || null`. Admin reads via `select("*")` so the
+dropdown pre-selects the current value. Admin panel stays EN-only (option labels hardcoded).
+
+**Public** (`site/index.html`). Added `level` to boot()'s anon `.select(...)`. New `levelLabel(v)`
+helper returns the trilingual label (empty when unset). Rendered as a teal `.lvl` pill (distinct
+from the gold position text) on the roster card body (after position) and inline in the detail
+modal's `.sh-pos`. i18n keys `level_college/international/pro` added to EN/ES/IT dicts:
+EN College/International/Pro · ES Universitario/Internacional/Profesional · IT
+Universitario/Internazionale/Professionista.
+
+**Scoping (flagged).** Per the task's default, this is display+edit only — NO new roster filter
+tab. The site already has two filter systems (`activeSport` Baseball/Softball + `active`
+position-group tabs); a third is non-trivial (new bar, state, render path, i18n tab labels) and
+Matt didn't ask for it. Easy to add later if wanted. Also: the 17 pre-generated static
+`players/*.html` pages are built from `players.json` (no `level` data) — they don't show the
+badge; the DB-driven homepage roster card (which every player has) does, so the requirement
+"visible on each player's card" is met. Regenerating static pages with level would need a
+generator change + level in the export — out of scope, flagged.
+
+**Validation.**
+- i18n validator (`node validate_i18n.mjs`): 0 hard problems, all keys resolve EN/ES/IT, scripts
+  parse (only an advisory length flag on IT "Professionista", a `nowrap` badge — fine).
+- Node `--check` on both inline module scripts (admin + index): syntax OK.
+- Admin write-path via REAL RLS (simulated `authenticated` + jwt claims): admin (mattswagj) UPDATE
+  → 1 row; non-admin UPDATE → 0 rows (blocked); CHECK rejects out-of-set value. Confirms Save
+  works for admins only and existing field edits are unaffected (same patch/handler, +1 line).
+- Live headless (puppeteer-core vs prod, after deploy): seeded 3 real approved players
+  (international/college/pro), verified the badge text on the roster CARD and detail MODAL across
+  EN/ES/IT on BOTH desktop (1280×900) and mobile (390×844), plus the negative case (no badge when
+  level null). 22/22 PASS. Test data then reverted to NULL (didn't assert classifications I can't
+  verify) — all players currently have level=null; Sam sets real values from admin.
+
+Commit `abdf0d9` "Add editable Level field (College/International/Pro) to player profiles"
+(pushed; Vercel auto-deployed; new bundle confirmed live before testing).
+
+---
+
 ### FIX: ESM13 master code not unlocking roster (2026-08-06, session 5)
 
 **Symptom (real user).** A real user typed `ESM13` (case-insensitive) into the roster gate's
