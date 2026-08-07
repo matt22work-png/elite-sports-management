@@ -11,6 +11,53 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Country flags fixed (emoji → flagcdn images) + full regression sweep (2026-08-06, session 5)
+
+**PRIORITY BUG — country flags not rendering. Root cause (two compounding issues):**
+1. **Emoji flags don't render on Windows.** Flags were Unicode regional-indicator emoji (🇻🇪, 🇩🇴 …).
+   Windows ships **no emoji-flag font**, so Chrome/Edge on Windows — the OS Sam and many ESM users
+   run — render them as blank or two letter-boxes, never a flag. (Firefox bundles its own emoji
+   font so it looked fine there, which is why it seemed intermittent.)
+2. **Inconsistent `country` data + mismatched lookup tables.** Live data has `country` stored three
+   ways: full name ("Venezuela"), a flag **emoji** ("🇩🇴", "🇻🇪"), even **multi** ("🇪🇸/🇲🇽/🇻🇪", Daniel).
+   The card body used `countryFlag()`→`CC_FLAG` (English names only) and silently returned "" for
+   emoji-stored or unlisted countries; the top-left used `flagFor()`→a different `FLAGS` table.
+
+**Fix — image-based flags via flagcdn.com (judgment call, documented).** Chosen over emoji-with-a-
+Twemoji-font because images are reliable on every OS/browser and also let us normalize the messy
+data. New resolver (index.html): `iso2For(p)` returns an ISO-3166 alpha-2 code from a stored flag
+emoji (decoding regional indicators, e.g. 🇻🇪→"ve") OR the country name (EN/ES/IT, via `NAME_ISO`
+built from DIAL_CODES — single source of truth — plus market-language aliases). `displayCountry(p)`
+converts emoji-stored countries (incl. multi → "Spain / Mexico / Venezuela") back to names.
+`flagImg(iso,…)` emits `<img src="https://flagcdn.com/{iso}.svg" loading="lazy">`. The country NAME
+text still shows beside the flag, so a failed image degrades gracefully. Applied to: roster card
+(top-left flag + heritage flag + body country line) and detail modal (index.html); scout portal
+roster (scout/index.html, self-contained copy of the resolver); and the 17 static player pages
+(gen_player_pages.mjs updated + regenerated — this also refreshed their embedded card CSS, so they
+picked up the flag + Level-badge styles they were missing). **No player data mutated** — the
+resolver handles all three storage formats, so the inconsistent data renders correctly as-is.
+Removed the old emoji `FLAGS`/`flagFor`/`CC_FLAG`/`countryFlag`. Commit `57aac23`.
+Validated live (headless Chrome, desktop 1280 + mobile 390): **40/40 flag images load** with
+`naturalWidth>0` on both viewports; emoji-stored countries resolve correctly (Brayan→Dominican
+Republic, Jose→Venezuela, Daniel→"Spain / Mexico / Venezuela"); Oscar Romero (no country) correctly
+shows no flag. Screenshot confirmed visually. NOTE for future: flagcdn images are opaque
+cross-origin so the SW won't cache them (no risk of pinning a broken flag); if flagcdn is ever
+unreachable the country name still shows.
+
+**FULL REGRESSION SWEEP — all live-tested, nothing broken (fixes were only needed for the flag bug).**
+- ✅ **i18n**: `validate_i18n.mjs` — 0 hard problems across index/portal/scout/register/tenerife; all keys resolve EN/ES/IT.
+- ✅ **Payment links/prices**: all 6 (PayPal py.pl + Wise × roster €49.99 / profile €129.99 / Tenerife €599.99) present and matching across every surface (index/register/scout/portal/tenerife).
+- ✅ **Roster filters**: headless clicked all **15** sport×group combos — every one renders cards or the empty-state (never a blank/broken list), **zero card-rect overlap**.
+- ✅ **Page health**: homepage + /portal/ + /scout/ + /admin/ + /register/ + /tenerife/ all load with key UI and **no unexpected JS/console errors**.
+- ✅ **Jesús Delgado** appears **once** (id=7, approved — no duplicate).
+- ✅ **Stale wording**: no "access code"/"unlock code" in any public page (gate copy is "Code/Código/Codice" + "Unlock/Desbloquear/Sblocca"). The only "access code" strings are the admin panel's intentional "Roster access code" feature label/toast (Sam-facing).
+- ✅ **RLS boundaries (anon REST)**: `players.email`, `profiles`, `scouts`, `player_notes`, `app_settings` all return 42501 to anon; `scout_roster()` denied to anon; public approved-player names readable. Intact after the Level + master-code work.
+- ✅ **Player portal flow (real E2E)**: signed up a throwaway player via the API — got an **immediate session** (email-confirm OFF), `handle_new_user()` **auto-created the profile** (role=player, pending), and RLS scoped reads to **own data only**; admin-only `player_notes` invisible. Test account deleted afterward (0 leftover). NOTE: a logged-in player reading `players` sees 0 approved rows — this is **by design** (the `read approved players` policy is **anon-only**; the homepage reads via a session-less anon client, and approved scouts get the full roster via the `scout_roster()` SECURITY DEFINER RPC). Not a regression.
+- ✅ **Admin mechanisms**: /admin/ loads clean and contains the master-code editor (view/change/**retire** — `rc-current-val`/`showActiveCode`), the Level dropdown, etc.; the `admin-reset-user-password` Edge Function correctly rejects unauth/anon with **401** ("Not signed in."). Live master code confirmed = **ESM13**.
+- ❓ **Fully-interactive admin/scout actions** (clicking approve/reject, editing a player, running a password reset, changing the code from the UI) were **not** driven end-to-end because they require Sam's admin password, which I don't have. Each was validated at the mechanism layer instead: RLS write-path (admin allowed / non-admin blocked, verified in sessions 4–5), page-load, element presence, and Edge-Function auth. Recommend Sam do a 2-minute click-through when convenient.
+
+---
+
 ### Master roster code is now FULLY admin-managed via cached lookup (2026-08-06, session 5) — SUPERSEDES "hardcoded ESM13, do not remove"
 
 **⚠️ Supersedes prior guidance.** Earlier this session the fix hardcoded `const
