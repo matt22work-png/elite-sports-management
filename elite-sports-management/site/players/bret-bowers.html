@@ -158,10 +158,22 @@
   .pcard .top::after{content:"";position:absolute;inset:0;opacity:.07;background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 8px)}
   .mono{font-family:'Anton';font-size:46px;color:var(--gold);z-index:1;width:96px;height:96px;border-radius:50%;border:2px solid rgba(217,177,84,.4);display:grid;place-items:center;background:rgba(6,20,42,.45)}
   .tier{position:absolute;top:12px;right:12px;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:rgba(6,20,42,.7);border:1px solid var(--line);color:var(--gold-soft);z-index:2}
-  .flag{position:absolute;top:12px;left:12px;font-size:19px;z-index:2;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+  .flag{position:absolute;top:12px;left:12px;font-size:19px;z-index:2;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));display:flex;align-items:center;gap:5px}
+  /* Image-based country flags (flagcdn) — reliable cross-platform, unlike emoji flags. */
+  .flag .flagimg{height:22px;width:auto;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.5);display:block}
+  .flag .flagimg.heritageimg{height:17px}
+  .pcard .country .cflagimg{height:13px;width:auto;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.35);flex:none}
+  .sh-flags{display:inline-flex;align-items:center;gap:6px;vertical-align:middle}
+  .sh-flags .flagimg{height:20px;width:auto;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+  .sh-flags .flagimg.heritageimg{height:16px}
   .pcard .body{padding:17px 18px 20px}
   .pcard .body h3{font-size:19px;line-height:1.15}
   .pcard .pos{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:3px}
+  /* Level classification badge (College/International/Pro) — teal pill, distinct from the
+     gold position text. Used on the roster card body and inline in the detail modal. */
+  .lvl{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:rgba(45,150,160,.14);border:1px solid var(--teal-soft);color:var(--teal-soft);line-height:1.1;white-space:nowrap}
+  .pcard .lvl{margin-top:9px}
+  .sh-pos .lvl{margin-left:9px;vertical-align:middle}
   .pcard .country{color:var(--muted);font-size:13px;margin-top:9px;display:flex;align-items:center;gap:6px}
   .pcard .country .cflag{font-size:15px;line-height:1;flex:none}
   .pcard .team{color:var(--muted);font-size:13px;margin-top:11px;display:flex;align-items:center;gap:7px}
@@ -397,7 +409,7 @@
   .pp-tier-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .pp-tier{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:rgba(6,20,42,.7);border:1px solid var(--line);color:var(--gold-soft)}
   .pp-flagchip{font-size:13px;font-weight:700;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
-  .pp-flagchip .pp-flag{font-size:18px}
+  .pp-flagchip .pp-flag{height:16px;width:auto;border-radius:3px;box-shadow:0 1px 2px rgba(0,0,0,.4)}
   .pp-sport{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-soft);border:1px solid var(--line);border-radius:999px;padding:5px 11px;background:rgba(6,20,42,.5)}
   .pp-headline{font-size:clamp(24px,4.4vw,34px);line-height:1.25;margin:0 0 12px}
   .pp-name-line{display:block;font-size:.62em;color:var(--gold-soft);font-weight:700;margin-bottom:6px;letter-spacing:.02em}
@@ -450,7 +462,7 @@
   <div class="pp-hero">
     <div class="pp-tier-row">
       <span class="pp-tier">College</span>
-      <span class="pp-flagchip"><span class="pp-flag">🇺🇸</span>United States</span>
+      <span class="pp-flagchip"><img class="pp-flag" src="https://flagcdn.com/us.svg" alt="" width="24" height="18" loading="lazy" decoding="async">United States</span>
       <span class="pp-sport">Baseball</span>
     </div>
     <h1 class="display pp-headline"><span class="pp-name-line">Bret Bowers</span>College Infielder — Campbellsville University (NAIA)</h1>

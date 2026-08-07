@@ -130,6 +130,14 @@ const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+/* Country flags as IMAGES (flagcdn) — emoji flags don't render on Windows (no emoji-flag
+   font). Resolve each player to an ISO code from a stored flag emoji or the country name. */
+const _NAME_ISO={"italy":"it","italia":"it","united states":"us","usa":"us","estados unidos":"us","stati uniti":"us","dominican republic":"do","república dominicana":"do","repubblica dominicana":"do","venezuela":"ve","spain":"es","españa":"es","spagna":"es","colombia":"co","germany":"de","alemania":"de","germania":"de","portugal":"pt","canada":"ca","mexico":"mx","méxico":"mx","cuba":"cu","puerto rico":"pr","panama":"pa","nicaragua":"ni","costa rica":"cr","france":"fr","francia":"fr","united kingdom":"gb","netherlands":"nl","australia":"au","japan":"jp","south korea":"kr","brazil":"br","brasil":"br","argentina":"ar","curaçao":"cw","curacao":"cw","aruba":"aw"};
+const _ISO_NAME={it:"Italy",us:"United States",do:"Dominican Republic",ve:"Venezuela",es:"Spain",co:"Colombia",de:"Germany",pt:"Portugal",ca:"Canada",mx:"Mexico",cu:"Cuba",pr:"Puerto Rico",pa:"Panama",ni:"Nicaragua",cr:"Costa Rica",fr:"France",gb:"United Kingdom",nl:"Netherlands",au:"Australia",jp:"Japan",kr:"South Korea",br:"Brazil",ar:"Argentina",cw:"Curaçao",aw:"Aruba"};
+function emojiToIso(s){if(!s)return"";const o=[];for(const ch of String(s)){const cp=ch.codePointAt(0);if(cp>=0x1F1E6&&cp<=0x1F1FF){o.push(String.fromCharCode(cp-0x1F1E6+97));if(o.length===2)break;}}return o.length===2?o.join(""):"";}
+const iso2For=p=>emojiToIso(p&&p.flag)||emojiToIso(p&&p.country)||_NAME_ISO[((p&&p.country)||"").trim().toLowerCase()]||"";
+function displayCountry(p){const c=((p&&p.country)||"").trim();if(!c)return"";if(/[\u{1F1E6}-\u{1F1FF}]/u.test(c)){const names=[];let pair="";for(const ch of c){const cp=ch.codePointAt(0);if(cp>=0x1F1E6&&cp<=0x1F1FF){pair+=String.fromCharCode(cp-0x1F1E6+97);if(pair.length===2){if(_ISO_NAME[pair])names.push(_ISO_NAME[pair]);pair="";}}}return names.join(" / ");}return c;}
+function flagImg(iso){return iso?`<img src="https://flagcdn.com/${iso}.svg" alt="" style="height:13px;width:auto;border-radius:2px;vertical-align:middle;box-shadow:0 1px 2px rgba(0,0,0,.35)" width="20" height="15" loading="lazy" decoding="async">`:"";}
 const initials = n => (n||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
 
 /* ---------- i18n (EN / ES / IT) — shared `esm_lang` key with the rest of the site.
@@ -392,7 +400,7 @@ function card(p){
       <span class="avatar" ${p.image_url ? `style="background-image:url('${esc(p.image_url)}')"` : ""}>${p.image_url ? "" : esc(initials(p.name))}</span>
       <div style="flex:1">
         <h3 class="display">${esc(p.name)}</h3>
-        <div class="pos">${esc(p.position || p.group || "")} ${p.flag || ""} ${p.country ? "· "+esc(p.country) : ""} · ${esc(p.sport || "Baseball")}</div>
+        <div class="pos">${esc(p.position || p.group || "")} ${flagImg(iso2For(p))} ${(()=>{const dn=displayCountry(p);return dn?"· "+esc(dn):"";})()} · ${esc(p.sport || "Baseball")}</div>
       </div>
     </div>
     ${contact ? `<div class="contact">${contact}</div>` : ""}

@@ -201,7 +201,14 @@
   .pcard .top::after{content:"";position:absolute;inset:0;opacity:.07;background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 8px)}
   .mono{font-family:'Anton';font-size:46px;color:var(--gold);z-index:1;width:96px;height:96px;border-radius:50%;border:2px solid rgba(217,177,84,.4);display:grid;place-items:center;background:rgba(6,20,42,.45)}
   .tier{position:absolute;top:12px;right:12px;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:rgba(6,20,42,.7);border:1px solid var(--line);color:var(--gold-soft);z-index:2}
-  .flag{position:absolute;top:12px;left:12px;font-size:19px;z-index:2;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+  .flag{position:absolute;top:12px;left:12px;font-size:19px;z-index:2;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));display:flex;align-items:center;gap:5px}
+  /* Image-based country flags (flagcdn) — reliable cross-platform, unlike emoji flags. */
+  .flag .flagimg{height:22px;width:auto;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.5);display:block}
+  .flag .flagimg.heritageimg{height:17px}
+  .pcard .country .cflagimg{height:13px;width:auto;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.35);flex:none}
+  .sh-flags{display:inline-flex;align-items:center;gap:6px;vertical-align:middle}
+  .sh-flags .flagimg{height:20px;width:auto;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+  .sh-flags .flagimg.heritageimg{height:16px}
   .pcard .body{padding:17px 18px 20px}
   .pcard .body h3{font-size:19px;line-height:1.15}
   .pcard .pos{color:var(--gold-soft);font-size:13px;font-weight:700;margin-top:3px}
@@ -1067,11 +1074,8 @@ const T = {
     admin_link:"Admin",login_h:"Accesso Admin",login_sub:"Gestisci atleti, statistiche e foto",login_email:"Email",login_pass:"Password",login_btn:"Accedi"}
 };
 
-const FLAGS={"Dominican Republic":"🇩🇴","República Dominicana":"🇩🇴","Repubblica Dominicana":"🇩🇴","Venezuela":"🇻🇪","Spain":"🇪🇸","España":"🇪🇸","Spagna":"🇪🇸","Colombia":"🇨🇴","Italy":"🇮🇹","Italia":"🇮🇹","United States":"🇺🇸","USA":"🇺🇸","Estados Unidos":"🇺🇸","Stati Uniti":"🇺🇸","Germany":"🇩🇪","Alemania":"🇩🇪","Germania":"🇩🇪","Portugal":"🇵🇹","Canada":"🇨🇦","Mexico":"🇲🇽","México":"🇲🇽"};
-// Show a real country flag next to every player: use a stored flag if present, else
-// derive it from the country, else a neutral globe. Keeps flags on registered/legacy
-// players that never had the emoji stored.
-const flagFor=p=>p.flag||FLAGS[p&&p.country]||"🌎";
+// (Country flags moved to image-based flagcdn rendering — see the resolver just below the
+//  DIAL_CODES table. Emoji flags don't render on Windows, so they're no longer used.)
 
 /* Country-code phone input: a dial-code <select> + a number field, combined into a
    proper international string ("+39 340…") on submit. Curated to ESM's markets
@@ -1091,11 +1095,39 @@ const DIAL_CODES=[
   {c:"AR",n:"Argentina",d:"+54",f:"🇦🇷"},{c:"CW",n:"Curaçao",d:"+599",f:"🇨🇼"},
   {c:"AW",n:"Aruba",d:"+297",f:"🇦🇼"},
 ];
-// Country → flag derived straight from the DIAL_CODES list above (single source of
-// truth, shared with the phone country-code input) — no second hardcoded mapping.
-// Unknown/unlisted country → "" so the card just shows the text with no flag.
-const CC_FLAG = DIAL_CODES.reduce((m,x)=>{ if(!(x.n in m)) m[x.n]=x.f; return m; }, {});
-const countryFlag = c => CC_FLAG[c] || "";
+/* ===== Country flags as IMAGES (flagcdn.com), not emoji ==========================
+   Windows (Chrome/Edge) — the OS Sam and many of ESM's users run — ships NO emoji-flag
+   font, so Unicode flag emoji (🇻🇪 …) render as blank/letter boxes, not flags. Player
+   `country` data is also inconsistent: some full names, some stored as a flag emoji, even
+   multi ("🇪🇸/🇲🇽/🇻🇪"). So we resolve every player to an ISO-3166 alpha-2 code and render a
+   real <img> flag from flagcdn.com — reliable on every OS/browser. The country NAME text is
+   still shown beside it, so if the image ever fails to load the label degrades gracefully. */
+// name (EN/ES/IT) -> iso2, built from DIAL_CODES (single source of truth, shared with the
+// phone input) + market-language aliases for names that appear in EN/ES/IT roster data.
+const NAME_ISO = DIAL_CODES.reduce((m,x)=>{ m[x.n.toLowerCase()]=x.c.toLowerCase(); return m; }, {});
+Object.assign(NAME_ISO,{"república dominicana":"do","repubblica dominicana":"do","españa":"es","spagna":"es","italia":"it","estados unidos":"us","stati uniti":"us","usa":"us","alemania":"de","germania":"de","méxico":"mx","brasil":"br","francia":"fr","curacao":"cw","gran bretaña":"gb","regno unito":"gb","países bajos":"nl","paesi bassi":"nl"});
+const ISO_NAME = DIAL_CODES.reduce((m,x)=>{ m[x.c.toLowerCase()]=x.n; return m; }, {});
+// Decode a flag emoji (2 regional-indicator symbols) -> iso2 (e.g. "🇻🇪" -> "ve"), else "".
+function emojiToIso(s){
+  if(!s) return "";
+  const out=[];
+  for(const ch of String(s)){ const cp=ch.codePointAt(0); if(cp>=0x1F1E6&&cp<=0x1F1FF){ out.push(String.fromCharCode(cp-0x1F1E6+97)); if(out.length===2)break; } }
+  return out.length===2?out.join(""):"";
+}
+// Best iso2 for a player: a stored flag emoji, else the country (emoji or name).
+const iso2For=p=>emojiToIso(p&&p.flag)||emojiToIso(p&&p.country)||NAME_ISO[((p&&p.country)||"").trim().toLowerCase()]||"";
+// Human-readable country name, converting emoji-stored countries (incl. multi) back to names.
+function displayCountry(p){
+  const c=((p&&p.country)||"").trim(); if(!c) return "";
+  if(/[\u{1F1E6}-\u{1F1FF}]/u.test(c)){
+    const names=[]; let pair="";
+    for(const ch of c){ const cp=ch.codePointAt(0); if(cp>=0x1F1E6&&cp<=0x1F1FF){ pair+=String.fromCharCode(cp-0x1F1E6+97); if(pair.length===2){ if(ISO_NAME[pair])names.push(ISO_NAME[pair]); pair=""; } } }
+    return names.join(" / ");
+  }
+  return c;
+}
+// Render a flag <img> from flagcdn (SVG). alt is empty when a country label sits next to it.
+function flagImg(iso,cls,alt){ return iso?`<img class="${cls}" src="https://flagcdn.com/${iso}.svg" alt="${alt?esc(alt):""}" width="28" height="21" loading="lazy" decoding="async">`:""; }
 function fillCC(sel, def){ if(!sel)return; sel.innerHTML=DIAL_CODES.map(x=>`<option value="${x.d}"${x.c===def?" selected":""}>${x.f} ${esc(x.n)} ${x.d}</option>`).join(""); }
 function combinePhone(ccId, numId){ const cc=document.getElementById(ccId), num=document.getElementById(numId); const n=((num&&num.value)||"").trim(); return n?(((cc&&cc.value)||"")+" "+n).trim():""; }
 
@@ -1451,11 +1483,11 @@ function renderRoster(){
     const linkAttr=hasPage?`href="players/${encodeURIComponent(p.slug)}.html"`:`data-slug="${esc(p.slug)}"`;
     return `
     <${tag} class="pcard" ${linkAttr}>
-      <div class="top" style="${bgImg(p.image)}"><span class="flag">${esc(flagFor(p))}${p.heritage?(" "+esc(p.heritage)):""}</span>
+      <div class="top" style="${bgImg(p.image)}"><span class="flag">${flagImg(iso2For(p),"flagimg",displayCountry(p))}${p.heritage?flagImg(emojiToIso(p.heritage),"flagimg heritageimg",""):""}</span>
         ${p.tier?`<span class="tier">${esc(p.tier)}</span>`:""}${p.image?"":`<span class="mono">${initials(p.name)}</span>`}</div>
       <div class="body"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position)}</div>
         ${levelLabel(p.level)?`<div class="lvl">${esc(levelLabel(p.level))}</div>`:""}
-        ${p.country?`<div class="country">${countryFlag(p.country)?`<span class="cflag">${esc(countryFlag(p.country))}</span>`:""}${esc(p.country)}</div>`:""}
+        ${(()=>{const dn=displayCountry(p),iso=iso2For(p);return (dn||iso)?`<div class="country">${flagImg(iso,"cflagimg","")}${esc(dn)}</div>`:"";})()}
         ${p.teams&&p.teams[0]?`<div class="team">${esc(p.teams[0])}</div>`:""}<div class="view">${t("card_view")}</div></div>
     </${tag}>`;
   }).join("");
@@ -1607,7 +1639,7 @@ function openModal(slug){
   const meta=[p.born?("Born "+p.born):null,p.birthplace,p.bats?("Bats "+p.bats):null].filter(Boolean).join("  ·  ");
   document.getElementById("sheetContent").innerHTML=`
     <div class="sh-top"><span class="sh-mono" style="${bgImg(p.image)}">${p.image?"":initials(p.name)}</span>
-      <div><h3 class="display">${esc(p.name)} <span style="font-size:.6em">${esc(flagFor(p))}${esc(p.heritage)}</span></h3>
+      <div><h3 class="display">${esc(p.name)} <span class="sh-flags">${flagImg(iso2For(p),"flagimg",displayCountry(p))}${p.heritage?flagImg(emojiToIso(p.heritage),"flagimg heritageimg",""):""}</span></h3>
       <div class="sh-pos">${esc(p.position)}${levelLabel(p.level)?` <span class="lvl">${esc(levelLabel(p.level))}</span>`:""}</div><div class="sh-meta">${esc(meta)}</div></div></div>
     <div class="sh-body"><p class="bio">${esc(p.bio)}</p>
       ${p.stats&&p.stats.length?`<div class="sh-label">${t("modal_highlights")}</div><div class="sh-stats">${p.stats.map(s=>`<div class="sh-stat"><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join("")}</div>`:""}
