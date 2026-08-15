@@ -188,7 +188,11 @@
   .roster{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
   @media(max-width:900px){.roster{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:560px){.roster{grid-template-columns:1fr}}
-  .pcard{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;background:linear-gradient(180deg,var(--card),var(--navy-2));transition:.25s;text-align:left;width:100%}
+  /* color:var(--ink) is explicit so cards render identically whether the element is
+     an <a> (players with a static page) or a <button> (players without one). A button
+     otherwise inherits the UA default `buttontext` (black), which made some player
+     names render dark while others were light — the "inconsistent name color" bug. */
+  .pcard{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;background:linear-gradient(180deg,var(--card),var(--navy-2));transition:.25s;text-align:left;width:100%;color:var(--ink)}
   .pcard:hover{transform:translateY(-5px);border-color:var(--gold);box-shadow:0 18px 40px -20px rgba(0,0,0,.8)}
   .pcard .top{position:relative;height:150px;display:grid;place-items:center;background:radial-gradient(circle at 50% 22%,#16386a,#0a1f3c);overflow:hidden;background-size:cover;background-position:center}
   .pcard .top::after{content:"";position:absolute;inset:0;opacity:.07;background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 8px)}
@@ -392,6 +396,8 @@
   .gate{display:none}
   .roster-wrap.is-locked .gate{display:flex;position:absolute;inset:0;align-items:center;justify-content:center;z-index:3;padding:18px}
   .gate-pay-note{color:var(--muted);font-size:12.5px;margin-top:12px;line-height:1.5}
+  .gate-need{display:inline-block;margin-top:16px;font-size:12.5px;font-weight:600;color:var(--gold-soft)}
+  .gate-need:hover{color:var(--gold)}
   .gate-in{max-width:520px;width:100%;text-align:center;border:1px solid var(--gold);border-radius:20px;padding:32px 28px;background:linear-gradient(180deg,rgba(12,33,67,.97),rgba(6,20,42,.99));box-shadow:0 26px 60px rgba(0,0,0,.55)}
   .gate-lock{font-size:25px;margin-bottom:10px}
   .gate-in h3{font-family:'Anton';font-size:23px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px}
@@ -411,6 +417,15 @@
   .pc-includes li{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:#d6e1f2}
   .pc-includes li::before{content:"✓";color:var(--teal-soft);font-weight:800;flex:none}
   .pc-access{margin-top:12px;font-size:13px;font-weight:700;color:var(--gold-soft);letter-spacing:.02em}
+  /* Two-tier profile pricing (item 6) — informational cards, not payment buttons. */
+  .pc-tiers{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:10px 0 4px;text-align:left}
+  @media(max-width:560px){.pc-tiers{grid-template-columns:1fr}}
+  .pc-tier{border:1px solid var(--line);border-radius:16px;padding:20px 18px;background:rgba(6,20,42,.4);display:flex;flex-direction:column;gap:10px}
+  .pc-tier-plus{border-color:var(--gold);background:linear-gradient(180deg,rgba(217,177,84,.08),rgba(6,20,42,.4))}
+  .pc-tier-name{font-weight:800;font-size:13px;color:var(--gold-soft);letter-spacing:.03em;text-transform:uppercase}
+  .pc-tier .gate-price{font-size:32px}
+  .pc-tier-desc{font-size:13.5px;color:#d6e1f2;line-height:1.5;flex:1}
+  .pc-tier .btn{margin-top:6px;width:100%}
   .gate-err{margin-top:11px;font-size:13px;color:#ff9c9c;display:none}
   .gate-err.show{display:block}
   .unlocked-note{display:none;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--teal-soft);margin-bottom:16px;font-weight:700;letter-spacing:.03em}
@@ -511,8 +526,9 @@
         <li data-i18n="svc5_b2"></li>
         <li data-i18n="svc5_b3"></li>
         <li data-i18n="svc5_b4"></li>
+        <li data-i18n="svc5_b5"></li>
       </ul>
-      <div class="do-hl"><b data-i18n="svc5_hl_t"></b><span data-i18n="svc5_hl_d"></span></div><a class="svc-pay svc-signup" href="#join" data-svc="Representation" data-i18n="svc5_pay"></a></div>
+      <div class="do-hl"><b data-i18n="svc5_hl_t"></b><span data-i18n="svc5_hl_d"></span></div></div>
   </div>
 </div></section>
 
@@ -576,15 +592,14 @@
         <div class="gate-lock">🔒</div>
         <h3 data-i18n="gate_h"></h3>
         <p data-i18n="gate_p"></p>
-        <div class="gate-price">€49.99<small data-i18n="gate_price_note"></small></div>
-        <a class="btn btn-gold" href="https://py.pl/GJ510klc0XW6dsbZ68gg1yg" target="_blank" rel="noopener" style="margin-top:18px" data-i18n="gate_btn"></a>
-        <a class="btn btn-ghost" href="https://wise.com/pay/r/Zhxkm7xyYL04RjA" target="_blank" rel="noopener" style="margin-top:10px" data-i18n="gate_btn_wise"></a>
-        <p class="gate-pay-note" data-i18n="gate_pay_note"></p>
+        <!-- Price + PayPal/Wise buttons removed 2026-08 (payment links pulled site-wide).
+             Code-only gate: an access code is obtained by contacting ESM. -->
         <div class="gate-or" data-i18n="gate_or"></div>
         <form class="gate-code" id="gateForm">
           <input id="gateInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="gate_ph" data-i18n-aria="gate_aria" />
           <button type="submit" data-i18n="gate_unlock"></button>
         </form>
+        <a class="gate-need" data-mail data-subject="Roster access code request — ESM" data-i18n="gate_need"></a>
         <div class="gate-err" id="gateErr" data-i18n="gate_err"></div>
       </div>
     </div>
@@ -620,9 +635,23 @@
         <li data-i18n="pg_i3"></li>
         <li data-i18n="pg_i4"></li>
       </ul>
-      <div class="gate-price">€129.99<small data-i18n="pg_price_note"></small></div>
+      <!-- Two informational tiers (item 6). Payment happens off-site with Sam; these
+           CTAs email ESM the athlete's interest + chosen tier (no payment buttons). -->
+      <div class="pc-tiers">
+        <div class="pc-tier">
+          <div class="pc-tier-name" data-i18n="pg_t1_name"></div>
+          <div class="gate-price">€129.99<small data-i18n="pg_price_note"></small></div>
+          <div class="pc-tier-desc" data-i18n="pg_t1_desc"></div>
+          <a class="btn btn-gold pc-tier-cta" data-mail data-subject="Profile creation — Standard (€129.99)" data-body="I'd like to create my ESM athlete profile — Standard tier (€129.99). My details — Name: / Age: / Position & sport: / Country: / Current team: / Instagram:" data-i18n="pg_t1_btn"></a>
+        </div>
+        <div class="pc-tier pc-tier-plus">
+          <div class="pc-tier-name" data-i18n="pg_t2_name"></div>
+          <div class="gate-price">€149.99<small data-i18n="pg_price_note"></small></div>
+          <div class="pc-tier-desc" data-i18n="pg_t2_desc"></div>
+          <a class="btn btn-gold pc-tier-cta" data-mail data-subject="Profile creation — Direct Contact (€149.99)" data-body="I'd like to create my ESM athlete profile — Direct Contact tier (€149.99, direct phone number shared with scouts/teams/GMs). My details — Name: / Age: / Position & sport: / Country: / Current team: / Instagram:" data-i18n="pg_t2_btn"></a>
+        </div>
+      </div>
       <div class="pc-access" data-i18n="pg_access"></div>
-      <a class="btn btn-gold" href="register/" style="margin-top:18px" data-i18n="pg_btn"></a>
     </div>
   </div>
 </div></section>
@@ -701,7 +730,19 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
    nothing on the site is a dead end. */
 const STRIPE_REGISTER_URL = "";   // $125   — athlete registration
 const STRIPE_COLLEGE_URL  = "";   // college placement — price TBD
-const FALLBACK_EMAIL      = "mailto:elitesportsmanagement50@gmail.com";
+
+/* ⚠️ PLACEHOLDER CONTACT ADDRESS — CHANGE IN ONE PLACE.
+   Sam is creating a NEW dedicated contact email; until it exists this is his current
+   address. Every "route to email" CTA on this page uses ONE of these two constants,
+   so swapping in the new address is a single-line edit here — no other code changes.
+   Any element with a `data-mail` attribute gets its href set to CONTACT_MAILTO by
+   wirePayButtons() (optionally with a `data-subject`). NOTE: this is only the CLIENT
+   mailto target. Form SUBMISSIONS (application / register / Tenerife) are emailed to
+   Sam server-side by the send-form-notification Edge Function — if the RECEIVING inbox
+   changes, also update OPS_INBOX there (and the DB form routing). See ENGINEERING_LOG. */
+const CONTACT_EMAIL       = "elitesportsmanagement50@gmail.com";
+const CONTACT_MAILTO      = "mailto:" + CONTACT_EMAIL;
+const FALLBACK_EMAIL      = CONTACT_MAILTO;   // back-compat alias (older references)
 
 /* Contact button on a player modal — a nudge to reach ESM about the athlete.
    Empty → falls back to an email enquiry (no per-player fee). */
@@ -815,10 +856,9 @@ const T = {
     gate_h:"Full roster access for coaches & teams",
     gate_p:"Unlock every ESM athlete — full profiles, career history and playing experience.",
     gate_price_note:"1 year + 1 year free",
-    gate_btn:"Pay €49.99 via PayPal →",gate_btn_wise:"Pay €49.99 via Wise →",
-    gate_pay_note:"Pay Samuele directly via PayPal or Wise, then enter the code he sends you.",
     gate_ph:"Code",gate_aria:"Code",
-    gate_or:"Already have your code?",gate_unlock:"Unlock",
+    gate_or:"Enter your access code",gate_unlock:"Unlock",
+    gate_need:"Need a code? Contact us →",
     gate_err:"That code isn't right. Check the code Sam sent you, or contact us.",
     gate_unlocked:"Roster unlocked — thanks for your support.",
     pg_kicker:"Create Your Profile",pg_h2:"Get Represented by ESM",pg_p2:"Create your official athlete profile and start your journey with Elite Sports Management.",
@@ -826,6 +866,8 @@ const T = {
     pg_i1:"A professionally built profile on the ESM roster",pg_i2:"Your bio, photo and season-by-season stats, presented properly",pg_i3:"Exposure to scouts, coaches and teams in the ESM network",pg_i4:"Your own portal to keep it up to date",
     pg_access:"1 year of profile access + 1 year free — 2 years total.",
     pg_price_note:"One-time · Profile creation",pg_btn:"Create your profile →",pg_or:"Already paid? Enter your code",pg_unlock:"Unlock",
+    pg_t1_name:"Standard",pg_t1_desc:"Everything above — your full professional profile on the ESM roster.",pg_t1_btn:"Choose Standard →",
+    pg_t2_name:"Standard + Direct Contact",pg_t2_desc:"Everything in Standard, plus your direct phone number shared with scouts, teams and GMs.",pg_t2_btn:"Choose Direct Contact →",
     pg_err:"That code isn't right. Check the email from your purchase, or contact us.",
     pg_done_h:"You're all set!",pg_done_p:"Your access is unlocked. Complete the application form to create your athlete profile.",pg_done_btn:"Continue to your application →",
     pay_h:"One last step",
@@ -845,7 +887,7 @@ const T = {
     svc2_t:"Indy Ball",svc2_d:"Opening doors to professional independent leagues across North America.",svc2_pay:"Sign up for Indy Ball →",
     svc6_t:"Winter League",svc6_d:"Placing athletes in winter league play abroad for extra reps and exposure during the offseason.",svc6_pay:"Sign up for Winter League →",svc_pro_t:"Professional Leagues",svc_pro_d:"Opening doors to professional play — independent leagues in North America, winter leagues abroad, and clubs across Europe.",svc_pro_pay:"Explore Professional Leagues →",
     so_t:"Softball Opportunities",so_d:"Guiding softball athletes through college recruiting, national team pathways and international competition — with player development, showcase events and exposure to college coaches and scouts.",so_pay:"Explore Softball Opportunities →",    svc4_t:"Social Media & Branding",svc4_d:"Building each athlete's profile and story to grow their visibility.",
-    svc5_t:"Representation & Development",svc5_d:"Day-to-day management and a plan tailored to each athlete.",svc5_b1:"Progress tracking",svc5_b2:"Personalized training",svc5_b3:"Nutrition guidance",svc5_b4:"WhatsApp support",svc5_pay:"Sign up for Representation →",svc5_hl_t:"Specialized Personalized Training",svc5_hl_d:"One-on-one and online coaching tailored to each athlete's game and goals.",
+    svc5_t:"Representation & Development",svc5_d:"Day-to-day management and a plan tailored to each athlete.",svc5_b1:"Progress tracking",svc5_b2:"Personalized training",svc5_b3:"Nutrition guidance",svc5_b4:"WhatsApp support",svc5_b5:"Social media representation",svc5_pay:"Sign up for Representation →",svc5_hl_t:"Specialized Personalized Training",svc5_hl_d:"One-on-one and online coaching tailored to each athlete's game and goals.",
     who_kicker:"Who I Am",who_role:"CEO & Founder · Professional Baseball Player",
     who_bio:"Elite Sports Management was founded by Samuele Bruno — born and raised in Italy, and the first player born and raised in Italy to go on and play in the Canadian Baseball League. He came up through the Italian system, took silver with Italy at the U18 European Championship, and went on to wear the shirt of the Italian National Team. He played six seasons professionally in Italy, and earned a scholarship to play three years of college baseball in the United States.",
     who_bio2:"His own career ran through indy ball and winter leagues across North America and Australia — the same routes he now opens for ESM athletes. Beyond representation, Samuele runs camps, showcases and a coaching program built on one idea: talent gets you noticed, but representation gets you signed.",
@@ -889,10 +931,9 @@ const T = {
     gate_h:"Acceso completo al roster para entrenadores y equipos",
     gate_p:"Desbloquea a todos los atletas de ESM — perfiles completos, trayectoria y experiencia.",
     gate_price_note:"1 año + 1 año gratis",
-    gate_btn:"Paga €49.99 con PayPal →",gate_btn_wise:"Paga €49.99 con Wise →",
-    gate_pay_note:"Paga a Samuele directamente por PayPal o Wise y luego introduce el código que te envíe.",
     gate_ph:"Código",gate_aria:"Código",
-    gate_or:"¿Ya tienes tu código?",gate_unlock:"Desbloquear",
+    gate_or:"Introduce tu código de acceso",gate_unlock:"Desbloquear",
+    gate_need:"¿Necesitas un código? Contáctanos →",
     gate_err:"Ese código no es correcto. Revisa el código que te envió Sam o contáctanos.",
     gate_unlocked:"Roster desbloqueado — gracias por tu apoyo.",
     pg_kicker:"Crea Tu Perfil",pg_h2:"Hazte Representar por ESM",pg_p2:"Crea tu perfil oficial de atleta y comienza tu camino con Elite Sports Management.",
@@ -900,6 +941,8 @@ const T = {
     pg_i1:"Un perfil profesional en el roster de ESM",pg_i2:"Tu biografía, foto y estadísticas por temporada, bien presentadas",pg_i3:"Visibilidad ante scouts, entrenadores y equipos de la red ESM",pg_i4:"Tu propio portal para mantenerlo actualizado",
     pg_access:"1 año de acceso al perfil + 1 año gratis — 2 años en total.",
     pg_price_note:"Pago único · Creación de perfil",pg_btn:"Crea tu perfil →",pg_or:"¿Ya pagaste? Introduce tu código",pg_unlock:"Desbloquear",
+    pg_t1_name:"Estándar",pg_t1_desc:"Todo lo anterior — tu perfil profesional completo en el roster de ESM.",pg_t1_btn:"Elegir Estándar →",
+    pg_t2_name:"Estándar + Contacto Directo",pg_t2_desc:"Todo lo del Estándar, más tu número de teléfono directo compartido con scouts, equipos y GMs.",pg_t2_btn:"Elegir Contacto Directo →",
     pg_err:"Ese código no es correcto. Revisa el correo de tu compra o contáctanos.",
     pg_done_h:"¡Todo listo!",pg_done_p:"Tu acceso está desbloqueado. Completa el formulario para crear tu perfil de atleta.",pg_done_btn:"Continúa con tu solicitud →",
     pay_h:"Un último paso",
@@ -919,7 +962,7 @@ const T = {
     svc2_t:"Indy Ball",svc2_d:"Abrimos puertas a las ligas profesionales independientes de Norteamérica.",svc2_pay:"Inscríbete en Indy Ball →",
     svc6_t:"Liga de Invierno",svc6_d:"Ubicamos atletas en ligas de invierno en el extranjero para sumar experiencia y visibilidad fuera de temporada.",svc6_pay:"Inscríbete en la Liga de Invierno →",svc_pro_t:"Ligas Profesionales",svc_pro_d:"Abrimos puertas al béisbol profesional — ligas independientes en Norteamérica, ligas de invierno en el extranjero y clubes por toda Europa.",svc_pro_pay:"Explora las Ligas Profesionales →",
     so_t:"Oportunidades de Sóftbol",so_d:"Acompañamos a las atletas de sóftbol en el reclutamiento universitario, las vías hacia las selecciones nacionales y la competición internacional — con desarrollo de jugadoras, showcases y visibilidad ante entrenadores y scouts.",so_pay:"Explora las Oportunidades de Sóftbol →",    svc4_t:"Redes Sociales y Marca",svc4_d:"Construimos el perfil y la historia de cada atleta para aumentar su visibilidad.",
-    svc5_t:"Representación y Desarrollo",svc5_d:"Gestión diaria y un plan a la medida de cada atleta.",svc5_b1:"Seguimiento del progreso",svc5_b2:"Entrenamiento personalizado",svc5_b3:"Guía nutricional",svc5_b4:"Soporte por WhatsApp",svc5_pay:"Inscríbete en Representación →",svc5_hl_t:"Entrenamiento Personalizado Especializado",svc5_hl_d:"Coaching individual y online adaptado al juego y los objetivos de cada atleta.",
+    svc5_t:"Representación y Desarrollo",svc5_d:"Gestión diaria y un plan a la medida de cada atleta.",svc5_b1:"Seguimiento del progreso",svc5_b2:"Entrenamiento personalizado",svc5_b3:"Guía nutricional",svc5_b4:"Soporte por WhatsApp",svc5_b5:"Representación en redes sociales",svc5_pay:"Inscríbete en Representación →",svc5_hl_t:"Entrenamiento Personalizado Especializado",svc5_hl_d:"Coaching individual y online adaptado al juego y los objetivos de cada atleta.",
     who_kicker:"Quién Soy",who_role:"CEO y Fundador · Jugador de Béisbol Profesional",
     who_bio:"Elite Sports Management fue fundada por Samuele Bruno — nacido y criado en Italia, y el primer jugador nacido y criado en Italia en llegar a jugar en la Canadian Baseball League. Se formó en el sistema italiano, fue subcampeón con Italia en el Campeonato Europeo Sub-18 y llegó a vestir la camiseta de la Selección Italiana. Jugó seis temporadas como profesional en Italia y obtuvo una beca para jugar tres años de béisbol universitario en Estados Unidos.",
     who_bio2:"Su propia carrera pasó por el indy ball y las ligas de invierno de Norteamérica y Australia — las mismas rutas que hoy abre para los atletas de ESM. Además de la representación, Samuele organiza camps, showcases y un programa de coaching con una sola idea: el talento llama la atención, pero la representación te consigue el contrato.",
@@ -963,10 +1006,9 @@ const T = {
     gate_h:"Accesso completo al roster per allenatori e squadre",
     gate_p:"Sblocca tutti gli atleti ESM — profili completi, carriera ed esperienza.",
     gate_price_note:"1 anno + 1 anno gratis",
-    gate_btn:"Paga €49.99 con PayPal →",gate_btn_wise:"Paga €49.99 con Wise →",
-    gate_pay_note:"Paga Samuele direttamente tramite PayPal o Wise, poi inserisci il codice che ti invia.",
     gate_ph:"Codice",gate_aria:"Codice",
-    gate_or:"Hai già il codice?",gate_unlock:"Sblocca",
+    gate_or:"Inserisci il tuo codice di accesso",gate_unlock:"Sblocca",
+    gate_need:"Ti serve un codice? Contattaci →",
     gate_err:"Il codice non è corretto. Controlla il codice che ti ha inviato Sam o contattaci.",
     gate_unlocked:"Roster sbloccato — grazie del supporto.",
     pg_kicker:"Crea il Tuo Profilo",pg_h2:"Fatti Rappresentare da ESM",pg_p2:"Crea il tuo profilo ufficiale da atleta e inizia il tuo percorso con Elite Sports Management.",
@@ -974,6 +1016,8 @@ const T = {
     pg_i1:"Un profilo professionale nel roster ESM",pg_i2:"La tua bio, foto e statistiche stagione per stagione, presentate come si deve",pg_i3:"Visibilità verso scout, allenatori e squadre della rete ESM",pg_i4:"Il tuo portale personale per tenerlo aggiornato",
     pg_access:"1 anno di accesso al profilo + 1 anno gratis — 2 anni in totale.",
     pg_price_note:"Pagamento unico · Creazione profilo",pg_btn:"Crea il tuo profilo →",pg_or:"Hai già pagato? Inserisci il codice",pg_unlock:"Sblocca",
+    pg_t1_name:"Standard",pg_t1_desc:"Tutto quanto sopra — il tuo profilo professionale completo nel roster ESM.",pg_t1_btn:"Scegli Standard →",
+    pg_t2_name:"Standard + Contatto Diretto",pg_t2_desc:"Tutto lo Standard, più il tuo numero di telefono diretto condiviso con scout, squadre e GM.",pg_t2_btn:"Scegli Contatto Diretto →",
     pg_err:"Codice non corretto. Controlla l'email del tuo acquisto o contattaci.",
     pg_done_h:"Tutto pronto!",pg_done_p:"Il tuo accesso è sbloccato. Completa il modulo per creare il tuo profilo da atleta.",pg_done_btn:"Continua con la candidatura →",
     pay_h:"Un ultimo passo",
@@ -993,7 +1037,7 @@ const T = {
     svc2_t:"Indy Ball",svc2_d:"Apriamo le porte alle leghe professionistiche indipendenti del Nord America.",svc2_pay:"Iscriviti all'Indy Ball →",
     svc6_t:"Winter League",svc6_d:"Inseriamo gli atleti in campionati invernali all'estero per accumulare esperienza e visibilità durante la bassa stagione.",svc6_pay:"Iscriviti alla Winter League →",svc_pro_t:"Leghe Professionistiche",svc_pro_d:"Apriamo le porte al professionismo — leghe indipendenti in Nord America, winter league all'estero e club in tutta Europa.",svc_pro_pay:"Scopri le Leghe Professionistiche →",
     so_t:"Opportunità nel Softball",so_d:"Accompagniamo le atlete di softball nel recruiting universitario, nei percorsi verso le nazionali e nella competizione internazionale — con sviluppo delle giocatrici, showcase ed esposizione a coach e scout.",so_pay:"Scopri le Opportunità nel Softball →",    svc4_t:"Social Media e Brand",svc4_d:"Costruiamo il profilo e la storia di ogni atleta per aumentarne la visibilità.",
-    svc5_t:"Rappresentanza e Sviluppo",svc5_d:"Gestione quotidiana e un piano su misura per ogni atleta.",svc5_b1:"Monitoraggio dei progressi",svc5_b2:"Allenamento personalizzato",svc5_b3:"Guida nutrizionale",svc5_b4:"Supporto via WhatsApp",svc5_pay:"Iscriviti alla Rappresentanza →",svc5_hl_t:"Allenamento Personalizzato Specializzato",svc5_hl_d:"Coaching individuale e online su misura per il gioco e gli obiettivi di ogni atleta.",
+    svc5_t:"Rappresentanza e Sviluppo",svc5_d:"Gestione quotidiana e un piano su misura per ogni atleta.",svc5_b1:"Monitoraggio dei progressi",svc5_b2:"Allenamento personalizzato",svc5_b3:"Guida nutrizionale",svc5_b4:"Supporto via WhatsApp",svc5_b5:"Rappresentanza sui social media",svc5_pay:"Iscriviti alla Rappresentanza →",svc5_hl_t:"Allenamento Personalizzato Specializzato",svc5_hl_d:"Coaching individuale e online su misura per il gioco e gli obiettivi di ogni atleta.",
     who_kicker:"Chi Sono",who_role:"CEO e Fondatore · Giocatore di Baseball Professionista",
     who_bio:"Elite Sports Management è stata fondata da Samuele Bruno — nato e cresciuto in Italia, e il primo giocatore nato e cresciuto in Italia ad arrivare a giocare nella Canadian Baseball League. Cresciuto nel sistema italiano, ha conquistato l'argento con l'Italia al Campionato Europeo U18 ed è arrivato a vestire la maglia della Nazionale Italiana. Ha giocato sei stagioni da professionista in Italia e ha ottenuto una borsa di studio per giocare tre anni di baseball universitario negli Stati Uniti.",
     who_bio2:"La sua carriera è passata per l'indy ball e le winter league tra Nord America e Australia — le stesse strade che oggi apre agli atleti ESM. Oltre alla rappresentanza, Samuele organizza camp, showcase e un programma di coaching con un'unica idea: il talento ti fa notare, ma la rappresentanza ti fa firmare.",
@@ -1687,6 +1731,15 @@ function wireServiceSignups(){
 function wirePayButtons(){
   const col=document.getElementById("collegePayBtn");
   if(col)col.href=STRIPE_COLLEGE_URL||"#join";
+  // Centralized "route to email" wiring: any [data-mail] element points at the single
+  // CONTACT_MAILTO constant (+ optional data-subject). Swapping Sam's address updates
+  // every one of these at once. (Payment links were removed 2026-08; purchase/contact
+  // CTAs now email ESM instead.)
+  document.querySelectorAll("[data-mail]").forEach(el=>{
+    const subj=el.getAttribute("data-subject"), body=el.getAttribute("data-body");
+    const q=[]; if(subj)q.push("subject="+encodeURIComponent(subj)); if(body)q.push("body="+encodeURIComponent(body));
+    el.href=CONTACT_MAILTO+(q.length?("?"+q.join("&")):"");
+  });
 }
 
 function closeModal(){document.getElementById("modal").classList.remove("open");document.body.style.overflow="";}
