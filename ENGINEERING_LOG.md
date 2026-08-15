@@ -11,6 +11,74 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Gmail SMTP form-notification system — built + wired, ready to activate (2026-08-15)
+
+**Goal:** email the ESM inbox on every form submission, via Gmail SMTP. Gmail App
+Password not available yet (Sam provides it), so build everything to go live with
+**zero code changes** once the secret is added.
+
+**Edge Function `send-form-notification`** (`site/supabase/functions/send-form-notification/index.ts`,
+deployed **v1 ACTIVE**, verify_jwt=false):
+- Reads `GMAIL_APP_PASSWORD` via `Deno.env.get`. **Missing → logs a clear line and
+  returns `{ok:true,delivered:false,reason:"GMAIL_APP_PASSWORD not set"}` (HTTP 200)**,
+  never crashes. denomailer is **dynamically imported only after** the password
+  check, so with no password the SMTP lib never even loads.
+- From-address hardcoded `elitesportsmanagement50@gmail.com`; SMTP `smtp.gmail.com:465`
+  implicit TLS, auth user = from-address, pass = the App Password.
+- One template path (`buildMessage`) formats each type into a readable label→value
+  HTML table (empty fields dropped; never raw JSON). Subjects: "New Baseball/Softball/
+  Coaching application: <name>", "New College consulting inquiry: <name>",
+  "New player/scout registration (pending approval): <name>", "New Tenerife Winter
+  League registration: <name>".
+- **Routing:** all recipients currently `elitesportsmanagement50@gmail.com` (softball
+  unified here 2026-08-14 when the specialist was removed — see below). "kind" is
+  labeled in the subject for triage.
+- **Test mode:** `POST {"test":true}` (optional `"to"`) sends a test email and returns
+  the send result — for validating the pipeline once the password is in.
+- Returns **200 on every path** so the caller never treats a mail failure as a
+  submission failure.
+
+**Wiring** (`site/supabase-gmail-notify.sql`, migration `notify_config_table_and_fn`):
+- Reused the generic `private.notify_submission()` trigger (async `pg_net` POST,
+  exception-guarded so it can never block the insert) + existing triggers on
+  `players` / `profiles` / `tenerife_registrations`.
+- Config moved from the `app.*` GUCs to a **`private.notify_config` table** (url +
+  secret, single row) because managed Postgres rejects `ALTER DATABASE SET app.*`
+  (`42501 permission denied`). The table is in `private` (never anon-exposed) and is
+  read live by the trigger — also fixes the GUC connection-caching gotcha. Row now
+  points at the `send-form-notification` URL.
+- Supersedes the Resend-based `notify` function + `supabase-notify.sql` (that function
+  is now orphaned/harmless — nothing points at it; left deployed, not deleted).
+
+**Secret needed to go live (only this — no code/SQL changes):**
+`GMAIL_APP_PASSWORD` as an Edge Function secret on `send-form-notification`. Optional
+hardening: set `FORM_NOTIFY_SECRET` = the value in `private.notify_config.secret` to
+lock the endpoint to the trigger (function enforces the x-notify-secret header only
+when that env var is present; today it's unset → endpoint open but only ever emails
+the fixed inbox).
+
+**Verified today (password NOT set, as expected):**
+- Function deploys **ACTIVE** (v1).
+- Trigger fires: inserted a marked test application row (id 88) → `pg_net` POST hit the
+  function → `net._http_response` shows **200** `{delivered:false,reason:"GMAIL_APP_PASSWORD not set"}`;
+  edge logs show `POST | 200` + the clear `[send-form-notification] GMAIL_APP_PASSWORD
+  not set … Would have emailed "New Baseball application: TEST Email Pipeline" to
+  elitesportsmanagement50@gmail.com`. Test row then **deleted**.
+- **Submission NOT blocked:** the insert returned the row normally despite the email
+  no-op — the key property. Explicit `{"test":true}` POST also returned 200 gracefully.
+- Could not test actual delivery (no password yet) — that's tomorrow's one step.
+
+### Marianna Zumerle fully removed from the site (2026-08-14, commit 508b1c5)
+
+Per Sam. Deleted the whole `#collab` Collaborators section (cover + card + reveal JS +
+`.collab-cover` CSS + `nav_collab`/`collab_*`/`mz_*` i18n EN/ES/IT), her photo
+`marianna.jpeg`, and regenerated all 17 `players/*.html` (vestigial CSS dropped).
+Softball-application email routing unified to Sam (elitesportsmanagement50@gmail.com);
+`notify` redeployed v3 + `supabase-notify.sql` updated. Admin access revoked: removed
+from `admin/index.html` ADMIN_EMAILS and her `private.esm_admins` row deleted (3 admins
+left). Her `auth.users` login still exists (zero admin rights now). Verified: i18n
+validator 0 hard problems, no orphaned refs, page renders no console errors.
+
 ### Country flags fixed (emoji → flagcdn images) + full regression sweep (2026-08-06, session 5)
 
 **PRIORITY BUG — country flags not rendering. Root cause (two compounding issues):**
