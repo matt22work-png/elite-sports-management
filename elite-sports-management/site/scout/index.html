@@ -122,6 +122,8 @@
 </div>
 
 <script type="module">
+/* ⚠️ PLACEHOLDER CONTACT ADDRESS — change in one place (payment links removed 2026-08). */
+const CONTACT_EMAIL = "elitesportsmanagement50@gmail.com";
 const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
 
@@ -170,7 +172,7 @@ const DICT = {
     s_st_notscout_t:"You're a player account", s_st_notscout_b:"This is the scout portal. Head to your Player Portal to see your profile.",
     s_st_none_t:"No scout account yet", s_st_none_b:"We couldn't find a scout account for this login. Create one to request roster access.",
     s_pay_paypal:"Pay €49.99 via PayPal →", s_pay_wise:"Pay €49.99 via Wise →",
-    s_pay_hint:"Haven't paid yet? Pay €49.99 via PayPal or Wise (brunosamuele56@gmail.com) to get roster access — Samuele approves your account once payment is confirmed.",
+    s_pay_hint:"Your account is pending — Elite Sports Management will review it and be in touch about roster access.",
     s_go_register:"Create a scout account", s_go_player:"Go to Player Portal",
   },
   es:{
@@ -199,7 +201,7 @@ const DICT = {
     s_st_notscout_t:"Tienes una cuenta de jugador", s_st_notscout_b:"Este es el portal de scouts. Ve a tu Portal de Jugador para ver tu perfil.",
     s_st_none_t:"Aún no hay cuenta de scout", s_st_none_b:"No encontramos una cuenta de scout para este acceso. Crea una para solicitar acceso al roster.",
     s_pay_paypal:"Paga €49.99 con PayPal →", s_pay_wise:"Paga €49.99 con Wise →",
-    s_pay_hint:"¿Aún no has pagado? Paga €49.99 con PayPal o Wise (brunosamuele56@gmail.com) para obtener acceso al roster — Samuele aprueba tu cuenta cuando se confirme el pago.",
+    s_pay_hint:"Tu cuenta está pendiente — Elite Sports Management la revisará y se pondrá en contacto sobre el acceso al roster.",
     s_go_register:"Crear una cuenta de scout", s_go_player:"Ir al Portal de Jugador",
   },
   it:{
@@ -228,7 +230,7 @@ const DICT = {
     s_st_notscout_t:"Hai un account giocatore", s_st_notscout_b:"Questo è il portale scout. Vai al tuo Portale Giocatore per vedere il tuo profilo.",
     s_st_none_t:"Nessun account scout", s_st_none_b:"Non abbiamo trovato un account scout per questo accesso. Creane uno per richiedere l'accesso al roster.",
     s_pay_paypal:"Paga €49.99 con PayPal →", s_pay_wise:"Paga €49.99 con Wise →",
-    s_pay_hint:"Non hai ancora pagato? Paga €49.99 con PayPal o Wise (brunosamuele56@gmail.com) per ottenere l'accesso al roster — Samuele approva il tuo account una volta confermato il pagamento.",
+    s_pay_hint:"Il tuo account è in attesa — Elite Sports Management lo esaminerà e ti contatterà riguardo all'accesso al roster.",
     s_go_register:"Crea un account scout", s_go_player:"Vai al Portale Giocatore",
   },
 };
@@ -315,8 +317,6 @@ function showStatus(kind, link){
   const icons = { pending:"⏳", rejected:"✉️", archived:"📁", notscout:"⚾", none:"🔎" };
   const key = icons[kind] ? kind : "pending";
   const payHtml = key === "pending" ? `
-    <a class="btn btn-gold" href="https://py.pl/GJ510klc0XW6dsbZ68gg1yg" target="_blank" rel="noopener" style="margin-top:16px;display:inline-block">${esc(t("s_pay_paypal"))}</a>
-    <a class="btn btn-ghost" href="https://wise.com/pay/r/Zhxkm7xyYL04RjA" target="_blank" rel="noopener" style="margin-top:10px;display:inline-block">${esc(t("s_pay_wise"))}</a>
     <p class="note" style="margin-top:12px">${esc(t("s_pay_hint"))}</p>` : "";
   $("statusBox").innerHTML = `<div class="center">
     <div style="font-size:40px;margin-bottom:10px">${icons[key]}</div>
@@ -324,7 +324,7 @@ function showStatus(kind, link){
     <p class="note" style="font-size:14.5px;line-height:1.6">${esc(t("s_st_"+key+"_b"))}</p>
     ${payHtml}
     ${link || ""}
-    <p class="note" style="margin-top:18px">${esc(t("s_questions"))} <a href="mailto:elitesportsmanagement50@gmail.com?subject=Scout%20account">${esc(t("s_email_us"))}</a>.</p>
+    <p class="note" style="margin-top:18px">${esc(t("s_questions"))} <a href="mailto:${CONTACT_EMAIL}?subject=Scout%20account">${esc(t("s_email_us"))}</a>.</p>
   </div>`;
   showView("status");
 }

@@ -191,40 +191,34 @@
     <p class="lead" id="payLead" data-i18n="r_s3_lead">Thank you for completing your registration. Your account has been created successfully.</p>
     <div id="payService" class="pay-service"></div>
     <ol class="pay-steps">
-      <li><span class="n">1</span><span data-i18n="r_s3_step1">Complete your payment using the secure link below.</span></li>
-      <li><span class="n">2</span><span data-i18n="r_s3_step2">Elite Sports Management verifies your payment and reviews your account.</span></li>
+      <li><span class="n">1</span><span data-i18n="r_s3_step1">Elite Sports Management reviews your registration and reaches out to you.</span></li>
+      <li><span class="n">2</span><span data-i18n="r_s3_step2">Any payment is arranged directly with ESM — there's nothing to pay on this site.</span></li>
       <li><span class="n">3</span><span data-i18n="r_s3_step3">Once approved, simply sign in with the same email &amp; password you just created — no additional registration needed.</span></li>
     </ol>
-    <a class="btn btn-gold" id="payBtn" style="width:100%;margin-top:16px" target="_blank" rel="noopener" data-i18n="r_pay_paypal">Pay via PayPal →</a>
-    <a class="btn btn-ghost" id="payBtnWise" style="width:100%;margin-top:10px" target="_blank" rel="noopener" data-i18n="r_pay_wise">Pay via Wise →</a>
-    <p class="note" data-i18n="r_s3_note">Pay Samuele directly via PayPal (brunosamuele56@gmail.com) or Wise. You can close this page after paying — we'll email you once he confirms payment and approves your account.</p>
+    <a class="btn btn-gold" id="payBtn" style="width:100%;margin-top:16px" data-mail data-subject="Account registration — Elite Sports Management" data-i18n="r_contact">Contact ESM →</a>
+    <p class="note" data-i18n="r_s3_note">We'll email you once ESM has reviewed and approved your account.</p>
     <p class="note" id="payAppt" style="margin-top:8px"></p>
   </div>
 </div>
 
 <script type="module">
 /* =====================================================================
-   Off-site payment, per account role. Payment is handled entirely OFF-SITE.
-   - player: €129.99 profile creation — LIVE (Phase 1), PayPal (py.pl).
-   - scout:  €49.99 roster access   — self-service; PayPal (py.pl); Sam approves after
-     payment is confirmed (no code-gate on this account-creation flow).
-   Kept role-keyed so the roster (€49.99) and Tenerife (€599.99) flows can
-   drop in without reworking this step.
-   ===================================================================== */
-/* URLs and prices are fixed; all display copy (title/includes/access) is resolved
-   per-role via t() at render time so it follows the chosen language. */
+   Per-account-role summary shown on the final (confirmation) step. On-site
+   PAYMENT LINKS WERE REMOVED 2026-08 — the account/profile submission itself
+   reaches Sam (the profiles INSERT triggers the send-form-notification Edge
+   Function), and any payment is arranged directly with ESM off-site.
+   - player: €129.99 profile creation (price shown for information only).
+   - scout:  €49.99 roster access   (price shown for information only).
+   Prices/includes are kept per-role and resolved via t() at render time so the
+   summary follows the chosen language. No payment URLs anymore. */
 const PAY = {
   player: {
-    url: "https://py.pl/zN5DhqAoS3GziqI35iqiUQ",
-    wiseUrl: "https://wise.com/pay/r/NKJf01HKt8PuX2s",
     price: "€129.99",
     titleKey: "r_pay_player_title",
     incKeys: ["r_pay_player_inc1","r_pay_player_inc2","r_pay_player_inc3","r_pay_player_inc4"],
     accessKey: "r_pay_player_access",
   },
   scout: {
-    url: "https://py.pl/GJ510klc0XW6dsbZ68gg1yg",
-    wiseUrl: "https://wise.com/pay/r/Zhxkm7xyYL04RjA",
     price: "€49.99",
     titleKey: "r_pay_scout_title",
     incKeys: ["r_pay_scout_inc1","r_pay_scout_inc2","r_pay_scout_inc3","r_pay_scout_inc4"],
@@ -236,6 +230,10 @@ const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
 const PHOTO_BUCKET = "player-photos";
 const STASH_KEY = "esm_reg_pending";
+/* ⚠️ PLACEHOLDER CONTACT ADDRESS — change in one place. Payment links removed 2026-08;
+   the account/profile submission itself reaches Sam (the profiles INSERT triggers the
+   send-form-notification Edge Function). Swap in Sam's NEW email here once it exists. */
+const CONTACT_EMAIL = "elitesportsmanagement50@gmail.com";
 // Country → flag emoji, so a registered athlete's roster card shows their flag
 // (mirrors the public site's FLAGS map). Unknown country → left null (site falls back).
 const FLAGS = {"Dominican Republic":"🇩🇴","República Dominicana":"🇩🇴","Repubblica Dominicana":"🇩🇴","Venezuela":"🇻🇪","Spain":"🇪🇸","España":"🇪🇸","Spagna":"🇪🇸","Colombia":"🇨🇴","Italy":"🇮🇹","Italia":"🇮🇹","United States":"🇺🇸","USA":"🇺🇸","Estados Unidos":"🇺🇸","Stati Uniti":"🇺🇸","Germany":"🇩🇪","Alemania":"🇩🇪","Germania":"🇩🇪","Portugal":"🇵🇹","Canada":"🇨🇦","Mexico":"🇲🇽","México":"🇲🇽"};
@@ -315,11 +313,11 @@ const DICT = {
     r_save_details:"Save details & continue",
     r_s3_h:'Activate your <em>account</em>',
     r_s3_lead:"Thank you for completing your registration. Your account has been created successfully.",
-    r_s3_step1:"Complete your payment using the secure link below.",
-    r_s3_step2:"Elite Sports Management verifies your payment and reviews your account.",
+    r_s3_step1:"Elite Sports Management reviews your registration and reaches out to you.",
+    r_s3_step2:"Any payment is arranged directly with ESM — there's nothing to pay on this site.",
     r_s3_step3:"Once approved, simply sign in with the same email & password you just created — no additional registration needed.",
-    r_pay_paypal:"Pay via PayPal →", r_pay_wise:"Pay via Wise →",
-    r_s3_note:"Pay Samuele directly via PayPal (brunosamuele56@gmail.com) or Wise. You can close this page after paying — we'll email you once he confirms payment and approves your account.",
+    r_pay_paypal:"Pay via PayPal →", r_pay_wise:"Pay via Wise →", r_contact:"Contact ESM →",
+    r_s3_note:"We'll email you once ESM has reviewed and approved your account.",
     // Payment service card — player
     r_pay_player_title:"Official Player Profile",
     r_pay_player_inc1:"A professionally built athlete profile on the ESM roster",
@@ -377,11 +375,11 @@ const DICT = {
     r_save_details:"Guardar datos y continuar",
     r_s3_h:'Activa tu <em>cuenta</em>',
     r_s3_lead:"Gracias por completar tu registro. Tu cuenta se ha creado correctamente.",
-    r_s3_step1:"Completa tu pago con el enlace seguro de abajo.",
-    r_s3_step2:"Elite Sports Management verifica tu pago y revisa tu cuenta.",
+    r_s3_step1:"Elite Sports Management revisa tu registro y se pone en contacto contigo.",
+    r_s3_step2:"Cualquier pago se coordina directamente con ESM — no hay nada que pagar en este sitio.",
     r_s3_step3:"Una vez aprobado, simplemente entra con el mismo correo y contraseña que acabas de crear — sin registro adicional.",
-    r_pay_paypal:"Paga con PayPal →", r_pay_wise:"Paga con Wise →",
-    r_s3_note:"Paga a Samuele directamente con PayPal (brunosamuele56@gmail.com) o Wise. Puedes cerrar esta página tras pagar — te avisaremos por correo en cuanto confirme el pago y apruebe tu cuenta.",
+    r_pay_paypal:"Paga con PayPal →", r_pay_wise:"Paga con Wise →", r_contact:"Contactar a ESM →",
+    r_s3_note:"Te avisaremos por correo en cuanto ESM haya revisado y aprobado tu cuenta.",
     r_pay_player_title:"Perfil Oficial de Jugador",
     r_pay_player_inc1:"Un perfil de atleta creado profesionalmente en el roster de ESM",
     r_pay_player_inc2:"Tu biografía, foto y estadísticas temporada a temporada, presentadas como corresponde",
@@ -435,11 +433,11 @@ const DICT = {
     r_save_details:"Salva dati e continua",
     r_s3_h:'Attiva il tuo <em>account</em>',
     r_s3_lead:"Grazie per aver completato la registrazione. Il tuo account è stato creato con successo.",
-    r_s3_step1:"Completa il pagamento tramite il link sicuro qui sotto.",
-    r_s3_step2:"Elite Sports Management verifica il pagamento ed esamina il tuo account.",
+    r_s3_step1:"Elite Sports Management esamina la tua registrazione e ti contatta.",
+    r_s3_step2:"Eventuali pagamenti vengono organizzati direttamente con ESM — non c'è nulla da pagare su questo sito.",
     r_s3_step3:"Una volta approvato, accedi semplicemente con la stessa email e password appena create — nessuna registrazione aggiuntiva.",
-    r_pay_paypal:"Paga con PayPal →", r_pay_wise:"Paga con Wise →",
-    r_s3_note:"Paga Samuele direttamente con PayPal (brunosamuele56@gmail.com) o Wise. Puoi chiudere questa pagina dopo il pagamento — ti avviseremo via email non appena conferma il pagamento e approva il tuo account.",
+    r_pay_paypal:"Paga con PayPal →", r_pay_wise:"Paga con Wise →", r_contact:"Contatta ESM →",
+    r_s3_note:"Ti invieremo un'email non appena ESM avrà esaminato e approvato il tuo account.",
     r_pay_player_title:"Profilo Ufficiale Giocatore",
     r_pay_player_inc1:"Un profilo atleta costruito professionalmente sul roster ESM",
     r_pay_player_inc2:"La tua biografia, foto e statistiche stagione per stagione, presentate come si deve",
@@ -490,14 +488,15 @@ function setLang(l){
 document.querySelectorAll("#langsw button").forEach(b => b.onclick = () => setLang(b.dataset.l));
 // Translate the static markup once on load (before any view is revealed).
 applyStatic();
+// Wire every mailto contact link (the removed pay buttons are now "Contact ESM").
+document.querySelectorAll("[data-mail]").forEach(a=>{ const s=a.getAttribute("data-subject"); a.href="mailto:"+CONTACT_EMAIL+(s?("?subject="+encodeURIComponent(s)):""); });
 
 /* Populate + reveal the payment step for a given role (price, service summary,
    access duration, and the correct off-site link). */
 function renderPayStep(role){
   const cfg = PAY[role] || PAY.player;
-  $("payBtn").href = cfg.url;
-  const wb = $("payBtnWise");
-  if (wb){ if (cfg.wiseUrl){ wb.href = cfg.wiseUrl; wb.style.display = ""; } else { wb.style.display = "none"; } }
+  // Payment links removed 2026-08 — this step is now a confirmation. The account was
+  // already created (a profiles row), which emails ESM via send-form-notification.
   const svc = $("payService");
   const includes = (cfg.incKeys || []).map(k => t(k));
   if (includes.length){
