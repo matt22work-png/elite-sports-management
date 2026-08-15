@@ -1,7 +1,7 @@
 // ============================================================================
 // ESM — submission notification Edge Function (Phase 6)
 // ============================================================================
-// Emails Sam / Marianna whenever a new submission lands. Invoked server-side by a
+// Emails Sam whenever a new submission lands. Invoked server-side by a
 // DB trigger (see supabase-notify.sql) that POSTs the new row via pg_net, so it
 // fires on EVERY submission regardless of the client (a closed tab can't skip it).
 //
@@ -9,9 +9,9 @@
 // how payment was taken — so it keeps working whether the flow uses Wise, Stripe,
 // or anything else. Payment method and notification are fully decoupled.
 //
-// Routing:
-//   • Baseball application / College consulting inquiry / registrations → Sam
-//   • Softball application → Marianna
+// Routing: all submissions → Sam (Baseball / Softball / College applications and
+//   player/scout registrations). The submission "kind" is still labeled in the
+//   subject line for triage; only the recipient is unified.
 //   (Tenerife registrations, Phase 2, will funnel to Sam via the profiles path.)
 //
 // Security: closed by default. Refuses every request until NOTIFY_SECRET is set,
@@ -21,7 +21,7 @@
 //   RESEND_API_KEY  — Resend API key. Until set, the function no-ops (logs only).
 //   NOTIFY_SECRET   — shared secret; must match the DB's app.notify_secret setting.
 //   NOTIFY_FROM     — verified Resend sender, e.g. "ESM <noreply@yourdomain>".
-//   NOTIFY_SAM / NOTIFY_MARIANNA — override the default recipient addresses.
+//   NOTIFY_SAM      — override the default recipient address.
 // ============================================================================
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
@@ -29,7 +29,6 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
 const NOTIFY_SECRET  = Deno.env.get("NOTIFY_SECRET") ?? "";
 const FROM           = Deno.env.get("NOTIFY_FROM") ?? "Elite Sports Management <onboarding@resend.dev>";
 const SAM            = Deno.env.get("NOTIFY_SAM") ?? "elitesportsmanagement50@gmail.com";
-const MARIANNA       = Deno.env.get("NOTIFY_MARIANNA") ?? "softball.esm@gmail.com";
 
 const escHtml = (s: unknown) =>
   String(s ?? "").replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]!));
@@ -57,7 +56,7 @@ function buildMessage(table: string, r: Record<string, unknown>) {
     const applying = String(r.applying_for ?? "");
     const isSoftball = r.sport === "Softball" || /softball/i.test(applying);
     const isCollege  = /college/i.test(applying);
-    const to = isSoftball ? MARIANNA : SAM;
+    const to = SAM;   // all applications route to Sam; isSoftball only labels the kind
     const kind = isCollege ? "College consulting inquiry"
                : isSoftball ? "Softball application" : "Baseball application";
     const rows: [string, unknown][] = [

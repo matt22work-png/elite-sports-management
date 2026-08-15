@@ -234,7 +234,6 @@ const PHOTO_BUCKET = "player-photos";
    add them there too or their writes will be rejected by the database. */
 const ADMIN_EMAILS = [
   "brunosamuele48@gmail.com",   // Samuele Bruno — CEO & Founder
-  "softball.esm@gmail.com",     // Marianna Zumerle — Softball Specialist
   "mattswagj@gmail.com",
   "matt22work-png@gmail.com",
 ];
@@ -562,7 +561,7 @@ function bindAccountActions(){
 
 /* ---------- roster sport filter ----------
    In-session only (defaults to All on load; not persisted across logins). Not
-   tied to the logged-in admin — Sam, Marianna, or Matt can each toggle it. */
+   tied to the logged-in admin — Sam or Matt can each toggle it. */
 let SPORT_FILTER = "All";   // "All" | "Baseball" | "Softball"
 function setSportFilter(sport){
   SPORT_FILTER = sport;
@@ -983,7 +982,7 @@ $("ap-save").onclick = async () => {
 /* ---------- change your own password ----------
    updateUser({password}) acts on the currently-signed-in session, so a logged-in
    admin can set a new password directly — no email reset / redirect involved.
-   Works for whoever is logged in (Sam, Marianna, Matt), no special permission. */
+   Works for whoever is logged in (Sam, Matt), no special permission. */
 $("pwToggle").onclick = () => $("pwEditor").classList.toggle("open");
 $("pw-save").onclick = async () => {
   const msg = $("pw-msg"); msg.classList.remove("show", "ok"); msg.classList.add("err");

@@ -2,7 +2,7 @@
 -- ESM — Phase 6: email notification on every submission
 -- ============================================================================
 -- A DB trigger POSTs each new submission to the `notify` Edge Function
--- (site/supabase/functions/notify/index.ts), which emails Sam / Marianna via
+-- (site/supabase/functions/notify/index.ts), which emails Sam via
 -- Resend. pg_net does the POST asynchronously, so it NEVER blocks the insert.
 --
 -- APPLIED to prod (sbexwyvsgqayxrsrlrpm) as migration notify_submission_triggers.
@@ -11,8 +11,8 @@
 --
 -- Routing (in the Edge Function):
 --   • players INSERT source='application'  → public #join application:
---         Softball (sport='Softball' or applying_for ~ softball) → Marianna
---         College (applying_for ~ college) / Baseball / everything else → Sam
+--         Softball / College / Baseball / everything else → Sam
+--         (kind is labeled in the subject line for triage; recipient is unified)
 --   • profiles INSERT (player or scout registration) → Sam
 --   • players source='registration'/'admin' → skipped (the profiles row covers
 --     registrations; admin-added rows don't need an email)
@@ -77,7 +77,7 @@ create trigger trg_notify_profile after insert on public.profiles
 --        RESEND_API_KEY = re_xxx
 --        NOTIFY_SECRET  = <random>
 --        NOTIFY_FROM    = Elite Sports Management <noreply@your-verified-domain>
---        (optional) NOTIFY_SAM / NOTIFY_MARIANNA to override recipients
+--        (optional) NOTIFY_SAM to override the recipient
 --
 -- 3. Point the DB at the function + share the SAME secret (persists for new
 --    connections; the trigger reads these at runtime):

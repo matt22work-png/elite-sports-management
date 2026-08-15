@@ -181,13 +181,6 @@
   .founder-contact{display:inline-flex;align-items:center;gap:9px;margin-top:20px;padding:11px 20px;border-radius:999px;border:1px solid var(--line);color:var(--gold-soft);font-weight:700;font-size:13.5px;transition:.22s}
   .founder-contact:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
   .founder-contact .ic{font-size:15px;line-height:1}
-  /* Collaborators/Staff cover — reuses .founder so it has the SAME footprint as
-     Marianna's card; clicking it reveals her real card (#collabCard) in place. */
-  .collab-cover{cursor:pointer;transition:.25s}
-  .collab-cover:hover{border-color:var(--gold);transform:translateY(-3px)}
-  .collab-cover:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-  .collab-cover .collab-cover-cta{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:11px 20px;border-radius:999px;border:1px solid var(--gold);color:var(--gold-soft);font-weight:700;font-size:13.5px}
-  .collab-cover:hover .collab-cover-cta{background:rgba(217,177,84,.08)}
 
   .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px}
   .chip{padding:9px 17px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font-weight:700;font-size:13.5px;cursor:pointer;transition:.18s}
@@ -453,7 +446,6 @@
     <nav class="nav-links">
       <a href="#about" data-i18n="nav_about"></a>
       <a href="#who" data-i18n="nav_who"></a>
-      <a href="#collab" data-i18n="nav_collab"></a>
       <a href="#college" data-i18n="nav_college"></a>
       <a href="#roster" data-i18n="nav_roster"></a>
       <a href="#events" data-i18n="nav_events"></a>
@@ -563,39 +555,6 @@
         <span class="cred" data-i18n="cred_ecc"></span>
       </div>
       <a class="founder-contact" href="mailto:elitesportsmanagement50@gmail.com?subject=Inquiry%20-%20Elite%20Sports%20Management"><span class="ic">✉</span><span data-i18n="sam_contact"></span></a>
-    </div>
-  </div>
-</div></section>
-
-<!-- Collaborators / Staff — a full-size cover (matching the founder-card footprint)
-     stands in for Marianna's card; her real card (#collabCard) is hidden until the
-     cover is clicked (expand in place). The top-nav "Collaborators" item scrolls here. -->
-<section class="sec" id="collab" style="padding-top:10px"><div class="wrap">
-  <div class="sec-head"><div class="kicker" data-i18n="collab_kicker"></div><h2 class="display" data-i18n="collab_h2"></h2></div>
-  <div class="founder collab-cover" id="collabCover" role="button" tabindex="0" aria-expanded="false" aria-controls="collabCard">
-    <div class="mono collab-cover-ic">🤝</div>
-    <div>
-      <h3 class="display" data-i18n="collab_cover_t"></h3>
-      <div class="role" data-i18n="collab_cover_p"></div>
-      <span class="collab-cover-cta" data-i18n="collab_cover_cta"></span>
-    </div>
-  </div>
-  <div class="founder" id="collabCard" style="display:none">
-    <div class="mono" id="specialistPhoto" style="background-image:url('marianna.jpeg');background-size:220%;background-position:54% 27%;font-size:0"></div>
-    <div>
-      <h3 class="display">Marianna Zumerle</h3>
-      <div class="role" data-i18n="mz_role"></div>
-      <p data-i18n="mz_bio"></p>
-      <p data-i18n="mz_bio2"></p>
-      <p data-i18n="mz_bio3"></p>
-      <div class="creds">
-        <span class="cred" data-i18n="mz_cred1"></span>
-        <span class="cred" data-i18n="mz_cred2"></span>
-        <span class="cred" data-i18n="mz_cred3"></span>
-        <span class="cred" data-i18n="mz_cred4"></span>
-        <span class="cred" data-i18n="mz_cred5"></span>
-      </div>
-      <a class="founder-contact" href="mailto:softball.esm@gmail.com?subject=Softball%20Inquiry%20-%20Elite%20Sports%20Management"><span class="ic">✉</span><span data-i18n="mz_contact"></span></a>
     </div>
   </div>
 </div></section>
@@ -838,7 +797,7 @@ const TESTIMONIALS = [
 const STATIC_PLAYER_PAGES = new Set(["brayan-hernandez", "gianni-westphal", "jose-cedeno", "danyer-sanabria", "francesco-mazzei", "anderson-pena", "jesus-delgado", "lorenzo-gonzalez", "jaider-morelos", "bret-bowers", "osiris-german", "adam-moser", "yerardo-ciofani", "javier-useche", "david-chavez", "matteo-colalucci", "anthony-quattrocchi"]);
 
 const T = {
-  en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_collab:"Collaborators",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_signin:"Sign In",nav_myprofile:"My Profile",nav_signin_create:"Create Account",nav_signin_player:"Player Portal",nav_signin_scout:"Scout Portal",nav_signin_admin:"Admin Portal",nav_cta:"Apply Now",
+  en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_signin:"Sign In",nav_myprofile:"My Profile",nav_signin_create:"Create Account",nav_signin_player:"Player Portal",nav_signin_scout:"Scout Portal",nav_signin_admin:"Admin Portal",nav_cta:"Apply Now",
     contracts_h2:'50+ contracts signed <em>since 2025</em>',
     contracts_sub:'Our athletes have signed contracts in <b>7 different countries</b> to date.',
     feat_role:"Former Cleveland Indians organization",
@@ -887,15 +846,11 @@ const T = {
     svc6_t:"Winter League",svc6_d:"Placing athletes in winter league play abroad for extra reps and exposure during the offseason.",svc6_pay:"Sign up for Winter League →",svc_pro_t:"Professional Leagues",svc_pro_d:"Opening doors to professional play — independent leagues in North America, winter leagues abroad, and clubs across Europe.",svc_pro_pay:"Explore Professional Leagues →",
     so_t:"Softball Opportunities",so_d:"Guiding softball athletes through college recruiting, national team pathways and international competition — with player development, showcase events and exposure to college coaches and scouts.",so_pay:"Explore Softball Opportunities →",    svc4_t:"Social Media & Branding",svc4_d:"Building each athlete's profile and story to grow their visibility.",
     svc5_t:"Representation & Development",svc5_d:"Day-to-day management and a plan tailored to each athlete.",svc5_b1:"Progress tracking",svc5_b2:"Personalized training",svc5_b3:"Nutrition guidance",svc5_b4:"WhatsApp support",svc5_pay:"Sign up for Representation →",svc5_hl_t:"Specialized Personalized Training",svc5_hl_d:"One-on-one and online coaching tailored to each athlete's game and goals.",
-    who_kicker:"Who I Am",who_role:"CEO & Founder · Professional Baseball Player",collab_kicker:"The Team",collab_h2:"Collaborators",collab_cover_t:"Our Team & Staff",collab_cover_p:"Specialists who work alongside Elite Sports Management.",collab_cover_cta:"Click to Meet Our Team →",
+    who_kicker:"Who I Am",who_role:"CEO & Founder · Professional Baseball Player",
     who_bio:"Elite Sports Management was founded by Samuele Bruno — born and raised in Italy, and the first player born and raised in Italy to go on and play in the Canadian Baseball League. He came up through the Italian system, took silver with Italy at the U18 European Championship, and went on to wear the shirt of the Italian National Team. He played six seasons professionally in Italy, and earned a scholarship to play three years of college baseball in the United States.",
     who_bio2:"His own career ran through indy ball and winter leagues across North America and Australia — the same routes he now opens for ESM athletes. Beyond representation, Samuele runs camps, showcases and a coaching program built on one idea: talent gets you noticed, but representation gets you signed.",
     cred_italy:"Italy National Team",cred_u18:"U18 European Championship · Silver",cred_cbl:"First Italian-raised player in the CBL",cred_pro:"6 Seasons Pro in Italy",cred_college:"U.S. College Scholarship",cred_hastings:"Hastings College · All-GPAC Honorable Mention",cred_cod:"College of the Desert · 3 HR in One Game",cred_ecc:"ECC College · Region 16 Champions",cred_util:"Professional Baseball Player",
-    mz_role:"Softball Specialist",
-    mz_bio:"NASM Certified Personal Trainer. Played JUCO softball at Eastern Arizona College before continuing her career at Texas A&M Kingsville, where she's studying Kinesiology – Performance Psychology and was named to the 2026 LSC All-Conference Tournament Team.",
-    mz_bio2:"A three-time member of the Italian National Team, Marianna won silver with the U18 squad in 2021, silver again with the U22 squad in 2024, and gold in 2026 — becoming U22 European Champions.",
-    mz_bio3:"She has competed in Italy's Serie A1, the country's highest level of softball, since 2020 and is entering her fourth season playing in the United States.",
-    mz_cred1:"NASM Certified Personal Trainer",mz_cred2:"Italian National Team ×3",mz_cred3:"U22 European Champion · Gold 2026",mz_cred4:"LSC All-Conference Tournament Team 2026",mz_cred5:"Serie A1 · Italy's Top Level",mz_contact:"Contact Her",sam_contact:"Contact Him",
+    sam_contact:"Contact Him",
     roster_kicker:"The Roster",roster_h2:"A growing family of baseball players from around the world",
     roster_p:"A growing family of baseball players from around the world.",roster_cta_p:"Are you a coach or team? Get full roster access with athlete contact details — 1 year, plus 1 year free.",roster_cta_btn:"Get roster access →",
     filter_all:"All",filter_pitcher:"Pitchers",filter_catcher:"Catchers",filter_infielder:"Infielders",filter_twoway:"Two-Way",card_view:"View profile →",roster_empty:"No athletes in this category yet.",
@@ -916,7 +871,7 @@ const T = {
     foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",ceasai_cta:"Website built by CeasAI — Create your own site like this →",ceasai_ig:"Follow CeasAI on Instagram",ceasai_email:"Email CeasAI",ceasai_tiktok:"Follow CeasAI on TikTok",
     install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install",
     admin_link:"Admin",login_h:"Admin Login",login_sub:"Manage athletes, stats & photos",login_email:"Email",login_pass:"Password",login_btn:"Log in"},
-  es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_collab:"Colaboradores",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_signin:"Entrar",nav_myprofile:"Mi Perfil",nav_signin_create:"Crear Cuenta",nav_signin_player:"Portal Jugador",nav_signin_scout:"Portal Scout",nav_signin_admin:"Portal Admin",nav_cta:"Aplica Ahora",
+  es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_signin:"Entrar",nav_myprofile:"Mi Perfil",nav_signin_create:"Crear Cuenta",nav_signin_player:"Portal Jugador",nav_signin_scout:"Portal Scout",nav_signin_admin:"Portal Admin",nav_cta:"Aplica Ahora",
     contracts_h2:'Más de 50 contratos firmados <em>desde 2025</em>',
     contracts_sub:'Nuestros atletas han firmado contratos en <b>7 países diferentes</b> hasta la fecha.',
     feat_role:"Ex organización de los Cleveland Indians",
@@ -965,15 +920,11 @@ const T = {
     svc6_t:"Liga de Invierno",svc6_d:"Ubicamos atletas en ligas de invierno en el extranjero para sumar experiencia y visibilidad fuera de temporada.",svc6_pay:"Inscríbete en la Liga de Invierno →",svc_pro_t:"Ligas Profesionales",svc_pro_d:"Abrimos puertas al béisbol profesional — ligas independientes en Norteamérica, ligas de invierno en el extranjero y clubes por toda Europa.",svc_pro_pay:"Explora las Ligas Profesionales →",
     so_t:"Oportunidades de Sóftbol",so_d:"Acompañamos a las atletas de sóftbol en el reclutamiento universitario, las vías hacia las selecciones nacionales y la competición internacional — con desarrollo de jugadoras, showcases y visibilidad ante entrenadores y scouts.",so_pay:"Explora las Oportunidades de Sóftbol →",    svc4_t:"Redes Sociales y Marca",svc4_d:"Construimos el perfil y la historia de cada atleta para aumentar su visibilidad.",
     svc5_t:"Representación y Desarrollo",svc5_d:"Gestión diaria y un plan a la medida de cada atleta.",svc5_b1:"Seguimiento del progreso",svc5_b2:"Entrenamiento personalizado",svc5_b3:"Guía nutricional",svc5_b4:"Soporte por WhatsApp",svc5_pay:"Inscríbete en Representación →",svc5_hl_t:"Entrenamiento Personalizado Especializado",svc5_hl_d:"Coaching individual y online adaptado al juego y los objetivos de cada atleta.",
-    who_kicker:"Quién Soy",who_role:"CEO y Fundador · Jugador de Béisbol Profesional",collab_kicker:"El Equipo",collab_h2:"Colaboradores",collab_cover_t:"Nuestro Equipo y Staff",collab_cover_p:"Especialistas que trabajan junto a Elite Sports Management.",collab_cover_cta:"Haz clic para conocer a nuestro equipo →",
+    who_kicker:"Quién Soy",who_role:"CEO y Fundador · Jugador de Béisbol Profesional",
     who_bio:"Elite Sports Management fue fundada por Samuele Bruno — nacido y criado en Italia, y el primer jugador nacido y criado en Italia en llegar a jugar en la Canadian Baseball League. Se formó en el sistema italiano, fue subcampeón con Italia en el Campeonato Europeo Sub-18 y llegó a vestir la camiseta de la Selección Italiana. Jugó seis temporadas como profesional en Italia y obtuvo una beca para jugar tres años de béisbol universitario en Estados Unidos.",
     who_bio2:"Su propia carrera pasó por el indy ball y las ligas de invierno de Norteamérica y Australia — las mismas rutas que hoy abre para los atletas de ESM. Además de la representación, Samuele organiza camps, showcases y un programa de coaching con una sola idea: el talento llama la atención, pero la representación te consigue el contrato.",
     cred_italy:"Selección de Italia",cred_u18:"Campeonato Europeo Sub-18 · Plata",cred_cbl:"Primer italiano de formación en la CBL",cred_pro:"6 Temporadas Pro en Italia",cred_college:"Beca Universitaria en EE. UU.",cred_hastings:"Hastings College · Mención de Honor All-GPAC",cred_cod:"College of the Desert · 3 HR en un Partido",cred_ecc:"ECC College · Campeones de la Región 16",cred_util:"Jugador de Béisbol Profesional",
-    mz_role:"Especialista en Softbol",
-    mz_bio:"Entrenadora personal certificada por NASM. Jugó softbol JUCO en Eastern Arizona College antes de continuar su carrera en Texas A&M Kingsville, donde estudia Kinesiología – Psicología del Rendimiento y fue nombrada al Equipo All-Conference del Torneo LSC 2026.",
-    mz_bio2:"Miembro de la Selección Nacional de Italia en tres ocasiones, Marianna ganó la medalla de plata con la selección U18 en 2021, plata nuevamente con la U22 en 2024 y oro en 2026, coronándose Campeona Europea U22.",
-    mz_bio3:"Compite en la Serie A1 de Italia, la máxima categoría del país, desde 2020 y está por comenzar su cuarta temporada jugando en Estados Unidos.",
-    mz_cred1:"Entrenadora Personal Certificada NASM",mz_cred2:"Selección de Italia ×3",mz_cred3:"Campeona Europea U22 · Oro 2026",mz_cred4:"Equipo All-Conference del Torneo LSC 2026",mz_cred5:"Serie A1 · Máxima Categoría de Italia",mz_contact:"Contáctala",sam_contact:"Contáctalo",
+    sam_contact:"Contáctalo",
     roster_kicker:"Los Jugadores",roster_h2:"Una familia creciente de jugadores de béisbol de todo el mundo",
     roster_p:"Una familia creciente de jugadores de béisbol de todo el mundo.",roster_cta_p:"¿Eres entrenador o equipo? Consigue acceso completo al roster con los datos de contacto de los atletas — 1 año, más 1 año gratis.",roster_cta_btn:"Consigue acceso al roster →",
     filter_all:"Todos",filter_pitcher:"Lanzadores",filter_catcher:"Receptores",filter_infielder:"Infielders",filter_twoway:"Dos Vías",card_view:"Ver perfil →",roster_empty:"Aún no hay atletas en esta categoría.",
@@ -994,7 +945,7 @@ const T = {
     foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",ceasai_cta:"Sitio web creado por CeasAI — Crea tu propio sitio como este →",ceasai_ig:"Sigue a CeasAI en Instagram",ceasai_email:"Escríbele un correo a CeasAI",ceasai_tiktok:"Sigue a CeasAI en TikTok",
     install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar",
     admin_link:"Admin",login_h:"Acceso Admin",login_sub:"Gestiona atletas, estadísticas y fotos",login_email:"Correo",login_pass:"Contraseña",login_btn:"Entrar"},
-  it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_collab:"Collaboratori",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_signin:"Accedi",nav_myprofile:"Il Mio Profilo",nav_signin_create:"Crea Account",nav_signin_player:"Portale Giocatore",nav_signin_scout:"Portale Scout",nav_signin_admin:"Portale Admin",nav_cta:"Candidati",
+  it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_signin:"Accedi",nav_myprofile:"Il Mio Profilo",nav_signin_create:"Crea Account",nav_signin_player:"Portale Giocatore",nav_signin_scout:"Portale Scout",nav_signin_admin:"Portale Admin",nav_cta:"Candidati",
     contracts_h2:'Oltre 50 contratti firmati <em>dal 2025</em>',
     contracts_sub:'I nostri atleti hanno firmato contratti in <b>7 paesi diversi</b> a oggi.',
     feat_role:"Ex organizzazione Cleveland Indians",
@@ -1043,15 +994,11 @@ const T = {
     svc6_t:"Winter League",svc6_d:"Inseriamo gli atleti in campionati invernali all'estero per accumulare esperienza e visibilità durante la bassa stagione.",svc6_pay:"Iscriviti alla Winter League →",svc_pro_t:"Leghe Professionistiche",svc_pro_d:"Apriamo le porte al professionismo — leghe indipendenti in Nord America, winter league all'estero e club in tutta Europa.",svc_pro_pay:"Scopri le Leghe Professionistiche →",
     so_t:"Opportunità nel Softball",so_d:"Accompagniamo le atlete di softball nel recruiting universitario, nei percorsi verso le nazionali e nella competizione internazionale — con sviluppo delle giocatrici, showcase ed esposizione a coach e scout.",so_pay:"Scopri le Opportunità nel Softball →",    svc4_t:"Social Media e Brand",svc4_d:"Costruiamo il profilo e la storia di ogni atleta per aumentarne la visibilità.",
     svc5_t:"Rappresentanza e Sviluppo",svc5_d:"Gestione quotidiana e un piano su misura per ogni atleta.",svc5_b1:"Monitoraggio dei progressi",svc5_b2:"Allenamento personalizzato",svc5_b3:"Guida nutrizionale",svc5_b4:"Supporto via WhatsApp",svc5_pay:"Iscriviti alla Rappresentanza →",svc5_hl_t:"Allenamento Personalizzato Specializzato",svc5_hl_d:"Coaching individuale e online su misura per il gioco e gli obiettivi di ogni atleta.",
-    who_kicker:"Chi Sono",who_role:"CEO e Fondatore · Giocatore di Baseball Professionista",collab_kicker:"Il Team",collab_h2:"Collaboratori",collab_cover_t:"Il Nostro Team e Staff",collab_cover_p:"Specialisti che lavorano insieme a Elite Sports Management.",collab_cover_cta:"Clicca per conoscere il nostro team →",
+    who_kicker:"Chi Sono",who_role:"CEO e Fondatore · Giocatore di Baseball Professionista",
     who_bio:"Elite Sports Management è stata fondata da Samuele Bruno — nato e cresciuto in Italia, e il primo giocatore nato e cresciuto in Italia ad arrivare a giocare nella Canadian Baseball League. Cresciuto nel sistema italiano, ha conquistato l'argento con l'Italia al Campionato Europeo U18 ed è arrivato a vestire la maglia della Nazionale Italiana. Ha giocato sei stagioni da professionista in Italia e ha ottenuto una borsa di studio per giocare tre anni di baseball universitario negli Stati Uniti.",
     who_bio2:"La sua carriera è passata per l'indy ball e le winter league tra Nord America e Australia — le stesse strade che oggi apre agli atleti ESM. Oltre alla rappresentanza, Samuele organizza camp, showcase e un programma di coaching con un'unica idea: il talento ti fa notare, ma la rappresentanza ti fa firmare.",
     cred_italy:"Nazionale Italiana",cred_u18:"Campionato Europeo U18 · Argento",cred_cbl:"Primo italiano di formazione nella CBL",cred_pro:"6 Stagioni Pro in Italia",cred_college:"Borsa di Studio negli USA",cred_hastings:"Hastings College · Menzione d'Onore All-GPAC",cred_cod:"College of the Desert · 3 HR in una Partita",cred_ecc:"ECC College · Campioni della Regione 16",cred_util:"Giocatore di Baseball Professionista",
-    mz_role:"Specialista di Softball",
-    mz_bio:"Personal trainer certificata NASM. Ha giocato softball JUCO all'Eastern Arizona College prima di proseguire la carriera alla Texas A&M Kingsville, dove studia Kinesiologia – Psicologia della Performance ed è stata inserita nella Tournament Team All-Conference LSC 2026.",
-    mz_bio2:"Convocata tre volte nella Nazionale Italiana, ha conquistato l'argento con la U18 nel 2021, nuovamente l'argento con la U22 nel 2024 e l'oro nel 2026, laureandosi Campionessa Europea U22.",
-    mz_bio3:"Gioca nella Serie A1, il massimo campionato italiano di softball, dal 2020 ed è pronta ad affrontare la sua quarta stagione negli Stati Uniti.",
-    mz_cred1:"Personal Trainer Certificata NASM",mz_cred2:"Nazionale Italiana ×3",mz_cred3:"Campionessa Europea U22 · Oro 2026",mz_cred4:"Tournament Team All-Conference LSC 2026",mz_cred5:"Serie A1 · Massimo Campionato Italiano",mz_contact:"Contattala",sam_contact:"Contattalo",
+    sam_contact:"Contattalo",
     roster_kicker:"Il Roster",roster_h2:"Una famiglia in crescita di giocatori di baseball da tutto il mondo",
     roster_p:"Una famiglia in crescita di giocatori di baseball da tutto il mondo.",roster_cta_p:"Sei un allenatore o una squadra? Ottieni l'accesso completo al roster con i contatti degli atleti — 1 anno, più 1 anno gratis.",roster_cta_btn:"Ottieni l'accesso al roster →",
     filter_all:"Tutti",filter_pitcher:"Lanciatori",filter_catcher:"Ricevitori",filter_infielder:"Interni",filter_twoway:"Due Ruoli",card_view:"Vedi profilo →",roster_empty:"Ancora nessun atleta in questa categoria.",
@@ -1754,15 +1701,6 @@ document.getElementById("yr").textContent=new Date().getFullYear();
   if(!si)return;
   document.addEventListener("click",e=>{if(si.open&&!si.contains(e.target))si.open=false;});
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&si.open)si.open=false;});
-})();
-
-// Collaborators cover: reveal Marianna's real card in place on click/Enter/Space.
-(function(){
-  const cover=document.getElementById("collabCover"), card=document.getElementById("collabCard");
-  if(!cover||!card)return;
-  function reveal(){card.style.display="";cover.style.display="none";cover.setAttribute("aria-expanded","true");card.scrollIntoView({behavior:"smooth",block:"nearest"});}
-  cover.addEventListener("click",reveal);
-  cover.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();reveal();}});
 })();
 
 const form=document.getElementById("applyForm");
