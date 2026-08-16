@@ -267,6 +267,10 @@
   .phone-row .phone-num{flex:1;min-width:0}
   .form-msg{display:none;margin-top:14px;padding:14px 16px;border-radius:12px;background:rgba(217,177,84,.12);border:1px solid var(--gold);color:var(--gold-soft);font-weight:600}
   .form-msg.show{display:block}
+  /* Terms & Conditions acceptance (item 8) — required before purchase/signup submits. */
+  .tc{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:var(--muted);margin:2px 0 14px;line-height:1.5;text-align:left;flex-wrap:wrap;cursor:pointer}
+  .tc input{margin-top:2px;flex:none;width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
+  .tc-more{color:var(--gold-soft);font-weight:700;text-decoration:underline}
 
   .band{position:relative;z-index:1;margin:30px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:linear-gradient(120deg,rgba(217,177,84,.10),transparent)}
   .band-in{padding:58px 0;text-align:center}.band h2{font-size:clamp(28px,5vw,50px)}
@@ -653,6 +657,8 @@
           <a class="btn btn-gold pc-tier-cta" data-mail data-subject="Profile creation — Direct Contact (€149.99)" data-body="I'd like to create my ESM athlete profile — Direct Contact tier (€149.99, direct phone number shared with scouts/teams/GMs). My details — Name: / Age: / Position & sport: / Country: / Current team: / Instagram:" data-i18n="pg_t2_btn"></a>
         </div>
       </div>
+      <label class="tc" style="justify-content:center"><input type="checkbox" class="tc-check" id="profileTc"><span data-i18n="tc_label"></span> <a class="tc-more" href="terms.html" target="_blank" rel="noopener" data-i18n="tc_more"></a></label>
+      <div class="gate-err" id="profileTcErr" data-i18n="tc_required"></div>
       <div class="pc-access" data-i18n="pg_access"></div>
     </div>
   </div>
@@ -679,6 +685,7 @@
       <div class="field"><label data-i18n="f_other"></label><textarea name="other"></textarea></div>
       <!-- Anti-spam honeypot — hidden from real users; must stay empty. -->
       <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <label class="tc"><input type="checkbox" class="tc-check" id="joinTc"><span data-i18n="tc_label"></span> <a class="tc-more" href="terms.html" target="_blank" rel="noopener" data-i18n="tc_more"></a></label>
       <button class="btn btn-gold" type="submit" data-i18n="f_submit"></button>
       <div class="form-msg" id="formMsg"></div>
     </form>
@@ -902,6 +909,7 @@ const T = {
     events_kicker:"Events",events_h2:"Camps, Showcases & Tournaments",events_p:"Where Elite Sports Management athletes train, compete and get seen.",
     ev_upcoming:"Upcoming",ev_past:"Past",ev_register:"Register",ev_gallery:"View media & photos",
     testi_kicker:"Testimonials",testi_h2:"What People Say",testi_p:"Voices from players, families and coaches in the ESM family.",testi_seeall:"See all testimonials →",testi_all_h:"All Testimonials",
+    tc_label:"I accept the Terms & Conditions",tc_more:"Read more",tc_required:"Please accept the Terms & Conditions to continue.",
     join_kicker:"Join Us",join_h2:"Apply to Elite Sports Management",join_p:"Players, families and clubs — tell us about yourself and we'll create your athlete profile.",
     join_tagline:"Talent Gets You Noticed. Representation Gets You Signed.",
     join_pitch:"Talent alone rarely opens the door. The right agent turns tryouts into contracts — negotiating your deals, opening leagues at home and abroad, and putting your name in front of the scouts and coaches who decide careers.",
@@ -977,6 +985,7 @@ const T = {
     events_kicker:"Eventos",events_h2:"Camps, Showcases y Torneos",events_p:"Donde los atletas de Elite Sports Management entrenan, compiten y se hacen ver.",
     ev_upcoming:"Próximo",ev_past:"Pasado",ev_register:"Inscribirse",ev_gallery:"Ver fotos y videos",
     testi_kicker:"Testimonios",testi_h2:"Lo Que Dicen",testi_p:"Voces de jugadores, familias y entrenadores de la familia ESM.",testi_seeall:"Ver todos los testimonios →",testi_all_h:"Todos los Testimonios",
+    tc_label:"Acepto los Términos y Condiciones",tc_more:"Leer más",tc_required:"Acepta los Términos y Condiciones para continuar.",
     join_kicker:"Únete",join_h2:"Aplica a Elite Sports Management",join_p:"Jugadores, familias y clubes — cuéntanos sobre ti y crearemos tu perfil de atleta.",
     join_tagline:"El talento llama la atención. La representación te consigue el contrato.",
     join_pitch:"El talento por sí solo casi nunca abre la puerta. El agente adecuado convierte las pruebas en contratos: negocia tus acuerdos, te abre ligas dentro y fuera del país y pone tu nombre frente a los scouts y entrenadores que deciden carreras.",
@@ -1052,6 +1061,7 @@ const T = {
     events_kicker:"Eventi",events_h2:"Camp, Showcase e Tornei",events_p:"Dove gli atleti di Elite Sports Management si allenano, competono e si fanno notare.",
     ev_upcoming:"In arrivo",ev_past:"Passato",ev_register:"Iscriviti",ev_gallery:"Foto e video",
     testi_kicker:"Testimonianze",testi_h2:"Cosa Dicono",testi_p:"Le voci di giocatori, famiglie e coach della famiglia ESM.",testi_seeall:"Vedi tutte le testimonianze →",testi_all_h:"Tutte le Testimonianze",
+    tc_label:"Accetto i Termini e Condizioni",tc_more:"Leggi di più",tc_required:"Accetta i Termini e Condizioni per continuare.",
     join_kicker:"Unisciti",join_h2:"Candidati a Elite Sports Management",join_p:"Giocatori, famiglie e club — raccontaci di te e creeremo il tuo profilo da atleta.",
     join_tagline:"Il talento ti fa notare. La rappresentanza ti fa firmare.",
     join_pitch:"Il solo talento raramente apre le porte. L'agente giusto trasforma i provini in contratti: negozia i tuoi accordi, ti apre le leghe in patria e all'estero e mette il tuo nome davanti agli scout e agli allenatori che decidono le carriere.",
@@ -1577,6 +1587,15 @@ function openTestiModal(){
 document.getElementById("testiAll").onclick=openTestiModal;
 {const tt=document.getElementById("testiAllTop");if(tt)tt.onclick=openTestiModal;}
 
+// Two-tier profile CTAs email ESM — but only after Terms & Conditions are accepted (item 8).
+(function(){
+  const tc=document.getElementById("profileTc"), err=document.getElementById("profileTcErr");
+  document.querySelectorAll(".pc-tier-cta").forEach(a=>a.addEventListener("click",e=>{
+    if(tc&&!tc.checked){ e.preventDefault(); if(err)err.classList.add("show"); }
+  }));
+  if(tc)tc.addEventListener("change",()=>{ if(tc.checked&&err)err.classList.remove("show"); });
+})();
+
 /* ===== media lightbox (opened from the event detail modal's photo gallery) ===== */
 function openLightbox(src,cap){
   document.getElementById("sheetContent").innerHTML=
@@ -1782,6 +1801,12 @@ form.addEventListener("submit",async e=>{
   if((fd.get("company")||"").trim() || (Date.now()-FORM_T0)<1500){
     form.reset();msg.textContent=t("f_success");msg.classList.add("show");
     return;
+  }
+
+  // Terms & Conditions must be accepted before the submission is saved (item 8).
+  if(!document.getElementById("joinTc")?.checked){
+    msg.textContent=t("tc_required");msg.classList.add("show","err");
+    msg.scrollIntoView({behavior:"smooth",block:"center"});return;
   }
 
   // Applications require the live database; without it we can't save them.

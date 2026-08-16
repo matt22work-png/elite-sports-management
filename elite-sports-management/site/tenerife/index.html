@@ -62,6 +62,9 @@
   .pay-service li::before{content:"✓";color:var(--teal-soft);font-weight:800;flex:0 0 auto}
   #booting{color:var(--muted);text-align:center;padding:30px}
   .hide{display:none}
+  .tc{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--muted);margin:2px 0 14px;line-height:1.5;flex-wrap:wrap;cursor:pointer}
+  .tc input{margin-top:2px;flex:none;width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
+  .tc-more{color:var(--gold-soft);font-weight:700;text-decoration:underline}
   @media(max-width:560px){ .wrap{padding:18px 14px 80px} .grid2{grid-template-columns:1fr} .field input,.field select,.field textarea{font-size:16px} }
 </style>
 </head>
@@ -92,6 +95,7 @@
         <div class="field"><label for="t-position" data-i18n="te_position">Position</label><input id="t-position" data-i18n-ph="te_position_ph" placeholder="e.g. Catcher / RHP" /></div>
       </div>
       <div class="field"><label for="t-notes" data-i18n="te_other">Anything else? (optional)</label><textarea id="t-notes" rows="3" data-i18n-ph="te_other_ph" placeholder="Dietary needs, travel questions, level of play…"></textarea></div>
+      <label class="tc"><input type="checkbox" id="teTc"><span data-i18n="tc_label">I accept the Terms &amp; Conditions</span> <a class="tc-more" href="../terms.html" target="_blank" rel="noopener" data-i18n="tc_more">Read more</a></label>
       <button class="btn btn-gold" type="submit" style="width:100%" data-i18n="te_submit">Submit registration</button>
       <div class="msg" id="regMsg" role="alert" aria-live="assertive"></div>
     </form>
@@ -160,6 +164,7 @@ const DICT = {
     te_step3:"We'll email you with the next steps and event details.",
     te_note2:"We'll be in touch to confirm your registration.",
     te_err_name:"Please enter your name.", te_err_submit:"Couldn't submit your registration: ",
+    tc_label:"I accept the Terms & Conditions", tc_more:"Read more", tc_required:"Please accept the Terms & Conditions to continue.",
   },
   es:{
     te_kicker:"WINTER LEAGUE · TENERIFE", te_loading:"Cargando…",
@@ -181,6 +186,7 @@ const DICT = {
     te_step3:"Te enviaremos un correo con los siguientes pasos y los detalles del evento.",
     te_note2:"Nos pondremos en contacto para confirmar tu inscripción.",
     te_err_name:"Por favor, introduce tu nombre.", te_err_submit:"No pudimos enviar tu inscripción: ",
+    tc_label:"Acepto los Términos y Condiciones", tc_more:"Leer más", tc_required:"Acepta los Términos y Condiciones para continuar.",
   },
   it:{
     te_kicker:"WINTER LEAGUE · TENERIFE", te_loading:"Caricamento…",
@@ -202,6 +208,7 @@ const DICT = {
     te_step3:"Ti invieremo un'email con i prossimi passi e i dettagli dell'evento.",
     te_note2:"Ti contatteremo per confermare la tua iscrizione.",
     te_err_name:"Inserisci il tuo nome.", te_err_submit:"Impossibile inviare la tua iscrizione: ",
+    tc_label:"Accetto i Termini e Condizioni", tc_more:"Leggi di più", tc_required:"Accetta i Termini e Condizioni per continuare.",
   },
 };
 const SUPPORTED = ["en","es","it"];
@@ -257,6 +264,7 @@ $("regForm").addEventListener("submit", async e => {
   const m = $("regMsg"); m.classList.remove("show");
   const name = $("t-name").value.trim();
   if (!name){ m.textContent = t("te_err_name"); m.classList.add("show"); $("t-name").focus(); return; }
+  if (!$("teTc")?.checked){ m.textContent = t("tc_required"); m.classList.add("show"); return; }
   const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
   try {
     // Insert-only (no .select()): anon has INSERT but not SELECT on this table.

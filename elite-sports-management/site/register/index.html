@@ -62,6 +62,9 @@
   .msg.show{display:block}
   .msg.ok{color:var(--teal-soft);border-color:var(--teal-soft);background:rgba(58,154,166,.1)}
   .note{font-size:13px;color:var(--muted);margin-top:16px;text-align:center}
+  .tc{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--muted);margin:2px 0 14px;line-height:1.5;flex-wrap:wrap;cursor:pointer}
+  .tc input{margin-top:2px;flex:none;width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
+  .tc-more{color:var(--gold-soft);font-weight:700;text-decoration:underline}
   .pay-steps{list-style:none;margin:14px 0 4px;padding:0}
   .pay-steps li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(217,177,84,.12);font-size:14.5px;color:var(--ink)}
   .pay-steps li:last-child{border-bottom:0}
@@ -127,6 +130,7 @@
         <div class="role-opt" data-role="scout" role="radio" aria-checked="false" tabindex="0"><span class="ic">🔎</span><b data-i18n="r_role_scout">Scout / Recruiter</b><span data-i18n="r_role_scout_desc">Roster &amp; recruiting access</span></div>
       </div>
 
+      <label class="tc"><input type="checkbox" id="acctTc"><span data-i18n="tc_label">I accept the Terms &amp; Conditions</span> <a class="tc-more" href="../terms.html" target="_blank" rel="noopener" data-i18n="tc_more">Read more</a></label>
       <button class="btn btn-gold" type="submit" style="width:100%" data-i18n="r_create_continue">Create account &amp; continue</button>
       <div class="msg" id="acctMsg" role="alert" aria-live="assertive"></div>
     </form>
@@ -340,6 +344,7 @@ const DICT = {
     // JS messages
     r_err_role:"Please choose whether you're a Player or a Scout.",
     r_err_pwmatch:"Passwords don't match. Please re-enter them.",
+    tc_label:"I accept the Terms & Conditions", tc_more:"Read more", tc_required:"Please accept the Terms & Conditions to continue.",
     r_err_session:"Your session expired — please sign in again.",
     r_err_save_profile:"Couldn't save your profile: ",
     r_err_save_details:"Couldn't save your details: ",
@@ -398,6 +403,7 @@ const DICT = {
     r_sb_remove:"Eliminar esta temporada",
     r_err_role:"Elige si eres Jugador o Scout.",
     r_err_pwmatch:"Las contraseñas no coinciden. Vuelve a introducirlas.",
+    tc_label:"Acepto los Términos y Condiciones", tc_more:"Leer más", tc_required:"Acepta los Términos y Condiciones para continuar.",
     r_err_session:"Tu sesión expiró — vuelve a iniciar sesión.",
     r_err_save_profile:"No se pudo guardar tu perfil: ",
     r_err_save_details:"No se pudieron guardar tus datos: ",
@@ -456,6 +462,7 @@ const DICT = {
     r_sb_remove:"Rimuovi questa stagione",
     r_err_role:"Scegli se sei un Giocatore o uno Scout.",
     r_err_pwmatch:"Le password non coincidono. Reinseriscile.",
+    tc_label:"Accetto i Termini e Condizioni", tc_more:"Leggi di più", tc_required:"Accetta i Termini e Condizioni per continuare.",
     r_err_session:"La tua sessione è scaduta — accedi di nuovo.",
     r_err_save_profile:"Impossibile salvare il tuo profilo: ",
     r_err_save_details:"Impossibile salvare i tuoi dati: ",
@@ -593,6 +600,7 @@ $("acctForm").addEventListener("submit", async e => {
   e.preventDefault();
   clearMsg($("acctMsg"));
   if (!chosenRole){ msg($("acctMsg"), t("r_err_role")); return; }
+  if (!$("acctTc")?.checked){ msg($("acctMsg"), t("tc_required")); return; }
   const first = $("first").value.trim(), last = $("last").value.trim();
   const email = $("email").value.trim(), password = $("password").value;
   // Require the two password fields to match before creating the account.
