@@ -506,6 +506,8 @@
       </div>
     </div>
   </div>
+  <!-- "See all testimonials" near the featured testimonial (item 1) — same modal + styling as the bottom one. -->
+  <div style="text-align:center;margin-top:22px"><button type="button" id="testiAllTop" class="btn btn-gold" style="display:none" data-i18n="testi_seeall"></button></div>
 </div></section>
 
 <div class="stats"><div class="wrap stats-in">
@@ -1552,11 +1554,18 @@ const testiCard=x=>`
         <div><div class="nm">${esc(x.n)}</div><div class="rl">${esc(loc(x.r))}</div></div>
       </div></div>`;
 function renderTesti(){
-  document.getElementById("testiList").innerHTML=TESTIMONIALS.map(testiCard).join("");
+  // Lower grid shows the admin-managed (DB) testimonials; Jos\u00E9 stays the featured
+  // card at the top only (item 4 \u2014 no duplicate). Falls back to the embedded set if
+  // the DB is unreachable so the section is never empty.
+  const lower=DB_TESTI.length?DB_TESTI:TESTIMONIALS;
+  document.getElementById("testiList").innerHTML=lower.map(testiCard).join("");
   const feat=document.getElementById("featQuote");
   if(feat&&TESTIMONIALS[0])feat.textContent="\u201C"+loc(TESTIMONIALS[0].q)+"\u201D";
-  const more=document.getElementById("testiAll");
-  if(more){ more.textContent=t("testi_seeall"); more.style.display=DB_TESTI.length?"":"none"; }
+  // Both "See all testimonials" buttons (top, by the featured card; and bottom) show
+  // only when there are extra testimonials in the modal beyond the featured one.
+  [document.getElementById("testiAll"),document.getElementById("testiAllTop")].forEach(more=>{
+    if(more){ more.textContent=t("testi_seeall"); more.style.display=DB_TESTI.length?"":"none"; }
+  });
 }
 function openTestiModal(){
   const all=[...TESTIMONIALS,...DB_TESTI];
@@ -1566,6 +1575,7 @@ function openTestiModal(){
   document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
 }
 document.getElementById("testiAll").onclick=openTestiModal;
+{const tt=document.getElementById("testiAllTop");if(tt)tt.onclick=openTestiModal;}
 
 /* ===== media lightbox (opened from the event detail modal's photo gallery) ===== */
 function openLightbox(src,cap){
@@ -1836,8 +1846,8 @@ async function boot(){
       // Supabase stores the photo in `image_url`; the renderer reads `image`.
       if(data&&data.length)PLAYERS=data.map(p=>({...p,image:p.image_url||p.image||null}));
       // Extra testimonials from the CMS for the "See all" list (plain strings; loc() handles them).
-      const {data:tData}=await SB.from("testimonials").select("quote,name,role,sort_order").order("sort_order");
-      if(tData&&tData.length)DB_TESTI=tData.map(x=>({q:x.quote,n:x.name,r:x.role,photo:null}));
+      const {data:tData}=await SB.from("testimonials").select("quote,name,role,image_url,sort_order").order("sort_order");
+      if(tData&&tData.length)DB_TESTI=tData.map(x=>({q:x.quote,n:x.name,r:x.role,photo:x.image_url||null}));
     }catch(err){console.warn("Supabase load failed; using embedded roster.",err);}
   }
   // Repo-committed photos fill in only where Supabase has none.

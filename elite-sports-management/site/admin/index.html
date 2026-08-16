@@ -202,6 +202,22 @@
     <div class="kicker">Tenerife registrants<span class="count" id="tenCount">0</span></div>
     <div id="tenList"></div>
 
+    <div class="kicker">Testimonials</div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">Testimonials on the homepage — the lower “What People Say” grid and the “See all” list. (The featured José Cedeño quote at the very top is separate.) Add a name, role, the quote, an optional photo, and a display order. Changes are <b style="color:var(--ink)">live immediately</b>.</p>
+      <button class="btn btn-gold" type="button" id="tsAddToggle">+ Add testimonial</button>
+      <div class="editor" id="tsAddEditor">
+        <div class="field"><label for="ts-name">Name</label><input id="ts-name" placeholder="e.g. José Cedeño" /></div>
+        <div class="field"><label for="ts-role">Role / subtitle</label><input id="ts-role" placeholder="e.g. Former Cleveland Indians organization" /></div>
+        <div class="field"><label for="ts-quote">Quote *</label><textarea id="ts-quote" rows="4" placeholder="What they said…"></textarea></div>
+        <div class="field"><label for="ts-order">Display order (lower shows first)</label><input id="ts-order" type="number" value="0" /></div>
+        <div class="field"><label for="ts-photo">Photo (optional)</label><input type="file" accept="image/*" id="ts-photo" /></div>
+        <div class="row-btns"><button class="btn btn-gold" type="button" id="ts-save">Add testimonial</button></div>
+        <div class="msg err" id="ts-msg" role="alert" aria-live="assertive"></div>
+      </div>
+      <div id="tsList" style="margin-top:14px"></div>
+    </div>
+
     <div class="kicker">Your account</div>
     <div class="card">
       <div class="acct-meta" id="acctWho"></div>
@@ -349,6 +365,7 @@ async function load(){
   render();
   loadAccounts();
   loadTenerife();
+  loadTestimonials();
 }
 
 /* ---------- Tenerife Winter League registrants ---------- */
@@ -422,6 +439,105 @@ function bindTenerifeActions(){
 
 /* ---------- registered accounts (profiles + scouts) ---------- */
 let ACCOUNTS = [];
+/* ---------- Testimonials (homepage "What People Say" grid + See-all list) ----------
+   DB-backed CMS. José Cedeño stays the embedded featured card at the top of the
+   homepage; everything here fills the lower grid + the "See all" modal. */
+let TESTI_ADMIN = [];
+async function loadTestimonials(){
+  const { data, error } = await SB.from("testimonials").select("*").order("sort_order");
+  if (error){ $("tsList").innerHTML = `<div class="card empty">Couldn't load testimonials: ${esc(error.message)}</div>`; return; }
+  TESTI_ADMIN = data || [];
+  renderTestimonials();
+}
+function cardTestimonial(x){
+  return `<div class="card" data-ts="${x.id}" style="margin-top:12px">
+    <div class="p-head">${x.image_url?`<span class="avatar" style="background-image:url('${esc(x.image_url)}')"></span>`:`<span class="avatar">${esc(initials(x.name||"?"))}</span>`}
+      <div style="flex:1"><h3 class="display" style="font-size:18px">${esc(x.name||"(no name)")}</h3>
+        <div class="p-meta">${esc(x.role||"")}${x.role?" · ":""}order ${x.sort_order??0}</div></div></div>
+    <div class="acct-meta" style="white-space:pre-wrap">“${esc(x.quote||"")}”</div>
+    <div class="editor" id="tsed-${x.id}">
+      <div class="field"><label>Name</label><input data-tsf="name" data-id="${x.id}" value="${esc(x.name||"")}" /></div>
+      <div class="field"><label>Role / subtitle</label><input data-tsf="role" data-id="${x.id}" value="${esc(x.role||"")}" /></div>
+      <div class="field"><label>Quote *</label><textarea data-tsf="quote" data-id="${x.id}" rows="4">${esc(x.quote||"")}</textarea></div>
+      <div class="field"><label>Display order</label><input type="number" data-tsf="sort_order" data-id="${x.id}" value="${x.sort_order??0}" /></div>
+      <div class="field"><label>Replace photo</label><input type="file" accept="image/*" data-tsphoto="${x.id}" /></div>
+      <div class="row-btns"><button class="btn btn-gold" data-tssave="${x.id}">Save changes</button></div>
+    </div>
+    <div class="row-btns">
+      <button class="btn btn-ghost" data-tsedit="${x.id}">✏️ Edit</button>
+      <button class="btn btn-red" data-tsdel="${x.id}">🗑 Delete</button>
+    </div>
+  </div>`;
+}
+function renderTestimonials(){
+  $("tsList").innerHTML = TESTI_ADMIN.length ? TESTI_ADMIN.map(cardTestimonial).join("")
+    : `<div class="card empty">No testimonials yet — add one above.</div>`;
+  bindTestimonialActions();
+}
+function bindTestimonialActions(){
+  document.querySelectorAll("[data-tsedit]").forEach(b => b.onclick = () => $("tsed-"+b.dataset.tsedit)?.classList.toggle("open"));
+  document.querySelectorAll("[data-tsdel]").forEach(b => b.onclick = async () => {
+    if (!confirm("Delete this testimonial? This can't be undone.")) return;
+    b.disabled = true;
+    const { error } = await SB.from("testimonials").delete().eq("id", +b.dataset.tsdel);
+    b.disabled = false;
+    if (error){ toast("Delete failed: " + error.message, true); return; }
+    toast("Testimonial deleted"); loadTestimonials();
+  });
+  document.querySelectorAll("[data-tssave]").forEach(b => b.onclick = async () => {
+    const id = +b.dataset.tssave;
+    const val = f => document.querySelector(`[data-tsf="${f}"][data-id="${id}"]`);
+    const quote = val("quote").value.trim();
+    if (!quote){ toast("Quote is required", true); return; }
+    const patch = { name: val("name").value.trim()||null, role: val("role").value.trim()||null, quote,
+                    sort_order: parseInt(val("sort_order").value,10)||0 };
+    b.disabled = true;
+    const { error } = await SB.from("testimonials").update(patch).eq("id", id);
+    b.disabled = false;
+    if (error){ toast("Save failed: " + error.message, true); return; }
+    toast("Testimonial saved ✓"); loadTestimonials();
+  });
+  document.querySelectorAll("[data-tsphoto]").forEach(inp => inp.onchange = async () => {
+    const file = inp.files?.[0]; if (!file) return;
+    const id = +inp.dataset.tsphoto;
+    const ext = (file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
+    const path = `testimonial-${id}-${Date.now()}.${ext}`;
+    inp.disabled = true; toast("Uploading photo…");
+    const { error: upErr } = await SB.storage.from(PHOTO_BUCKET).upload(path, file, { upsert: true, contentType: file.type||"image/jpeg" });
+    if (upErr){ inp.disabled = false; toast("Upload failed: " + upErr.message, true); return; }
+    const url = SB.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+    const { error: dbErr } = await SB.from("testimonials").update({ image_url: url }).eq("id", id);
+    inp.disabled = false;
+    if (dbErr){ toast("Photo saved to storage but DB update failed: " + dbErr.message, true); return; }
+    toast("Photo updated ✓"); loadTestimonials();
+  });
+}
+$("tsAddToggle").onclick = () => $("tsAddEditor").classList.toggle("open");
+$("ts-save").onclick = async () => {
+  const msg = $("ts-msg"); msg.classList.remove("show");
+  const quote = $("ts-quote").value.trim();
+  if (!quote){ msg.textContent = "Quote is required."; msg.classList.add("show"); $("ts-quote").focus(); return; }
+  const name = $("ts-name").value.trim()||null, role = $("ts-role").value.trim()||null, sort_order = parseInt($("ts-order").value,10)||0;
+  const btn = $("ts-save"); btn.disabled = true;
+  let image_url = null;
+  const file = $("ts-photo").files?.[0];
+  if (file){
+    const ext = (file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
+    toast("Uploading photo…");
+    const path = `testimonial-new-${Date.now()}.${ext}`;
+    const { error: upErr } = await SB.storage.from(PHOTO_BUCKET).upload(path, file, { upsert: true, contentType: file.type||"image/jpeg" });
+    if (upErr){ btn.disabled = false; msg.textContent = "Photo upload failed: " + upErr.message; msg.classList.add("show"); return; }
+    image_url = SB.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+  const { error } = await SB.from("testimonials").insert({ name, role, quote, sort_order, image_url });
+  btn.disabled = false;
+  if (error){ msg.textContent = "Save failed: " + error.message; msg.classList.add("show"); return; }
+  toast("Testimonial added ✓");
+  ["ts-name","ts-role","ts-quote"].forEach(id => $(id).value = ""); $("ts-order").value = "0"; $("ts-photo").value = "";
+  $("tsAddEditor").classList.remove("open");
+  loadTestimonials();
+};
+
 async function loadAccounts(){
   if (!ACCOUNTS.length){ $("pendingAccounts").innerHTML = `<div class="card empty">Loading accounts…</div>`; }
   const [{ data: profs, error: pErr }, { data: scouts }, { data: notes }] = await Promise.all([
