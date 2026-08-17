@@ -11,6 +11,47 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Notification-system reconciliation — audit's "Resend" claim was WRONG (2026-08-16)
+
+**A later audit reported email notifications as "dormant, needs a new Resend account +
+domain verification." That is INCORRECT.** Verified against the live prod project
+(`sbexwyvsgqayxrsrlrpm`) — the real, wired notification path is **Gmail SMTP**, not Resend:
+
+- **`send-form-notification`** (Gmail SMTP) is deployed **v1 ACTIVE** (`verify_jwt=false`).
+- **`private.notify_config`** (the single row the trigger reads) points at
+  `…/functions/v1/send-form-notification` — i.e. the Gmail function, NOT Resend.
+- All three triggers (`trg_notify_player` / `trg_notify_profile` / `trg_notify_tenerife`)
+  are **enabled** and call `private.notify_submission()`, which POSTs to that URL.
+- **The ONLY thing blocking go-live is the `GMAIL_APP_PASSWORD` Edge Function secret** on
+  `send-form-notification`. **No Resend account, API key, or domain verification is required.**
+  Until the password is added, the function logs a clear line and returns 200 without sending;
+  submissions still save normally (verified 2026-08-15).
+
+**Why the audit got it wrong:** an orphaned **Resend**-based function (`notify`, v3 ACTIVE) and
+its old `supabase-notify.sql` were still sitting in the repo/project from the superseded Phase 6
+design. Nothing pointed at them (no `app.notify_url`, config table points elsewhere, no
+`RESEND_API_KEY` ever set), so they never fired — but their presence made the audit describe the
+wrong system. **Resolved by removing the redundant path:**
+- **Deleted from the repo:** `site/supabase/functions/notify/index.ts` and `site/supabase-notify.sql`.
+- The deployed `notify` Edge Function is now fully orphaned and harmless (no secret, nothing calls
+  it). It can be deleted from the Supabase dashboard at leisure; leaving it does nothing.
+- **Going forward there is ONE notification path: Gmail SMTP `send-form-notification`.**
+
+Also in this pass: **College Placement CTA copy** corrected to Sam's exact phrase "to get
+connected and have an evaluation" (`col_cta_p`, EN/ES/IT in `index.html`). **Player-page
+generator drift fixed** — `gen_player_pages.py` still emitted the pre-flagcdn **emoji** flag
+markup (`.pp-flag{font-size:18px}` + `<span class="pp-flag">{flag}</span>`) while
+`gen_player_pages.mjs` and the live 17 pages use **flagcdn `<img>`** flags (commit 57aac23 was
+never ported to the `.py`); ported `_NAME_ISO`/`_emojiToIso`/`flagImgChip` + the img CSS into the
+`.py` so both generators emit byte-identical output. (The audit's "dead #roster redirect" framing
+was a mischaracterization — the `#roster` paywall bounce is live/correct and identical in both
+generators and all 17 files; the actual drift was **stale embedded CSS**: the 17 pages predated
+recent `index.html` CSS edits — name-color fix, T&C, two-tier profile, `gate-need` — so all 17
+were **regenerated** via `node gen_player_pages.mjs` to resync.) **Testimonials:** the 3 DB rows
+("ESM Athlete"/"Parent"/"ESM Athlete") are still generic placeholders shown live; added a
+self-clearing **PLACEHOLDER badge + warning banner in the admin Testimonials panel** so Sam/Matt
+see they're example filler, not real quotes (badge clears once the generic name is replaced).
+
 ### Gmail SMTP form-notification system — built + wired, ready to activate (2026-08-15)
 
 **Goal:** email the ESM inbox on every form submission, via Gmail SMTP. Gmail App

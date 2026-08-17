@@ -449,10 +449,18 @@ async function loadTestimonials(){
   TESTI_ADMIN = data || [];
   renderTestimonials();
 }
+// The homepage testimonials are SEEDED with generic placeholders (example text, not real
+// quotes) until Sam supplies real ones. Flag them loudly HERE so they're never mistaken
+// for live, real content. Self-clearing: the badge disappears the moment the generic name
+// is replaced with a real one.
+const PLACEHOLDER_TESTI_NAMES = new Set(["esm athlete","parent"]);
+const isPlaceholderTesti = x => PLACEHOLDER_TESTI_NAMES.has((x.name||"").trim().toLowerCase());
 function cardTestimonial(x){
-  return `<div class="card" data-ts="${x.id}" style="margin-top:12px">
+  const ph = isPlaceholderTesti(x)
+    ? ` <span style="font-size:11px;font-weight:800;letter-spacing:.05em;color:#0b1f3a;background:var(--gold);border-radius:999px;padding:2px 9px;vertical-align:middle">PLACEHOLDER</span>` : "";
+  return `<div class="card" data-ts="${x.id}" style="margin-top:12px${isPlaceholderTesti(x)?";border-color:var(--gold)":""}">
     <div class="p-head">${x.image_url?`<span class="avatar" style="background-image:url('${esc(x.image_url)}')"></span>`:`<span class="avatar">${esc(initials(x.name||"?"))}</span>`}
-      <div style="flex:1"><h3 class="display" style="font-size:18px">${esc(x.name||"(no name)")}</h3>
+      <div style="flex:1"><h3 class="display" style="font-size:18px">${esc(x.name||"(no name)")}${ph}</h3>
         <div class="p-meta">${esc(x.role||"")}${x.role?" · ":""}order ${x.sort_order??0}</div></div></div>
     <div class="acct-meta" style="white-space:pre-wrap">“${esc(x.quote||"")}”</div>
     <div class="editor" id="tsed-${x.id}">
@@ -470,8 +478,10 @@ function cardTestimonial(x){
   </div>`;
 }
 function renderTestimonials(){
-  $("tsList").innerHTML = TESTI_ADMIN.length ? TESTI_ADMIN.map(cardTestimonial).join("")
-    : `<div class="card empty">No testimonials yet — add one above.</div>`;
+  const nPh = TESTI_ADMIN.filter(isPlaceholderTesti).length;
+  const banner = nPh ? `<div class="card" style="margin-top:0;border-color:var(--gold);background:rgba(217,177,84,.10);color:var(--ink);font-size:13.5px;line-height:1.55">⚠️ <b>${nPh} placeholder testimonial${nPh>1?"s are":" is"} currently LIVE on the public homepage</b> — the text below is example filler, not real quotes. Edit each with a real name + quote (the badge clears automatically), or delete it, before treating the section as final.</div>` : "";
+  $("tsList").innerHTML = banner + (TESTI_ADMIN.length ? TESTI_ADMIN.map(cardTestimonial).join("")
+    : `<div class="card empty">No testimonials yet — add one above.</div>`);
   bindTestimonialActions();
 }
 function bindTestimonialActions(){

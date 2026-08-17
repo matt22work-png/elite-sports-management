@@ -33,7 +33,7 @@ EXTRA_CSS = """
   .pp-tier-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .pp-tier{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:rgba(6,20,42,.7);border:1px solid var(--line);color:var(--gold-soft)}
   .pp-flagchip{font-size:13px;font-weight:700;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
-  .pp-flagchip .pp-flag{font-size:18px}
+  .pp-flagchip .pp-flag{height:16px;width:auto;border-radius:3px;box-shadow:0 1px 2px rgba(0,0,0,.4)}
   .pp-sport{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-soft);border:1px solid var(--line);border-radius:999px;padding:5px 11px;background:rgba(6,20,42,.5)}
   .pp-headline{font-size:clamp(24px,4.4vw,34px);line-height:1.25;margin:0 0 12px}
   .pp-name-line{display:block;font-size:.62em;color:var(--gold-soft);font-weight:700;margin-bottom:6px;letter-spacing:.02em}
@@ -103,10 +103,29 @@ def headline_for(p):
         headline += " — " + lead_team
     return headline
 
+# Country flags as IMAGES (flagcdn) — emoji flags don't render on Windows (no emoji-flag
+# font). Resolve the player's country/flag to an ISO code and emit an <img>.
+# Keep IDENTICAL to _NAME_ISO/_emojiToIso/flagImgChip in gen_player_pages.mjs.
+_NAME_ISO = {"italy":"it","italia":"it","united states":"us","usa":"us","estados unidos":"us","stati uniti":"us","dominican republic":"do","república dominicana":"do","repubblica dominicana":"do","venezuela":"ve","spain":"es","españa":"es","spagna":"es","colombia":"co","germany":"de","alemania":"de","germania":"de","portugal":"pt","canada":"ca","mexico":"mx","méxico":"mx","cuba":"cu","puerto rico":"pr","panama":"pa","nicaragua":"ni","costa rica":"cr","france":"fr","united kingdom":"gb","netherlands":"nl","brazil":"br","argentina":"ar","curaçao":"cw","curacao":"cw","aruba":"aw"}
+
+def _emoji_to_iso(s):
+    o = []
+    for ch in str(s or ""):
+        cp = ord(ch)
+        if 0x1F1E6 <= cp <= 0x1F1FF:
+            o.append(chr(cp - 0x1F1E6 + 97))
+            if len(o) == 2:
+                break
+    return "".join(o) if len(o) == 2 else ""
+
+def flag_img_chip(p):
+    iso = _emoji_to_iso(p.get("flag")) or _emoji_to_iso(p.get("country")) or _NAME_ISO.get((p.get("country") or "").strip().lower(), "")
+    return f'<img class="pp-flag" src="https://flagcdn.com/{iso}.svg" alt="" width="24" height="18" loading="lazy" decoding="async">' if iso else ""
+
 def render_page(p):
     slug = p["slug"]
     name = esc(p["name"])
-    flag = p.get("flag") or ""
+    flag_chip = flag_img_chip(p)
     position = esc(p.get("position") or "")
     tier = esc(p.get("tier") or "")
     country = esc(p.get("country") or "")
@@ -196,7 +215,7 @@ def render_page(p):
   <div class="pp-hero">
     <div class="pp-tier-row">
       <span class="pp-tier">{tier}</span>
-      <span class="pp-flagchip"><span class="pp-flag">{flag}</span>{country}</span>
+      <span class="pp-flagchip">{flag_chip}{country}</span>
       {sport_badge}
     </div>
     <h1 class="display pp-headline"><span class="pp-name-line">{name}</span>{headline}</h1>
