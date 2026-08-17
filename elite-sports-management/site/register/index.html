@@ -234,6 +234,10 @@ const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
 const PHOTO_BUCKET = "player-photos";
 const STASH_KEY = "esm_reg_pending";
+// Pricing tier the athlete picked on the homepage before starting (see index.html).
+// No payment is taken here — it's recorded for Sam's reference only.
+const TIER_KEY = "esm_reg_tier";
+function readTier(){ try{ return JSON.parse(localStorage.getItem(TIER_KEY) || "null"); }catch(_){ return null; } }
 /* ⚠️ PLACEHOLDER CONTACT ADDRESS — change in one place. Payment links removed 2026-08;
    the account/profile submission itself reaches Sam (the profiles INSERT triggers the
    send-form-notification Edge Function). Swap in Sam's NEW email here once it exists. */
@@ -504,12 +508,20 @@ function renderPayStep(role){
   const cfg = PAY[role] || PAY.player;
   // Payment links removed 2026-08 — this step is now a confirmation. The account was
   // already created (a profiles row), which emails ESM via send-form-notification.
+  // For players, reflect the tier they picked on the homepage (title + price) so the
+  // summary matches their choice — Standard (€129.99) or Direct Contact (€149.99).
+  let title = t(cfg.titleKey), price = cfg.price;
+  if (role === "player"){
+    const ts = readTier();
+    if (ts && ts.name)  title = `${t(cfg.titleKey)} — ${ts.name}`;
+    if (ts && ts.price) price = ts.price;
+  }
   const svc = $("payService");
   const includes = (cfg.incKeys || []).map(k => t(k));
   if (includes.length){
     svc.style.display = "";
     svc.innerHTML =
-      `<div class="ps-top"><span class="ps-title">${esc(t(cfg.titleKey))}</span>${cfg.price ? `<span class="ps-price">${esc(cfg.price)}</span>` : ""}</div>` +
+      `<div class="ps-top"><span class="ps-title">${esc(title)}</span>${price ? `<span class="ps-price">${esc(price)}</span>` : ""}</div>` +
       `<ul>${includes.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` +
       (cfg.accessKey ? `<div class="ps-access">${esc(t(cfg.accessKey))}</div>` : "");
   } else {
@@ -518,7 +530,7 @@ function renderPayStep(role){
 }
 function showPay(role){ CUR = { view:"pay", role }; renderPayStep(role); show("step3"); }
 
-$("signOut").onclick = async () => { await SB.auth.signOut(); localStorage.removeItem(STASH_KEY); location.reload(); };
+$("signOut").onclick = async () => { await SB.auth.signOut(); localStorage.removeItem(STASH_KEY); localStorage.removeItem(TIER_KEY); location.reload(); };
 
 /* ---------- season-stats builder (player profile) ----------
    Raw per-season totals; derived stats (AVG/OBP/SLG, ERA/WHIP, Fld%) are
@@ -696,6 +708,13 @@ $("playerForm").addEventListener("submit", async e => {
     }
     const teams = $("p-teams").value.split("\n").map(t => t.trim()).filter(Boolean);
     const position = $("p-position").value.trim();
+    // Which pricing tier did they pick on the homepage before starting? Recorded for
+    // Sam's reference (payment is arranged off-site) — surfaced on the admin pending
+    // card via players.message. Absent if they came straight to /register/.
+    const tierMsg = (() => {
+      const ts = readTier();
+      return ts && ts.name ? `Requested profile tier: ${ts.name}${ts.price ? ` (${ts.price})` : ""}` : null;
+    })();
     const { error } = await SB.from("players").insert({
       slug: (slugify(fullName) || "player") + "-" + user.id.slice(0,8),
       name: fullName, "group": position || "Player", position,
@@ -704,6 +723,7 @@ $("playerForm").addEventListener("submit", async e => {
       age: $("p-age").value.trim() || null, bio: $("p-bio").value.trim(),
       instagram: $("p-instagram").value.trim() || null, phone: combinePhone("p-cc","p-phone") || null,
       teams, stats: [], season_stats: collectSeasonStats(), image_url, email: user.email,
+      message: tierMsg,
       owner_id: user.id, status: "pending", source: "registration",
     });
     if (error){

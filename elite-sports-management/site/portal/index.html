@@ -48,6 +48,7 @@
   .avatar{width:64px;height:64px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;font-family:'Anton';color:var(--gold);font-size:20px;background-size:cover;background-position:center;flex:0 0 auto}
   .p-head h2{font-size:24px}
   .pos{color:var(--muted);font-size:14px}
+  .pflag{height:14px;width:auto;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.4);vertical-align:middle;margin-left:3px}
   .chip{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--gold-soft)}
   .chip.approved{color:var(--teal-soft)}
   .chip.pending{color:var(--gold-soft)}
@@ -140,6 +141,15 @@ const SB = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const initials = n => (n||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
+
+/* Country flags as IMAGES (flagcdn) — Windows (Sam's OS) ships no emoji-flag font, so a
+   raw emoji flag (🇻🇪 …) renders as blank/letter boxes. Mirror the public site + player
+   pages: resolve the athlete's stored flag/country to an iso2 code and emit a real <img>.
+   Self-contained here (the portal has no DIAL_CODES table to derive from). */
+const NAME_ISO = {"italy":"it","italia":"it","united states":"us","usa":"us","estados unidos":"us","stati uniti":"us","dominican republic":"do","república dominicana":"do","repubblica dominicana":"do","venezuela":"ve","spain":"es","españa":"es","spagna":"es","colombia":"co","germany":"de","alemania":"de","germania":"de","portugal":"pt","canada":"ca","mexico":"mx","méxico":"mx","cuba":"cu","puerto rico":"pr","panama":"pa","nicaragua":"ni","costa rica":"cr","france":"fr","united kingdom":"gb","netherlands":"nl","brazil":"br","argentina":"ar","curaçao":"cw","curacao":"cw","aruba":"aw"};
+function emojiToIso(s){ if(!s) return ""; const out=[]; for(const ch of String(s)){ const cp=ch.codePointAt(0); if(cp>=0x1F1E6&&cp<=0x1F1FF){ out.push(String.fromCharCode(cp-0x1F1E6+97)); if(out.length===2)break; } } return out.length===2?out.join(""):""; }
+const iso2For = p => emojiToIso(p&&p.flag) || emojiToIso(p&&p.country) || NAME_ISO[((p&&p.country)||"").trim().toLowerCase()] || "";
+function flagImg(iso, alt){ return iso ? `<img class="pflag" src="https://flagcdn.com/${iso}.svg" alt="${alt?esc(alt):""}" width="20" height="15" loading="lazy" decoding="async">` : ""; }
 
 /* ---------- i18n (EN / ES / IT) ----------
    Chrome + labels are translated; universal baseball stat abbreviations (AVG, OBP, …)
@@ -461,7 +471,7 @@ async function loadMe(session){
         <span class="avatar" ${p.image_url ? `style="background-image:url('${esc(p.image_url)}')"` : ""}>${p.image_url ? "" : esc(initials(p.name))}</span>
         <div style="flex:1">
           <h2 class="display">${esc(p.name)}</h2>
-          <div class="pos">${esc(p.position || p.group || "")} ${p.flag || ""}</div>
+          <div class="pos">${esc(p.position || p.group || "")} ${flagImg(iso2For(p), p.country)}</div>
         </div>
         <span class="chip ${esc(p.status)}">${esc(statusLabel)}</span>
       </div>

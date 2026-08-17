@@ -23,7 +23,11 @@ const CONTACT_EMAIL = "elitesportsmanagement50@gmail.com";
 const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
 
 const EXTRA_CSS = `
-  .pp-wrap{max-width:760px;margin:0 auto;padding:40px 22px 90px}
+  /* z-index:1 keeps the profile body ABOVE the fixed .bg-fx background layer
+     (which is position:fixed;z-index:0). Without it the opaque background paints
+     over the whole <main> and the profile renders blank — only the nav (z-50) and
+     footer (z-1) escape. Mirrors the homepage's section/footer z-index:1. */
+  .pp-wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:40px 22px 90px}
   .pp-back{display:inline-flex;align-items:center;gap:8px;color:var(--gold-soft);font-weight:700;font-size:13.5px;margin-bottom:26px}
   .pp-back:hover{color:var(--gold)}
 

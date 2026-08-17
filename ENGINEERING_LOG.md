@@ -11,6 +11,46 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Remove payment gate blocking profile creation + fix two player-profile display bugs (2026-08-17)
+
+**Reported by Sam:** (1) "two issues when displaying player profiles" (vague), (2) selecting
+either pricing tier (€129.99 / €149.99) blocked profile creation — a dead end.
+
+**#2 — payment-gate dead end (root cause + fix).** On the homepage profile-creation section
+(`index.html` `#profile`), each tier CTA was a `data-mail` mailto link — clicking it only
+opened an email; there was NO on-site path to actually build a profile (the real flow lives
+at `/register/`, which itself has no payment gate). Per Matt: selecting a tier must record the
+choice and take the athlete straight into profile creation, no paying first. Fix:
+- Homepage tier CTAs → `href="register/"` + `data-tier-name`/`data-tier-price`; on click they
+  stash `esm_reg_tier` (`{name,price}`) in localStorage. T&C acceptance still gates the click
+  (legal, not payment). Removed the `data-mail`/`data-subject`/`data-body` attrs.
+- `/register/` reads the stash: writes `Requested profile tier: <name> (<price>)` into
+  `players.message` (shown on the admin pending card, so **Sam sees the tier**), and the
+  confirmation step (`renderPayStep`) now shows the chosen tier's title + price. Stash cleared
+  on sign-out. Notification email fires on the `profiles` insert (before tier is known), so the
+  tier reaches Sam via the admin panel, not the email — acceptable per the task.
+- **Validated** with real end-to-end signups (Playwright) for BOTH tiers: account → profile +
+  stats → confirmation, no dead-end; confirmation showed "Official Player Profile — Standard
+  €129.99" / "— Direct Contact €149.99"; DB rows carried the tier in `message` and the season
+  stats. **Test rows + auth users cleaned up afterward** (players/profiles/auth back to 8/11/14).
+
+**#1 — two display bugs.**
+- **Public player pages rendered with a BLANK body.** `.pp-wrap` (`<main>`) lacked
+  `position/z-index`, so the fixed `.bg-fx` background layer (`position:fixed;z-index:0`) painted
+  OVER the entire profile — only the nav (z-50) and footer (z-1) escaped. The whole hero/bio/
+  stats/teams/contact were invisible on all 17 pages. Fix: added `position:relative;z-index:1`
+  to `.pp-wrap` in BOTH generators (`gen_player_pages.mjs` + `.py`, kept in sync) and
+  regenerated all 17 `players/*.html`. Verified via headless screenshot (full profile + flag
+  now render).
+- **Player portal showed country as a raw emoji flag** (`${p.flag}`) → blank/letter-boxes on
+  Windows (Sam's OS), inconsistent with the flagcdn `<img>` flags used on the homepage + player
+  pages (the exact bug fixed site-wide in commit 57aac23, but the portal was left behind). Fix:
+  added self-contained `NAME_ISO`/`emojiToIso`/`iso2For`/`flagImg` helpers + `.pflag` CSS to
+  `portal/index.html` and render the flag as an image. Verified (Venezuela flag renders).
+
+**Files:** `site/index.html`, `site/register/index.html`, `site/portal/index.html`,
+`site/gen_player_pages.mjs`, `site/gen_player_pages.py`, `site/players/*.html` (17 regenerated).
+
 ### Notification-system reconciliation — audit's "Resend" claim was WRONG (2026-08-16)
 
 **A later audit reported email notifications as "dormant, needs a new Resend account +

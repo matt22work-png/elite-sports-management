@@ -641,20 +641,22 @@
         <li data-i18n="pg_i3"></li>
         <li data-i18n="pg_i4"></li>
       </ul>
-      <!-- Two informational tiers (item 6). Payment happens off-site with Sam; these
-           CTAs email ESM the athlete's interest + chosen tier (no payment buttons). -->
+      <!-- Two informational tiers (item 6). Payment happens off-site with Sam — there is
+           NO payment gate. Selecting a tier records the athlete's choice (stashed for the
+           /register/ flow, which writes it onto their profile so Sam sees it) and sends
+           them straight into profile creation. No paying first. -->
       <div class="pc-tiers">
         <div class="pc-tier">
           <div class="pc-tier-name" data-i18n="pg_t1_name"></div>
           <div class="gate-price">€129.99<small data-i18n="pg_price_note"></small></div>
           <div class="pc-tier-desc" data-i18n="pg_t1_desc"></div>
-          <a class="btn btn-gold pc-tier-cta" data-mail data-subject="Profile creation — Standard (€129.99)" data-body="I'd like to create my ESM athlete profile — Standard tier (€129.99). My details — Name: / Age: / Position & sport: / Country: / Current team: / Instagram:" data-i18n="pg_t1_btn"></a>
+          <a class="btn btn-gold pc-tier-cta" href="register/" data-tier-name="Standard" data-tier-price="€129.99" data-i18n="pg_t1_btn"></a>
         </div>
         <div class="pc-tier pc-tier-plus">
           <div class="pc-tier-name" data-i18n="pg_t2_name"></div>
           <div class="gate-price">€149.99<small data-i18n="pg_price_note"></small></div>
           <div class="pc-tier-desc" data-i18n="pg_t2_desc"></div>
-          <a class="btn btn-gold pc-tier-cta" data-mail data-subject="Profile creation — Direct Contact (€149.99)" data-body="I'd like to create my ESM athlete profile — Direct Contact tier (€149.99, direct phone number shared with scouts/teams/GMs). My details — Name: / Age: / Position & sport: / Country: / Current team: / Instagram:" data-i18n="pg_t2_btn"></a>
+          <a class="btn btn-gold pc-tier-cta" href="register/" data-tier-name="Direct Contact" data-tier-price="€149.99" data-i18n="pg_t2_btn"></a>
         </div>
       </div>
       <label class="tc" style="justify-content:center"><input type="checkbox" class="tc-check" id="profileTc"><span data-i18n="tc_label"></span> <a class="tc-more" href="terms.html" target="_blank" rel="noopener" data-i18n="tc_more"></a></label>
@@ -1587,11 +1589,19 @@ function openTestiModal(){
 document.getElementById("testiAll").onclick=openTestiModal;
 {const tt=document.getElementById("testiAllTop");if(tt)tt.onclick=openTestiModal;}
 
-// Two-tier profile CTAs email ESM — but only after Terms & Conditions are accepted (item 8).
+// Two-tier profile CTAs: record the chosen tier, then send the athlete straight into
+// /register/ to build their profile. NO payment gate — payment is arranged off-site by
+// ESM; the tier is stashed so /register/ can write it onto the profile for Sam's
+// reference. Terms & Conditions acceptance is still required before proceeding (item 8).
 (function(){
   const tc=document.getElementById("profileTc"), err=document.getElementById("profileTcErr");
   document.querySelectorAll(".pc-tier-cta").forEach(a=>a.addEventListener("click",e=>{
-    if(tc&&!tc.checked){ e.preventDefault(); if(err)err.classList.add("show"); }
+    if(tc&&!tc.checked){ e.preventDefault(); if(err)err.classList.add("show"); return; }
+    try{ localStorage.setItem("esm_reg_tier", JSON.stringify({
+      name:  a.getAttribute("data-tier-name")  || "",
+      price: a.getAttribute("data-tier-price") || "",
+    })); }catch(_){}
+    // href="register/" then carries them into profile creation.
   }));
   if(tc)tc.addEventListener("change",()=>{ if(tc.checked&&err)err.classList.remove("show"); });
 })();
