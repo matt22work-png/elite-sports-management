@@ -11,6 +11,42 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### "Sam sees no updates" — verified all fixes ARE live; bumped SW cache to force stale clients (2026-08-18)
+
+**Report:** Sam said none of the recent updates show on the live site, and re-flagged the two
+player-profile display issues + the tier-selection dead end.
+
+**Investigation — everything is already deployed and live (verified against prod):**
+- **Deploy pipeline healthy.** Local `main` == `origin/main` == `ae602c0`; tree clean. Vercel
+  deployment `dpl_DbB1N6j9uFtmoJDHsSWgm2ysiXha` is `state:READY`, `target:production`, built from
+  `ae602c0` — the exact HEAD. Not stuck/failed, not a preview.
+- **Payment-gate fix IS live.** `curl` of the prod homepage: 0 old `data-mail`/`data-subject`
+  tier CTAs, 2 new `href="register/" data-tier-name…` CTAs. `/register/` completes cleanly —
+  step 3 is a confirmation, no payment step; the players INSERT carries `message` = the tier.
+- **Tier IS recorded + visible to Sam.** `players.message` exists in prod with anon+authenticated
+  INSERT grants and a ≤5000-char CHECK (tier string ~50 chars — safe). Admin `select("*")` +
+  `cardPending` renders `<b>Message:</b> …` (admin/index.html:766) → the "Requested profile tier:
+  … (€…)" line shows on the pending card. No CHECK on `tier`; `sport` CHECK matches the form's
+  Baseball/Softball options — no schema dead-end anywhere in the flow.
+- **Display bug #1 fix IS live.** Prod `players/jose-cedeno.html` serves
+  `.pp-wrap{position:relative;z-index:1;…}` — the blank-body fix. Flags resolve to flagcdn `<img>`.
+- **Display bug #2 fix** (portal flag `<img>`) present in `portal/index.html`.
+- **Cache headers are correct:** HTML + `sw.js` served `Cache-Control: public, max-age=0,
+  must-revalidate` (revalidate every load); SW is network-first for HTML. Server side is current.
+
+**Root cause of "no updates": a stale client — an old installed PWA / service worker on Sam's
+device**, not the code. **Fix applied:** bumped `sw.js` `CACHE` `esm-v6 → esm-v7`. The changed
+bytes make the browser detect a new worker on Sam's next visit; `skipWaiting()` + `clients.claim()`
+activate it immediately and the `activate` handler deletes every non-current cache — purging the
+stale shell so all already-deployed fixes appear. (Also available to Sam: pull-to-refresh, which
+calls `reg.update()` then reloads.)
+
+**For Sam if it still looks stale:** hard-refresh (Ctrl/Cmd-Shift-R), or if the site was
+"Add to Home Screen"/installed, remove and re-add it — his device is holding an old cached copy.
+
+**Files:** `site/sw.js` (cache bump). No app-logic changes — the reported bugs were already fixed
+in `ae602c0` and confirmed live this session.
+
 ### Remove payment gate blocking profile creation + fix two player-profile display bugs (2026-08-17)
 
 **Reported by Sam:** (1) "two issues when displaying player profiles" (vague), (2) selecting
