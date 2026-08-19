@@ -11,6 +11,83 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Expanded application form + scout fields + Teams/Scouts option + IT tagline + hero photo — built & 3-pass reviewed (2026-08-19)
+
+**Four batches of work, all deployed to prod and verified live. Commits `bc956b3`, `e468268`,
+`98d6f3e`, `fd1df81` on `main`.**
+
+**1 — Category-driven public application form (`#join`, index.html).** The "I'm applying for"
+dropdown now drives which field set shows: Baseball/Softball Representation and College Placement
+collect a full profile + file uploads; College adds English cert + education level + diploma.
+- New Storage buckets: `application-photos` (PUBLIC, jpg/png) for headshots; `application-docs`
+  (PRIVATE, pdf) for resume/CV, English cert, diploma. Both 10 MB + mime-limited at the bucket
+  level. RLS: anon INSERT on both; admin (authenticated) SELECT on docs; photos public via bucket
+  flag. Client validation mirrors the limits. Migration file `supabase-application-fields.sql`.
+- New `players` columns: `nationality, resume_url, english_cert_url, diploma_url, education_level,
+  study_goals` — length-capped, **not** added to the anon column SELECT grant (admin-only).
+- Admin pending cards show every new field + download the files (signed URLs for the private PDFs
+  via `openDoc`/`createSignedUrl`; direct link for the public photo).
+- `send-form-notification` email template expanded with new fields + file links (7-day signed URLs
+  for PDFs via the Storage sign REST API + auto-injected `SUPABASE_SERVICE_ROLE_KEY`).
+
+**2 — Team/scout fields on scout self-registration (register/).** Photo, Full Name / Team Name,
+nationality, phone+code, country, role (→ existing `title` col), positions/players sought. Account
+creation (email/pw) unchanged. Migration `supabase-scout-fields.sql`: new `scouts` columns
+`photo_url, name_or_team, nationality, looking_for`; legacy `organization/school_team/notes` kept
+(not dropped). Added an authenticated INSERT policy on `application-photos` (scouts upload signed-in).
+New scouts-INSERT notify trigger + edge-function `scouts` branch (joins `profiles` for name/email).
+Admin Scouts view shows all new fields + photo.
+
+**3 — "Coaching" → "Teams and Scouts" dropdown option.** Selecting it shows the team/scout field
+set (mirrors registration; saves to `players` as a lead). New `players` cols `role, looking_for`
+(migration `supabase-application-teams-fields.sql`). Email labels this kind "Teams / scouts inquiry".
+
+**4 — Italian hero tagline + Arath Zapien hero photo.** Tagline → "...al livello successivo:
+*visibilità, contratti e sviluppo*" — à verified as UTF-8 `c3 a0`. Photo `<figure>` + corner caption
+added to the hero (all 3 langs, caption untranslated); `onerror` hides the figure until the JPG lands.
+
+Trilingual EN/ES/IT throughout. Edge function redeployed to v4 (verify_jwt:false). SW cache v7→v9.
+
+**Admin editor "declutter" (Sam's ambiguous ask): NO CHANGES MADE — flagged.** Reviewed the admin
+player/account editor for Coaching-specific or orphaned fields; found none (every section is
+general-purpose and in use). Per the "leave & flag if ambiguous" guidance, left it untouched.
+
+**3-PASS REVIEW — confirmed solid (verified against prod, not just source):**
+- Pass 1 (live): dropdown shows Baseball/Softball Rep, College, Teams and Scouts, **0 "Coaching"
+  options**; all 3 langs; IT tagline `visibilità` present in served bytes; hero photo markup + SW
+  `esm-v9` live; register scout fields present, old `s-org/s-school/s-notes` removed; admin
+  signed-URL handler + new displays deployed.
+- Pass 2 (regression): `get_roster_code` RPC 200; anon reads approved public roster; **all 13
+  intake/PII columns (old + new) return 401 to anon — zero leakage**; no clickable PayPal/Wise
+  targets anywhere (only descriptive comments remain); T&C enforced on index (`joinTc`), register
+  (`acctTc`), tenerife (`teTc`); `validate_i18n.mjs` → **0 hard problems**.
+- Pass 3 (skeptical/security): **private `application-docs` does not leak** — anon public-read 400,
+  authed-path read 400, anon sign 400, anon list `[]`; anon cannot enumerate `application-photos`
+  (list `[]`); Supabase security advisors show **no new issues** (all 8 warnings pre-existing &
+  by-design: roster-gate RPCs, scout_roster, self-service, esm_admins lockdown, auth leaked-pw).
+
+**Fixes applied during review (commit `fd1df81`):**
+- Hero photo was `margin:auto` (centered) but the hero copy is left-aligned → `margin:30px 0 0`.
+- Application "Teams and Scouts" photo was required, but the scout-registration photo is optional
+  and a team/org may lack a headshot → made `ts_photo` optional (still validated + uploaded if given).
+
+**Needs Sam/Matt input:**
+- **`site/assets/arath-zapien.jpg` is still NOT in the repo** (the `assets/` folder was created but
+  is empty; git can't commit an empty dir). Drop the real JPG at
+  `elite-sports-management/site/assets/arath-zapien.jpg`, then `git add -A && commit && push` — the
+  hero photo will appear (markup already wired, hides gracefully until then).
+- **Admin "declutter"** — tell me exactly which editor sections to remove; I found nothing
+  Coaching-specific to safely remove.
+- **`GMAIL_APP_PASSWORD` secret still unset** → all notifications (applications, scouts, teams) are
+  deployed but a graceful no-op until it's added (Supabase → Edge Functions → send-form-notification
+  → Secrets). New dedicated submissions inbox = one-line swap of `OPS_INBOX`.
+- Judgment calls flagged: rep/college file uploads (resume/cert/diploma) are **required** per Sam's
+  field lists — say if any should be optional. Teams/Scouts photo made optional (above).
+- Couldn't run a headless browser here; validation was live-curl + byte-level + DB/RLS + syntax.
+  Worth a real mobile+desktop eyeball, especially once the photo file is added.
+
+---
+
 ### "Sam sees no updates" — verified all fixes ARE live; bumped SW cache to force stale clients (2026-08-18)
 
 **Report:** Sam said none of the recent updates show on the live site, and re-flagged the two
