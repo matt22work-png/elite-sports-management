@@ -374,6 +374,10 @@
   .tcard{display:flex;gap:24px;align-items:flex-start;border:1px solid var(--line);border-radius:18px;padding:30px;background:linear-gradient(180deg,var(--card),var(--navy-2))}
   /* Tall portrait crop, like the reference card — noticeably taller than it is wide. */
   .tcard .shot{width:140px;min-width:140px;height:230px;border-radius:12px;background-size:cover;background-position:center 20%;border:1px solid var(--line)}
+  /* Hero athlete photo with a small semi-transparent caption/credit bar. */
+  .hero-photo{position:relative;margin:30px auto 0;max-width:520px;border-radius:14px;overflow:hidden;border:1px solid var(--line);line-height:0}
+  .hero-photo img{display:block;width:100%;height:auto}
+  .hero-photo figcaption{position:absolute;left:0;bottom:0;background:rgba(5,16,31,.72);color:#fff;font-size:12px;font-weight:600;line-height:1.3;padding:6px 12px;border-top-right-radius:10px;letter-spacing:.01em}
   .tcard .qt{font-size:16.5px;line-height:1.7;color:#d6e1f2;font-style:italic}
   .tcard .nm{margin-top:14px;font-family:'Anton';letter-spacing:.09em;font-size:15px;color:var(--gold-soft);text-transform:uppercase}
   .tcard .rl{font-size:12.5px;color:var(--muted);margin-top:3px}
@@ -502,6 +506,14 @@
     <a class="btn btn-gold" href="#roster" data-i18n="hero_btn1"></a>
     <a class="btn btn-ghost" href="#join" data-i18n="hero_btn2"></a>
   </div>
+  <!-- Athlete photo shown in all languages (not IT-specific); the caption is a proper
+       name/credit so it is not translated. If the image file is missing the figure
+       hides itself (onerror) so the hero never shows a broken image. -->
+  <figure class="hero-photo">
+    <img src="assets/arath-zapien.jpg" alt="Arath Zapien, North Central Missouri Pirates"
+         loading="lazy" onerror="this.closest('figure').style.display='none'" />
+    <figcaption>Arath Zapien, North Central Missouri Pirates.</figcaption>
+  </figure>
 </div></section>
 
 <section class="contracts"><div class="wrap">
@@ -694,7 +706,7 @@
           <option value="Baseball Representation" data-i18n="opt_rep_baseball"></option>
           <option value="Softball Representation" data-i18n="opt_rep_softball"></option>
           <option value="College Placement" data-i18n="opt_college"></option>
-          <option value="Coaching" data-i18n="opt_coach"></option>
+          <option value="Teams and Scouts" data-i18n="opt_teams"></option>
         </select></div>
 
       <!-- ===== Representation + College shared fields ===== -->
@@ -738,9 +750,24 @@
         <small class="fhint" data-i18n="f_pdf_hint"></small></div>
       <div class="field af" data-cats="college"><label data-i18n="f_study"></label><textarea name="study_goals"></textarea></div>
 
-      <!-- ===== Coaching (minimal, unchanged) ===== -->
-      <div class="field af" data-cats="coach"><label data-i18n="f_why"></label><textarea name="why"></textarea></div>
-      <div class="field af" data-cats="coach"><label data-i18n="f_other"></label><textarea name="other"></textarea></div>
+      <!-- ===== Teams and Scouts ===== -->
+      <!-- Distinct field names (ts_*) so a hidden Representation/College field of the
+           same purpose can never collide with these in FormData. Mirrors the scout
+           self-registration field set (register/), which lives on a separate page and
+           writes to the scouts account table; this path is a lead into players. -->
+      <div class="field af" data-cats="teams"><label data-i18n="f_photo"></label>
+        <input type="file" name="ts_photo" accept="image/jpeg,image/png" />
+        <small class="fhint" data-i18n="f_photo_hint"></small></div>
+      <div class="field af" data-cats="teams"><label data-i18n="f_name_or_team"></label><input type="text" name="name_or_team" /></div>
+      <div class="field af" data-cats="teams"><label data-i18n="f_nationality"></label><input type="text" name="ts_nationality" /></div>
+      <div class="field af" data-cats="teams"><label data-i18n="f_email"></label><input type="email" name="ts_email" autocomplete="email" /></div>
+      <div class="af af-row af-phone" data-cats="teams">
+        <div class="field field-code"><label data-i18n="f_phone_code"></label><input type="text" name="ts_phone_code" placeholder="+1" inputmode="tel" /></div>
+        <div class="field"><label data-i18n="f_phone"></label><input type="tel" name="ts_phone" autocomplete="tel-national" /></div>
+      </div>
+      <div class="field af" data-cats="teams"><label data-i18n="f_country"></label><input type="text" name="ts_country" autocomplete="country-name" /></div>
+      <div class="field af" data-cats="teams"><label data-i18n="f_role"></label><input type="text" name="ts_role" /></div>
+      <div class="field af" data-cats="teams"><label data-i18n="f_looking"></label><textarea name="looking_for"></textarea></div>
 
       <!-- Anti-spam honeypot — hidden from real users; must stay empty. -->
       <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
@@ -972,7 +999,8 @@ const T = {
     join_kicker:"Join Us",join_h2:"Apply to Elite Sports Management",join_p:"Players, families and clubs — tell us about yourself and we'll create your athlete profile.",
     join_tagline:"Talent Gets You Noticed. Representation Gets You Signed.",
     join_pitch:"Talent alone rarely opens the door. The right agent turns tryouts into contracts — negotiating your deals, opening leagues at home and abroad, and putting your name in front of the scouts and coaches who decide careers.",
-    f_applying:"I'm applying for",opt_rep_baseball:"Baseball Representation",opt_rep_softball:"Softball Representation",opt_college:"College Placement",opt_coach:"Coaching",
+    f_applying:"I'm applying for",opt_rep_baseball:"Baseball Representation",opt_rep_softball:"Softball Representation",opt_college:"College Placement",opt_teams:"Teams and Scouts",
+    f_name_or_team:"Full Name / Team Name",f_role:"Role within the team / organization",f_looking:"Positions to fill / players you're looking for",
     f_photo:"Photo",f_photo_hint:"JPG or PNG, up to 10 MB.",
     f_first:"First name",f_last:"Last name",f_nationality:"Nationality",f_email:"Email",
     f_phone_code:"Code",f_phone:"Phone number",f_country:"Country",
@@ -1058,7 +1086,8 @@ const T = {
     join_kicker:"Únete",join_h2:"Aplica a Elite Sports Management",join_p:"Jugadores, familias y clubes — cuéntanos sobre ti y crearemos tu perfil de atleta.",
     join_tagline:"El talento llama la atención. La representación te consigue el contrato.",
     join_pitch:"El talento por sí solo casi nunca abre la puerta. El agente adecuado convierte las pruebas en contratos: negocia tus acuerdos, te abre ligas dentro y fuera del país y pone tu nombre frente a los scouts y entrenadores que deciden carreras.",
-    f_applying:"Aplico para",opt_rep_baseball:"Representación de Béisbol",opt_rep_softball:"Representación de Sóftbol",opt_college:"Colocación en College",opt_coach:"Coaching",
+    f_applying:"Aplico para",opt_rep_baseball:"Representación de Béisbol",opt_rep_softball:"Representación de Sóftbol",opt_college:"Colocación en College",opt_teams:"Equipos y Scouts",
+    f_name_or_team:"Nombre completo / Nombre del equipo",f_role:"Rol dentro del equipo / la organización",f_looking:"Posiciones a cubrir / jugadores que buscas",
     f_photo:"Foto",f_photo_hint:"JPG o PNG, hasta 10 MB.",
     f_first:"Nombre",f_last:"Apellido",f_nationality:"Nacionalidad",f_email:"Correo electrónico",
     f_phone_code:"Código",f_phone:"Número de teléfono",f_country:"País",
@@ -1117,7 +1146,7 @@ const T = {
     media_kicker:"Media",media_h2:"Sul campo",
     media_p:"Video e foto dalla Winter League di Tenerife e dagli eventi ESM.",
     media_video_label:"Video",media_photo_label:"Foto",
-    hero_eyebrow:"Rappresentanza Atleti · In Tutto il Mondo",hero_h1:'Portiamo gli atleti di baseball e softball a essere <em>visti, messi sotto contratto e sviluppati</em>.',
+    hero_eyebrow:"Rappresentanza Atleti · In Tutto il Mondo",hero_h1:'Portiamo gli atleti di baseball e softball al livello successivo: <em>visibilità, contratti e sviluppo</em>.',
     hero_lead:"Elite Sports Management accompagna gli atleti di baseball e softball fin da giovani al professionismo — tra college, indy ball, winter league, Europa e Australia.",
     hero_btn1:"Vedi il Roster",hero_btn2:"Registrati Qui",
     stat1:"Atleti Rappresentati",stat2:"Paesi",stat3:"Organizzazioni MLB",
@@ -1144,7 +1173,8 @@ const T = {
     join_kicker:"Unisciti",join_h2:"Candidati a Elite Sports Management",join_p:"Giocatori, famiglie e club — raccontaci di te e creeremo il tuo profilo da atleta.",
     join_tagline:"Il talento ti fa notare. La rappresentanza ti fa firmare.",
     join_pitch:"Il solo talento raramente apre le porte. L'agente giusto trasforma i provini in contratti: negozia i tuoi accordi, ti apre le leghe in patria e all'estero e mette il tuo nome davanti agli scout e agli allenatori che decidono le carriere.",
-    f_applying:"Mi candido per",opt_rep_baseball:"Rappresentanza Baseball",opt_rep_softball:"Rappresentanza Softball",opt_college:"Collocamento College",opt_coach:"Coaching",
+    f_applying:"Mi candido per",opt_rep_baseball:"Rappresentanza Baseball",opt_rep_softball:"Rappresentanza Softball",opt_college:"Collocamento College",opt_teams:"Squadre e Scout",
+    f_name_or_team:"Nome completo / Nome della squadra",f_role:"Ruolo all'interno della squadra / organizzazione",f_looking:"Posizioni da coprire / giocatori che cerchi",
     f_photo:"Foto",f_photo_hint:"JPG o PNG, fino a 10 MB.",
     f_first:"Nome",f_last:"Cognome",f_nationality:"Nazionalità",f_email:"Email",
     f_phone_code:"Prefisso",f_phone:"Numero di telefono",f_country:"Paese",
@@ -1887,10 +1917,11 @@ const applyingSelect=document.getElementById("applyingSelect");
 const FORM_T0=Date.now();   // page-load time, for the anti-spam time trap below
 
 /* Map the "I'm applying for" value → a category token used by data-cats.
-   Baseball + Softball Representation share the same field set ("rep"). */
+   Baseball + Softball Representation share the same field set ("rep"); "Teams and
+   Scouts" (which replaced Coaching) uses its own team/scout field set ("teams"). */
 function applyCat(v){
   v=String(v||"");
-  return /college/i.test(v) ? "college" : /coach/i.test(v) ? "coach" : "rep";
+  return /college/i.test(v) ? "college" : /team|scout/i.test(v) ? "teams" : "rep";
 }
 /* Show only the fields whose data-cats includes the selected category, and clear
    any stale validation highlight. Hidden fields stay in the DOM but are ignored by
@@ -1961,14 +1992,14 @@ form.addEventListener("submit",async e=>{
 
   // ---- Per-category required fields (item 1) ----
   // Baseball/Softball Representation and College share the full profile; College
-  // adds the academic docs. Coaching stays minimal. File fields are required too,
-  // per Sam's field lists.
+  // adds the academic docs. "Teams and Scouts" collects a team/scout lead. File
+  // fields are required too, per Sam's field lists.
   const REQ={
     rep:    ["photo","first_name","last_name","nationality","email","phone","country","position","resume","age","goals"],
     college:["photo","first_name","last_name","nationality","email","phone","country","position","resume","age","english_cert","education_level","diploma","study_goals"],
-    coach:  ["why"],
+    teams:  ["ts_photo","name_or_team","ts_nationality","ts_email","ts_phone","ts_country","ts_role","looking_for"],
   }[cat];
-  const FILE_FIELDS={photo:"image",resume:"pdf",english_cert:"pdf",diploma:"pdf"};
+  const FILE_FIELDS={photo:"image",ts_photo:"image",resume:"pdf",english_cert:"pdf",diploma:"pdf"};
 
   // Mark the .field wrapper of a named control invalid (for the red-border hint).
   const markInvalid=name=>{const c=form.querySelector(`[name="${name}"]`);const fld=c&&c.closest(".field");if(fld)fld.classList.add("invalid");};
@@ -2025,19 +2056,27 @@ form.addEventListener("submit",async e=>{
       const dip=gf("diploma");
       if(dip) diploma_url=await uploadApplicationFile("application-docs",key,"diploma",dip);
     }
+    if(cat==="teams"){
+      const photo=gf("ts_photo");
+      if(photo){
+        const p=await uploadApplicationFile("application-photos",key,"photo",photo);
+        image_url=SB.storage.from("application-photos").getPublicUrl(p).data.publicUrl;
+      }
+    }
 
     // ---- Build the row (item 3) ----
-    // players.name and players."group" are NOT NULL. For rep/college we now have a
-    // real name; Coaching still has none, so we fall back to the applying label.
+    // players.name and players."group" are NOT NULL. rep/college build the name from
+    // first+last; teams use the single "name_or_team" field.
     const fullName=[g("first_name"),g("last_name")].filter(Boolean).join(" ");
-    const name=fullName || applying;
+    const name=(cat==="teams" ? g("name_or_team") : fullName) || applying;
     // Sport: Softball Representation → Softball; everything else defaults to Baseball
     // (College placement covers both; applying_for keeps the exact choice for routing).
     const sport=/softball/i.test(applying)?"Softball":"Baseball";
-    // Goals text: rep uses "goals"; college uses "study_goals"; coaching uses "why".
-    const goalsText=cat==="college"?g("study_goals"):cat==="coach"?g("why"):g("goals");
+    // Goals/summary text stored in bio: rep uses "goals"; college uses "study_goals".
+    const goalsText=cat==="college"?g("study_goals"):g("goals");
     // Phone: combine the country code + number into one stored value.
     const phone=[g("phone_code"),g("phone")].filter(Boolean).join(" ").trim();
+    const tsPhone=[g("ts_phone_code"),g("ts_phone")].filter(Boolean).join(" ").trim();
 
     const row={
       slug:key,
@@ -2049,8 +2088,7 @@ form.addEventListener("submit",async e=>{
       source:"application",
       status:"pending",
     };
-    // Only attach the extended fields for the categories that collect them, so a
-    // Coaching submission stays as lean as before.
+    // Only attach the extended fields for the categories that collect them.
     if(cat==="rep"||cat==="college"){
       Object.assign(row,{
         nationality:g("nationality")||null,
@@ -2071,8 +2109,16 @@ form.addEventListener("submit",async e=>{
         study_goals:g("study_goals")||null,
       });
     }
-    if(cat==="coach"){
-      row.message=g("other")||null;
+    if(cat==="teams"){
+      Object.assign(row,{
+        nationality:g("ts_nationality")||null,
+        email:g("ts_email")||null,
+        phone:tsPhone||null,
+        country:g("ts_country")||null,
+        role:g("ts_role")||null,
+        looking_for:g("looking_for")||null,
+        image_url,
+      });
     }
 
     const {error}=await SB.from("players").insert(row);

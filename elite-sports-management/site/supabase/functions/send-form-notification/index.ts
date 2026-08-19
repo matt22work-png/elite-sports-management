@@ -128,18 +128,20 @@ async function buildMessage(table: string, r: Record<string, unknown>): Promise<
     const applying = String(r.applying_for ?? "");
     const isSoftball = r.sport === "Softball" || /softball/i.test(applying);
     const isCollege  = /college/i.test(applying);
-    const isCoaching = /coach/i.test(applying);
+    const isTeams    = /team|scout/i.test(applying);
+    const isCoaching = /coach/i.test(applying);   // legacy rows only
     const kind = isCollege ? "College application"
+               : isTeams ? "Teams / scouts inquiry"
                : isSoftball ? "Softball application"
                : isCoaching ? "Coaching application"
                : "Baseball application";
     const rows: [string, unknown][] = [
       ["Name", r.name], ["Applying for", r.applying_for], ["Sport", r.sport],
       ["Nationality", r.nationality], ["Age", r.age], ["Position", r.position],
-      ["Country", r.country], ["Email", r.email], ["Phone", r.phone],
+      ["Role", r.role], ["Country", r.country], ["Email", r.email], ["Phone", r.phone],
       ["Instagram", r.instagram], ["Education level", r.education_level],
       ["Goals", r.bio], ["What they'd like to study / goals", r.study_goals],
-      ["Anything else", r.message],
+      ["Looking for", r.looking_for], ["Anything else", r.message],
     ];
     // Signed links for the private PDFs (best-effort); photo is a public URL.
     const [resume, english, diploma] = await Promise.all([

@@ -772,6 +772,7 @@ function cardPending(p){
   const contact = [
     p.applying_for ? `<b>Applying for:</b> ${esc(p.applying_for)}` : null,
     p.nationality ? `<b>Nationality:</b> ${esc(p.nationality)}` : null,
+    p.role ? `<b>Role:</b> ${esc(p.role)}` : null,
     p.age ? `<b>Age:</b> ${esc(p.age)}` : null,
     p.email ? `<b>Email:</b> ${esc(p.email)}` : null,
     p.phone ? `<b>Phone:</b> ${esc(p.phone)}` : null,
@@ -789,6 +790,7 @@ function cardPending(p){
     ${contact ? `<div class="p-meta">${contact}</div>` : ""}
     ${p.bio ? `<div class="p-meta"><b>Goals:</b> ${esc(p.bio)}</div>` : ""}
     ${p.study_goals ? `<div class="p-meta"><b>Study &amp; goals:</b> ${esc(p.study_goals)}</div>` : ""}
+    ${p.looking_for ? `<div class="p-meta"><b>Looking for:</b> ${esc(p.looking_for)}</div>` : ""}
     ${p.message ? `<div class="p-meta"><b>Message:</b> ${esc(p.message)}</div>` : ""}
     ${pendingFilesHTML(p)}
     ${pendingStatsHTML(p)}
