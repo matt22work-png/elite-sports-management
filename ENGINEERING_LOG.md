@@ -11,6 +11,54 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Full ownership review + roster position-filter fix (2026-08-19, session 2)
+
+**Autonomous end-to-end review of the whole project against LIVE prod (Supabase + Vercel), using
+real test-account signups, direct RLS/API probes, and headless-Chrome CDP.** Commits `932ba7a`
+(fix), `5733b6c` (repo hygiene).
+
+**BUG FOUND & FIXED — roster position filters hid 70% of athletes.** The position tabs matched
+`p.group === activeTab` exactly, but the live roster's `group`/`position` are admin free-text
+("Player", "Catcher/Swich Hitter", "2 Way Player (C-Pitcher-1B)", "Outfield/DH", "Starting
+Pitcher", …). Result: of 10 approved athletes, only 3 appeared under any position tab; the other 7
+(incl. the founder) were visible only under "All" — a scout filtering by position saw a broken
+roster. Also there was **no Outfielder tab** despite 2 outfielders.
+- Fix (client-only, NO DB mutation): added `posCategory(p)` — a tolerant, order-sensitive matcher
+  over `group+position` (Two-Way checked first so P+C combos don't double-count) returning exactly
+  one canonical tab per athlete. `renderRoster` now filters by it. Added the missing **Outfielder**
+  tab (FILTERS + `groupKey` + `filter_outfielder` EN/ES/IT).
+- Verified live: All=10, Pitcher=3, Catcher=3, Infielder=0, Outfielder=2, Two-Way=2 → sum=10, clean
+  partition (no overlap, no gaps); empty Infielder shows the graceful empty state. SW v9→v10.
+
+**Everything else tested and PASSED (no other bugs):**
+- Player signup→profile(auto-created by `handle_new_user` trigger, `on conflict do nothing`)→own-data
+  read via RLS; anon can't see pending player; cross-user RLS isolation holds. Email confirmation is
+  disabled (immediate session — no confirm block).
+- Scout signup→pending (`scout_roster` returns 0)→admin approval→`scout_roster` returns 10 rows WITH
+  contact fields; anon calling `scout_roster` → `42501 permission denied`.
+- Application form file uploads (College path): anon uploads photo→application-photos + 3 PDFs→
+  application-docs; row inserts with all fields; public photo readable; **private docs return 400 to
+  anon on read/sign, `[]` on list — no leakage** (re-verified from 4 angles). Dropdown switching,
+  T&C blocking, file validation all work in real Chrome.
+- Roster code gate: `get_roster_code`→"ESM13", correct→true, wrong/empty→false.
+- All 7 pages (home/register/scout/portal/admin/tenerife + a static player page), desktop AND mobile:
+  **0 console errors, 0 failed requests**; hero photo loads (naturalWidth>0); no broken images; 0
+  mobile horizontal overflow; no dead in-page anchors; all buttons have accessible names; testimonials
+  (3) + events (2) render; language switcher EN/ES/IT works on every page and **"visibilità" renders
+  correctly in real Chrome**.
+- i18n validator: 0 hard problems. All 58 inline scripts + JS files syntax-clean. Prod schema fully
+  applied (8 player cols, 4 scout cols, both buckets, 4 notify triggers, 5 storage policies). Security
+  advisors: unchanged — the 8 warnings are all pre-existing & by-design (this session added no DB
+  objects). All test data + temp policies cleaned; repo tree clean; throwaway test scripts removed +
+  gitignored (`site/_*`).
+
+**Still needs Matt/Sam (unchanged from session 1):** `GMAIL_APP_PASSWORD` secret unset → notifications
+are a deployed no-op until added; admin editor "declutter" still needs specifics (nothing
+Coaching-specific found to remove); rep/college file uploads are required by design (say if any should
+be optional). Optional hardening: enable Supabase Auth leaked-password protection (dashboard setting).
+Admin UI click-through (approve/reject/edit/stats/password-reset/testimonials editing) couldn't be
+exercised without admin credentials, but its full data layer (RLS, edge fn, RPCs) is verified.
+
 ### Expanded application form + scout fields + Teams/Scouts option + IT tagline + hero photo — built & 3-pass reviewed (2026-08-19)
 
 **Four batches of work, all deployed to prod and verified live. Commits `bc956b3`, `e468268`,
