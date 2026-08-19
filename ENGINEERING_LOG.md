@@ -71,11 +71,12 @@ general-purpose and in use). Per the "leave & flag if ambiguous" guidance, left 
 - Application "Teams and Scouts" photo was required, but the scout-registration photo is optional
   and a team/org may lack a headshot → made `ts_photo` optional (still validated + uploaded if given).
 
+**RESOLVED after review:** `site/assets/arath-zapien.jpg` now committed (commit `1f775d7`). The file
+had been saved as `arath-zapien.jpg.jpg` (accidental double extension); renamed to match the `<img>`
+src. Valid JPEG 1280×854, 124 KB. Verified live: `GET /assets/arath-zapien.jpg` → 200 `image/jpeg`
+126760 bytes; `<figcaption>` (static, no data-i18n) renders in all 3 languages; onerror-hide never fires.
+
 **Needs Sam/Matt input:**
-- **`site/assets/arath-zapien.jpg` is still NOT in the repo** (the `assets/` folder was created but
-  is empty; git can't commit an empty dir). Drop the real JPG at
-  `elite-sports-management/site/assets/arath-zapien.jpg`, then `git add -A && commit && push` — the
-  hero photo will appear (markup already wired, hides gracefully until then).
 - **Admin "declutter"** — tell me exactly which editor sections to remove; I found nothing
   Coaching-specific to safely remove.
 - **`GMAIL_APP_PASSWORD` secret still unset** → all notifications (applications, scouts, teams) are
