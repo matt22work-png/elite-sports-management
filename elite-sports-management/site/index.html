@@ -262,6 +262,15 @@
   .field input,.field select,.field textarea{background:rgba(6,20,42,.6);border:1px solid var(--line);border-radius:11px;padding:13px 14px;color:var(--ink);font-family:inherit;font-size:15px;outline:none;transition:.18s}
   .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
   .field textarea{resize:vertical;min-height:90px}.field select{appearance:none;cursor:pointer}
+  /* Application form: two-column rows (name, phone+code) + upload hints */
+  .af-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .af-phone{grid-template-columns:110px 1fr}
+  .af-row .field{margin-bottom:0}
+  .af-row+.af{margin-top:16px}
+  .fhint{color:var(--muted);font-size:12px;margin-top:-3px}
+  .field input[type=file]{padding:11px 12px;font-size:14px;cursor:pointer}
+  .field.invalid input,.field.invalid select,.field.invalid textarea{border-color:#e05d5d}
+  @media(max-width:480px){.af-row{grid-template-columns:1fr}.af-phone{grid-template-columns:90px 1fr}}
   .phone-row{display:flex;gap:8px}
   .phone-row .phone-cc{flex:0 0 auto;width:auto;max-width:142px}
   .phone-row .phone-num{flex:1;min-width:0}
@@ -671,10 +680,14 @@
   <div class="join">
     <div class="tagline" data-i18n="join_tagline"></div>
     <p class="join-pitch" data-i18n="join_pitch"></p>
-    <!-- Trimmed to 3 fields per Sam (2026-08): what they're applying for + goals +
-         anything else. Name/age/phone/email/IG/country/sport/position were removed
-         from THIS form. (Full contact + stats are captured on the /register/ account
-         flow instead.) -->
+    <!-- Category-driven application form (2026-08, per Sam — supersedes the earlier
+         3-field version). The "I'm applying for" select drives which field set is
+         shown: Baseball/Softball Representation and College Placement each get a
+         full profile + file uploads; Coaching keeps the minimal goals + note fields.
+         Every field carries data-cats listing the categories it belongs to; the
+         updateApplyFields() JS toggles `hidden` on change. Fields are NOT removed
+         from the DOM, only hidden — the submit handler reads only the fields that
+         belong to the selected category, so hidden inputs are ignored. -->
     <form id="applyForm" novalidate>
       <div class="field"><label data-i18n="f_applying"></label>
         <select name="applying" id="applyingSelect">
@@ -683,8 +696,52 @@
           <option value="College Placement" data-i18n="opt_college"></option>
           <option value="Coaching" data-i18n="opt_coach"></option>
         </select></div>
-      <div class="field"><label data-i18n="f_why"></label><textarea name="why"></textarea></div>
-      <div class="field"><label data-i18n="f_other"></label><textarea name="other"></textarea></div>
+
+      <!-- ===== Representation + College shared fields ===== -->
+      <div class="field af" data-cats="rep college"><label data-i18n="f_photo"></label>
+        <input type="file" name="photo" accept="image/jpeg,image/png" />
+        <small class="fhint" data-i18n="f_photo_hint"></small></div>
+      <div class="af af-row" data-cats="rep college">
+        <div class="field"><label data-i18n="f_first"></label><input type="text" name="first_name" autocomplete="given-name" /></div>
+        <div class="field"><label data-i18n="f_last"></label><input type="text" name="last_name" autocomplete="family-name" /></div>
+      </div>
+      <div class="field af" data-cats="rep college"><label data-i18n="f_nationality"></label><input type="text" name="nationality" /></div>
+      <div class="field af" data-cats="rep college"><label data-i18n="f_email"></label><input type="email" name="email" autocomplete="email" /></div>
+      <div class="af af-row af-phone" data-cats="rep college">
+        <div class="field field-code"><label data-i18n="f_phone_code"></label><input type="text" name="phone_code" placeholder="+39" inputmode="tel" /></div>
+        <div class="field"><label data-i18n="f_phone"></label><input type="tel" name="phone" autocomplete="tel-national" /></div>
+      </div>
+      <div class="field af" data-cats="rep college"><label data-i18n="f_country"></label><input type="text" name="country" autocomplete="country-name" /></div>
+      <div class="field af" data-cats="rep college"><label data-i18n="f_position"></label>
+        <select name="position">
+          <option value="" data-i18n="f_position_ph"></option>
+          <option value="Pitcher" data-i18n="pos_pitcher"></option>
+          <option value="Catcher" data-i18n="pos_catcher"></option>
+          <option value="Infield" data-i18n="pos_infield"></option>
+          <option value="Outfield" data-i18n="pos_outfield"></option>
+        </select></div>
+      <div class="field af" data-cats="rep college"><label data-i18n="f_age"></label><input type="number" name="age" min="1" max="99" inputmode="numeric" /></div>
+      <div class="field af" data-cats="rep college"><label data-i18n="f_resume"></label>
+        <input type="file" name="resume" accept="application/pdf,.pdf" />
+        <small class="fhint" data-i18n="f_pdf_hint"></small></div>
+
+      <!-- ===== Representation only ===== -->
+      <div class="field af" data-cats="rep"><label data-i18n="f_goals"></label><textarea name="goals"></textarea></div>
+
+      <!-- ===== College only ===== -->
+      <div class="field af" data-cats="college"><label data-i18n="f_english"></label>
+        <input type="file" name="english_cert" accept="application/pdf,.pdf" />
+        <small class="fhint" data-i18n="f_pdf_hint"></small></div>
+      <div class="field af" data-cats="college"><label data-i18n="f_education"></label><input type="text" name="education_level" /></div>
+      <div class="field af" data-cats="college"><label data-i18n="f_diploma"></label>
+        <input type="file" name="diploma" accept="application/pdf,.pdf" />
+        <small class="fhint" data-i18n="f_pdf_hint"></small></div>
+      <div class="field af" data-cats="college"><label data-i18n="f_study"></label><textarea name="study_goals"></textarea></div>
+
+      <!-- ===== Coaching (minimal, unchanged) ===== -->
+      <div class="field af" data-cats="coach"><label data-i18n="f_why"></label><textarea name="why"></textarea></div>
+      <div class="field af" data-cats="coach"><label data-i18n="f_other"></label><textarea name="other"></textarea></div>
+
       <!-- Anti-spam honeypot — hidden from real users; must stay empty. -->
       <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <label class="tc"><input type="checkbox" class="tc-check" id="joinTc"><span data-i18n="tc_label"></span> <a class="tc-more" href="terms.html" target="_blank" rel="noopener" data-i18n="tc_more"></a></label>
@@ -916,6 +973,16 @@ const T = {
     join_tagline:"Talent Gets You Noticed. Representation Gets You Signed.",
     join_pitch:"Talent alone rarely opens the door. The right agent turns tryouts into contracts — negotiating your deals, opening leagues at home and abroad, and putting your name in front of the scouts and coaches who decide careers.",
     f_applying:"I'm applying for",opt_rep_baseball:"Baseball Representation",opt_rep_softball:"Softball Representation",opt_college:"College Placement",opt_coach:"Coaching",
+    f_photo:"Photo",f_photo_hint:"JPG or PNG, up to 10 MB.",
+    f_first:"First name",f_last:"Last name",f_nationality:"Nationality",f_email:"Email",
+    f_phone_code:"Code",f_phone:"Phone number",f_country:"Country",
+    f_position:"Position",f_position_ph:"Select a position…",pos_pitcher:"Pitcher",pos_catcher:"Catcher",pos_infield:"Infield",pos_outfield:"Outfield",
+    f_age:"Age",f_resume:"Resume / CV (PDF)",f_pdf_hint:"PDF only, up to 10 MB.",
+    f_goals:"Your goals",
+    f_english:"English certificate (PDF)",f_education:"Education level & diploma",f_diploma:"Diploma (PDF)",
+    f_study:"What would you like to study in college? Your goals",
+    f_submitting:"Submitting…",
+    f_err_required:"Please fill in all required fields.",f_err_size:"That file is too large (max 10 MB).",f_err_img:"Please upload a JPG or PNG image.",f_err_pdf:"Please upload a PDF file.",
     f_why:"Why do you want to start? / Your goals",f_other:"Anything else?",f_submit:"Submit application",
     f_success:"Thanks! Your application has been received — we'll review it and be in touch.",
     f_error:"Sorry, something went wrong sending your application. Please try again.",
@@ -992,6 +1059,16 @@ const T = {
     join_tagline:"El talento llama la atención. La representación te consigue el contrato.",
     join_pitch:"El talento por sí solo casi nunca abre la puerta. El agente adecuado convierte las pruebas en contratos: negocia tus acuerdos, te abre ligas dentro y fuera del país y pone tu nombre frente a los scouts y entrenadores que deciden carreras.",
     f_applying:"Aplico para",opt_rep_baseball:"Representación de Béisbol",opt_rep_softball:"Representación de Sóftbol",opt_college:"Colocación en College",opt_coach:"Coaching",
+    f_photo:"Foto",f_photo_hint:"JPG o PNG, hasta 10 MB.",
+    f_first:"Nombre",f_last:"Apellido",f_nationality:"Nacionalidad",f_email:"Correo electrónico",
+    f_phone_code:"Código",f_phone:"Número de teléfono",f_country:"País",
+    f_position:"Posición",f_position_ph:"Elige una posición…",pos_pitcher:"Lanzador",pos_catcher:"Receptor",pos_infield:"Cuadro interior",pos_outfield:"Jardinero",
+    f_age:"Edad",f_resume:"Currículum / CV (PDF)",f_pdf_hint:"Solo PDF, hasta 10 MB.",
+    f_goals:"Tus objetivos",
+    f_english:"Certificado de inglés (PDF)",f_education:"Nivel educativo y diploma",f_diploma:"Diploma (PDF)",
+    f_study:"¿Qué te gustaría estudiar en la universidad? Tus objetivos",
+    f_submitting:"Enviando…",
+    f_err_required:"Por favor, completa todos los campos obligatorios.",f_err_size:"Ese archivo es demasiado grande (máx. 10 MB).",f_err_img:"Sube una imagen JPG o PNG.",f_err_pdf:"Sube un archivo PDF.",
     f_why:"¿Por qué quieres empezar? / Tus objetivos",f_other:"¿Algo más?",f_submit:"Enviar solicitud",
     f_success:"¡Gracias! Hemos recibido tu solicitud — la revisaremos y te contactaremos.",
     f_error:"Lo sentimos, hubo un problema al enviar tu solicitud. Inténtalo de nuevo.",
@@ -1068,6 +1145,16 @@ const T = {
     join_tagline:"Il talento ti fa notare. La rappresentanza ti fa firmare.",
     join_pitch:"Il solo talento raramente apre le porte. L'agente giusto trasforma i provini in contratti: negozia i tuoi accordi, ti apre le leghe in patria e all'estero e mette il tuo nome davanti agli scout e agli allenatori che decidono le carriere.",
     f_applying:"Mi candido per",opt_rep_baseball:"Rappresentanza Baseball",opt_rep_softball:"Rappresentanza Softball",opt_college:"Collocamento College",opt_coach:"Coaching",
+    f_photo:"Foto",f_photo_hint:"JPG o PNG, fino a 10 MB.",
+    f_first:"Nome",f_last:"Cognome",f_nationality:"Nazionalità",f_email:"Email",
+    f_phone_code:"Prefisso",f_phone:"Numero di telefono",f_country:"Paese",
+    f_position:"Ruolo",f_position_ph:"Scegli un ruolo…",pos_pitcher:"Lanciatore",pos_catcher:"Ricevitore",pos_infield:"Interno",pos_outfield:"Esterno",
+    f_age:"Età",f_resume:"Curriculum / CV (PDF)",f_pdf_hint:"Solo PDF, fino a 10 MB.",
+    f_goals:"I tuoi obiettivi",
+    f_english:"Certificato di inglese (PDF)",f_education:"Livello di istruzione e diploma",f_diploma:"Diploma (PDF)",
+    f_study:"Cosa vorresti studiare al college? I tuoi obiettivi",
+    f_submitting:"Invio in corso…",
+    f_err_required:"Compila tutti i campi obbligatori.",f_err_size:"Il file è troppo grande (max 10 MB).",f_err_img:"Carica un'immagine JPG o PNG.",f_err_pdf:"Carica un file PDF.",
     f_why:"Perché vuoi iniziare? / I tuoi obiettivi",f_other:"Altro?",f_submit:"Invia candidatura",
     f_success:"Grazie! Abbiamo ricevuto la tua candidatura — la esamineremo e ti contatteremo.",
     f_error:"Spiacenti, qualcosa è andato storto nell'invio della candidatura. Riprova.",
@@ -1796,20 +1883,65 @@ document.getElementById("yr").textContent=new Date().getFullYear();
 })();
 
 const form=document.getElementById("applyForm");
+const applyingSelect=document.getElementById("applyingSelect");
 const FORM_T0=Date.now();   // page-load time, for the anti-spam time trap below
+
+/* Map the "I'm applying for" value → a category token used by data-cats.
+   Baseball + Softball Representation share the same field set ("rep"). */
+function applyCat(v){
+  v=String(v||"");
+  return /college/i.test(v) ? "college" : /coach/i.test(v) ? "coach" : "rep";
+}
+/* Show only the fields whose data-cats includes the selected category, and clear
+   any stale validation highlight. Hidden fields stay in the DOM but are ignored by
+   the submit handler (it reads only the selected category's fields). */
+function updateApplyFields(){
+  const cat=applyCat(applyingSelect.value);
+  form.querySelectorAll(".af").forEach(el=>{
+    el.hidden=!(el.dataset.cats||"").split(" ").includes(cat);
+  });
+  form.querySelectorAll(".invalid").forEach(el=>el.classList.remove("invalid"));
+}
+applyingSelect.addEventListener("change",updateApplyFields);
+
+/* Upload limits — mirrored server-side by the bucket file_size_limit + allowed_mime_types. */
+const MAX_UPLOAD=10*1024*1024;                 // 10 MB
+const IMG_TYPES=["image/jpeg","image/png"];
+const PDF_TYPE="application/pdf";
+const extFor=f=>{const n=(f&&f.name||"").toLowerCase();const i=n.lastIndexOf(".");return i>=0?n.slice(i+1):"";};
+
+// Validate a File against a kind ("image"|"pdf"); returns an error i18n-key or null.
+function fileError(file,kind){
+  if(!file||!file.size) return null;             // caller decides if required
+  if(file.size>MAX_UPLOAD) return "f_err_size";
+  if(kind==="image" && !IMG_TYPES.includes(file.type) && !["jpg","jpeg","png"].includes(extFor(file))) return "f_err_img";
+  if(kind==="pdf"   && file.type!==PDF_TYPE && extFor(file)!=="pdf") return "f_err_pdf";
+  return null;
+}
+
+// Upload one file to a bucket under key/<label>.<ext>. Returns the object path.
+async function uploadApplicationFile(bucket,key,label,file){
+  const ext=extFor(file)|| (bucket==="application-docs"?"pdf":"jpg");
+  const path=`${key}/${label}.${ext}`;
+  const {error}=await SB.storage.from(bucket).upload(path,file,{contentType:file.type||undefined,upsert:true});
+  if(error) throw error;
+  return path;
+}
+
 form.addEventListener("submit",async e=>{
   e.preventDefault();
   const fd=new FormData(form);
   const btn=form.querySelector("button[type=submit]");
   const msg=document.getElementById("formMsg");
   msg.classList.remove("show","err");
+  form.querySelectorAll(".invalid").forEach(el=>el.classList.remove("invalid"));
 
   // Dependency-free spam guard: bots auto-fill the hidden honeypot ("company"), and no
   // real user reaches and submits this bottom-of-page form within 1.5s of load. Either
   // signal → show the success UI but skip the insert, so bots don't retry or spam the
   // moderation queue. Real submissions are unaffected.
   if((fd.get("company")||"").trim() || (Date.now()-FORM_T0)<1500){
-    form.reset();msg.textContent=t("f_success");msg.classList.add("show");
+    form.reset();updateApplyFields();msg.textContent=t("f_success");msg.classList.add("show");
     return;
   }
 
@@ -1822,28 +1954,137 @@ form.addEventListener("submit",async e=>{
   // Applications require the live database; without it we can't save them.
   if(!SB){msg.textContent=t("f_error");msg.classList.add("show","err");msg.scrollIntoView({behavior:"smooth",block:"center"});return;}
 
-  btn.disabled=true;
-  // This form is now just 3 fields (applying for / goals / anything else) — no name,
-  // contact or sport is collected here. players.name and players."group" are NOT NULL,
-  // so we synthesize a human-readable label from the "applying for" value; the row is
-  // saved `pending` and is never shown on the public roster. The notify Edge Function
-  // still routes softball/college inquiries correctly off the applying_for text.
   const applying=(fd.get("applying")||"").trim()||"General application";
-  const {error}=await SB.from("players").insert({
-    slug:slugify(applying)+"-"+Date.now().toString(36),
-    name:applying,
-    "group":"Applicant",
-    bio:(fd.get("why")||"").trim()||"—",
-    applying_for:applying,
-    message:(fd.get("other")||"").trim(),
-    // General application from the public #join form. Paid profile creation + full
-    // contact/stats now have their own account flow at /register/ (source:"registration").
-    source:"application",
-    status:"pending",
-  });
-  btn.disabled=false;
-  if(error){console.error("Application failed",error);msg.textContent=t("f_error");msg.classList.add("show","err");msg.scrollIntoView({behavior:"smooth",block:"center"});return;}
-  form.reset();
+  const cat=applyCat(applying);
+  const g=n=>(fd.get(n)||"").toString().trim();
+  const gf=n=>{const f=fd.get(n);return f&&f.size?f:null;};
+
+  // ---- Per-category required fields (item 1) ----
+  // Baseball/Softball Representation and College share the full profile; College
+  // adds the academic docs. Coaching stays minimal. File fields are required too,
+  // per Sam's field lists.
+  const REQ={
+    rep:    ["photo","first_name","last_name","nationality","email","phone","country","position","resume","age","goals"],
+    college:["photo","first_name","last_name","nationality","email","phone","country","position","resume","age","english_cert","education_level","diploma","study_goals"],
+    coach:  ["why"],
+  }[cat];
+  const FILE_FIELDS={photo:"image",resume:"pdf",english_cert:"pdf",diploma:"pdf"};
+
+  // Mark the .field wrapper of a named control invalid (for the red-border hint).
+  const markInvalid=name=>{const c=form.querySelector(`[name="${name}"]`);const fld=c&&c.closest(".field");if(fld)fld.classList.add("invalid");};
+
+  let firstBad=null, fileMsgKey=null;
+  for(const name of REQ){
+    if(FILE_FIELDS[name]){
+      const file=gf(name);
+      if(!file){ markInvalid(name); firstBad=firstBad||name; continue; }
+      const err=fileError(file,FILE_FIELDS[name]);
+      if(err){ markInvalid(name); firstBad=firstBad||name; fileMsgKey=fileMsgKey||err; }
+    }else if(!g(name)){
+      markInvalid(name); firstBad=firstBad||name;
+    }
+  }
+  // Also validate any optionally-present file even if not required (defensive).
+  for(const [name,kind] of Object.entries(FILE_FIELDS)){
+    if(REQ.includes(name)) continue;
+    const err=fileError(gf(name),kind);
+    if(err){ markInvalid(name); firstBad=firstBad||name; fileMsgKey=fileMsgKey||err; }
+  }
+  if(firstBad){
+    msg.textContent=t(fileMsgKey||"f_err_required");
+    msg.classList.add("show","err");
+    const bad=form.querySelector(`[name="${firstBad}"]`);
+    (bad||msg).scrollIntoView({behavior:"smooth",block:"center"});
+    if(bad&&bad.focus)try{bad.focus({preventScroll:true});}catch(_){}
+    return;
+  }
+
+  btn.disabled=true;
+  const oldLabel=btn.textContent; btn.textContent=t("f_submitting");
+  try{
+    // A stable key groups this applicant's uploads under one folder in each bucket.
+    const key=slugify(applying)+"-"+Date.now().toString(36);
+
+    // ---- File uploads (item 2) ----
+    // Headshot → public application-photos bucket (renders in admin + any profile).
+    // PDFs → private application-docs bucket; we store the object PATH and the admin
+    // panel mints short-lived signed URLs to download them.
+    let image_url=null, resume_url=null, english_cert_url=null, diploma_url=null;
+    if(cat==="rep"||cat==="college"){
+      const photo=gf("photo");
+      if(photo){
+        const p=await uploadApplicationFile("application-photos",key,"photo",photo);
+        image_url=SB.storage.from("application-photos").getPublicUrl(p).data.publicUrl;
+      }
+      const resume=gf("resume");
+      if(resume) resume_url=await uploadApplicationFile("application-docs",key,"resume",resume);
+    }
+    if(cat==="college"){
+      const eng=gf("english_cert");
+      if(eng) english_cert_url=await uploadApplicationFile("application-docs",key,"english-cert",eng);
+      const dip=gf("diploma");
+      if(dip) diploma_url=await uploadApplicationFile("application-docs",key,"diploma",dip);
+    }
+
+    // ---- Build the row (item 3) ----
+    // players.name and players."group" are NOT NULL. For rep/college we now have a
+    // real name; Coaching still has none, so we fall back to the applying label.
+    const fullName=[g("first_name"),g("last_name")].filter(Boolean).join(" ");
+    const name=fullName || applying;
+    // Sport: Softball Representation → Softball; everything else defaults to Baseball
+    // (College placement covers both; applying_for keeps the exact choice for routing).
+    const sport=/softball/i.test(applying)?"Softball":"Baseball";
+    // Goals text: rep uses "goals"; college uses "study_goals"; coaching uses "why".
+    const goalsText=cat==="college"?g("study_goals"):cat==="coach"?g("why"):g("goals");
+    // Phone: combine the country code + number into one stored value.
+    const phone=[g("phone_code"),g("phone")].filter(Boolean).join(" ").trim();
+
+    const row={
+      slug:key,
+      name,
+      "group":"Applicant",
+      sport,
+      applying_for:applying,
+      bio:goalsText||"—",
+      source:"application",
+      status:"pending",
+    };
+    // Only attach the extended fields for the categories that collect them, so a
+    // Coaching submission stays as lean as before.
+    if(cat==="rep"||cat==="college"){
+      Object.assign(row,{
+        nationality:g("nationality")||null,
+        email:g("email")||null,
+        phone:phone||null,
+        country:g("country")||null,
+        position:g("position")||null,
+        age:g("age")||null,
+        image_url,
+        resume_url,
+      });
+    }
+    if(cat==="college"){
+      Object.assign(row,{
+        english_cert_url,
+        diploma_url,
+        education_level:g("education_level")||null,
+        study_goals:g("study_goals")||null,
+      });
+    }
+    if(cat==="coach"){
+      row.message=g("other")||null;
+    }
+
+    const {error}=await SB.from("players").insert(row);
+    if(error) throw error;
+  }catch(err){
+    console.error("Application failed",err);
+    btn.disabled=false; btn.textContent=oldLabel;
+    msg.textContent=t("f_error");msg.classList.add("show","err");msg.scrollIntoView({behavior:"smooth",block:"center"});
+    return;
+  }
+  btn.disabled=false; btn.textContent=oldLabel;
+  form.reset();updateApplyFields();
   msg.textContent=t("f_success");msg.classList.add("show");
   msg.scrollIntoView({behavior:"smooth",block:"center"});
 });
@@ -1891,6 +2132,8 @@ async function boot(){
   applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();
   applyLockState();
 }
+// Show the correct application field set for the default-selected category on load.
+updateApplyFields();
 // Wire the pay buttons synchronously too: their hrefs come only from top-level
 // constants (no network), so doing this before boot()'s async import+fetch means the
 // "€49.99" roster button always has a working target even if the connection stalls —

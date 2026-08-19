@@ -745,13 +745,29 @@ function pendingStatsHTML(p){
   return out;
 }
 
+// Download buttons for an applicant's uploaded PDFs. The files live in the PRIVATE
+// `application-docs` bucket, so each button mints a short-lived signed URL on click
+// (see openDoc / bindActions). The headshot lives in the PUBLIC application-photos
+// bucket and is already shown as the card avatar; we add a "View photo" link too.
+function pendingFilesHTML(p){
+  const btns = [
+    p.image_url        ? `<a class="btn btn-ghost" href="${esc(p.image_url)}" target="_blank" rel="noopener">🖼 Photo</a>` : null,
+    p.resume_url       ? `<button class="btn btn-ghost" data-doc="${esc(p.resume_url)}" type="button">📄 Resume/CV</button>` : null,
+    p.english_cert_url ? `<button class="btn btn-ghost" data-doc="${esc(p.english_cert_url)}" type="button">📄 English cert</button>` : null,
+    p.diploma_url      ? `<button class="btn btn-ghost" data-doc="${esc(p.diploma_url)}" type="button">📄 Diploma</button>` : null,
+  ].filter(Boolean).join(" ");
+  return btns ? `<div class="p-meta"><b>Files:</b> ${btns}</div>` : "";
+}
+
 function cardPending(p){
   const contact = [
+    p.applying_for ? `<b>Applying for:</b> ${esc(p.applying_for)}` : null,
+    p.nationality ? `<b>Nationality:</b> ${esc(p.nationality)}` : null,
     p.age ? `<b>Age:</b> ${esc(p.age)}` : null,
     p.email ? `<b>Email:</b> ${esc(p.email)}` : null,
     p.phone ? `<b>Phone:</b> ${esc(p.phone)}` : null,
     p.instagram ? `<b>IG:</b> ${esc(p.instagram)}` : null,
-    p.applying_for ? `<b>Applying for:</b> ${esc(p.applying_for)}` : null,
+    p.education_level ? `<b>Education:</b> ${esc(p.education_level)}` : null,
   ].filter(Boolean).join(" &nbsp;·&nbsp; ");
   // Self-created paid profiles come through the /register/ account flow (source
   // "registration"); "profile-gate" is the retired legacy source, kept for old rows.
@@ -762,8 +778,10 @@ function cardPending(p){
       ${isPaidProfile ? `<span class="chip paid" title="Self-created player profile (paid account flow)">💳 Paid profile</span>` : `<span class="chip" style="opacity:.6">Applicant</span>`}
     </div>
     ${contact ? `<div class="p-meta">${contact}</div>` : ""}
-    ${p.bio ? `<div class="p-meta">${esc(p.bio)}</div>` : ""}
+    ${p.bio ? `<div class="p-meta"><b>Goals:</b> ${esc(p.bio)}</div>` : ""}
+    ${p.study_goals ? `<div class="p-meta"><b>Study &amp; goals:</b> ${esc(p.study_goals)}</div>` : ""}
     ${p.message ? `<div class="p-meta"><b>Message:</b> ${esc(p.message)}</div>` : ""}
+    ${pendingFilesHTML(p)}
     ${pendingStatsHTML(p)}
     <div class="row-btns">
       <button class="btn btn-teal" data-approve="${p.id}">✓ Approve</button>
@@ -944,7 +962,20 @@ async function setStatus(id, status, btn){
   await load();
 }
 
+// Open an applicant's PDF from the private application-docs bucket via a short-lived
+// signed URL (valid ~2 min). Only admins can read that bucket (RLS), so this only
+// works for a signed-in admin — exactly who this panel is for.
+async function openDoc(path, btn){
+  if (!SB || !path) return;
+  const label = btn.textContent; btn.disabled = true; btn.textContent = "…";
+  const { data, error } = await SB.storage.from("application-docs").createSignedUrl(path, 120);
+  btn.disabled = false; btn.textContent = label;
+  if (error || !data?.signedUrl){ alert("Couldn't open file: " + (error?.message || "unknown error")); return; }
+  window.open(data.signedUrl, "_blank", "noopener");
+}
+
 function bindActions(){
+  document.querySelectorAll("[data-doc]").forEach(b => b.onclick = () => openDoc(b.dataset.doc, b));
   document.querySelectorAll("[data-approve]").forEach(b => b.onclick = () => setStatus(+b.dataset.approve, "approved", b));
   document.querySelectorAll("[data-reject]").forEach(b => b.onclick = () => setStatus(+b.dataset.reject, "rejected", b));
   document.querySelectorAll("[data-archive]").forEach(b => b.onclick = () => setStatus(+b.dataset.archive, "archived", b));

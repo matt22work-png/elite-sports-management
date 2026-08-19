@@ -28,13 +28,45 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 // Hardcoded Gmail sending account (also the App Password owner).
 const FROM_EMAIL = "elitesportsmanagement50@gmail.com";
-// All current routing targets resolve to the main ESM ops inbox. (Softball was
-// unified here on 2026-08-14 when the softball specialist was removed from the
-// site; see ENGINEERING_LOG.md.)
+// ⚠️ ONE-LINE SWAP POINT — where every submission notification is delivered.
+// Sam is creating a NEW dedicated inbox for form submissions; until those
+// credentials exist we use the current placeholder address. When the new inbox is
+// ready, change ONLY this constant (and, if the SENDING account changes too, set a
+// new GMAIL_APP_PASSWORD secret + update FROM_EMAIL above). All current routing
+// targets resolve here (softball was unified in on 2026-08-14; see ENGINEERING_LOG).
 const OPS_INBOX = "elitesportsmanagement50@gmail.com";
 
 const GMAIL_APP_PASSWORD = Deno.env.get("GMAIL_APP_PASSWORD") ?? "";
 const FORM_NOTIFY_SECRET = Deno.env.get("FORM_NOTIFY_SECRET") ?? "";
+
+// Supabase auto-injects these into every Edge Function. Used ONLY to mint short-lived
+// signed download links for an applicant's private PDFs (application-docs bucket) so
+// the notification email can link to them directly — see docLink().
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
+const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+
+// Mint a signed URL (7 days) for a private application-docs object path via the
+// Storage REST API. Never throws — returns null on any failure so the email still
+// sends. We deliberately DON'T attach files: links are far more reliable than
+// multi-MB SMTP attachments and won't trip Gmail size limits.
+async function docLink(path: string): Promise<string | null> {
+  if (!path || !SUPABASE_URL || !SERVICE_ROLE_KEY) return null;
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/storage/v1/object/sign/application-docs/${path.split("/").map(encodeURIComponent).join("/")}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE_KEY}`, apikey: SERVICE_ROLE_KEY },
+        body: JSON.stringify({ expiresIn: 604800 }), // 7 days
+      },
+    );
+    if (!res.ok) return null;
+    const j = await res.json();
+    return j?.signedURL ? `${SUPABASE_URL}/storage/v1${j.signedURL}` : null;
+  } catch {
+    return null;
+  }
+}
 
 const escHtml = (s: unknown) =>
   String(s ?? "").replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]!));
@@ -59,25 +91,51 @@ function wrap(title: string, inner: string) {
 
 type Mail = { to: string; subject: string; html: string };
 
+// A "Files" block: labelled links to the applicant's uploads. Photo is public
+// (direct URL); the PDFs are private, so each is a 7-day signed link (docLink).
+function filesTable(links: [string, string | null][]) {
+  const items = links
+    .filter(([, url]) => !!url)
+    .map(([k, url]) => `<div style="margin:4px 0"><a href="${escHtml(url)}" style="color:#1f6feb">${escHtml(k)} →</a></div>`)
+    .join("");
+  return items ? `<div style="margin-top:12px"><div style="color:#7a8aa0;font-size:13px;margin-bottom:4px">Uploaded files</div>${items}</div>` : "";
+}
+
 // Map a DB record → one email, or null to skip (no email for this row type).
-// A single template path formats each submission type by its fields.
-function buildMessage(table: string, r: Record<string, unknown>): Mail | null {
+// A single template path formats each submission type by its fields. Async because
+// building an application email mints signed download links for the private PDFs.
+async function buildMessage(table: string, r: Record<string, unknown>): Promise<Mail | null> {
   if (table === "players" && r.source === "application") {
     // Public #join application form. applying_for drives the routing "kind".
     const applying = String(r.applying_for ?? "");
     const isSoftball = r.sport === "Softball" || /softball/i.test(applying);
     const isCollege  = /college/i.test(applying);
     const isCoaching = /coach/i.test(applying);
-    const kind = isCollege ? "College consulting inquiry"
+    const kind = isCollege ? "College application"
                : isSoftball ? "Softball application"
                : isCoaching ? "Coaching application"
                : "Baseball application";
     const rows: [string, unknown][] = [
       ["Name", r.name], ["Applying for", r.applying_for], ["Sport", r.sport],
-      ["Age", r.age], ["Country", r.country], ["Email", r.email], ["Phone", r.phone],
-      ["Instagram", r.instagram], ["Goals", r.bio], ["Anything else", r.message],
+      ["Nationality", r.nationality], ["Age", r.age], ["Position", r.position],
+      ["Country", r.country], ["Email", r.email], ["Phone", r.phone],
+      ["Instagram", r.instagram], ["Education level", r.education_level],
+      ["Goals", r.bio], ["What they'd like to study / goals", r.study_goals],
+      ["Anything else", r.message],
     ];
-    return { to: OPS_INBOX, subject: `New ${kind}: ${r.name ?? "athlete"}`, html: wrap(kind, rowsTable(rows)) };
+    // Signed links for the private PDFs (best-effort); photo is a public URL.
+    const [resume, english, diploma] = await Promise.all([
+      docLink(String(r.resume_url ?? "")),
+      docLink(String(r.english_cert_url ?? "")),
+      docLink(String(r.diploma_url ?? "")),
+    ]);
+    const files = filesTable([
+      ["Photo", r.image_url ? String(r.image_url) : null],
+      ["Resume / CV", resume],
+      ["English certificate", english],
+      ["Diploma", diploma],
+    ]);
+    return { to: OPS_INBOX, subject: `New ${kind}: ${r.name ?? "athlete"}`, html: wrap(kind, rowsTable(rows) + files) };
   }
   if (table === "profiles") {
     const name = [r.first_name, r.last_name].filter(Boolean).join(" ") || "(no name)";
@@ -171,7 +229,7 @@ Deno.serve(async (req: Request) => {
   }
 
   // ── Normal path: build + send from the submission row ─────────────────────
-  const msg = buildMessage(String(payload?.table ?? ""), payload?.record ?? {});
+  const msg = await buildMessage(String(payload?.table ?? ""), payload?.record ?? {});
   if (!msg) return json({ ok: true, skipped: true, reason: "no email for this row type" }, 200);
 
   const res = await sendMail(msg);
