@@ -177,12 +177,13 @@
     <h1 class="display" data-i18n-html="r_s2s_h">Your scout <em>details</em></h1>
     <p class="lead" data-i18n="r_s2s_lead">Just what we need to grant roster access.</p>
     <form id="scoutForm">
-      <div class="field"><label for="s-org" data-i18n="r_s_org">Organization</label><input id="s-org" data-i18n-ph="r_s_org_ph" placeholder="e.g. Cleveland Guardians" /></div>
-      <div class="field"><label for="s-title" data-i18n="r_s_title">Position / Title</label><input id="s-title" data-i18n-ph="r_s_title_ph" placeholder="e.g. Area Scout" /></div>
-      <div class="field"><label for="s-school" data-i18n="r_s_school">School / Team (if applicable)</label><input id="s-school" data-i18n-ph="r_s_school_ph" placeholder="e.g. Hastings College" /></div>
-      <div class="field"><label for="s-country" data-i18n="r_s_country">Country</label><input id="s-country" data-i18n-ph="r_s_country_ph" placeholder="e.g. USA" /></div>
+      <div class="field"><label for="s-photo" data-i18n="r_s_photo">Photo</label><input id="s-photo" type="file" accept="image/jpeg,image/png" /><small class="hint" data-i18n="r_s_photo_hint">JPG or PNG, up to 10 MB.</small></div>
+      <div class="field"><label for="s-name" data-i18n="r_s_name">Full Name / Team Name</label><input id="s-name" data-i18n-ph="r_s_name_ph" placeholder="Your name or your team / organization" /></div>
+      <div class="field"><label for="s-nationality" data-i18n="r_s_nationality">Nationality</label><input id="s-nationality" data-i18n-ph="r_s_nationality_ph" placeholder="e.g. American" /></div>
       <div class="field"><label for="s-phone" data-i18n="r_s_phone">Phone</label><div class="phone-row"><select class="phone-cc" id="s-cc" aria-label="Country dialing code"></select><input class="phone-num" id="s-phone" inputmode="tel" data-i18n-ph="r_phone_ph" placeholder="Phone number" /></div></div>
-      <div class="field"><label for="s-notes" data-i18n="r_s_notes">Notes (optional)</label><textarea id="s-notes" rows="3" data-i18n-ph="r_s_notes_ph" placeholder="Anything we should know about your interest…"></textarea></div>
+      <div class="field"><label for="s-country" data-i18n="r_s_country">Country</label><input id="s-country" data-i18n-ph="r_s_country_ph" placeholder="e.g. USA" /></div>
+      <div class="field"><label for="s-title" data-i18n="r_s_role">Role within the team / organization</label><input id="s-title" data-i18n-ph="r_s_role_ph" placeholder="e.g. Head Scout, GM, Director of Player Development" /></div>
+      <div class="field"><label for="s-looking" data-i18n="r_s_looking">Positions to fill / players you're looking for</label><textarea id="s-looking" rows="3" data-i18n-ph="r_s_looking_ph" placeholder="Tell us the roles you need to fill or the type of players you're seeking…"></textarea></div>
       <button class="btn btn-gold" type="submit" style="width:100%" data-i18n="r_save_details">Save details &amp; continue</button>
       <div class="msg" id="scoutMsg" role="alert" aria-live="assertive"></div>
     </form>
@@ -313,18 +314,20 @@ const DICT = {
     r_p_instagram:"Instagram", r_p_phone:"Phone", r_phone_ph:"Phone number", r_cc_ph:"Select country code", r_p_photo:"Profile photo (optional)",
     r_save_profile:"Save profile & continue",
     r_s2s_h:'Your scout <em>details</em>', r_s2s_lead:"Just what we need to grant roster access.",
-    r_s_org:"Organization", r_s_org_ph:"e.g. Cleveland Guardians",
-    r_s_title:"Position / Title", r_s_title_ph:"e.g. Area Scout",
-    r_s_school:"School / Team (if applicable)", r_s_school_ph:"e.g. Hastings College",
+    r_s_photo:"Photo", r_s_photo_hint:"JPG or PNG, up to 10 MB.",
+    r_s_name:"Full Name / Team Name", r_s_name_ph:"Your name or your team / organization",
+    r_s_nationality:"Nationality", r_s_nationality_ph:"e.g. American",
     r_s_country:"Country", r_s_country_ph:"e.g. USA",
-    r_s_phone:"Phone", r_s_notes:"Notes (optional)", r_s_notes_ph:"Anything we should know about your interest…",
+    r_s_phone:"Phone",
+    r_s_role:"Role within the team / organization", r_s_role_ph:"e.g. Head Scout, GM, Director of Player Development",
+    r_s_looking:"Positions to fill / players you're looking for", r_s_looking_ph:"Tell us the roles you need to fill or the type of players you're seeking…",
     r_save_details:"Save details & continue",
     r_s3_h:'Activate your <em>account</em>',
     r_s3_lead:"Thank you for completing your registration. Your account has been created successfully.",
     r_s3_step1:"Elite Sports Management reviews your registration and reaches out to you.",
     r_s3_step2:"Any payment is arranged directly with ESM — there's nothing to pay on this site.",
     r_s3_step3:"Once approved, simply sign in with the same email & password you just created — no additional registration needed.",
-    r_pay_paypal:"Pay via PayPal →", r_pay_wise:"Pay via Wise →", r_contact:"Contact ESM →",
+    r_contact:"Contact ESM →",
     r_s3_note:"We'll email you once ESM has reviewed and approved your account.",
     // Payment service card — player
     r_pay_player_title:"Official Player Profile",
@@ -350,6 +353,7 @@ const DICT = {
     r_err_pwmatch:"Passwords don't match. Please re-enter them.",
     tc_label:"I accept the Terms & Conditions", tc_more:"Read more", tc_required:"Please accept the Terms & Conditions to continue.",
     r_err_session:"Your session expired — please sign in again.",
+    r_err_img:"Please upload a JPG or PNG image.", r_err_size:"That file is too large (max 10 MB).",
     r_err_save_profile:"Couldn't save your profile: ",
     r_err_save_details:"Couldn't save your details: ",
   },
@@ -376,18 +380,20 @@ const DICT = {
     r_p_instagram:"Instagram", r_p_phone:"Teléfono", r_phone_ph:"Número de teléfono", r_cc_ph:"Elige el código de país", r_p_photo:"Foto de perfil (opcional)",
     r_save_profile:"Guardar perfil y continuar",
     r_s2s_h:'Tus datos de <em>scout</em>', r_s2s_lead:"Solo lo que necesitamos para darte acceso al roster.",
-    r_s_org:"Organización", r_s_org_ph:"ej. Cleveland Guardians",
-    r_s_title:"Posición / Cargo", r_s_title_ph:"ej. Area Scout",
-    r_s_school:"Escuela / Equipo (si aplica)", r_s_school_ph:"ej. Hastings College",
+    r_s_photo:"Foto", r_s_photo_hint:"JPG o PNG, hasta 10 MB.",
+    r_s_name:"Nombre completo / Nombre del equipo", r_s_name_ph:"Tu nombre o tu equipo / organización",
+    r_s_nationality:"Nacionalidad", r_s_nationality_ph:"ej. Estadounidense",
     r_s_country:"País", r_s_country_ph:"ej. EE. UU.",
-    r_s_phone:"Teléfono", r_s_notes:"Notas (opcional)", r_s_notes_ph:"Algo que debamos saber sobre tu interés…",
+    r_s_phone:"Teléfono",
+    r_s_role:"Rol dentro del equipo / la organización", r_s_role_ph:"ej. Scout Principal, GM, Director de Desarrollo de Jugadores",
+    r_s_looking:"Posiciones a cubrir / jugadores que buscas", r_s_looking_ph:"Cuéntanos los puestos que necesitas cubrir o el tipo de jugadores que buscas…",
     r_save_details:"Guardar datos y continuar",
     r_s3_h:'Activa tu <em>cuenta</em>',
     r_s3_lead:"Gracias por completar tu registro. Tu cuenta se ha creado correctamente.",
     r_s3_step1:"Elite Sports Management revisa tu registro y se pone en contacto contigo.",
     r_s3_step2:"Cualquier pago se coordina directamente con ESM — no hay nada que pagar en este sitio.",
     r_s3_step3:"Una vez aprobado, simplemente entra con el mismo correo y contraseña que acabas de crear — sin registro adicional.",
-    r_pay_paypal:"Paga con PayPal →", r_pay_wise:"Paga con Wise →", r_contact:"Contactar a ESM →",
+    r_contact:"Contactar a ESM →",
     r_s3_note:"Te avisaremos por correo en cuanto ESM haya revisado y aprobado tu cuenta.",
     r_pay_player_title:"Perfil Oficial de Jugador",
     r_pay_player_inc1:"Un perfil de atleta creado profesionalmente en el roster de ESM",
@@ -409,6 +415,7 @@ const DICT = {
     r_err_pwmatch:"Las contraseñas no coinciden. Vuelve a introducirlas.",
     tc_label:"Acepto los Términos y Condiciones", tc_more:"Leer más", tc_required:"Acepta los Términos y Condiciones para continuar.",
     r_err_session:"Tu sesión expiró — vuelve a iniciar sesión.",
+    r_err_img:"Sube una imagen JPG o PNG.", r_err_size:"Ese archivo es demasiado grande (máx. 10 MB).",
     r_err_save_profile:"No se pudo guardar tu perfil: ",
     r_err_save_details:"No se pudieron guardar tus datos: ",
   },
@@ -435,18 +442,20 @@ const DICT = {
     r_p_instagram:"Instagram", r_p_phone:"Telefono", r_phone_ph:"Numero di telefono", r_cc_ph:"Scegli il prefisso internazionale", r_p_photo:"Foto profilo (facoltativo)",
     r_save_profile:"Salva profilo e continua",
     r_s2s_h:'I tuoi dati <em>scout</em>', r_s2s_lead:"Solo ciò che ci serve per concederti l'accesso al roster.",
-    r_s_org:"Organizzazione", r_s_org_ph:"es. Cleveland Guardians",
-    r_s_title:"Posizione / Ruolo", r_s_title_ph:"es. Area Scout",
-    r_s_school:"Scuola / Squadra (se applicabile)", r_s_school_ph:"es. Hastings College",
+    r_s_photo:"Foto", r_s_photo_hint:"JPG o PNG, fino a 10 MB.",
+    r_s_name:"Nome completo / Nome della squadra", r_s_name_ph:"Il tuo nome o la tua squadra / organizzazione",
+    r_s_nationality:"Nazionalità", r_s_nationality_ph:"es. Americana",
     r_s_country:"Paese", r_s_country_ph:"es. USA",
-    r_s_phone:"Telefono", r_s_notes:"Note (facoltativo)", r_s_notes_ph:"Qualcosa che dovremmo sapere sul tuo interesse…",
+    r_s_phone:"Telefono",
+    r_s_role:"Ruolo all'interno della squadra / organizzazione", r_s_role_ph:"es. Capo Scout, GM, Direttore Sviluppo Giocatori",
+    r_s_looking:"Posizioni da coprire / giocatori che cerchi", r_s_looking_ph:"Indicaci i ruoli da coprire o il tipo di giocatori che cerchi…",
     r_save_details:"Salva dati e continua",
     r_s3_h:'Attiva il tuo <em>account</em>',
     r_s3_lead:"Grazie per aver completato la registrazione. Il tuo account è stato creato con successo.",
     r_s3_step1:"Elite Sports Management esamina la tua registrazione e ti contatta.",
     r_s3_step2:"Eventuali pagamenti vengono organizzati direttamente con ESM — non c'è nulla da pagare su questo sito.",
     r_s3_step3:"Una volta approvato, accedi semplicemente con la stessa email e password appena create — nessuna registrazione aggiuntiva.",
-    r_pay_paypal:"Paga con PayPal →", r_pay_wise:"Paga con Wise →", r_contact:"Contatta ESM →",
+    r_contact:"Contatta ESM →",
     r_s3_note:"Ti invieremo un'email non appena ESM avrà esaminato e approvato il tuo account.",
     r_pay_player_title:"Profilo Ufficiale Giocatore",
     r_pay_player_inc1:"Un profilo atleta costruito professionalmente sul roster ESM",
@@ -468,6 +477,7 @@ const DICT = {
     r_err_pwmatch:"Le password non coincidono. Reinseriscile.",
     tc_label:"Accetto i Termini e Condizioni", tc_more:"Leggi di più", tc_required:"Accetta i Termini e Condizioni per continuare.",
     r_err_session:"La tua sessione è scaduta — accedi di nuovo.",
+    r_err_img:"Carica un'immagine JPG o PNG.", r_err_size:"Il file è troppo grande (max 10 MB).",
     r_err_save_profile:"Impossibile salvare il tuo profilo: ",
     r_err_save_details:"Impossibile salvare i tuoi dati: ",
   },
@@ -745,14 +755,36 @@ $("scoutForm").addEventListener("submit", async e => {
   try {
     const { data: sess } = await SB.auth.getSession();
     const user = sess?.session?.user; if (!user) throw new Error(t("r_err_session"));
+
+    // Optional photo → public application-photos bucket (same bucket/pattern as the
+    // public application form). Client-side type/size guard mirrors the bucket's
+    // server-side limits. A photo hiccup must never cost the scout their whole
+    // submission, so an upload failure is non-fatal: log it and save without it.
+    let photo_url = null;
+    const file = $("s-photo").files?.[0];
+    if (file){
+      if (!["image/jpeg","image/png"].includes(file.type)){ msg($("scoutMsg"), t("r_err_img")); btn.disabled = false; return; }
+      if (file.size > 10*1024*1024){ msg($("scoutMsg"), t("r_err_size")); btn.disabled = false; return; }
+      try {
+        const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
+        const path = `scouts/${user.id}/${Date.now()}.${ext}`;
+        const { error: upErr } = await SB.storage.from("application-photos").upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
+        if (upErr) throw upErr;
+        photo_url = SB.storage.from("application-photos").getPublicUrl(path).data.publicUrl;
+      } catch (photoErr){
+        console.warn("scout photo upload failed — saving details without it", photoErr);
+      }
+    }
+
     const { error } = await SB.from("scouts").upsert({
       id: user.id,
-      organization: $("s-org").value.trim() || null,
-      title: $("s-title").value.trim() || null,
-      school_team: $("s-school").value.trim() || null,
+      name_or_team: $("s-name").value.trim() || null,
+      nationality: $("s-nationality").value.trim() || null,
+      title: $("s-title").value.trim() || null,            // "Role within the team / organization"
       country: $("s-country").value.trim() || null,
       phone: combinePhone("s-cc","s-phone") || null,
-      notes: $("s-notes").value.trim() || null,
+      looking_for: $("s-looking").value.trim() || null,
+      photo_url,
     }, { onConflict: "id" });
     if (error) throw error;
     showPay("scout");

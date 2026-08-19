@@ -580,12 +580,17 @@ function cardAccount(a){
   const st = a.account_status;
   const details = a.role === "scout"
     ? (() => { const s = a._scout || {}; return [
-        s.organization ? `<b>Org:</b> ${esc(s.organization)}` : "",
-        s.title ? `<b>Title:</b> ${esc(s.title)}` : "",
-        s.school_team ? `<b>School/Team:</b> ${esc(s.school_team)}` : "",
+        s.name_or_team ? `<b>Name / Team:</b> ${esc(s.name_or_team)}` : "",
+        s.nationality ? `<b>Nationality:</b> ${esc(s.nationality)}` : "",
+        s.title ? `<b>Role:</b> ${esc(s.title)}` : "",
         s.country ? `<b>Country:</b> ${esc(s.country)}` : "",
         s.phone ? `<b>Phone:</b> ${esc(s.phone)}` : "",
+        s.looking_for ? `<b>Looking for:</b> ${esc(s.looking_for)}` : "",
+        // Legacy columns (older scout rows) — shown only if still populated.
+        s.organization ? `<b>Org:</b> ${esc(s.organization)}` : "",
+        s.school_team ? `<b>School/Team:</b> ${esc(s.school_team)}` : "",
         s.notes ? `<b>Their notes:</b> ${esc(s.notes)}` : "",
+        s.photo_url ? `<a href="${esc(s.photo_url)}" target="_blank" rel="noopener">🖼 Photo</a>` : "",
       ].filter(Boolean).join(" &nbsp;·&nbsp; "); })()
     : (() => { const p = a._player; return p ? [
         p.position ? `<b>Position:</b> ${esc(p.position)}` : "",
@@ -595,9 +600,13 @@ function cardAccount(a){
         p.phone ? `<b>Phone:</b> ${esc(p.phone)}` : "",
       ].filter(Boolean).join(" &nbsp;·&nbsp; ") : `<i>No roster profile created yet.</i>`; })();
   const payOpts = ["unpaid","submitted","verified"].map(v => `<option value="${v}"${a.payment_status===v?" selected":""}>${v}</option>`).join("");
+  const photo = a.role === "scout" ? (a._scout && a._scout.photo_url) : (a._player && a._player.image_url);
+  const acctAvatar = photo
+    ? `<span class="avatar" style="background-image:url('${esc(photo)}')"></span>`
+    : `<span class="avatar">${esc(initials(name))}</span>`;
   return `<div class="card" data-acct="${a.id}">
     <div class="p-head">
-      <span class="avatar">${esc(initials(name))}</span>
+      ${acctAvatar}
       <div style="flex:1">
         <h3 class="display">${esc(name)}</h3>
         <div class="chips-row" style="margin-top:4px">

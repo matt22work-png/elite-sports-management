@@ -68,6 +68,24 @@ async function docLink(path: string): Promise<string | null> {
   }
 }
 
+// Look up a profile (name/email/status) by id via the REST API + service role.
+// Scout details land in `scouts` but the email/name live on `profiles`, so we join
+// them here for a complete notification. Never throws — returns null on failure.
+async function fetchProfile(id: string): Promise<Record<string, unknown> | null> {
+  if (!id || !SUPABASE_URL || !SERVICE_ROLE_KEY) return null;
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}&select=first_name,last_name,email,account_status`,
+      { headers: { Authorization: `Bearer ${SERVICE_ROLE_KEY}`, apikey: SERVICE_ROLE_KEY } },
+    );
+    if (!res.ok) return null;
+    const arr = await res.json();
+    return Array.isArray(arr) && arr[0] ? arr[0] : null;
+  } catch {
+    return null;
+  }
+}
+
 const escHtml = (s: unknown) =>
   String(s ?? "").replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]!));
 
@@ -136,6 +154,23 @@ async function buildMessage(table: string, r: Record<string, unknown>): Promise<
       ["Diploma", diploma],
     ]);
     return { to: OPS_INBOX, subject: `New ${kind}: ${r.name ?? "athlete"}`, html: wrap(kind, rowsTable(rows) + files) };
+  }
+  if (table === "scouts") {
+    // Scout/team details completed at /register/ (fires once on the scouts INSERT).
+    // Join the account's name + email from profiles for a complete notification.
+    const prof = await fetchProfile(String(r.id ?? ""));
+    const acctName = prof ? [prof.first_name, prof.last_name].filter(Boolean).join(" ") : "";
+    const displayName = String(r.name_or_team || acctName || "scout");
+    const rows: [string, unknown][] = [
+      ["Name / Team", r.name_or_team], ["Account name", acctName], ["Email", prof?.email],
+      ["Nationality", r.nationality], ["Country", r.country], ["Phone", r.phone],
+      ["Role", r.title], ["Looking for", r.looking_for],
+      // Legacy columns (older scout rows) — shown only if populated.
+      ["Organization", r.organization], ["School/Team", r.school_team], ["Notes", r.notes],
+    ];
+    const files = filesTable([["Photo", r.photo_url ? String(r.photo_url) : null]]);
+    const kind = "Scout / team details submitted";
+    return { to: OPS_INBOX, subject: `New scout details: ${displayName}`, html: wrap(kind, rowsTable(rows) + files) };
   }
   if (table === "profiles") {
     const name = [r.first_name, r.last_name].filter(Boolean).join(" ") || "(no name)";
