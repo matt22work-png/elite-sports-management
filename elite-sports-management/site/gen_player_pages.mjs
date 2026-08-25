@@ -241,6 +241,7 @@ ${EXTRA_CSS}
 
 <script>document.getElementById("yr").textContent=new Date().getFullYear();</script>
 ${I18N_SCRIPT}
+<script src="/esm-legal.js"></script>
 </body>
 </html>
 `;

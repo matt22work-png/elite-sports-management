@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Privacy Policy — Elite Sports Management</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{--navy-2:#06142a;--gold:#d9b154;--gold-soft:#e7c878;--ink:#eaf0fa;--muted:#9fb1cc;--line:rgba(217,177,84,.22);--card:#0c2143}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--navy-2);color:var(--ink);line-height:1.65}
+  .wrap{max-width:820px;margin:0 auto;padding:26px 18px 90px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  header img{height:38px;width:auto}
+  .kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  h1{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:.02em;font-size:clamp(28px,6vw,44px);margin:14px 0 6px}
+  .updated{color:var(--muted);font-size:13px;margin:2px 0 0}
+  .langsw{margin-left:auto;display:flex;gap:6px}
+  .langsw button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;font-weight:700;cursor:pointer;font-family:inherit}
+  .langsw button.on{background:var(--gold);color:#05101f;border-color:var(--gold)}
+  .card{border:1px solid var(--line);border-radius:18px;padding:26px 24px;background:linear-gradient(180deg,var(--card),var(--navy-2));margin-top:22px}
+  .priv{font-size:15.5px;color:#d6e1f2}
+  .priv .lead{font-size:16px;color:#e7edf7}
+  .priv h2{font-size:17px;color:var(--gold-soft);margin:30px 0 10px;font-weight:800;letter-spacing:.01em}
+  .priv h2:first-of-type{margin-top:22px}
+  .priv p{margin:10px 0}
+  .priv ul{margin:8px 0 0;padding-left:20px}
+  .priv li{margin:7px 0}
+  .priv a{color:var(--gold-soft)}
+  .disclaimer{margin-top:26px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:rgba(6,20,42,.5);color:var(--muted);font-size:13.5px}
+  .muted{color:var(--muted);font-size:13.5px;margin-top:20px}
+  a{color:var(--gold-soft)}
+  .back{display:inline-block;margin-top:26px;font-weight:700;color:var(--gold-soft);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="/index.html"><img src="/logo.png" alt="Elite Sports Management" /></a>
+    <div class="langsw" id="langsw" role="group" aria-label="Language">
+      <button data-l="en" type="button">EN</button><button data-l="es" type="button">ES</button><button data-l="it" type="button">IT</button>
+    </div>
+  </header>
+  <div class="kicker" data-i18n="pv_kicker">Legal</div>
+  <h1 data-i18n="pv_h1">Privacy Policy</h1>
+  <p class="updated" data-i18n="pv_updated">Last updated: 25 August 2026</p>
+
+  <div class="card">
+    <!-- ▼▼▼ SINGLE SOURCE OF THE PRIVACY POLICY ▼▼▼
+         The full policy text lives in DICT below (EN/ES/IT). This describes the
+         site's ACTUAL data practices — keep it accurate if forms, storage, or
+         sharing change. It is placeholder-quality legal language, not a
+         lawyer-drafted policy (see the disclaimer at the bottom). To edit, change
+         the strings in DICT — this is the only place the copy lives, and the
+         footer/cookie-notice links across the whole site point here. -->
+    <div class="priv" id="privBody"></div>
+    <div class="disclaimer" data-i18n="pv_disclaimer"></div>
+    <p class="muted" data-i18n="pv_contact"></p>
+  </div>
+
+  <a class="back" href="/index.html" data-i18n="pv_back">← Back to Elite Sports Management</a>
+</div>
+
+<script>
+/* Trilingual, sharing the site-wide `esm_lang` localStorage key (same pattern as
+   terms.html). Section bodies are trusted static HTML authored here. */
+const DICT = {
+  en:{
+    pv_kicker:"Legal", pv_h1:"Privacy Policy",
+    pv_updated:"Last updated: 25 August 2026",
+    pv_back:"← Back to Elite Sports Management",
+    pv_disclaimer:"This is a plain-language policy that aims to accurately describe our current data practices. It is not a substitute for advice from a qualified lawyer, and may be updated as the service evolves. If anything here is unclear, please contact us before submitting your information.",
+    pv_contact:"For any privacy question — or to access, correct, or delete your data — email Elite Sports Management at elitesportsmanagement50@gmail.com.",
+    pv_body:`
+      <p class="lead">Elite Sports Management (“ESM”, “we”, “us”) provides athlete representation, roster placement, and college-placement services. This policy explains what personal data we collect through this website, how we use it, who can see it, and the choices you have. It reflects how the site actually works today.</p>
+
+      <h2>1. Information we collect</h2>
+      <p>We only collect information you choose to give us — mainly when you apply, register an account, or sign up for an event. Depending on what you apply for, this may include:</p>
+      <ul>
+        <li><b>Identity &amp; contact details:</b> name, email address, phone number, nationality, country, age, and Instagram handle.</li>
+        <li><b>Athlete profile details:</b> playing position, bio, career stats, teams and experience, and the level or program you’re applying for.</li>
+        <li><b>Application responses:</b> your goals, why you want to join, and — for college placement — your education level and what you’d like to study.</li>
+        <li><b>Documents you upload:</b> a headshot photo, a resume/CV (PDF), and — for college placement — English-language certificates and diplomas (PDF).</li>
+        <li><b>Account details:</b> if you create a player or scout account, your email and a password (passwords are stored securely by our authentication provider, never by us in plain text), plus your role and approval/payment status.</li>
+        <li><b>Payment selections:</b> the service tier you choose. Any card payments are handled by a third-party payment processor — we do not receive or store your full card details.</li>
+      </ul>
+
+      <h2>2. How we use your information</h2>
+      <p>We use your information to:</p>
+      <ul>
+        <li>Create and review your application or profile, and decide whether to approve it.</li>
+        <li>Build and display an approved athlete’s public roster profile.</li>
+        <li>Allow vetted scouts and coaches to evaluate approved athletes.</li>
+        <li>Contact you about your application, profile, events, or our services.</li>
+        <li>Operate, secure, and improve the website.</li>
+      </ul>
+      <p>We do not sell your personal data, and we do not use it for advertising.</p>
+
+      <h2>3. Who your information is shared with</h2>
+      <p>Access to your data is deliberately limited:</p>
+      <ul>
+        <li><b>ESM administration</b> (run by Sam) can view submitted information in order to review and manage applications.</li>
+        <li><b>Public roster:</b> once your profile is <b>approved</b>, your public profile details — such as your name, photo, position, bio, and stats — become visible to anyone who unlocks the roster. Please don’t put anything in those fields that you don’t want shown publicly.</li>
+        <li><b>Private documents stay private:</b> your resume/CV, English certificates, diplomas, and contact details are <b>not</b> shown on the public roster. They are restricted to ESM administrators (technically enforced by database access rules). Approved scouts with an account may be given access to athlete contact information for legitimate recruiting purposes.</li>
+        <li><b>Service providers:</b> we rely on trusted infrastructure providers (see section 4) who process data on our behalf.</li>
+      </ul>
+      <p>We may also disclose information where required to do so by law.</p>
+
+      <h2>4. Where your data is stored &amp; how long we keep it</h2>
+      <p>Your data is stored using <b>Supabase</b>, a hosted database, authentication, and file-storage platform, on infrastructure located in the <b>United States (US East region)</b>. Uploaded documents are held in access-controlled storage and are served to administrators only through short-lived, signed links.</p>
+      <p>We keep your information for as long as your application or profile is active. We currently do not operate a fixed automatic-deletion schedule: rejected or archived accounts, and the data attached to them, are retained until an administrator deletes them. You can ask us to delete your data at any time (see section 6).</p>
+
+      <h2>5. Cookies &amp; local storage</h2>
+      <p>This site does <b>not</b> use advertising or third-party tracking cookies, and it contains no analytics or ad-network code. We use only your browser’s local storage, for essential, functional purposes:</p>
+      <ul>
+        <li>An <b>authentication session token</b>, so you stay signed in to your account.</li>
+        <li>Your <b>language preference</b> (English, Spanish, or Italian).</li>
+        <li>Your <b>roster access status</b>, so the roster stays unlocked after you gain access.</li>
+        <li>Your <b>registration tier selection</b>, to carry your choice through sign-up.</li>
+        <li>A small flag recording that you’ve <b>dismissed the cookie notice</b>, so it doesn’t reappear.</li>
+      </ul>
+      <p>Because these are strictly necessary for the site to work, they are enabled without a separate opt-in — this notice discloses them. You can clear them at any time from your browser settings, though doing so will sign you out and reset your preferences.</p>
+
+      <h2>6. Your rights</h2>
+      <p>Depending on where you live (for example, under the EU/UK GDPR), you may have the right to access the personal data we hold about you, to correct it, to request its deletion, to object to or restrict certain processing, and to receive a copy of your data. To exercise any of these rights, email us at <a href="mailto:elitesportsmanagement50@gmail.com">elitesportsmanagement50@gmail.com</a> and we’ll respond as soon as we reasonably can. You also have the right to lodge a complaint with your local data protection authority.</p>
+
+      <h2>7. Contact</h2>
+      <p>This website is operated by Elite Sports Management. For any privacy question, or to access, correct, or delete your data, contact us at <a href="mailto:elitesportsmanagement50@gmail.com">elitesportsmanagement50@gmail.com</a>.</p>
+    `,
+  },
+  es:{
+    pv_kicker:"Legal", pv_h1:"Política de Privacidad",
+    pv_updated:"Última actualización: 25 de agosto de 2026",
+    pv_back:"← Volver a Elite Sports Management",
+    pv_disclaimer:"Esta es una política en lenguaje sencillo que busca describir con precisión nuestras prácticas de datos actuales. No sustituye el asesoramiento de un abogado cualificado y puede actualizarse a medida que el servicio evolucione. Si algo no queda claro, contáctanos antes de enviar tu información.",
+    pv_contact:"Para cualquier consulta sobre privacidad — o para acceder, corregir o eliminar tus datos — escribe a Elite Sports Management a elitesportsmanagement50@gmail.com.",
+    pv_body:`
+      <p class="lead">Elite Sports Management (“ESM”, “nosotros”) ofrece servicios de representación de atletas, incorporación al roster y colocación universitaria. Esta política explica qué datos personales recopilamos a través de este sitio web, cómo los usamos, quién puede verlos y las opciones que tienes. Refleja cómo funciona el sitio hoy en día.</p>
+
+      <h2>1. Información que recopilamos</h2>
+      <p>Solo recopilamos la información que decides darnos — principalmente cuando te postulas, creas una cuenta o te inscribes en un evento. Según lo que solicites, esto puede incluir:</p>
+      <ul>
+        <li><b>Identidad y contacto:</b> nombre, correo electrónico, teléfono, nacionalidad, país, edad y usuario de Instagram.</li>
+        <li><b>Datos del perfil deportivo:</b> posición de juego, biografía, estadísticas, equipos y experiencia, y el nivel o programa al que te postulas.</li>
+        <li><b>Respuestas de la solicitud:</b> tus objetivos, por qué quieres unirte y — para colocación universitaria — tu nivel de estudios y qué te gustaría estudiar.</li>
+        <li><b>Documentos que subes:</b> una foto de rostro, un currículum/CV (PDF) y — para colocación universitaria — certificados de inglés y diplomas (PDF).</li>
+        <li><b>Datos de la cuenta:</b> si creas una cuenta de jugador o de scout, tu correo y una contraseña (las contraseñas las guarda de forma segura nuestro proveedor de autenticación, nunca nosotros en texto plano), además de tu rol y estado de aprobación/pago.</li>
+        <li><b>Selección de pago:</b> el nivel de servicio que elijas. Cualquier pago con tarjeta lo gestiona un procesador de pagos externo — no recibimos ni almacenamos los datos completos de tu tarjeta.</li>
+      </ul>
+
+      <h2>2. Cómo usamos tu información</h2>
+      <p>Usamos tu información para:</p>
+      <ul>
+        <li>Crear y revisar tu solicitud o perfil, y decidir si lo aprobamos.</li>
+        <li>Crear y mostrar el perfil público en el roster de un atleta aprobado.</li>
+        <li>Permitir que scouts y entrenadores verificados evalúen a los atletas aprobados.</li>
+        <li>Contactarte sobre tu solicitud, perfil, eventos o nuestros servicios.</li>
+        <li>Operar, proteger y mejorar el sitio web.</li>
+      </ul>
+      <p>No vendemos tus datos personales y no los usamos con fines publicitarios.</p>
+
+      <h2>3. Con quién se comparte tu información</h2>
+      <p>El acceso a tus datos es deliberadamente limitado:</p>
+      <ul>
+        <li><b>La administración de ESM</b> (a cargo de Sam) puede ver la información enviada para revisar y gestionar las solicitudes.</li>
+        <li><b>Roster público:</b> una vez que tu perfil es <b>aprobado</b>, tus datos de perfil público — como tu nombre, foto, posición, biografía y estadísticas — se hacen visibles para cualquiera que desbloquee el roster. No incluyas en esos campos nada que no quieras mostrar públicamente.</li>
+        <li><b>Los documentos privados siguen siendo privados:</b> tu currículum/CV, certificados de inglés, diplomas y datos de contacto <b>no</b> se muestran en el roster público. Están restringidos a los administradores de ESM (aplicado técnicamente mediante reglas de acceso a la base de datos). Los scouts aprobados con cuenta pueden recibir acceso a la información de contacto de los atletas con fines legítimos de reclutamiento.</li>
+        <li><b>Proveedores de servicios:</b> nos apoyamos en proveedores de infraestructura de confianza (ver sección 4) que procesan datos en nuestro nombre.</li>
+      </ul>
+      <p>También podemos divulgar información cuando la ley lo exija.</p>
+
+      <h2>4. Dónde se almacenan tus datos y cuánto los conservamos</h2>
+      <p>Tus datos se almacenan mediante <b>Supabase</b>, una plataforma alojada de base de datos, autenticación y almacenamiento de archivos, en infraestructura ubicada en <b>Estados Unidos (región US East)</b>. Los documentos subidos se guardan en almacenamiento con control de acceso y se entregan a los administradores solo mediante enlaces firmados de corta duración.</p>
+      <p>Conservamos tu información mientras tu solicitud o perfil esté activo. Actualmente no aplicamos un calendario fijo de eliminación automática: las cuentas rechazadas o archivadas, y los datos asociados, se conservan hasta que un administrador los elimina. Puedes pedir que eliminemos tus datos en cualquier momento (ver sección 6).</p>
+
+      <h2>5. Cookies y almacenamiento local</h2>
+      <p>Este sitio <b>no</b> usa cookies de publicidad ni de rastreo de terceros, y no contiene ningún código de analítica o de redes publicitarias. Usamos únicamente el almacenamiento local de tu navegador, con fines esenciales y funcionales:</p>
+      <ul>
+        <li>Un <b>token de sesión de autenticación</b>, para que sigas conectado a tu cuenta.</li>
+        <li>Tu <b>preferencia de idioma</b> (inglés, español o italiano).</li>
+        <li>Tu <b>estado de acceso al roster</b>, para que siga desbloqueado tras obtener acceso.</li>
+        <li>Tu <b>selección de nivel de registro</b>, para mantener tu elección durante el alta.</li>
+        <li>Una pequeña marca que registra que has <b>cerrado el aviso de cookies</b>, para que no vuelva a aparecer.</li>
+      </ul>
+      <p>Como son estrictamente necesarios para que el sitio funcione, se activan sin un consentimiento por separado — este aviso los informa. Puedes borrarlos en cualquier momento desde la configuración de tu navegador, aunque al hacerlo se cerrará tu sesión y se restablecerán tus preferencias.</p>
+
+      <h2>6. Tus derechos</h2>
+      <p>Según dónde vivas (por ejemplo, bajo el RGPD de la UE/Reino Unido), puedes tener derecho a acceder a los datos personales que tenemos sobre ti, a corregirlos, a solicitar su eliminación, a oponerte o restringir ciertos tratamientos y a recibir una copia de tus datos. Para ejercer cualquiera de estos derechos, escríbenos a <a href="mailto:elitesportsmanagement50@gmail.com">elitesportsmanagement50@gmail.com</a> y responderemos tan pronto como razonablemente podamos. También tienes derecho a presentar una reclamación ante tu autoridad local de protección de datos.</p>
+
+      <h2>7. Contacto</h2>
+      <p>Este sitio web es operado por Elite Sports Management. Para cualquier consulta sobre privacidad, o para acceder, corregir o eliminar tus datos, escríbenos a <a href="mailto:elitesportsmanagement50@gmail.com">elitesportsmanagement50@gmail.com</a>.</p>
+    `,
+  },
+  it:{
+    pv_kicker:"Legale", pv_h1:"Informativa sulla Privacy",
+    pv_updated:"Ultimo aggiornamento: 25 agosto 2026",
+    pv_back:"← Torna a Elite Sports Management",
+    pv_disclaimer:"Questa è un’informativa in linguaggio semplice che mira a descrivere accuratamente le nostre attuali pratiche sui dati. Non sostituisce la consulenza di un avvocato qualificato e può essere aggiornata con l’evolversi del servizio. Se qualcosa non è chiaro, contattaci prima di inviare le tue informazioni.",
+    pv_contact:"Per qualsiasi domanda sulla privacy — o per accedere, correggere o eliminare i tuoi dati — scrivi a Elite Sports Management all’indirizzo elitesportsmanagement50@gmail.com.",
+    pv_body:`
+      <p class="lead">Elite Sports Management (“ESM”, “noi”) offre servizi di rappresentanza di atleti, inserimento nel roster e placement universitario. Questa informativa spiega quali dati personali raccogliamo tramite questo sito web, come li usiamo, chi può vederli e le scelte a tua disposizione. Riflette il funzionamento attuale del sito.</p>
+
+      <h2>1. Informazioni che raccogliamo</h2>
+      <p>Raccogliamo solo le informazioni che scegli di fornirci — principalmente quando ti candidi, crei un account o ti iscrivi a un evento. A seconda di ciò per cui ti candidi, possono includere:</p>
+      <ul>
+        <li><b>Identità e contatti:</b> nome, indirizzo email, numero di telefono, nazionalità, paese, età e nome utente Instagram.</li>
+        <li><b>Dati del profilo sportivo:</b> ruolo, biografia, statistiche di carriera, squadre ed esperienza, e il livello o programma per cui ti candidi.</li>
+        <li><b>Risposte della candidatura:</b> i tuoi obiettivi, perché vuoi unirti e — per il placement universitario — il tuo livello di istruzione e cosa vorresti studiare.</li>
+        <li><b>Documenti che carichi:</b> una foto del volto, un curriculum/CV (PDF) e — per il placement universitario — certificati di inglese e diplomi (PDF).</li>
+        <li><b>Dati dell’account:</b> se crei un account giocatore o scout, la tua email e una password (le password sono conservate in modo sicuro dal nostro fornitore di autenticazione, mai da noi in chiaro), oltre al tuo ruolo e stato di approvazione/pagamento.</li>
+        <li><b>Selezioni di pagamento:</b> il livello di servizio che scegli. Eventuali pagamenti con carta sono gestiti da un processore di pagamento esterno — non riceviamo né conserviamo i dati completi della tua carta.</li>
+      </ul>
+
+      <h2>2. Come usiamo le tue informazioni</h2>
+      <p>Usiamo le tue informazioni per:</p>
+      <ul>
+        <li>Creare ed esaminare la tua candidatura o profilo e decidere se approvarla.</li>
+        <li>Creare e mostrare il profilo pubblico nel roster di un atleta approvato.</li>
+        <li>Consentire a scout e allenatori verificati di valutare gli atleti approvati.</li>
+        <li>Contattarti riguardo alla tua candidatura, profilo, eventi o ai nostri servizi.</li>
+        <li>Gestire, proteggere e migliorare il sito web.</li>
+      </ul>
+      <p>Non vendiamo i tuoi dati personali e non li usiamo per la pubblicità.</p>
+
+      <h2>3. Con chi vengono condivise le tue informazioni</h2>
+      <p>L’accesso ai tuoi dati è volutamente limitato:</p>
+      <ul>
+        <li><b>L’amministrazione di ESM</b> (gestita da Sam) può vedere le informazioni inviate per esaminare e gestire le candidature.</li>
+        <li><b>Roster pubblico:</b> una volta che il tuo profilo è <b>approvato</b>, i dati del tuo profilo pubblico — come nome, foto, ruolo, biografia e statistiche — diventano visibili a chiunque sblocchi il roster. Non inserire in quei campi nulla che non vuoi mostrare pubblicamente.</li>
+        <li><b>I documenti privati restano privati:</b> il tuo curriculum/CV, i certificati di inglese, i diplomi e i dati di contatto <b>non</b> vengono mostrati nel roster pubblico. Sono riservati agli amministratori di ESM (applicato tecnicamente tramite regole di accesso al database). Gli scout approvati con un account possono ricevere accesso alle informazioni di contatto degli atleti per legittimi scopi di reclutamento.</li>
+        <li><b>Fornitori di servizi:</b> ci affidiamo a fornitori di infrastruttura affidabili (vedi sezione 4) che trattano i dati per nostro conto.</li>
+      </ul>
+      <p>Possiamo inoltre divulgare informazioni ove richiesto dalla legge.</p>
+
+      <h2>4. Dove sono conservati i tuoi dati e per quanto tempo</h2>
+      <p>I tuoi dati sono conservati tramite <b>Supabase</b>, una piattaforma ospitata di database, autenticazione e archiviazione file, su infrastruttura situata negli <b>Stati Uniti (regione US East)</b>. I documenti caricati sono custoditi in archiviazione ad accesso controllato e vengono forniti agli amministratori solo tramite link firmati di breve durata.</p>
+      <p>Conserviamo le tue informazioni finché la tua candidatura o profilo è attivo. Attualmente non applichiamo un calendario fisso di cancellazione automatica: gli account rifiutati o archiviati, e i dati a essi collegati, vengono conservati finché un amministratore non li elimina. Puoi chiederci di eliminare i tuoi dati in qualsiasi momento (vedi sezione 6).</p>
+
+      <h2>5. Cookie e archiviazione locale</h2>
+      <p>Questo sito <b>non</b> usa cookie pubblicitari o di tracciamento di terze parti e non contiene alcun codice di analisi o di reti pubblicitarie. Usiamo solo l’archiviazione locale del tuo browser, per finalità essenziali e funzionali:</p>
+      <ul>
+        <li>Un <b>token di sessione di autenticazione</b>, così resti connesso al tuo account.</li>
+        <li>La tua <b>preferenza di lingua</b> (inglese, spagnolo o italiano).</li>
+        <li>Il tuo <b>stato di accesso al roster</b>, così resta sbloccato dopo aver ottenuto l’accesso.</li>
+        <li>La tua <b>selezione del livello di registrazione</b>, per mantenere la scelta durante l’iscrizione.</li>
+        <li>Un piccolo contrassegno che registra che hai <b>chiuso l’avviso sui cookie</b>, così non ricompare.</li>
+      </ul>
+      <p>Poiché sono strettamente necessari al funzionamento del sito, sono attivi senza un consenso separato — questo avviso li rende noti. Puoi cancellarli in qualsiasi momento dalle impostazioni del browser, anche se così facendo verrai disconnesso e le tue preferenze verranno reimpostate.</p>
+
+      <h2>6. I tuoi diritti</h2>
+      <p>A seconda di dove vivi (ad esempio, ai sensi del GDPR UE/Regno Unito), puoi avere il diritto di accedere ai dati personali che deteniamo su di te, di correggerli, di richiederne la cancellazione, di opporti o limitare determinati trattamenti e di ricevere una copia dei tuoi dati. Per esercitare uno di questi diritti, scrivici a <a href="mailto:elitesportsmanagement50@gmail.com">elitesportsmanagement50@gmail.com</a> e risponderemo il prima possibile. Hai inoltre il diritto di presentare un reclamo alla tua autorità locale per la protezione dei dati.</p>
+
+      <h2>7. Contatti</h2>
+      <p>Questo sito web è gestito da Elite Sports Management. Per qualsiasi domanda sulla privacy, o per accedere, correggere o eliminare i tuoi dati, contattaci all’indirizzo <a href="mailto:elitesportsmanagement50@gmail.com">elitesportsmanagement50@gmail.com</a>.</p>
+    `,
+  },
+};
+const SUPPORTED = ["en","es","it"];
+let lang = (()=>{ try{ const l = localStorage.getItem("esm_lang"); return SUPPORTED.includes(l)?l:"en"; }catch(e){ return "en"; } })();
+const t = k => (DICT[lang]&&DICT[lang][k]) || DICT.en[k] || k;
+function apply(){
+  document.documentElement.lang = lang;
+  document.title = t("pv_h1") + " — Elite Sports Management";
+  document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.getAttribute("data-i18n")));
+  document.getElementById("privBody").innerHTML = t("pv_body");
+  document.querySelectorAll("#langsw button").forEach(b => b.classList.toggle("on", b.dataset.l === lang));
+}
+document.querySelectorAll("#langsw button").forEach(b => b.onclick = () => {
+  lang = b.dataset.l; try{ localStorage.setItem("esm_lang", lang); }catch(e){} apply();
+});
+apply();
+</script>
+<script src="/esm-legal.js"></script>
+</body>
+</html>

@@ -8,6 +8,7 @@ import fs from "node:fs";
 const PAGES = [
   "index.html", "portal/index.html", "scout/index.html",
   "register/index.html", "tenerife/index.html", "players/adam-moser.html",
+  "terms.html", "privacy/index.html",
 ];
 
 // string-aware balanced {...} from the opening brace at `open`
