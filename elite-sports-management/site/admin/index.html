@@ -1264,7 +1264,7 @@ function bbRowHTML(kind, r){
 function bbTotalsHTML(kind, rows){
   const tot = BBREF.totals(kind, rows), nS = BBREF.distinctSeasons(rows);
   const cells = BBREF.COLUMNS[kind].map((c,i) => {
-    if (i === 0) return `<td class="bb-yr">All Levels (${nS} Season${nS===1?"":"s"})</td>`;
+    if (i === 0) return `<td class="bb-yr">Career Totals (${nS} Season${nS===1?"":"s"})</td>`;
     if (c.type === "calc") return `<td class="bb-c">${c.fmt(tot.calc[c.k])}</td>`;
     if (c.type === "num") return `<td>${tot.sum[c.k] ? tot.sum[c.k] : ""}</td>`;
     if ((kind==="pitching"&&c.k==="ip")||(kind==="fielding"&&c.k==="inn")) return `<td>${BBREF.fmt.fIp(tot.ipNotation)}</td>`;
@@ -1276,8 +1276,17 @@ function bbSectionHTML(kind, label, pid, rows){
   const head = BBREF.COLUMNS[kind].map(c => `<th>${c.h}</th>`).join("") + "<th></th>";
   return `<div class="bb-sec" data-kind="${kind}" data-pid="${pid}">
     <div class="bb-sec-head"><span class="bb-sec-t">${label}</span>
-      <span class="bb-sec-btns"><button type="button" class="btn btn-ghost bb-add">+ Add row</button>
+      <span class="bb-sec-btns"><button type="button" class="btn btn-ghost bb-paste-toggle">📋 Paste stats</button>
+      <button type="button" class="btn btn-ghost bb-add">+ Add row</button>
       <button type="button" class="btn btn-gold bb-save">Save</button></span></div>
+    <div class="bb-paste" hidden style="margin:0 0 10px;padding:10px;border:1px dashed rgba(217,177,84,.4);border-radius:10px;background:rgba(6,20,42,.5)">
+      <textarea class="bb-paste-in" rows="4" placeholder="Paste raw ${kind} stats here — a box score, a screenshot transcription, a scouting note. The AI pulls out the raw numbers into new rows for you to review before saving." style="width:100%;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--ink);font-size:14px;font-family:inherit;resize:vertical"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">
+        <button type="button" class="btn btn-teal bb-paste-go">✨ Parse with AI</button>
+        <button type="button" class="btn btn-ghost bb-paste-cancel">Cancel</button>
+        <span class="msg bb-paste-msg" role="status" aria-live="polite"></span>
+      </div>
+    </div>
     <div class="bb-scroll"><table class="bb-table bb-edit">
       <thead><tr>${head}</tr></thead>
       <tbody>${rows.map(r => bbRowHTML(kind, r)).join("")}</tbody>
@@ -1310,7 +1319,7 @@ function bbRecalc(sec){
   const tr = sec.querySelector("tfoot tr"); if (!tr) return;
   BBREF.COLUMNS[kind].forEach((c,i) => {
     const cell = tr.children[i]; if (!cell) return;
-    if (i === 0){ cell.textContent = `All Levels (${nS} Season${nS===1?"":"s"})`; return; }
+    if (i === 0){ cell.textContent = `Career Totals (${nS} Season${nS===1?"":"s"})`; return; }
     if (c.type === "calc") cell.textContent = c.fmt(tot.calc[c.k]);
     else if (c.type === "num") cell.textContent = tot.sum[c.k] ? tot.sum[c.k] : "";
     else if ((kind==="pitching"&&c.k==="ip")||(kind==="fielding"&&c.k==="inn")) cell.textContent = BBREF.fmt.fIp(tot.ipNotation);
@@ -1329,6 +1338,42 @@ function bbWireSection(sec){
     bbRecalc(sec);
   };
   sec.querySelector(".bb-save").onclick = () => bbSave(sec);
+  bbWirePaste(sec);
+}
+/* AI paste-and-parse: send pasted text + this section's kind to the parse-stats Edge Function,
+   which returns RAW stat rows (never calculated). We append them as normal editable rows and
+   recompute — Sam reviews and clicks the existing Save. No separate save path; nothing is
+   written until he saves. Failures/empty results degrade to a message, leaving manual entry. */
+function bbWirePaste(sec){
+  const panel = sec.querySelector(".bb-paste"); if (!panel) return;
+  const toggle = sec.querySelector(".bb-paste-toggle");
+  const cancel = sec.querySelector(".bb-paste-cancel");
+  const go = sec.querySelector(".bb-paste-go");
+  const ta = sec.querySelector(".bb-paste-in");
+  const msg = sec.querySelector(".bb-paste-msg");
+  const setMsg = (txt, cls) => { msg.textContent = txt; msg.className = "msg bb-paste-msg" + (txt ? " show " + cls : ""); };
+  toggle.onclick = () => { panel.hidden = !panel.hidden; if (!panel.hidden) ta.focus(); };
+  cancel.onclick = () => { panel.hidden = true; setMsg("", ""); };
+  go.onclick = async () => {
+    const kind = sec.dataset.kind, text = (ta.value || "").trim();
+    if (!text){ setMsg("Paste some stat text first.", "err"); return; }
+    go.disabled = true; setMsg("Parsing with AI…", "ok");
+    try {
+      const { data, error } = await SB.functions.invoke("parse-stats", { body: { text, category: kind } });
+      let detail = null, rows = null;
+      if (error){ detail = error.message; try { const j = await error.context.json(); if (j && j.error) detail = j.error; } catch (e) {} }
+      else if (data && data.error){ detail = data.error; }
+      else if (data && Array.isArray(data.rows)){ rows = data.rows; }
+      if (detail){ setMsg(detail, "err"); go.disabled = false; return; }
+      if (!rows || !rows.length){ setMsg("Couldn't find any stats to import — try clearer text, or add a row manually.", "err"); go.disabled = false; return; }
+      const tbody = sec.querySelector("tbody");
+      rows.forEach(r => tbody.insertAdjacentHTML("beforeend", bbRowHTML(kind, r)));
+      bbRecalc(sec);
+      setMsg(`Added ${rows.length} row${rows.length === 1 ? "" : "s"} below — review the values, then click Save.`, "ok");
+      ta.value = "";
+    } catch (ex){ setMsg("Parse failed: " + ex.message, "err"); }
+    go.disabled = false;
+  };
 }
 async function loadBbref(pid){
   const host = document.getElementById("bbref-" + pid);
