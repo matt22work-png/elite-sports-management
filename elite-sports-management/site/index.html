@@ -537,7 +537,7 @@
        hides itself (onerror) so the hero never shows a broken image. -->
   <figure class="hero-photo">
     <img src="assets/arath-zapien.jpg" alt="Arath Zapien, North Central Missouri Pirates"
-         loading="lazy" onerror="this.closest('figure').style.display='none'" />
+         loading="eager" fetchpriority="high" decoding="async" onerror="this.closest('figure').style.display='none'" />
     <figcaption>Arath Zapien, North Central Missouri Pirates.</figcaption>
   </figure>
 </div></section>
