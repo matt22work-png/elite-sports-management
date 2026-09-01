@@ -1,8 +1,9 @@
 /* ============================================================================
    ESM — Baseball-Reference-style "Register" stats: shared client module.
    Single source of truth for column layout, the derived-stat math (mirroring the
-   Supabase calc triggers in supabase-bbref-stats.sql), the "All Levels" totals
-   row, and the read-only public table renderer. Loaded as a classic <script> by
+   Supabase calc triggers in supabase-bbref-stats.sql), the "Career Totals" line
+   (one combined row across ALL levels — college + pro together, Baseball-Reference
+   style), and the read-only public table renderer. Loaded as a classic <script> by
    the admin editor, the homepage player modal, and the static player pages.
    Plain ES5-ish JS, no deps — attaches window.BBREF.
    ============================================================================ */
@@ -116,8 +117,9 @@
     };
   }
 
-  // "All Levels" totals: sum the RAW stats across rows, then recompute derived
-  // stats FROM the summed raw (not averaged) — matching how Baseball-Reference does it.
+  // "Career Totals" line: sum the RAW stats across ALL rows (every level — college and
+  // pro together), then recompute derived stats FROM the summed raw (not averaged) —
+  // matching how Baseball-Reference does its combined multi-level register total.
   function totals(kind, rows) {
     var sum = {}, keys = rawNumKeys(kind), i, j;
     for (i = 0; i < keys.length; i++) sum[keys[i]] = 0;
@@ -170,7 +172,7 @@
     }).join("");
     var tot = totals(kind, rows), nS = distinctSeasons(rows);
     var totCells = cols.map(function (c, i) {
-      if (i === 0) return '<td class="bb-yr">All Levels (' + nS + " Season" + (nS === 1 ? "" : "s") + ")</td>";
+      if (i === 0) return '<td class="bb-yr">Career Totals (' + nS + " Season" + (nS === 1 ? "" : "s") + ")</td>";
       if (c.type === "calc") return '<td class="bb-c">' + c.fmt(tot.calc[c.k]) + "</td>";
       if (c.type === "num") return "<td>" + (tot.sum[c.k] ? tot.sum[c.k] : "") + "</td>";
       if ((kind === "pitching" && c.k === "ip") || (kind === "fielding" && c.k === "inn")) return "<td>" + fIp(tot.ipNotation) + "</td>";
