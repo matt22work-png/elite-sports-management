@@ -1609,7 +1609,7 @@ function posCategory(p){
   if(!s.trim()) return null;
   if(/two[\s-]*way|\b2\s*ways?\b/.test(s) || (/pitch/.test(s) && /catch/.test(s))) return "Two-Way";
   if(/catch/.test(s)) return "Catcher";
-  if(/pitch/.test(s)) return "Pitcher";
+  if(/pitch|\brhp\b|\blhp\b|\brhsp\b|\blhsp\b/.test(s)) return "Pitcher";
   if(/outfield|\bof\b|center\s*field|left\s*field|right\s*field/.test(s)) return "Outfielder";
   if(/infield|shortstop|first\s*base|second\s*base|third\s*base|\b[123]b\b|\bss\b|\bif\b/.test(s)) return "Infielder";
   return null;
