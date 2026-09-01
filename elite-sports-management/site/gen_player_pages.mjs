@@ -161,9 +161,9 @@ function render_page(p){
 <script>
 /* Roster paywall. Player profiles are part of the paid roster, so bounce anyone
    who hasn't unlocked it back to the gate. Runs in <head>, before first paint.
-   Keep the localStorage key in sync with UNLOCK_KEY in index.html. */
+   Keep this gate in sync with UNLOCK_KEY / revalidateUnlock() in index.html (v2). */
 (function(){try{
-  if(localStorage.getItem("esm_roster_unlock_v1")!=="1"){location.replace("../index.html#roster");}
+  var u=null;try{u=JSON.parse(localStorage.getItem("esm_roster_unlock_v2")||"null");}catch(_){}var cur="";try{cur=localStorage.getItem("esm_roster_code_v1")||"";}catch(_){}if(!(u&&(u.m==="user"?!!u.h:(u.m==="master"&&!!u.c&&u.c===cur)))){location.replace("../index.html#roster");}
 }catch(e){}})();
 </script>
 <link rel="manifest" href="../manifest.json" />
