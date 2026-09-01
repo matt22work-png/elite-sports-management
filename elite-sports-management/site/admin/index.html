@@ -636,6 +636,12 @@ function cardAccount(a){
       <button class="btn btn-ghost" data-acct-resetpw="${a.id}" type="button">Set password</button>
     </div>
     <div class="msg" data-rp-msg="${a.id}" role="alert" aria-live="assertive" style="margin-top:6px"></div>
+    <div class="sub" style="margin-top:14px">✉️ Change login email <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(changes the sign-in email for this ${a.role === "scout" ? "scout" : "player"} — NOT the contact email above)</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input type="email" class="ce-new" placeholder="New login email" autocomplete="off" spellcheck="false" aria-label="New login email for ${esc(name)}" style="flex:1;min-width:160px;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--ink);font-size:14px;font-family:inherit" />
+      <button class="btn btn-ghost" data-acct-setemail="${a.id}" type="button">Set email</button>
+    </div>
+    <div class="msg" data-ce-msg="${a.id}" role="alert" aria-live="assertive" style="margin-top:6px"></div>
   </div>`;
 }
 
@@ -691,6 +697,29 @@ function bindAccountActions(){
     card.querySelector(".rp-new").value = ""; card.querySelector(".rp-confirm").value = "";
     m.textContent = "Password updated ✓ They can sign in with it now."; m.classList.remove("err"); m.classList.add("show","ok");
     toast("Password reset ✓");
+  });
+  // Change a user's LOGIN email (Supabase Auth). Runs through the admin-set-user-email Edge
+  // Function, which re-checks that WE are an admin and uses the service-role key server-side —
+  // the anon key here can never change another user's auth email. This is separate from the
+  // contact email (players.email / profiles.email), which the player-edit form handles.
+  document.querySelectorAll("[data-acct-setemail]").forEach(b => b.onclick = async () => {
+    const id = b.dataset.acctSetemail;
+    const card = document.querySelector(`[data-acct="${id}"]`);
+    const ne = card.querySelector(".ce-new").value.trim();
+    const m = card.querySelector(`[data-ce-msg="${id}"]`);
+    m.classList.remove("show","ok"); m.classList.add("err");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ne)){ m.textContent = "Enter a valid email address."; m.classList.add("show"); return; }
+    if (!confirm(`Change this user's LOGIN email to:\n\n${ne}\n\nThey will sign in with the new email; the old one stops working. The separate contact email is not affected. Continue?`)) return;
+    b.disabled = true;
+    const { data, error } = await SB.functions.invoke("admin-set-user-email", { body: { user_id: id, new_email: ne } });
+    b.disabled = false;
+    let detail = null;
+    if (error){ detail = error.message; try { const j = await error.context.json(); if (j && j.error) detail = j.error; } catch (e) {} }
+    else if (data && data.error){ detail = data.error; }
+    if (detail){ m.textContent = "Couldn't change email: " + detail; m.classList.add("show"); return; }
+    card.querySelector(".ce-new").value = "";
+    m.textContent = "Login email updated ✓ They sign in with " + ne + " now."; m.classList.remove("err"); m.classList.add("show","ok");
+    toast("Login email changed ✓");
   });
 }
 
