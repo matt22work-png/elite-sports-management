@@ -1,3 +1,13 @@
 
 # Throwaway test/verification scripts (never deploy)
 elite-sports-management/site/_*
+
+# Local verification tooling — puppeteer-core, ad-hoc test scripts, screenshots (never deploy)
+/node_modules/
+/package.json
+/package-lock.json
+/*.mjs
+/hero_*.png
+/og_check.png
+/pptr-profile/
+/.qa_*
