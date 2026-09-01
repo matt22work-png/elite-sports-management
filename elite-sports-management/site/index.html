@@ -393,6 +393,13 @@
     .hero-copy{flex:1 1 auto}
     .hero-photo{flex:1 1 auto;width:100%;max-width:440px;margin:30px auto 0;align-self:center}
   }
+  /* Desktop/laptop only: lift the hero photo to the TOP of the row so it sits up with the
+     headline instead of being vertically centered against the tall copy column. Its bottom
+     edge is already mask-faded to transparent, so the navy beneath it reads as intentional
+     hero background (not a dead gap). Mobile keeps align-self:center from the block above. */
+  @media(min-width:781px){
+    .hero-photo{align-self:flex-start}
+  }
   .tcard .qt{font-size:16.5px;line-height:1.7;color:#d6e1f2;font-style:italic}
   .tcard .nm{margin-top:14px;font-family:'Anton';letter-spacing:.09em;font-size:15px;color:var(--gold-soft);text-transform:uppercase}
   .tcard .rl{font-size:12.5px;color:var(--muted);margin-top:3px}
