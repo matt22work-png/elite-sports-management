@@ -159,8 +159,9 @@
     <div class="card">
       <button class="btn btn-gold" type="button" id="addToggle">+ Add a player</button>
       <div class="editor" id="addEditor">
-        <div class="sub">New athlete — saved as <b>approved</b>, goes straight to the roster</div>
+        <div class="sub">New athlete — saved as <b>approved</b>, goes straight to the roster. A login account is created so you can manage their email &amp; password below.</div>
         <div class="field"><label for="ap-name">Full name *</label><input id="ap-name" placeholder="Jane Doe" /></div>
+        <div class="field"><label for="ap-email">Login email *</label><input id="ap-email" type="email" autocomplete="off" spellcheck="false" placeholder="player@example.com" /></div>
         <div class="field"><label for="ap-position">Position</label><input id="ap-position" placeholder="e.g. Catcher" /></div>
         <div class="field"><label for="ap-sport">Sport</label><select id="ap-sport"><option value="Baseball">Baseball</option><option value="Softball">Softball</option></select></div>
         <div class="field"><label for="ap-country">Country</label><input id="ap-country" placeholder="e.g. Italy" /></div>
@@ -1145,32 +1146,45 @@ $("ap-save").onclick = async () => {
   const msg = $("ap-msg"); msg.classList.remove("show");
   const name = $("ap-name").value.trim();
   if (!name){ msg.textContent = "Name is required."; msg.classList.add("show"); $("ap-name").focus(); return; }
+  // A login email is now REQUIRED: admin-added players get a real Supabase Auth account so their
+  // login email & password can be managed below, exactly like a self-registered player. Without
+  // an account, the Set email / Set password controls have no auth user to act on.
+  const email = $("ap-email").value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    msg.textContent = "A valid login email is required — an account is created for this player.";
+    msg.classList.add("show"); $("ap-email").focus(); return;
+  }
   const position = $("ap-position").value.trim();
   const sport = $("ap-sport").value;
   const country = $("ap-country").value.trim();
   const bio = $("ap-bio").value.trim();
   const teams = $("ap-teams").value.split("\n").map(t => t.trim()).filter(Boolean);
-  const slug = (slugify(name) || "player") + "-" + Date.now().toString(36);
   const btn = $("ap-save"); btn.disabled = true;
-  // Optional photo — upload first (the storage path needs the slug), then embed the URL.
+  // Optional photo — upload first (the storage path needs a slug), then pass the URL to the
+  // function. The players-row slug is generated server-side; this path is just a storage key.
   let image_url = null;
   const file = $("ap-photo").files?.[0];
   if (file){
     const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
     toast("Uploading photo…");
-    const path = `${slug}.${ext}`;
+    const path = `${slugify(name) || "player"}-${Date.now().toString(36)}.${ext}`;
     const { error: upErr } = await SB.storage.from(PHOTO_BUCKET).upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
     if (upErr){ btn.disabled = false; msg.textContent = "Photo upload failed: " + upErr.message; msg.classList.add("show"); return; }
     image_url = SB.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
   }
-  const { error } = await SB.from("players").insert({
-    slug, name, "group": position || "Player", position, sport, country,
-    bio: bio || "", teams, stats: [], image_url, source: "admin", status: "approved",
+  // Create the auth account + linked approved roster row via the admin Edge Function (creating an
+  // auth user needs the service-role key, which never reaches the browser). Same error-surfacing
+  // pattern as the Set email / Set password controls.
+  const { data, error } = await SB.functions.invoke("admin-create-player", {
+    body: { name, email, position, sport, country, bio, teams, image_url },
   });
   btn.disabled = false;
-  if (error){ msg.textContent = "Save failed: " + error.message; msg.classList.add("show"); return; }
-  toast("Player added ✓");
-  ["ap-name","ap-position","ap-country","ap-bio","ap-teams"].forEach(id => { $(id).value = ""; });
+  let detail = null;
+  if (error){ detail = error.message; try { const j = await error.context.json(); if (j && j.error) detail = j.error; } catch (e) {} }
+  else if (data && data.error){ detail = data.error; }
+  if (detail){ msg.textContent = "Save failed: " + detail; msg.classList.add("show"); return; }
+  toast("Player added ✓ — login account created. Set their password below via “Set password”.");
+  ["ap-name","ap-email","ap-position","ap-country","ap-bio","ap-teams"].forEach(id => { $(id).value = ""; });
   $("ap-photo").value = "";
   $("addEditor").classList.remove("open");
   await load();
