@@ -1,4 +1,4 @@
-# Elite Sports Management — https://elite-sports-management.vercel.app
+# ESM Sports Network — https://elite-sports-management.vercel.app
 User-agent: *
 Allow: /
 

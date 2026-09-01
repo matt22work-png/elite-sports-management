@@ -103,7 +103,7 @@ function wrap(title: string, inner: string) {
   return `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:560px">
     <h2 style="font-size:18px;color:#0b1f3a;margin:0 0 14px">${escHtml(title)}</h2>
     ${inner}
-    <p style="color:#9aa7ba;font-size:12px;margin-top:20px">Automated notification from the Elite Sports Management website.</p>
+    <p style="color:#9aa7ba;font-size:12px;margin-top:20px">Automated notification from the ESM Sports Network website.</p>
   </div>`;
 }
 
@@ -220,7 +220,7 @@ async function sendMail(msg: Mail): Promise<{ delivered: boolean; reason?: strin
       },
     }) as unknown as typeof client;
     await client!.send({
-      from: `Elite Sports Management <${FROM_EMAIL}>`,
+      from: `ESM Sports Network <${FROM_EMAIL}>`,
       to: msg.to,
       subject: msg.subject,
       content: "auto",        // auto-generate a text/plain part from the html
