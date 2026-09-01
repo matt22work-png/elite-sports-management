@@ -1148,3 +1148,9 @@ Priority order: security > correctness > reliability > a11y > perf > SEO > UX > 
 3. **Click each of the 6 py.pl / Wise payment buttons** to confirm the external PayPal/Wise destinations + amounts (external redirects can't be followed headlessly).
 
 **Reusable tool added:** `site/validate_i18n.mjs` — re-run after any i18n change to catch missing keys/parse errors/length flags.
+
+---
+
+## 2026-08-31 — Batch of 10 updates from Sam (worked in order, per-item commits)
+
+**1. Deleted Dario Cardoso player profile — DONE (DB-only, no code).** Sam wrote "Danio"; the only Cardoso in the DB is **Dario Cardoso** (single unambiguous match). He was a self-registered player (`source=registration`), **status=rejected** (so never on the public approved roster). Purged in one transaction: `public.players` id=117 → `public.profiles` id=`c9440e61-7d9f-43f2-b5f3-0dd09f90caab` → `auth.users` same id. No batting/pitching/fielding/notes rows existed (players→stats FKs are ON DELETE CASCADE anyway); all image/resume/cert/diploma URLs were null and he had **zero** storage objects in player-photos/application-photos/application-docs. Verified 0 rows remain across players/profiles/auth/stats/notes. Nothing on the frontend referenced him (homepage roster is DB approved-only; no static players/*.html page — those are the 17 seed athletes).
