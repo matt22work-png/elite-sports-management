@@ -547,19 +547,20 @@ function renderPayStep(role){
   } else {
     svc.style.display = "none"; svc.innerHTML = "";
   }
-  // Pay button: a real Stripe link if one has been provided for this role, otherwise the
-  // default "Contact ESM →" mailto (wired by the [data-mail] loop at load). Re-applied here
-  // on every render (incl. language switch) so the two states never get out of sync.
+  // Pay button: shown ONLY when a real Stripe link has been provided for this role. While the
+  // STRIPE_*_URL is empty there is NO button at all (removed per Sam, 2026-09) — the steps above
+  // already explain payment is arranged directly with ESM, so nothing dead-ends. The moment a
+  // URL is filled in, the button auto-appears as a "Pay securely →" checkout link — no other
+  // code change needed. Re-applied on every render (incl. language switch) so state stays synced.
   const payBtn = $("payBtn");
   if (payBtn){
     const stripeUrl = role === "scout" ? STRIPE_ROSTER_URL : STRIPE_PROFILE_URL;
     if (stripeUrl){
+      payBtn.style.display = "";
       payBtn.href = stripeUrl; payBtn.target = "_blank"; payBtn.rel = "noopener";
       payBtn.textContent = t("r_pay_now") + (price ? " " + price : "") + " →";
     } else {
-      payBtn.href = "mailto:" + CONTACT_EMAIL + "?subject=" + encodeURIComponent("Account registration — ESM Sports Network");
-      payBtn.removeAttribute("target"); payBtn.removeAttribute("rel");
-      payBtn.textContent = t("r_contact");
+      payBtn.style.display = "none";
     }
   }
 }

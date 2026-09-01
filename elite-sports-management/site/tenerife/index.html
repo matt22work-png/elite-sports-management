@@ -105,7 +105,7 @@
   <!-- STEP 2 — payment -->
   <div id="step2" class="card hide">
     <h1 class="display" data-i18n-html="te_h2">Complete your <em>registration</em></h1>
-    <p class="lead" data-i18n="te_lead2">Thanks — your registration has been received. Secure your spot with the payment below.</p>
+    <p class="lead" data-i18n="te_lead2">Thanks — your registration has been received. ESM Sports Network will contact you to confirm your spot and next steps.</p>
     <div class="pay-service">
       <div class="ps-top"><span class="ps-title" data-i18n="te_ps_title">Tenerife Winter League</span><span class="ps-price">€599.99</span></div>
       <ul>
@@ -263,10 +263,13 @@ function combinePhone(ccId, numId){ const cc=$(ccId), num=$(numId); const n=((nu
 applyStatic();
 // Wire every mailto contact link from the single CONTACT_EMAIL constant.
 document.querySelectorAll("[data-mail]").forEach(a=>{ const s=a.getAttribute("data-subject"); a.href="mailto:"+CONTACT_EMAIL+(s?("?subject="+encodeURIComponent(s)):""); });
-// If a Stripe Payment Link exists, turn the Tenerife pay button into a real checkout link.
-// Swapping its data-i18n to te_pay_now keeps the label correct across language switches
-// (applyStatic re-reads data-i18n). While empty it stays the "Contact ESM →" mailto above.
-(function(){ const b=document.getElementById("tePayBtn"); if(b&&STRIPE_TENERIFE_URL){ b.href=STRIPE_TENERIFE_URL; b.target="_blank"; b.rel="noopener"; b.removeAttribute("data-mail"); b.setAttribute("data-i18n","te_pay_now"); b.textContent=t("te_pay_now"); } })();
+// Pay button shows ONLY when a Stripe Payment Link exists. While STRIPE_TENERIFE_URL is empty
+// there is NO button (removed per Sam, 2026-09) — the steps above already say the spot & payment
+// are arranged directly with ESM, so nothing dead-ends. The moment a URL is filled the button
+// auto-appears as a real "Pay securely →" checkout link — no other code change needed.
+(function(){ const b=document.getElementById("tePayBtn"); if(!b) return;
+  if(STRIPE_TENERIFE_URL){ b.style.display=""; b.href=STRIPE_TENERIFE_URL; b.target="_blank"; b.rel="noopener"; b.removeAttribute("data-mail"); b.setAttribute("data-i18n","te_pay_now"); b.textContent=t("te_pay_now"); }
+  else { b.style.display="none"; b.removeAttribute("data-mail"); } })();
 fillCC("t-cc");
 show("step1");
 
