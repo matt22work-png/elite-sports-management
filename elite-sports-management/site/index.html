@@ -869,7 +869,11 @@ const STRIPE_CONTACT_URL = "";
    and /tenerife/. Same hash as the pre-rework version, so codes already handed out
    still work. */
 const ROSTER_CODE_HASHES = ["99b2bfb3a4ac35e32491d22207e082500404dbbd30f0cd8a5152cd6185c3cc58"];
-const UNLOCK_KEY = "esm_roster_unlock_v1";
+/* v2 (was v1): the unlock is now VERSIONED against the code that granted it, so rotating the
+   master code re-locks everyone who unlocked with the old one (see revalidateUnlock below).
+   Bumping the key from v1→v2 also forces a one-time re-entry for anyone holding a legacy
+   un-versioned unlock, which immediately enforces the revocable model. */
+const UNLOCK_KEY = "esm_roster_unlock_v2";
 /* ===== MASTER ROSTER CODE — fully admin-managed, cached locally =================
    The single "trusted people" master code (players / coaches / scouts) is set by Sam from
    the Admin panel and lives ONLY in the database (public.app_settings, key
@@ -1842,7 +1846,13 @@ function openModal(slug){
    unlock is remembered in localStorage, so a buyer who paid Sam via PayPal enters the code
    he sends them just once. Deliberately NOT tied to account creation or admin approval —
    that flow stays on /register/ (€129.99 profile) and /tenerife/ (€599.99) only. */
-function isUnlocked(){try{return localStorage.getItem(UNLOCK_KEY)==="1"}catch(e){return false}}
+/* The stored unlock records HOW access was granted, so it can be re-validated on every load:
+     { m:'master', c:<normalized code> }  — granted by the rotating admin master code
+     { m:'user',   h:<sha-256 hash> }     — granted by a permanent per-user personal code
+   A bare presence check (isUnlocked) is safe for rendering because revalidateUnlock() prunes
+   any stale/invalid unlock BEFORE render, converting "present" into "present AND still valid". */
+function getUnlock(){try{return JSON.parse(localStorage.getItem(UNLOCK_KEY)||"null")}catch(e){return null}}
+function isUnlocked(){const u=getUnlock();return !!(u&&(u.m==="master"||u.m==="user"))}
 async function sha256Hex(str){
   const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(str));
   return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
@@ -1854,10 +1864,30 @@ function applyLockState(){
   if(wrap)wrap.classList.toggle("is-locked",!open);
   if(note)note.classList.toggle("show",open);
 }
-function unlockRoster(){
-  try{localStorage.setItem(UNLOCK_KEY,"1")}catch(e){}
+function unlockRoster(u){
+  try{localStorage.setItem(UNLOCK_KEY,JSON.stringify(u))}catch(e){}
+  try{localStorage.removeItem("esm_roster_unlock_v1")}catch(e){} // drop the legacy un-versioned flag
   applyLockState();
   renderRoster();
+}
+function lockRoster(){
+  try{localStorage.removeItem(UNLOCK_KEY)}catch(e){}
+  applyLockState();
+  renderRoster();
+}
+/* Revoke access when the code that granted it is no longer current. Runs at load (against the
+   cached code) AND again right after boot() re-fetches the live code — so when Sam changes or
+   retires the master code, the SAME reload that fetches the new value re-locks the browser.
+   Synchronous: master unlocks store the code string (already kept in localStorage as the cache,
+   so no extra exposure) and compare by string; per-user grants compare their hash to the
+   still-deployed hash list. Per-user grants are intentionally PERMANENT — a master-code rotation
+   does NOT revoke them (only removing their hash + redeploying does). */
+function revalidateUnlock(){
+  const u=getUnlock();
+  if(!u)return;
+  if(u.m==="user"){ if(!u.h||!ROSTER_CODE_HASHES.includes(u.h)) lockRoster(); return; }
+  if(u.m==="master"){ const cur=cachedMasterCode(); if(!cur||u.c!==cur) lockRoster(); return; }
+  lockRoster(); // unknown/corrupt shape -> fail closed
 }
 const gateForm=document.getElementById("gateForm");
 if(gateForm)gateForm.addEventListener("submit",async e=>{
@@ -1871,7 +1901,7 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
   try{hash=await sha256Hex(val);}
   catch(ex){console.warn("crypto.subtle unavailable",ex);}
   if(hash&&ROSTER_CODE_HASHES.includes(hash)){
-    unlockRoster();
+    unlockRoster({m:"user",h:hash});
     document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
     return;
   }
@@ -1882,7 +1912,7 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
   //    case-insensitive + whitespace-tolerant. This replaces the old hardcoded "ESM13" string.
   const cached=cachedMasterCode();
   if(cached&&val===cached){
-    unlockRoster();
+    unlockRoster({m:"master",c:cached});
     document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
     return;
   }
@@ -1895,7 +1925,7 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
       const {data:ok,error}=await SB.rpc("verify_roster_code",{p_code:val});
       if(!error&&ok===true){
         cacheMasterCode(val); // val is confirmed-current -> seed the offline cache
-        unlockRoster();
+        unlockRoster({m:"master",c:val});
         document.getElementById("roster").scrollIntoView({behavior:"smooth",block:"start"});
         return;
       }
@@ -1903,6 +1933,10 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
   }catch(ex){console.warn("verify_roster_code failed",ex);}
   err.classList.add("show");
 });
+// At load, re-check the stored unlock against the CACHED code (catches a code change that a
+// prior load already re-cached). boot() re-runs revalidateUnlock() once the LIVE code arrives,
+// so a change made since the last visit re-locks this browser on the very next reload.
+revalidateUnlock();
 applyLockState();
 
 /* Service cards (College, Indy Ball, Winter League, Representation) drop the athlete
@@ -2191,7 +2225,7 @@ async function boot(){
       // network error the RPC resolves to {data:null,error} — writing that null would WIPE the
       // last-known-good cache and destroy the offline fallback exactly when it's needed, so we
       // preserve the existing cache on error and only refresh/clear on a real response.
-      try{const {data:mc,error:mcErr}=await SB.rpc("get_roster_code");if(!mcErr)cacheMasterCode(mc);}
+      try{const {data:mc,error:mcErr}=await SB.rpc("get_roster_code");if(!mcErr){cacheMasterCode(mc);revalidateUnlock();}}
       catch(ex){console.warn("roster code cache refresh failed (cache preserved)",ex);}
       // Only approved players are publicly readable (enforced by RLS too). We request
       // just the public display columns — NOT the intake PII (age/phone/email/instagram/
