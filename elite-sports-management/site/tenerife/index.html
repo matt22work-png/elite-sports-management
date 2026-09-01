@@ -119,18 +119,25 @@
       <li><span class="n">2</span><span data-i18n="te_step2">Your spot and payment details are arranged directly with ESM.</span></li>
       <li><span class="n">3</span><span data-i18n="te_step3">We'll email you with the next steps and event details.</span></li>
     </ol>
-    <a class="btn btn-gold" style="width:100%;margin-top:16px" data-mail data-subject="Tenerife Winter League" data-i18n="te_contact">Contact ESM →</a>
+    <a class="btn btn-gold" id="tePayBtn" style="width:100%;margin-top:16px" data-mail data-subject="Tenerife Winter League" data-i18n="te_contact">Contact ESM →</a>
     <p class="note" data-i18n="te_note2">We'll be in touch to confirm your registration.</p>
   </div>
 </div>
 
 <script type="module">
 /* ⚠️ PLACEHOLDER CONTACT ADDRESS — change in one place.
-   Payment links (PayPal/Wise) were removed 2026-08. The registration itself is what
-   reaches Sam: the tenerife_registrations INSERT below triggers the send-form-notification
+   On-site pay links were removed 2026-08 (Stripe replacement via STRIPE_TENERIFE_URL above,
+   coming soon). The registration itself is what reaches Sam: the tenerife_registrations
+   INSERT below triggers the send-form-notification
    Edge Function, which emails ESM. This constant is used only for the contact links.
    Swap in Sam's NEW email here once it exists — nothing else needs to change. */
 const CONTACT_EMAIL = "elitesportsmanagement50@gmail.com";
+
+/* ===== Stripe Payment Link (Tenerife €599.99) =====
+   Legacy off-site pay links were pulled site-wide; paste the Stripe Payment Link here when Sam provides
+   it. While empty, the button stays a "Contact ESM →" mailto so the flow never dead-ends;
+   once filled it becomes a real "Pay securely →" button (target=_blank). */
+const STRIPE_TENERIFE_URL = "";
 
 const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
@@ -152,7 +159,7 @@ const DICT = {
     te_phone:"Phone", te_phone_ph:"Phone number", te_cc_ph:"Select country code",
     te_sport:"Sport", te_position:"Position", te_position_ph:"e.g. Catcher / RHP",
     te_other:"Anything else? (optional)", te_other_ph:"Dietary needs, travel questions, level of play…",
-    te_submit:"Submit registration", te_questions:"Questions?", te_email_us:"Email us", te_contact:"Contact ESM →",
+    te_submit:"Submit registration", te_questions:"Questions?", te_email_us:"Email us", te_contact:"Contact ESM →", te_pay_now:"Pay securely →",
     te_h2:'Registration <em>received</em>',
     te_lead2:"Thanks — your registration has been received. Elite Sports Management will contact you to confirm your spot and next steps.",
     te_ps_title:"Tenerife Winter League",
@@ -174,7 +181,7 @@ const DICT = {
     te_phone:"Teléfono", te_phone_ph:"Número de teléfono", te_cc_ph:"Selecciona el código de país",
     te_sport:"Deporte", te_position:"Posición", te_position_ph:"p. ej. Receptor / RHP",
     te_other:"¿Algo más? (opcional)", te_other_ph:"Necesidades dietéticas, dudas de viaje, nivel de juego…",
-    te_submit:"Enviar inscripción", te_questions:"¿Preguntas?", te_email_us:"Escríbenos", te_contact:"Contactar a ESM →",
+    te_submit:"Enviar inscripción", te_questions:"¿Preguntas?", te_email_us:"Escríbenos", te_contact:"Contactar a ESM →", te_pay_now:"Pagar de forma segura →",
     te_h2:'Inscripción <em>recibida</em>',
     te_lead2:"Gracias — hemos recibido tu inscripción. Elite Sports Management se pondrá en contacto para confirmar tu plaza y los siguientes pasos.",
     te_ps_title:"Tenerife Winter League",
@@ -196,7 +203,7 @@ const DICT = {
     te_phone:"Telefono", te_phone_ph:"Numero di telefono", te_cc_ph:"Seleziona il prefisso",
     te_sport:"Sport", te_position:"Ruolo", te_position_ph:"es. Ricevitore / RHP",
     te_other:"Altro? (facoltativo)", te_other_ph:"Esigenze alimentari, domande di viaggio, livello di gioco…",
-    te_submit:"Invia iscrizione", te_questions:"Domande?", te_email_us:"Scrivici", te_contact:"Contatta ESM →",
+    te_submit:"Invia iscrizione", te_questions:"Domande?", te_email_us:"Scrivici", te_contact:"Contatta ESM →", te_pay_now:"Paga in sicurezza →",
     te_h2:'Iscrizione <em>ricevuta</em>',
     te_lead2:"Grazie — abbiamo ricevuto la tua iscrizione. Elite Sports Management ti contatterà per confermare il tuo posto e i prossimi passi.",
     te_ps_title:"Tenerife Winter League",
@@ -256,6 +263,10 @@ function combinePhone(ccId, numId){ const cc=$(ccId), num=$(numId); const n=((nu
 applyStatic();
 // Wire every mailto contact link from the single CONTACT_EMAIL constant.
 document.querySelectorAll("[data-mail]").forEach(a=>{ const s=a.getAttribute("data-subject"); a.href="mailto:"+CONTACT_EMAIL+(s?("?subject="+encodeURIComponent(s)):""); });
+// If a Stripe Payment Link exists, turn the Tenerife pay button into a real checkout link.
+// Swapping its data-i18n to te_pay_now keeps the label correct across language switches
+// (applyStatic re-reads data-i18n). While empty it stays the "Contact ESM →" mailto above.
+(function(){ const b=document.getElementById("tePayBtn"); if(b&&STRIPE_TENERIFE_URL){ b.href=STRIPE_TENERIFE_URL; b.target="_blank"; b.rel="noopener"; b.removeAttribute("data-mail"); b.setAttribute("data-i18n","te_pay_now"); b.textContent=t("te_pay_now"); } })();
 fillCC("t-cc");
 show("step1");
 

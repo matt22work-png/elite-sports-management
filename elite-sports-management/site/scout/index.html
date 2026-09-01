@@ -307,8 +307,8 @@ $("resetForm").addEventListener("submit", async e => {
 });
 
 /* Non-approved states. A pending scout may just not have paid — show clear payment
-   instructions (same €49.99 PayPal/Wise as the roster gate) plus a direct line to Sam,
-   never a dead-end. Roster access is unlocked only after Sam confirms payment. */
+   instructions (same €49.99 roster access; Stripe link coming soon) plus a direct line to
+   Sam, never a dead-end. Roster access is unlocked only after Sam confirms payment. */
 function showStatus(kind, link){
   CUR = { view:"status", kind, link };
   const icons = { pending:"⏳", rejected:"✉️", archived:"📁", notscout:"⚾", none:"🔎" };

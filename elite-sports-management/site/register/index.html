@@ -235,6 +235,13 @@ const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
 const PHOTO_BUCKET = "player-photos";
 const STASH_KEY = "esm_reg_pending";
+/* ===== Stripe Payment Links (per paid flow) =====
+   Legacy off-site pay links were pulled site-wide; Stripe replaces them. Paste the Stripe
+   Payment Link URLs here when Sam provides them. While empty, the pay button stays a "Contact ESM →"
+   mailto so the flow never dead-ends; the moment a URL is filled it becomes a real
+   "Pay securely →" button (target=_blank). One per paid role handled by /register/. */
+const STRIPE_PROFILE_URL = "";   // player — €129.99 profile creation
+const STRIPE_ROSTER_URL  = "";   // scout  — €49.99 roster access
 // Pricing tier the athlete picked on the homepage before starting (see index.html).
 // No payment is taken here — it's recorded for Sam's reference only.
 const TIER_KEY = "esm_reg_tier";
@@ -328,6 +335,7 @@ const DICT = {
     r_s3_step2:"Any payment is arranged directly with ESM — there's nothing to pay on this site.",
     r_s3_step3:"Once approved, simply sign in with the same email & password you just created — no additional registration needed.",
     r_contact:"Contact ESM →",
+    r_pay_now:"Pay securely",
     r_s3_note:"We'll email you once ESM has reviewed and approved your account.",
     // Payment service card — player
     r_pay_player_title:"Official Player Profile",
@@ -394,6 +402,7 @@ const DICT = {
     r_s3_step2:"Cualquier pago se coordina directamente con ESM — no hay nada que pagar en este sitio.",
     r_s3_step3:"Una vez aprobado, simplemente entra con el mismo correo y contraseña que acabas de crear — sin registro adicional.",
     r_contact:"Contactar a ESM →",
+    r_pay_now:"Pagar de forma segura",
     r_s3_note:"Te avisaremos por correo en cuanto ESM haya revisado y aprobado tu cuenta.",
     r_pay_player_title:"Perfil Oficial de Jugador",
     r_pay_player_inc1:"Un perfil de atleta creado profesionalmente en el roster de ESM",
@@ -456,6 +465,7 @@ const DICT = {
     r_s3_step2:"Eventuali pagamenti vengono organizzati direttamente con ESM — non c'è nulla da pagare su questo sito.",
     r_s3_step3:"Una volta approvato, accedi semplicemente con la stessa email e password appena create — nessuna registrazione aggiuntiva.",
     r_contact:"Contatta ESM →",
+    r_pay_now:"Paga in sicurezza",
     r_s3_note:"Ti invieremo un'email non appena ESM avrà esaminato e approvato il tuo account.",
     r_pay_player_title:"Profilo Ufficiale Giocatore",
     r_pay_player_inc1:"Un profilo atleta costruito professionalmente sul roster ESM",
@@ -536,6 +546,21 @@ function renderPayStep(role){
       (cfg.accessKey ? `<div class="ps-access">${esc(t(cfg.accessKey))}</div>` : "");
   } else {
     svc.style.display = "none"; svc.innerHTML = "";
+  }
+  // Pay button: a real Stripe link if one has been provided for this role, otherwise the
+  // default "Contact ESM →" mailto (wired by the [data-mail] loop at load). Re-applied here
+  // on every render (incl. language switch) so the two states never get out of sync.
+  const payBtn = $("payBtn");
+  if (payBtn){
+    const stripeUrl = role === "scout" ? STRIPE_ROSTER_URL : STRIPE_PROFILE_URL;
+    if (stripeUrl){
+      payBtn.href = stripeUrl; payBtn.target = "_blank"; payBtn.rel = "noopener";
+      payBtn.textContent = t("r_pay_now") + (price ? " " + price : "") + " →";
+    } else {
+      payBtn.href = "mailto:" + CONTACT_EMAIL + "?subject=" + encodeURIComponent("Account registration — Elite Sports Management");
+      payBtn.removeAttribute("target"); payBtn.removeAttribute("rel");
+      payBtn.textContent = t("r_contact");
+    }
   }
 }
 function showPay(role){ CUR = { view:"pay", role }; renderPayStep(role); show("step3"); }

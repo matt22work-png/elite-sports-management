@@ -628,9 +628,10 @@
   <div class="filters" id="filters"></div>
 
   <!-- Roster paywall (€49.99): the public roster is blurred behind a client-side
-       unlock-code gate. A buyer pays Samuele directly via PayPal and enters the code he
-       sends them (validated by SHA-256 against localStorage). This is scoped to the
-       roster ONLY — the €129.99 profile and €599.99 Tenerife flows stay account-based. -->
+       unlock-code gate. A buyer arranges payment directly with ESM (Stripe link coming
+       soon) and enters the code he is sent (validated by SHA-256 against localStorage).
+       Scoped to the roster ONLY — the €129.99 profile and €599.99 Tenerife flows stay
+       account-based. -->
   <div class="roster-wrap is-locked" id="rosterWrap">
     <div class="roster" id="rosterList"></div>
     <div class="gate">
@@ -638,7 +639,7 @@
         <div class="gate-lock">🔒</div>
         <h3 data-i18n="gate_h"></h3>
         <p data-i18n="gate_p"></p>
-        <!-- Price + PayPal/Wise buttons removed 2026-08 (payment links pulled site-wide).
+        <!-- On-site pay buttons were pulled site-wide (Stripe links coming soon).
              Code-only gate: an access code is obtained by contacting ESM. -->
         <div class="gate-or" data-i18n="gate_or"></div>
         <form class="gate-code" id="gateForm">
@@ -863,11 +864,11 @@ const FALLBACK_EMAIL      = CONTACT_MAILTO;   // back-compat alias (older refere
 const STRIPE_CONTACT_URL = "";
 
 /* Roster paywall (€49.99): RESTORED 2026-08 to the original client-side unlock-code
-   gate (SHA-256 + localStorage) per Sam. A buyer pays Samuele via PayPal and enters the
-   code he sends them. Scoped to the roster ONLY — profile creation (€129.99) and
-   Tenerife (€599.99) stay on the account + admin-approval + PayPal flow at /register/
-   and /tenerife/. Same hash as the pre-rework version, so codes already handed out
-   still work. */
+   gate (SHA-256 + localStorage) per Sam. A buyer arranges payment directly with ESM
+   (Stripe link coming soon) and enters the code he is sent. Scoped to the roster ONLY —
+   profile creation (€129.99) and Tenerife (€599.99) stay on the account + admin-approval
+   flow at /register/ and /tenerife/. Same hash as the pre-rework version, so codes
+   already handed out still work. */
 const ROSTER_CODE_HASHES = ["99b2bfb3a4ac35e32491d22207e082500404dbbd30f0cd8a5152cd6185c3cc58"];
 /* v2 (was v1): the unlock is now VERSIONED against the code that granted it, so rotating the
    master code re-locks everyone who unlocked with the old one (see revalidateUnlock below).
@@ -1843,8 +1844,8 @@ function openModal(slug){
 }
 /* ===== roster paywall (€49.99) =====
    Client-side unlock gate: the valid code's SHA-256 lives in ROSTER_CODE_HASHES and the
-   unlock is remembered in localStorage, so a buyer who paid Sam via PayPal enters the code
-   he sends them just once. Deliberately NOT tied to account creation or admin approval —
+   unlock is remembered in localStorage, so a buyer who arranged payment with ESM enters the
+   code he is sent just once. Deliberately NOT tied to account creation or admin approval —
    that flow stays on /register/ (€129.99 profile) and /tenerife/ (€599.99) only. */
 /* The stored unlock records HOW access was granted, so it can be re-validated on every load:
      { m:'master', c:<normalized code> }  — granted by the rotating admin master code
