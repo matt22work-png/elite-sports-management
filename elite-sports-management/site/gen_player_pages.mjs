@@ -148,14 +148,14 @@ function render_page(p){
     teams_html = '<div class="pp-section"><h2 data-i18n="pp_experience">Playing Experience</h2><p style="color:var(--muted);font-size:14px" data-i18n="pp_exp_soon">Details coming soon.</p></div>';
   }
 
-  const desc = (p.bio || (p.name + " — " + (p.position || "") + " represented by Elite Sports Management.")).slice(0,155);
+  const desc = (p.bio || (p.name + " — " + (p.position || "") + " represented by ESM Sports Network.")).slice(0,155);
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>${name} — Elite Sports Management</title>
+<title>${name} — ESM Sports Network</title>
 <meta name="description" content="${esc(desc)}" />
 <meta name="robots" content="noindex,nofollow" />
 <script>
@@ -184,7 +184,7 @@ ${EXTRA_CSS}
 <div class="bg-fx"></div>
 
 <header class="nav"><div class="wrap nav-in">
-  <a class="brand" href="../index.html#top"><img class="logo-img" src="../logo.png" alt="Elite Sports Management" /></a>
+  <a class="brand" href="../index.html#top"><img class="logo-img" src="../logo.png" alt="ESM Sports Network" /></a>
   <div class="nav-right">
     <nav class="nav-links">
       <a href="../index.html#about" data-i18n="pp_nav_about">What We Do</a>
@@ -229,8 +229,8 @@ ${EXTRA_CSS}
 
 <footer><div class="wrap foot">
   <div>
-    <a class="brand" href="../index.html#top"><img class="logo-img foot-logo" src="../logo.png" alt="Elite Sports Management" /></a>
-    <p class="muted">&copy; <span id="yr"></span> Elite Sports Management. <span data-i18n="pp_rights">All rights reserved.</span></p>
+    <a class="brand" href="../index.html#top"><img class="logo-img foot-logo" src="../logo.png" alt="ESM Sports Network" /></a>
+    <p class="muted">&copy; <span id="yr"></span> ESM Sports Network. <span data-i18n="pp_rights">All rights reserved.</span></p>
     <a class="foot-admin" href="../admin/" data-i18n="pp_admin">Admin</a>
   </div>
   <div class="foot-links">
