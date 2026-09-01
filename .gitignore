@@ -7,7 +7,7 @@ elite-sports-management/site/_*
 /package.json
 /package-lock.json
 /*.mjs
-/hero_*.png
+/*.png
 /og_check.png
 /pptr-profile/
 /.qa_*
