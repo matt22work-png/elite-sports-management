@@ -1192,3 +1192,32 @@ Priority order: security > correctness > reliability > a11y > perf > SEO > UX > 
 ### Batch summary (2026-08-31) — all 10 items pushed as separate commits (Vercel auto-deploys from main)
 1 Delete Dario Cardoso ✅ · 2 OG/Twitter logo card ✅ · 3 Roster code revocation ✅ · 4 Remove PayPal/Wise + Stripe placeholders ✅ (Stripe URLs pending Sam) · 5 Admin change-login-email ✅ (live-tested) · 6 Career-register terminology ✅ (was already unified) · 7 AI paste-stats ✅ (**needs ANTHROPIC_API_KEY secret from Matt**) · 8 Hero photo higher (desktop) ✅ · 9 Text rebrand → ESM Sports Network ✅ · 10 CeasAI footer confirmed ✅.
 **Pending manual steps for Matt/Sam:** (a) add Supabase secret `ANTHROPIC_API_KEY` for item 7; (b) paste real Stripe Payment Link URLs into `STRIPE_PROFILE_URL`/`STRIPE_ROSTER_URL` (register) + `STRIPE_TENERIFE_URL` (tenerife) for item 4; (c) decide whether per-user roster codes should also be revoked on master-code rotation (item 3); (d) confirm legal-entity name handling on terms/privacy after the rebrand (item 9); (e) decide if the homepage roster gate should get a Stripe pay button (needs pay→code automation).
+
+---
+
+## 2026-09-01 — Live verification pass of the 10-item batch + site health check
+
+Tested against the LIVE site (https://elite-sports-management.vercel.app) with a real headless Edge browser (puppeteer-core) + live Supabase, not just headless simulation.
+
+**PRIORITY — Roster code revocation, real browser sequence: ✅ CONFIRMED LIVE.** Using a persistent browser profile (real returning-visitor localStorage): (1) unlocked the roster with the live code ESM13 → `#rosterWrap` lost `is-locked`, stored `{"m":"master","c":"ESM13"}`; (2) changed the master code to `TESTCODE99` (via `app_settings`, the exact path admin writes); (3) reloaded the SAME profile → **re-locked** (`is-locked` back, old unlock cleared, cache updated to TESTCODE99); (4) entered TESTCODE99 → unlocked; (5) **restored the code to ESM13**. Nothing left in a test state.
+
+**General verification — all ✅:**
+1. Dario/Danio Cardoso — gone: 0 players, 0 auth, not on the 19-player roster or accounts.
+2. Social preview — `og-image.png` HTTP 200, confirmed **1200×630**; og:image + twitter:image + alt all point to it.
+3. Payment — roster gate is code-only (no pay button), register `#payBtn` + tenerife `#tePayBtn` are clean `mailto:` "Contact ESM →" buttons; **zero** PayPal/Wise on any of the three surfaces.
+4. Admin email-change — real E2E: admin→200, login with NEW email works, OLD email rejected (throwaway account, cleaned up).
+5. Career Totals — Samuele Bruno's modal register shows **"Career Totals (6 Seasons)"**, rows chronological 2021→2026, college (NJCAA/NAIA) + pro (Indyball/Fgn) unified in one table.
+6. AI paste-stats — graceful **503** "ANTHROPIC_API_KEY is not set…" (what the UI shows); not broken.
+7. Hero photo — desktop `align-self:flex-start`, photo top-aligned (photoTop=0 in a 660px row), bottom fades into navy, no dead space; mobile stays `center` + stacked column (unaffected). Screenshots taken.
+8. Text rebrand — 0 visible "Elite Sports Management" across home/player/terms/privacy in EN/ES/IT after fixing one DB row (see fixes).
+9. CeasAI footer — renders live: logo (loads, naturalWidth 160), "Website built by CeasAI" CTA, Instagram/email/TikTok icons, styling intact.
+
+**Site health — all ✅:** console clean on every page (after favicon fix); roster filters work with no overlap (after RHP fix); player signup→profile(trigger)→approve→portal "APPROVED" view; scout signup→approve→scout roster (contact info via scout_roster RPC); Supabase ACTIVE_HEALTHY; security advisors — **no new** issues (all pre-existing/by-design: roster-code/scout/profile SECURITY DEFINER fns are intentionally callable + internally gated, `private.esm_admins` RLS-no-policy is deny-all on a non-exposed schema, leaked-password-protection still optional).
+
+**Fixes made this pass (committed):**
+- 🔧 **Player-page roster gate (REGRESSION from item 3) — CRITICAL.** All 17 static player pages + both generators still checked the old `esm_roster_unlock_v1==="1"` flag, which item 3 stopped setting (moved to `esm_roster_unlock_v2` JSON) — so every player detail page redirected even legitimately-unlocked visitors back to the gate. Rewrote the gate to the v2 scheme (per-user grant by presence; master grant matched against the cached current code, so a code change also re-locks player pages). Verified live: unlocked session serves the page, locked session redirects.
+- 🔧 **Favicon 404** on terms.html + privacy — they lacked `<link rel="icon">`, so browsers requested a nonexistent `/favicon.ico`. Added the standard icon/apple-touch/theme-color tags. Verified: terms.html now 0 4xx.
+- 🔧 **Rebrand leftover in DB** — testimonial id=1 still read "Elite Sports Management…"; updated to "ESM Sports Network…" (DB-only; renders on home + anywhere testimonials show). Now 0 visible leftovers.
+- 🔧 **Roster filter categorization** — `posCategory` didn't recognize "RHP"/"LHP", leaving one pitcher uncategorized (in no filter tab). Added RHP/LHP/RHSP/LHSP → Pitcher; now all 19 players categorize cleanly (P7/C6/OF4/TwoWay2/IF0), no overlap, no gap. (Infielders=0 is correct — no player's primary position is infield.)
+
+**Nothing NEW needs Matt beyond the two already-known items:** (a) add Supabase secret `ANTHROPIC_API_KEY` (item 7), (b) provide Stripe Payment Link URLs for the `STRIPE_*_URL` vars (item 4).
