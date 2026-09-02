@@ -9,9 +9,18 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // Calculated fields (BA/OBP/SLG/OPS/ERA/WHIP/Fld%/…) are intentionally NOT extracted — the
 // editor + DB triggers compute those from the raw values.
 //
+// ROBUSTNESS (why this uses tool calling): Claude is asked to return the rows via a forced
+// tool call (tool_choice), whose input is validated against a JSON Schema by the API itself.
+// That eliminates the two failure modes Sam hit — markdown code fences / prose wrapping the
+// JSON ("wasn't valid JSON") and a too-small token budget truncating a big paste. We still
+// keep a defensive text-parse fallback (fence-strip + brace-extract) for the rare case the
+// model returns a text block instead of a tool call, and we still sanitize every field at the
+// trust boundary. Genuinely unparseable input returns {rows:[]} → the UI shows the friendly
+// "couldn't find any stats" message. Parse detail is logged server-side only (never to users).
+//
 // Security mirrors admin-reset-user-password: verify_jwt=true AND server-side is_admin_email
 // check, so only an authenticated ESM admin can spend Claude API credits here.
-// Requires the Supabase secret ANTHROPIC_API_KEY (flagged to Matt if not yet set).
+// Requires the Supabase secret ANTHROPIC_API_KEY.
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -36,6 +45,18 @@ const KEY_NOTES = `Key notes (Baseball-Reference abbreviations -> schema key):
   Batting: g=G, pa=PA, ab=AB, r=R, h=H, doubles=2B, triples=3B, hr=HR, rbi=RBI, sb=SB, cs=CS, bb=BB, so=SO/K, hbp=HBP, sh=SH, sf=SF, ibb=IBB, gdp=GDP.
   Pitching: w=W, l=L, g=G, gs=GS, gf=GF, cg=CG, sho=SHO, sv=SV, ip=IP (baseball notation like 45.2 = 45 and 2/3), h=H, r=R, er=ER, hr=HR, bb=BB, ibb=IBB, so=SO/K, hbp=HBP, bk=BK, wp=WP, bf=BF/TBF.
   Fielding: position=Pos, g=G, gs=GS, cg=CG, inn=Inn (baseball notation), ch=Ch, po=PO, a=A, e=E, dp=DP, pb=PB, wp=WP, sb=SB, cs=CS, lg_cs_pct=lgCS%.`;
+
+// Build the tool JSON Schema for a category: one object per row, only the allowed keys, with
+// the right type per key, and additionalProperties:false so the API rejects invented keys.
+function rowSchema(keys: string[]) {
+  const props: Record<string, unknown> = {};
+  for (const k of keys) {
+    props[k] = STRING_KEYS.has(k)
+      ? { type: "string" }
+      : { type: "integer" };
+  }
+  return { type: "object", additionalProperties: false, properties: props };
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
@@ -66,21 +87,33 @@ Deno.serve(async (req) => {
   if (!text) return json({ error: "Paste some stat text first." }, 400);
   if (text.length > 8000) return json({ error: "That's a lot of text — please paste one player's stats at a time (max 8000 chars)." }, 400);
 
-  // 4) Ensure the API key exists (flagged to Matt as a required new secret if missing).
+  // 4) Ensure the API key exists.
   const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
   if (!apiKey) {
-    return json({ error: "ANTHROPIC_API_KEY is not set on this project. Matt needs to add it as a Supabase Edge Function secret (like GMAIL_APP_PASSWORD) before paste-and-parse works." }, 503);
+    return json({ error: "ANTHROPIC_API_KEY is not set on this project. Matt needs to add it as a Supabase Edge Function secret before paste-and-parse works." }, 503);
   }
 
   const keys = RAW_KEYS[category];
   const system =
-    `You extract ${category} baseball statistics from messy, pasted text into a strict JSON schema. ` +
-    `Return ONLY a JSON object of the form {"rows":[ { ... }, ... ]} and nothing else — no prose, no markdown fences. ` +
-    `Each row is one team-season line. Use ONLY these keys: ${keys.join(", ")}. ` +
-    `Integer count keys must be numbers; these keys are strings: ${[...STRING_KEYS].filter(k=>keys.includes(k)).join(", ")}. ` +
-    `OMIT any key you cannot confidently determine (do NOT guess or fill zeros for unknowns). ` +
+    `You extract ${category} baseball statistics from messy, pasted text (box scores, screenshots ` +
+    `transcribed to text, scouting notes) into a strict schema. Call the tool "emit_stats" exactly ` +
+    `once with the rows you find. Each row is one team-season line. ` +
+    `Use ONLY the schema keys. Extract every RAW count you can actually see — it is better to return ` +
+    `a partial row with the values present than to skip it. OMIT only keys you cannot determine ` +
+    `(do NOT guess or fill zeros for unknowns). ` +
     `NEVER output calculated stats (BA, OBP, SLG, OPS, TB, ERA, RA9, WHIP, H9, HR9, BB9, SO9, W-L%, Fld%, RF/9, RF/G, CS%) — they are computed downstream. ` +
-    `If the text clearly contains multiple seasons/teams, return multiple rows. If nothing is parseable, return {"rows":[]}.\n\n` + KEY_NOTES;
+    `If the text clearly contains multiple seasons/teams, return multiple rows. If nothing is parseable, call the tool with an empty rows array.\n\n` + KEY_NOTES;
+
+  const tool = {
+    name: "emit_stats",
+    description: `Return the extracted ${category} stat rows in the ESM register schema.`,
+    input_schema: {
+      type: "object",
+      additionalProperties: false,
+      properties: { rows: { type: "array", items: rowSchema(keys) } },
+      required: ["rows"],
+    },
+  };
 
   let apiRes: Response;
   try {
@@ -89,8 +122,10 @@ Deno.serve(async (req) => {
       headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 1500,
+        max_tokens: 4096,
         system,
+        tools: [tool],
+        tool_choice: { type: "tool", name: "emit_stats" },
         messages: [{ role: "user", content: text }],
       }),
     });
@@ -99,19 +134,31 @@ Deno.serve(async (req) => {
   }
   if (!apiRes.ok) {
     const detail = await apiRes.text().catch(() => "");
+    console.error("parse-stats: Claude API non-OK", apiRes.status, detail.slice(0, 500));
     return json({ error: `Claude API error (${apiRes.status}). ${detail.slice(0, 300)}` }, 502);
   }
 
   const payload = await apiRes.json().catch(() => null);
-  const raw = payload?.content?.[0]?.text ?? "";
-  // Be tolerant: strip accidental code fences and grab the outermost JSON object.
+  const blocks: any[] = Array.isArray(payload?.content) ? payload.content : [];
+
+  // Primary path: the forced tool call. Its input is already schema-validated by the API.
   let parsed: any = null;
-  try {
-    const cleaned = String(raw).replace(/```json\s*|\s*```/g, "").trim();
-    const start = cleaned.indexOf("{"), end = cleaned.lastIndexOf("}");
-    parsed = JSON.parse(start >= 0 && end >= 0 ? cleaned.slice(start, end + 1) : cleaned);
-  } catch {
-    return json({ error: "The AI response wasn't valid JSON. Try again, or enter the stats manually." }, 502);
+  const toolBlock = blocks.find((b) => b?.type === "tool_use" && b?.name === "emit_stats");
+  if (toolBlock && toolBlock.input && typeof toolBlock.input === "object") {
+    parsed = toolBlock.input;
+  } else {
+    // Fallback: model returned a text block instead of calling the tool. Be tolerant —
+    // strip accidental code fences and grab the outermost JSON object.
+    const raw = blocks.filter((b) => b?.type === "text").map((b) => b.text).join("\n") || "";
+    try {
+      const cleaned = String(raw).replace(/```json\s*|```/g, "").trim();
+      const start = cleaned.indexOf("{"), end = cleaned.lastIndexOf("}");
+      parsed = JSON.parse(start >= 0 && end >= 0 ? cleaned.slice(start, end + 1) : cleaned);
+    } catch {
+      console.error("parse-stats: no tool_use block and text fallback failed to parse.",
+        "stop_reason=", payload?.stop_reason, "raw=", String(raw).slice(0, 500));
+      return json({ error: "The AI response wasn't valid JSON. Try again, or enter the stats manually." }, 502);
+    }
   }
 
   // 5) Sanitize: keep only allowed keys, coerce number vs string, drop empties. This is the
