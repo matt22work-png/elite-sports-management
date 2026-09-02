@@ -377,31 +377,37 @@
   /* Hero side-by-side: headline copy on the left, athlete photo filling the empty space on the right. */
   .hero-grid{display:flex;align-items:center;gap:28px}
   .hero-copy{flex:1 1 58%;min-width:0}
-  /* Hero athlete photo — ONLY the RIGHT edge (the outer edge nearest the page boundary, opposite
-     the headline text on the left) fades to transparent so the photo blends into the navy hero
-     background on that side. Left, top and bottom are left sharp/opaque like a normal photo — this
-     is a single-direction mask, not the previous 4-edge intersected fade. Applied to the <img>
-     only, so the caption pill stays fully opaque/readable. */
+  /* Hero athlete photo. The whole image is shown at its natural aspect ratio (no object-fit
+     crop) so the athlete is never cut off, and the RIGHT edge fades to transparent so the photo
+     dissolves into the navy hero background toward the page boundary. Left/top/bottom stay sharp.
+     The mask is on the <img> only, so the caption pill stays fully opaque/readable. */
   .hero-photo{flex:0 1 42%;position:relative;margin:0;line-height:0}
-  .hero-photo img{display:block;width:100%;height:auto;object-fit:cover;object-position:50% 45%;
-    -webkit-mask-image:linear-gradient(to right,#000 0,#000 72%,transparent 100%);
-    mask-image:linear-gradient(to right,#000 0,#000 72%,transparent 100%)}
+  .hero-photo img{display:block;width:100%;height:auto;
+    -webkit-mask-image:linear-gradient(to right,#000 0,#000 60%,transparent 100%);
+    mask-image:linear-gradient(to right,#000 0,#000 60%,transparent 100%)}
   .hero-photo figcaption{position:absolute;left:0;bottom:0;background:rgba(5,16,31,.72);color:#fff;font-size:12px;font-weight:600;line-height:1.3;padding:6px 12px;border-top-right-radius:10px;letter-spacing:.01em}
-  /* Mobile: no room for two columns — stack the photo below the headline, centered and a touch smaller. */
+  /* Mobile: no room for two columns — stack the photo below the headline, centered. Natural
+     ratio (height:auto) already shows the full image; the right fade is softened here since a
+     centered photo looks better without a strong one-sided cut. */
   @media(max-width:780px){
     .hero-grid{flex-direction:column;align-items:stretch;gap:0}
     .hero-copy{flex:1 1 auto}
-    .hero-photo{flex:1 1 auto;width:100%;max-width:440px;margin:30px auto 0;align-self:center}
+    .hero-photo{flex:1 1 auto;width:100%;max-width:460px;margin:22px auto 0;align-self:center}
+    .hero-photo img{-webkit-mask-image:linear-gradient(to right,#000 0,#000 82%,transparent 100%);
+      mask-image:linear-gradient(to right,#000 0,#000 82%,transparent 100%)}
   }
-  /* Desktop/laptop only: lift the hero photo to the TOP of the row so it sits up with the
-     headline, AND give it a taller fixed height so it fills the column next to the copy instead
-     of leaving a gap below (natural ratio was only ~282px vs a ~660px text column). object-fit:
-     cover keeps the athlete framed at the taller crop; the strengthened bottom mask melts the
-     lower edge into navy so any remaining space reads as background, not a dead gap. Mobile
-     (≤780px) keeps height:auto + align-self:center from the block above — untouched. */
+  /* Desktop/laptop: make the photo read like a large background/hero that bleeds off the RIGHT
+     edge of the page. It is absolutely positioned against .hero (a full-width, position:relative
+     section), so right:0 is the true viewport edge — the fade therefore dissolves at the page
+     boundary, not in the middle of a column. Natural aspect ratio (width set, height:auto) keeps
+     the athlete's proportions and shows the whole figure; the copy is constrained to the left
+     ~54% and raised above the photo so text never sits on the image. */
   @media(min-width:781px){
-    .hero-photo{align-self:flex-start}
-    .hero-photo img{height:clamp(460px,44vw,560px)}
+    .hero{overflow:hidden}
+    .hero-grid{position:static;min-height:clamp(420px,42vw,560px)}
+    .hero-copy{flex:0 0 54%;max-width:54%;position:relative;z-index:1}
+    .hero-photo{position:absolute;top:50%;right:0;transform:translateY(-50%);
+      width:min(48vw,780px);margin:0;z-index:0}
   }
   .tcard .qt{font-size:16.5px;line-height:1.7;color:#d6e1f2;font-style:italic}
   .tcard .nm{margin-top:14px;font-family:'Anton';letter-spacing:.09em;font-size:15px;color:var(--gold-soft);text-transform:uppercase}
@@ -1619,6 +1625,16 @@ function posCategory(p){
 }
 const slugify=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const bgImg=u=>u?`background-image:url('${u}')`:"";
+/* Player photo as a cover background with the per-player focal point + zoom set by the admin
+   (players.photo_pos_x/_y/_zoom). This is what keeps heads from being cropped on the fixed-height
+   cover boxes (roster card top, modal avatar): background-position moves the focal point and, when
+   zoom>1, background-size scales past cover. zoom==1 keeps the exact `cover` behaviour (no gaps). */
+const photoBg=p=>{
+  if(!p||!p.image)return "";
+  const x=(p.photo_pos_x??50),y=(p.photo_pos_y??35),z=(p.photo_zoom??1);
+  const size=z>1?`${Math.round(z*100)}%`:"cover";
+  return `background-image:url('${p.image}');background-position:${x}% ${y}%;background-size:${size}`;
+};
 /* Escape untrusted text before it goes into innerHTML. Roster/modal data comes from
    Supabase (and originally from the public application form), so player-supplied
    strings like name/position/bio must not be able to inject markup. */
@@ -1655,7 +1671,7 @@ function renderRoster(){
     const linkAttr=hasPage?`href="players/${encodeURIComponent(p.slug)}.html"`:`data-slug="${esc(p.slug)}"`;
     return `
     <${tag} class="pcard" ${linkAttr}>
-      <div class="top" style="${bgImg(p.image)}"><span class="flag">${flagImg(iso2For(p),"flagimg",displayCountry(p))}${p.heritage?flagImg(emojiToIso(p.heritage),"flagimg heritageimg",""):""}</span>
+      <div class="top" style="${photoBg(p)}"><span class="flag">${flagImg(iso2For(p),"flagimg",displayCountry(p))}${p.heritage?flagImg(emojiToIso(p.heritage),"flagimg heritageimg",""):""}</span>
         ${p.tier?`<span class="tier">${esc(p.tier)}</span>`:""}${p.image?"":`<span class="mono">${initials(p.name)}</span>`}</div>
       <div class="body"><h3 class="display">${esc(p.name)}</h3><div class="pos">${esc(p.position)}</div>
         ${levelLabel(p.level)?`<div class="lvl">${esc(levelLabel(p.level))}</div>`:""}
@@ -1835,7 +1851,7 @@ function openModal(slug){
   const p=PLAYERS.find(x=>x.slug===slug);if(!p)return;
   const meta=[p.born?("Born "+p.born):null,p.birthplace,p.bats?("Bats "+p.bats):null].filter(Boolean).join("  ·  ");
   document.getElementById("sheetContent").innerHTML=`
-    <div class="sh-top"><span class="sh-mono" style="${bgImg(p.image)}">${p.image?"":initials(p.name)}</span>
+    <div class="sh-top"><span class="sh-mono" style="${photoBg(p)}">${p.image?"":initials(p.name)}</span>
       <div><h3 class="display">${esc(p.name)} <span class="sh-flags">${flagImg(iso2For(p),"flagimg",displayCountry(p))}${p.heritage?flagImg(emojiToIso(p.heritage),"flagimg heritageimg",""):""}</span></h3>
       <div class="sh-pos">${esc(p.position)}${levelLabel(p.level)?` <span class="lvl">${esc(levelLabel(p.level))}</span>`:""}</div><div class="sh-meta">${esc(meta)}</div></div></div>
     <div class="sh-body"><p class="bio">${esc(p.bio)}</p>
@@ -2242,7 +2258,7 @@ async function boot(){
       // just the public display columns — NOT the intake PII (age/phone/email/instagram/
       // message) — so an approved athlete's contact details are never sent to the browser.
       const {data,error}=await SB.from("players")
-        .select("id,slug,name,group,position,country,flag,heritage,born,birthplace,tier,bats,bio,teams,stats,season_stats,image_url,sport,level,sort_order")
+        .select("id,slug,name,group,position,country,flag,heritage,born,birthplace,tier,bats,bio,teams,stats,season_stats,image_url,photo_pos_x,photo_pos_y,photo_zoom,sport,level,sort_order")
         .eq("status","approved").order("sort_order");
       if(error)throw error;
       // Supabase stores the photo in `image_url`; the renderer reads `image`.

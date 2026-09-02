@@ -462,7 +462,7 @@ async function loadMe(session){
   $("profile").innerHTML = `
     <div class="card">
       <div class="p-head">
-        <span class="avatar" ${p.image_url ? `style="background-image:url('${esc(p.image_url)}')"` : ""}>${p.image_url ? "" : esc(initials(p.name))}</span>
+        <span class="avatar" ${p.image_url ? `style="background-image:url('${esc(p.image_url)}');background-position:${(p.photo_pos_x??50)}% ${(p.photo_pos_y??35)}%;background-size:${(p.photo_zoom??1)>1?Math.round((p.photo_zoom)*100)+'%':'cover'}"` : ""}>${p.image_url ? "" : esc(initials(p.name))}</span>
         <div style="flex:1">
           <h2 class="display">${esc(p.name)}</h2>
           <div class="pos">${esc(p.position || p.group || "")} ${flagImg(iso2For(p), p.country)}</div>

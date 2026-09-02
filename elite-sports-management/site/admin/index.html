@@ -43,6 +43,16 @@
   .avatar{width:52px;height:52px;flex:none;border-radius:50%;border:1.5px solid rgba(217,177,84,.4);display:grid;place-items:center;font-family:'Anton';font-size:18px;color:var(--gold);background:rgba(6,20,42,.5);background-size:cover;background-position:center}
   .p-head h3{font-size:16px}
   .p-head .pos{color:var(--gold-soft);font-size:13px;font-weight:700}
+  /* Per-player photo position/zoom adjuster. The stage mirrors the roster card's cover box
+     (wide, fixed height) so what Sam frames here is exactly how the photo appears publicly. */
+  .cropper{margin:8px 0 4px}
+  .crop-stage{width:100%;max-width:320px;aspect-ratio:16/9;border-radius:12px;border:1px solid var(--line);
+    background-color:#04101f;background-repeat:no-repeat;background-size:cover;background-position:center;
+    cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+  .crop-stage:active{cursor:grabbing}
+  .crop-note{font-size:12px;color:var(--muted);margin:6px 0 8px;max-width:360px}
+  .crop-ctl{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink);margin:6px 0;max-width:360px}
+  .crop-ctl input[type=range]{flex:1;accent-color:var(--gold)}
   .chip{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
   .chip.pending{color:var(--gold-soft)}
   .chip.approved{color:var(--teal);border-color:rgba(46,196,182,.4)}
@@ -755,9 +765,18 @@ function render(){
   bindActions();
 }
 
+// Inline background style for a player photo honouring the per-player focal point + zoom
+// (players.photo_pos_x/_y/_zoom). Shared by the card avatar and the crop preview so what Sam
+// sees while adjusting matches the roster. zoom==1 keeps plain `cover`.
+function photoStyle(p){
+  if(!p||!p.image_url)return "";
+  const x=(p.photo_pos_x??50),y=(p.photo_pos_y??35),z=(p.photo_zoom??1);
+  const size=z>1?`${Math.round(z*100)}%`:"cover";
+  return `background-image:url('${esc(p.image_url)}');background-position:${x}% ${y}%;background-size:${size}`;
+}
 function avatar(p){
   return p.image_url
-    ? `<span class="avatar" style="background-image:url('${esc(p.image_url)}')"></span>`
+    ? `<span class="avatar" style="${photoStyle(p)}"></span>`
     : `<span class="avatar">${esc(initials(p.name))}</span>`;
 }
 
@@ -860,8 +879,31 @@ function cardPlayer(p){
       <button class="btn btn-red" data-delete="${p.id}">🗑 Delete</button>
     </div>
     <div class="editor" id="ed-${p.id}">
+      ${!p.owner_id ? `
+      <div class="sub">🔑 Login account</div>
+      <div class="field" style="border:1px solid var(--line);border-radius:12px;padding:12px;background:rgba(217,177,84,.05)">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:8px">This player has <b>no login account</b> yet, so the “Set email / Set password” controls in the Accounts tab have nothing to act on. Create one to enable them (a temp password is set; use “Set password” afterwards).</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input type="email" data-la-email="${p.id}" value="${esc(p.email||"")}" placeholder="Login email" autocomplete="off" spellcheck="false" aria-label="Login email for ${esc(p.name)}" style="flex:1;min-width:180px;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--ink);font-size:14px;font-family:inherit" />
+          <button class="btn btn-gold" type="button" data-la-create="${p.id}">Create login account</button>
+        </div>
+        <div class="msg" data-la-msg="${p.id}" role="alert" aria-live="assertive" style="margin-top:6px"></div>
+      </div>` : ""}
       <div class="sub">Photo</div>
       <input type="file" accept="image/*" data-photo="${p.id}" aria-label="Upload photo for ${esc(p.name)}" />
+      ${p.image_url ? `
+      <div class="cropper" data-cropper="${p.id}">
+        <div class="crop-stage" data-crop-view="${p.id}" style="${photoStyle(p)}" title="Drag to reposition the photo" role="img" aria-label="Photo position preview for ${esc(p.name)} — drag to reposition"></div>
+        <div class="crop-note">Drag the photo to reposition, or use the sliders. This is how the photo is framed on the roster card &amp; profile — use it so heads aren’t cut off.</div>
+        <label class="crop-ctl">Up / down<input type="range" min="0" max="100" step="1" value="${p.photo_pos_y??35}" data-crop-y="${p.id}" aria-label="Vertical position"></label>
+        <label class="crop-ctl">Left / right<input type="range" min="0" max="100" step="1" value="${p.photo_pos_x??50}" data-crop-x="${p.id}" aria-label="Horizontal position"></label>
+        <label class="crop-ctl">Zoom<input type="range" min="1" max="3" step="0.05" value="${p.photo_zoom??1}" data-crop-z="${p.id}" aria-label="Zoom"></label>
+        <div class="row-btns">
+          <button class="btn btn-ghost" type="button" data-crop-reset="${p.id}">Reset</button>
+          <button class="btn btn-gold" type="button" data-crop-save="${p.id}">Save position</button>
+        </div>
+        <div class="msg" data-crop-msg="${p.id}" role="alert" aria-live="polite"></div>
+      </div>` : `<div class="crop-note">Upload a photo to enable position &amp; zoom adjustment.</div>`}
 
       <div class="sub">Profile</div>
       <div class="field"><label>Full name</label><input class="pf-name" data-id="${p.id}" value="${esc(p.name||"")}" placeholder="Full name" aria-label="Full name" /></div>
@@ -1134,6 +1176,84 @@ function bindActions(){
     toast("Photo uploaded ✓");
     await load();
     $("ed-" + id)?.classList.add("open");
+  });
+  // Create a login account for an existing roster player that has none (owner_id null). Uses the
+  // admin-link-player-account Edge Function (service-role Admin API) — same secure pattern as
+  // "Add player". Systemic: works for any such player (legacy rows, approved public applicants),
+  // not a per-player special case.
+  document.querySelectorAll("[data-la-create]").forEach(b => b.onclick = async () => {
+    const id = +b.dataset.laCreate;
+    const msg = document.querySelector(`[data-la-msg="${id}"]`);
+    const email = (document.querySelector(`[data-la-email="${id}"]`)?.value || "").trim();
+    const setMsg = (t, ok) => { if (msg){ msg.textContent = t; msg.classList.remove("ok","err","show"); msg.classList.add("show", ok ? "ok" : "err"); } };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ setMsg("Enter a valid login email first.", false); return; }
+    b.disabled = true; setMsg("Creating account…", true);
+    const { data, error } = await SB.functions.invoke("admin-link-player-account", { body: { player_id: id, email } });
+    let detail = null;
+    if (error){ detail = error.message; try { const j = await error.context.json(); if (j && j.error) detail = j.error; } catch (e) {} }
+    else if (data && data.error){ detail = data.error; }
+    b.disabled = false;
+    if (detail){ setMsg("Failed: " + detail, false); return; }
+    toast("Login account created ✓ — now set their password via “Set password”.");
+    await load();
+    $("ed-" + id)?.classList.add("open");
+  });
+  wireCroppers();
+}
+
+/* Per-player photo position/zoom adjuster. Drag the preview (or use the sliders) to set the
+   focal point + zoom, then Save writes players.photo_pos_x/_y/_zoom. Those values are read by
+   every surface that shows the photo in a cover box (roster card, modal, portal, admin avatar),
+   so the saved framing is respected everywhere — this is what stops heads being cropped. */
+function wireCroppers(){
+  const clamp = v => Math.max(0, Math.min(100, v));
+  document.querySelectorAll("[data-cropper]").forEach(box => {
+    const id = +box.dataset.cropper;
+    const p = PLAYERS.find(x => x.id === id); if (!p) return;
+    const view = box.querySelector("[data-crop-view]");
+    const rx = box.querySelector("[data-crop-x]"), ry = box.querySelector("[data-crop-y]"), rz = box.querySelector("[data-crop-z]");
+    const msg = box.querySelector("[data-crop-msg]");
+    const st = { x: p.photo_pos_x ?? 50, y: p.photo_pos_y ?? 35, z: p.photo_zoom ?? 1 };
+    const apply = () => {
+      view.style.backgroundPosition = `${st.x}% ${st.y}%`;
+      view.style.backgroundSize = st.z > 1 ? `${Math.round(st.z * 100)}%` : "cover";
+    };
+    rx.oninput = () => { st.x = clamp(+rx.value); apply(); };
+    ry.oninput = () => { st.y = clamp(+ry.value); apply(); };
+    rz.oninput = () => { st.z = Math.max(1, Math.min(3, +rz.value)); apply(); };
+    // Drag-to-reposition: moving the photo down/right reveals its top/left, so the focal point
+    // (background-position) moves the opposite way — feels like physically dragging the image.
+    let drag = null;
+    view.addEventListener("pointerdown", e => {
+      drag = { sx: e.clientX, sy: e.clientY, ox: st.x, oy: st.y, w: view.clientWidth || 1, h: view.clientHeight || 1 };
+      try { view.setPointerCapture(e.pointerId); } catch (_) {}
+      e.preventDefault();
+    });
+    view.addEventListener("pointermove", e => {
+      if (!drag) return;
+      const dx = (e.clientX - drag.sx) / drag.w * 100, dy = (e.clientY - drag.sy) / drag.h * 100;
+      st.x = clamp(drag.ox - dx); st.y = clamp(drag.oy - dy);
+      rx.value = Math.round(st.x); ry.value = Math.round(st.y); apply();
+    });
+    const end = e => { if (drag) { try { view.releasePointerCapture(e.pointerId); } catch (_) {} } drag = null; };
+    view.addEventListener("pointerup", end);
+    view.addEventListener("pointercancel", end);
+    box.querySelector("[data-crop-reset]").onclick = () => {
+      st.x = 50; st.y = 35; st.z = 1; rx.value = 50; ry.value = 35; rz.value = 1; apply();
+    };
+    box.querySelector("[data-crop-save]").onclick = async ev => {
+      const b = ev.currentTarget; b.disabled = true;
+      if (msg) { msg.classList.remove("show", "ok", "err"); msg.textContent = ""; }
+      const patch = { photo_pos_x: Math.round(st.x), photo_pos_y: Math.round(st.y), photo_zoom: Math.round(st.z * 100) / 100 };
+      const { error } = await SB.from("players").update(patch).eq("id", id);
+      b.disabled = false;
+      if (error) { toast("Position save failed: " + error.message, true); if (msg) { msg.textContent = error.message; msg.classList.add("show", "err"); } return; }
+      Object.assign(p, patch);   // keep local roster in sync (no full reload = editor stays open)
+      const av = box.closest(".card")?.querySelector(".avatar");
+      if (av) { av.style.backgroundPosition = `${patch.photo_pos_x}% ${patch.photo_pos_y}%`; av.style.backgroundSize = patch.photo_zoom > 1 ? Math.round(patch.photo_zoom * 100) + "%" : "cover"; }
+      toast("Photo position saved ✓");
+      if (msg) { msg.textContent = "Saved ✓ — this framing now applies everywhere the photo is shown."; msg.classList.add("show", "ok"); }
+    };
   });
 }
 
