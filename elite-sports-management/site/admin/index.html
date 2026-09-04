@@ -1066,15 +1066,27 @@ function bindActions(){
     const ed = $("ed-" + b.dataset.edit); ed.classList.toggle("open");
     if (ed.classList.contains("open")) loadBbref(+b.dataset.edit);   // lazy-load the register on first open
   });
+  // Permanent, full deletion. Runs through the admin-delete-player Edge Function (service-role), which
+  // is the ONLY way to fully clean up: it removes the players row (cascading stats + internal notes),
+  // the linked login account (auth.users → cascades profiles), AND the uploaded files (photo, resume/CV,
+  // English cert, diploma) — none of which the browser can delete on its own. This is destructive and
+  // irreversible: to merely hide a player from the public roster instead, use Archive.
   document.querySelectorAll("[data-delete]").forEach(b => b.onclick = async () => {
     const id = +b.dataset.delete;
     const p = PLAYERS.find(x => x.id === id);
-    if (!confirm(`Permanently delete ${p?.name || "this player"}?\n\nThis removes their profile and internal notes for good. This cannot be undone. To hide them instead, use Archive.`)) return;
-    b.disabled = true;
-    const { error } = await SB.from("players").delete().eq("id", id);
+    const name = p?.name || "this player";
+    if (!confirm(`⚠️ Permanently DELETE ${name}?\n\nThis is NOT the same as Reject or Archive (which just hide the player). Delete removes EVERYTHING for good:\n\n • their roster profile, stats & internal notes\n • their login account, if they have one\n • their uploaded photo and any documents (resume/CV, certificates, diploma)\n\nThis CANNOT be undone. To simply hide them from the public roster instead, cancel and use Archive.`)) return;
+    // Second confirm — this is irreversible, so make the admin type the exact name.
+    const typed = prompt(`To confirm permanent deletion, type the player's name exactly:\n\n${name}`);
+    if (typed === null) return;                       // cancelled
+    if (typed.trim() !== name.trim()) { toast("Name didn't match — deletion cancelled.", true); return; }
+    b.disabled = true; toast("Deleting " + name + "…");
+    const { data, error } = await SB.functions.invoke("admin-delete-player", { body: { player_id: id } });
     b.disabled = false;
-    if (error){ toast("Delete failed: " + error.message, true); return; }
-    toast("Player deleted");
+    if (error || data?.error){ toast("Delete failed: " + (data?.error || error.message), true); return; }
+    const warns = Array.isArray(data?.warnings) ? data.warnings : [];
+    toast(warns.length ? `Player deleted (with ${warns.length} warning${warns.length>1?"s":""}) — see console` : `${name} permanently deleted ✓`);
+    if (warns.length) console.warn("admin-delete-player warnings:", warns);
     await load();
   });
   document.querySelectorAll("[data-savenote]").forEach(b => b.onclick = async () => {
