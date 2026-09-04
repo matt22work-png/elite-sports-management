@@ -27,3 +27,10 @@ alter table public.players
 comment on column public.players.photo_pos_x is 'Focal point X% (0-100) for background-position in a cover box.';
 comment on column public.players.photo_pos_y is 'Focal point Y% (0-100). Lower = more of the top (head). Default 35 biases toward heads.';
 comment on column public.players.photo_zoom  is 'Zoom factor (1-4). >1 => background-size scales past cover; 1 = plain cover.';
+
+-- CRITICAL: anon SELECT is COLUMN-SCOPED (see supabase-harden-players-columns.sql), so a brand-new
+-- column is NOT readable by anon just because RLS "read approved players" allows the row. The public
+-- roster query selects these three columns, so without this grant the WHOLE query fails for anon with
+-- 42501 (permission denied) and the site silently falls back to its embedded seed roster — i.e. new
+-- players stop appearing. Grant SELECT on each new column, exactly like season_stats does.
+grant select (photo_pos_x, photo_pos_y, photo_zoom) on public.players to anon;
