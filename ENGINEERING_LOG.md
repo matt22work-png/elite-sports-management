@@ -1252,3 +1252,173 @@ Did NOT trust prior "done" notes — re-ran everything against the LIVE site + l
 - **NEW: `GMAIL_APP_PASSWORD`** Edge secret is NOT set — so **submission/registration notification emails are not being delivered** (function no-ops gracefully). Sam may believe he's getting new-signup emails; he isn't until this secret is added. Flagging as a genuinely new item.
 
 **Regression checks:** self-registered players unaffected (untouched flow); v2 roster gate consistent on homepage + player pages; EN/ES/IT all clean; desktop vs mobile hero both fine; no console errors introduced (admin + index inline scripts pass `node --check`).
+
+---
+
+## Homepage redesign — inventory
+*(branch `homepage-redesign`, 2026-09-06. Phase 1 of the visual-redesign brief. This is the
+checklist Phase 3 verifies against — anything not listed here cannot be silently lost.)*
+
+Scope of the redesign: `site/index.html` ONLY (+ `sw.js` cache bump). `register/`, `scout/`,
+`portal/`, `admin/`, `tenerife/`, `players/*.html`, `terms.html`, `privacy/` and the page
+generators are out of scope and must not change.
+
+### A. Sections in document order (with their i18n keys)
+
+| # | Section / element | Anchor | i18n keys |
+|---|---|---|---|
+| 1 | `<header class="nav">` — logo, 6 nav links, EN/ES/IT switch, Sign In `<details>` (4 links), Apply Now CTA | — | `nav_about` `nav_who` `nav_college` `nav_roster` `nav_events` `nav_join` `nav_signin` `nav_signin_create` `nav_signin_player` `nav_signin_scout` `nav_signin_admin` `nav_cta` (+ `nav_myprofile` swapped in by JS) |
+| 2 | `<section class="hero">` — eyebrow, stacked `<h1>` (gold `<em>`), lead, 2 CTA buttons, Arath Zapien `<figure class="hero-photo">` + figcaption | `#top` | `hero_eyebrow` `hero_h1` (html) `hero_lead` `hero_btn1` `hero_btn2` |
+| 3 | `<section class="contracts">` — "50+ contracts signed" headline, sub, rule, featured José Cedeño testimonial card (`#featQuote`), top "See all testimonials" button (`#testiAllTop`, JS-shown) | — | `contracts_h2` (html) `contracts_sub` (html) `feat_role` `testi_seeall` |
+| 4 | `<div class="stats">` — 2 stat tiles: `#statAthletes` = 19, `#statCountries` = 7 (hardcoded in HTML, NOT derived from the roster) | — | `stat1` `stat2` |
+| 5 | What We Do — 5 service cards (College, Professional Leagues, Softball, Social/Branding, Representation & Development w/ 5 bullets + highlight box) | `#about` | `about_kicker` `about_h2` `about_p` `svc1_t/_d/_pay` `svc_pro_t/_d/_pay` `so_t/_d/_pay` `svc4_t/_d` `svc5_t/_d/_b1..b5/_hl_t/_hl_d` |
+| 6 | College Placement — 6 numbered rows (01–06) + CTA card (`#collegePayBtn`) | `#college` | `col_kicker` `col_h2` `col_p` `col_1`..`col_6` `col_cta_h` `col_cta_p` `col_cta_btn` |
+| 7 | Who I Am — Samuele Bruno founder card, Supabase-hosted photo, role, 2 bio paras, 8 credential pills, "Contact Him" mailto | `#who` | `who_kicker` `who_role` `who_bio` `who_bio2` `cred_italy` `cred_u18` `cred_cbl` `cred_pro` `cred_college` `cred_hastings` `cred_cod` `cred_ecc` `sam_contact` |
+| 8 | Roster — unlocked note, sport filters (`#sportFilters`), position filters (`#filters`), `.roster-wrap.is-locked` + `#rosterList` + `.gate` (lock, code form, "need a code" mailto, error) | `#roster` | `roster_kicker` `roster_h2` `roster_p` `gate_unlocked` `gate_h` `gate_p` `gate_or` `gate_ph` `gate_aria` `gate_unlock` `gate_need` `gate_err` (+ JS: `filter_*`, `card_view`, `roster_empty`, `level_*`) |
+| 9 | Events — `#eventsList`, rendered from the `EVENTS` const (2 entries: Tenerife Winter League 2026 upcoming, Tenerife 2025 Edition past+media) | `#events` | `events_kicker` `events_h2` `events_p` (+ JS: `ev_upcoming` `ev_past` `ev_register` `ev_gallery`) |
+| 10 | Testimonials — `#testiList` grid + bottom "See all" button (`#testiAll`) | `#testi` | `testi_kicker` `testi_h2` `testi_p` `testi_seeall` (+ `testi_all_h` in the modal) |
+| 11 | Create Your Profile — includes list, two price tiers (€129.99 / €149.99), T&C checkbox `#profileTc` + `#profileTcErr`, access note | `#profile` | `pg_kicker` `pg_h2` `pg_p2` `pg_h` `pg_p` `pg_i1..i4` `pg_t1_name/_desc/_btn` `pg_t2_name/_desc/_btn` `pg_price_note` `tc_label` `tc_more` `tc_required` `pg_access` |
+| 12 | Join Us — tagline, pitch, `#applyForm` (category select + 3 field sets + honeypot + T&C `#joinTc` + submit + `#formMsg`) | `#join` | `join_kicker` `join_h2` `join_p` `join_tagline` `join_pitch` `f_applying` `opt_*` `f_*` `pos_*` `tc_label` `tc_more` `f_submit` |
+| 13 | Closing band | — | `band_h2` `band_p` `band_btn` |
+| 14 | Footer — logo, © + year (`#yr`), Admin link, Instagram pill, email pill, CeasAI credit block (logo + 3 social icons) | — | `foot_rights` `admin_link` `ceasai_cta` `ceasai_ig` `ceasai_email` `ceasai_tiktok` |
+| 15 | Shared `#modal` sheet (player / event / testimonials / lightbox) + `#install` PWA prompt | — | `install_t` `install_d` `install_btn` `modal_*` |
+| 16 | Cookie banner + Privacy/Terms footer links — injected by `/esm-legal.js` (own EN/ES/IT dict, reacts to `[data-l]` clicks) | — | *(in esm-legal.js)* |
+
+**NOT on the homepage** (checked): there is no Collaborators section. The `#collab`
+cover-to-reveal card (Marianna Zumerle) was deleted on Sam's instruction in an earlier session
+(see the Collaborators entries earlier in this log) — nothing to preserve.
+
+### B. Interactive behaviours and their implementations
+
+| Behaviour | Implementation |
+|---|---|
+| i18n switching | `T` dict (en/es/it) then `t(k)` then `applyI18n()` handles `data-i18n`, `-html`, `-aria`, `-ph`; `setLang(l)` persists `esm_lang` and re-runs `renderSportFilters/renderFilters/renderRoster/renderEvents/renderTesti` |
+| Roster fetch | `boot()` dynamic `import("https://esm.sh/@supabase/supabase-js@2")`, `createClient(..., {auth:{persistSession:false,…}})`, `players` select (18 public cols) `.eq("status","approved").order("sort_order")`; maps `image_url` to `image`. Falls back to the embedded `PLAYERS` seed on error |
+| Roster gate | `UNLOCK_KEY`/`MASTER_CODE_KEY` localStorage, `getUnlock/isUnlocked/applyLockState/unlockRoster/lockRoster/revalidateUnlock`, `#gateForm` submit: `sha256Hex` vs `ROSTER_CODE_HASHES`, then cached master code, then `verify_roster_code` RPC. Master code cached by `get_roster_code()` RPC in `boot()` |
+| Roster filters | `renderSportFilters()` (All/Baseball/Softball) + `renderFilters()` (All/Pitcher/Catcher/Infielder/Outfielder/Two-Way), `posCategory(p)` tolerant matcher, `renderRoster()` |
+| Player card to page or modal | `STATIC_PLAYER_PAGES` set decides `<a href="players/slug.html">` vs `<button data-slug>` then `openModal(slug)` |
+| Player modal | `openModal()` + `seasonStatsHTML()` + `loadPublicBbref()` (uses `bbref-stats.js` / `BBREF`) |
+| Events | `renderEvents()`, `openEventModal(i)` (video reel + `GALLERY` photos), `openLightbox()` |
+| Testimonials | `renderTesti()` (featured `#featQuote` from `TESTIMONIALS[0]`, grid from `DB_TESTI` with embedded fallback), `openTestiModal()` wired to both `#testiAll` and `#testiAllTop` |
+| Profile tier CTAs | IIFE on `.pc-tier-cta`: blocks unless `#profileTc` checked, stashes `esm_reg_tier` in localStorage, then `href="register/"` |
+| Application form — category switching | `applyCat(v)` to `rep` / `college` / `teams`; `updateApplyFields()` toggles `hidden` on every `.af[data-cats]`; wired to `applyingSelect` change + called once at load |
+| Application form — service deep-links | `wireServiceSignups()` — `.svc-signup[data-svc]` presets `#applyingSelect` |
+| Application form — upload validation | `MAX_UPLOAD` 10 MB, `IMG_TYPES`, `PDF_TYPE`, `fileError(file,kind)`, `uploadApplicationFile(bucket,key,label,file)` to `application-photos` (public) / `application-docs` (private) |
+| Application form — submit | honeypot `company` + 1.5 s time trap, `#joinTc` required, `SB` required, per-category `REQ` list, `markInvalid`, uploads, row build, `SB.from("players").insert(row)` |
+| Mailto wiring | `wirePayButtons()` — every `[data-mail]` gets `CONTACT_MAILTO` + optional `data-subject`/`data-body`; `#collegePayBtn` gets `STRIPE_COLLEGE_URL || "#join"` |
+| Sign In dropdown | native `<details id="signin">` + outside-click / Escape close IIFE |
+| Auth reflection in nav | `reflectAuthInNav()` IIFE — finds an `sb-*-auth-token` in localStorage and swaps `nav_signin` for `nav_myprofile` |
+| Modal close | `[data-close]` clicks + Escape, `closeModal()` |
+| PWA install prompt | `beforeinstallprompt`, `#install` banner, `#installBtn`, `#installX` |
+| Service worker | registered on `load` from `sw.js` |
+| Pull-to-refresh | standalone-only IIFE (touchstart/move/end, 70 px threshold, `reg.update()` then reload) |
+| Cookie banner | `/esm-legal.js` — one-time dismissible notice + Privacy/Terms footer links, re-renders on `[data-l]` clicks |
+
+### C. Assets referenced
+
+| Asset | Used by |
+|---|---|
+| `logo.png` | nav brand (40 px) + footer brand (64 px) |
+| `assets/arath-zapien.jpg` | hero photo (`.hero-photo img`, dual-edge CSS mask fade, `onerror` self-hides) |
+| `ceasai-logo.jpeg` | footer CeasAI credit block |
+| `og-image.png` | `og:image` / `twitter:image` meta |
+| `icons/icon-192.png`, `icon-512.png`, `apple-touch-icon.png` | favicons + PWA (also precached by `sw.js`) |
+| `manifest.json` | PWA manifest |
+| `media/photos/jose-cedeno-thumb.jpg` | featured testimonial card `.shot` + `TESTIMONIALS[0].photo` |
+| `media/photos/twl-field-aerial-thumb.jpg`, `twl-champions-thumb.jpg` | event card images |
+| `media/photos/*.jpg` + `*-thumb.jpg` (12 in `GALLERY`) | event modal gallery + lightbox |
+| `media/video/clip-1..9.mp4` + `clip-N-poster.jpg` | event modal video reel |
+| `media/photos/jose-cedeno.jpg` | `LOCAL_PHOTOS` roster fallback photo |
+| Supabase `player-photos/founder/sam.jpeg` | `#founderPhoto` |
+| `https://flagcdn.com/<iso>.svg` | all country flags (`flagImg()`) |
+| `bbref-stats.js`, `/esm-legal.js` | external scripts |
+| Google Fonts — Anton + Hanken Grotesk | typography |
+
+### D. Phase 2 — what changed (branch `homepage-redesign`)
+
+Files touched: `site/index.html`, `site/sw.js` (cache `esm-v16` → `esm-v17`), plus this log.
+Nothing under `register/`, `scout/`, `portal/`, `admin/`, `tenerife/`, `players/`, `privacy/`,
+`terms.html` or the generators was modified. `esm-legal.js` was NOT changed — the new
+multi-column footer keeps `<footer>` as the injection target, so its Privacy · Terms row
+still appends underneath.
+
+- **Nav** — compact uppercase links / Sign In / Apply Now. Same items, same destinations.
+- **Hero** — three-zone at ≥1200px: copy (col 1) · Arath Zapien photo (col 2, spanning into
+  col 3 at 75% of that span) · JOIN card (col 3, `z-index:2` over the photo). Below 1200px
+  everything stacks: copy → photo → full-width card. Photo masks untouched (40/60 desktop,
+  18/82 stacked).
+- **JOIN panel** — the whole former `#join` section (kicker, h2, lead, tagline, pitch and the
+  application form) moved into a card beside the hero and became a 4-step form with a
+  numbered indicator. `id="join"` moved with it, so all 9 existing `href="#join"` links still
+  resolve. The old bottom section was removed (its content is not duplicated).
+  Steps: 1 category + contact · 2 athlete details · 3 documents · 4 goals + terms + submit.
+- **Roster cards** — 212px photo, position as a gold badge reordered above the name via
+  CSS `order:-1` (DOM order untouched), name, level badge, country + flagcdn flag,
+  affiliation, uppercase "view profile".
+- **Sections** — larger uppercase titles, more spacing, alternating navy bands on
+  `#college` / `#roster` / `#testi`.
+- **Testimonials** — bigger quote mark, roomier quote cards. Featured José Cedeño card and
+  both "See all testimonials" buttons unchanged.
+- **Footer** — three columns (brand + © + Admin · quick links · contact). The quick-links
+  column re-uses the six existing nav anchors and their existing i18n keys.
+- **New i18n keys (6, EN/ES/IT)** — `step_1_t`…`step_4_t`, `step_back`, `step_next`.
+  Submit reuses `f_submit`; step gating reuses `f_err_required` / `tc_required`.
+
+### E. Bugs found on `main` and fixed here
+
+1. **`[hidden]` never worked on the application form.** `updateApplyFields()` set
+   `el.hidden = true` correctly, but `.field{display:flex}` / `.af-row{display:grid}` are
+   author rules and beat the UA `[hidden]{display:none}`. Result: **every category's fields
+   rendered at once on the live homepage** — College and Teams & Scouts fields were visible
+   while "Baseball Representation" was selected. Fixed with `[hidden]{display:none!important}`.
+   (Reproduced on `main` under Playwright before changing anything.)
+2. **Public applications could not be submitted at all.** `uploadApplicationFile()` passed
+   `upsert:true`; that sends `x-upsert`, which makes Supabase Storage require an UPDATE
+   policy on `storage.objects` in addition to INSERT. `anon` has only the INSERT policies
+   (`public can upload application photos` / `...docs`), so every upload returned
+   403 `new row violates row-level security policy` and the submit handler fell into the
+   generic "something went wrong" branch. Since a photo is a required field for **every**
+   category, no application could be filed. Verified by direct anon REST calls:
+   `x-upsert: true` → 400/403, without it → 200, on both buckets. Reproduced identically on
+   `main`, so it predates the redesign. Fixed by dropping `upsert` (the upload key already
+   carries `Date.now().toString(36)`, so objects never collide). Deliberately NOT fixed by
+   granting anon UPDATE, which would loosen production RLS.
+3. **Service-card deep links never switched the field set.** `wireServiceSignups()` set
+   `sel.value` without firing `change`, so `updateApplyFields()` never ran. Now calls
+   `goToStep(1)`, which re-renders the field set for the chosen category.
+4. **Roster cards misaligned.** A player without a static profile page renders as a
+   `<button>`, and Chrome vertically centres a stretched button's content, so a card with
+   fewer lines floated its photo down. Fixed by making `.pcard` an explicit flex column.
+5. **Empty position badge.** An athlete with no `position` rendered an empty pill; now
+   hidden with `.pcard .pos:empty`.
+6. **Narrow-phone overflow at ~320px** (pre-existing: `main` scrolled to 361px, this branch
+   to 339px before the fix). Phone-code column and the long email pill now collapse.
+
+### F. Phase 3 — verification results
+
+Tooling: Playwright (Chromium 1234) against a local static server, live Supabase.
+
+| Check | Result |
+|---|---|
+| `validate_i18n.mjs` | **0 hard problems** (236 EN keys, 160 used; only pre-existing LEN-FLAG advisories). All inline scripts parse. |
+| Automated suite | **50/50 pass, 0 console errors** |
+| Roster source | Live Supabase — 27 approved players, all carrying DB ids (the embedded seed is 19 and has none) |
+| Roster gate | Locks on a fresh visit · wrong code errors and stays locked · live master code from `get_roster_code()` unlocks · `lockRoster()` re-locks · locked gate card stays inside the roster wrap at 1366 and 390 |
+| Filters | Sport filters partition the roster exactly (27 = 27 Baseball + 0 Softball) · position filter narrows (10 Pitchers of 27) |
+| Form field sets | All 4 categories × 4 steps show **exactly** the expected field list — 16 assertions |
+| Step gating | Empty step refuses to advance, shows `f_err_required`, red-borders the field (all 4 categories) |
+| Upload validation | Non-PDF resume → `f_err_pdf` · >10 MB → `f_err_size` · GIF → `f_err_img` · valid JPG accepted · a JPG uploaded as the resume blocks step 3 in the real UI |
+| T&C gating | Submit blocked with `tc_required` until `#joinTc` is checked |
+| **Real submission** | College Placement submitted end to end with photo + resume + English certificate + diploma → row id 132 landed in `public.players` (status `pending`) with every step's field mapped correctly → **deleted afterwards** (0 test rows remain; 28 players, 27 approved) |
+| i18n | EN/ES/IT switch sets `documentElement.lang`, translates step titles, Back/Next/Submit, filters, footer nav; cookie banner re-renders |
+| Other behaviours | Service-card deep link · testimonials modal · Escape close · event modal (video reel + gallery) · Sign In dropdown · `#join` anchor · hero mask fades verified byte-exact at 1366/900/390 |
+| Layout | 1366 / 1440 / 1920 / 390 × EN/ES/IT: no card↔copy overlap, no card↔headline overlap, no empty footer columns |
+| Horizontal overflow | Swept 320/344/360/390/430/768/1024/1200/1366/1440/1920 × EN/ES/IT — **none** |
+| Palette | No red anywhere; navy/gold/teal only |
+
+**Left for manual cleanup:** six ~200-byte test objects remain in Supabase Storage
+(`application-photos/zz-diag-*`, `application-photos/college-placement-mtq6ws9f/`,
+`application-docs/zz-diag-*`, `application-docs/college-placement-mtq6ws9f/`). Postgres blocks
+`delete from storage.objects` (`storage.protect_delete()`), and no service-role key is
+available locally, so they need deleting from the Supabase dashboard's Storage browser.
+The `players` row they belonged to is already deleted, so nothing references them.
