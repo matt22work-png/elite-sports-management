@@ -499,188 +499,489 @@
   .col-cta h3{font-family:'Anton';text-transform:uppercase;letter-spacing:.05em;font-size:20px;margin-bottom:8px}
   .col-cta p{color:var(--muted);font-size:14px;margin-bottom:16px}
   .col-price{font-family:'Anton';font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:16px}
+
   /* ======================================================================
-     2026-09 HOMEPAGE REDESIGN — presentation layer.
-     Appended last so it overrides the rules above without rewriting them
-     (the originals stay readable as the "before" state). Palette is strictly
-     the existing navy / gold / teal set — the mockup's red is not used.
+     2026-09 HOMEPAGE REDESIGN — ROUND 2 (light theme, mockup-matched)
+     Reference: site/design/homepage-mockup.jpg
+     Appended last so it overrides everything above without rewriting it.
+     The page is now LIGHT: white / #f4f5f7 bands with navy text. Navy is kept
+     only for the nav, the hero band, athlete cards, the services card, the JOIN
+     card header, the closing band and the footer. Palette is navy/gold/teal —
+     every red in the mockup is rendered in --gold.
      ====================================================================== */
 
-  /* The HTML `hidden` attribute only maps to `display:none` in the UA sheet, so ANY
-     author `display` rule beats it. `.field{display:flex}` and `.af-row{display:grid}`
-     were silently defeating updateApplyFields(), which is why every category's fields
-     rendered at once. The step machinery relies on `hidden` too, so make it authoritative. */
-  [hidden]{display:none!important}
+  :root{
+    --paper:#ffffff; --paper-2:#f4f5f7; --line-2:#e5e7eb; --field-line:#d7dbe2;
+    --tx:#0f2036;       /* navy body text  */
+    --tx-m:#5c6b7f;     /* muted body text */
+    --shell:1280px; --rail:380px; --gutter:24px; --pad:24px; --hero-h:580px;
+    /* distance from the viewport edge to the shell's content edge — used to
+       full-bleed section bands leftwards out of the grid column */
+    --shell-inset:max(var(--pad), calc((100vw - var(--shell)) / 2 + var(--pad)));
+  }
 
-  /* ---------- nav: compact uppercase ---------- */
-  .nav-links{gap:20px}
-  .nav-links a{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-  .signin>summary{font-size:11.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
-  .nav-cta{font-size:11.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;padding:10px 17px}
-  .signin-menu a{font-size:13px}
+  /* The HTML `hidden` attribute only maps to display:none in the UA sheet, so ANY
+     author `display` rule beats it. `.field{display:flex}` was silently defeating
+     updateApplyFields(); the step machinery relies on `hidden` too. */
+  [hidden]{display:none!important}
+  .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+  html{background:var(--paper)}
+  body{background:var(--paper);color:var(--tx);font-size:15px}
+  .bg-fx{display:none}
+  a:focus-visible,button:focus-visible,.chip:focus-visible,[tabindex]:focus-visible{
+    outline:2px solid var(--gold);outline-offset:2px;border-radius:2px}
+
+  /* ---------- shell ---------- */
+  .shell{max-width:var(--shell);margin:0 auto;padding:0 var(--pad);width:100%}
+  @media(min-width:1200px){
+    .body-shell{display:grid;grid-template-columns:minmax(0,1fr) var(--rail);
+      gap:0 var(--gutter);align-items:start}
+    .col-main{min-width:0}
+    /* The rail is the second cell of the grid's first row, so with align-items:start
+       its top already sits level with the hero's top. No offset to keep in sync. */
+    .col-rail{position:relative;z-index:5;display:flex;flex-direction:column;gap:16px}
+    /* hero bleeds right, underneath the rail, and left to the viewport edge */
+    .col-main > .hero{
+      margin-right:calc(-1 * (var(--rail) + var(--gutter) + var(--shell-inset)));
+      padding-right:calc(var(--rail) + var(--gutter) + var(--shell-inset))}
+    /* Everything below the end of the rail reclaims the rail's width, so the page
+       never shows an empty right third. The rail is ~1450px tall and the main column
+       is past 1850px by the time #roster starts, so these can't collide. */
+    .col-main > .full{
+      margin-right:calc(-1 * (var(--rail) + var(--gutter) + var(--shell-inset)));
+      padding-right:var(--shell-inset)}
+  }
+  /* Single column below 1200px. `display:contents` dissolves .col-main's box so the
+     hero, the stats strip and the rail become siblings in one flex column — that lets the
+     rail cards drop in directly BELOW the navy hero+stats block (as specified) instead of
+     the whole rail leapfrogging above the hero. */
+  @media(max-width:1199.98px){
+    .body-shell{display:flex;flex-direction:column}
+    .col-main{display:contents}
+    .col-main > .hero{order:-3}
+    .col-main > .stats{order:-2}
+    .col-rail{order:-1;margin:22px 0 0;display:flex;flex-direction:column;gap:16px}
+  }
+
+  /* Section bands bleed left out of the grid column to the viewport edge (and to
+     both edges once the layout is single-column), like the mockup's full-width bands. */
+  .col-main > .sec,.col-main > .stats,.col-main > .band,.col-main > .hero{
+    margin-left:calc(-1 * var(--shell-inset));padding-left:var(--shell-inset)}
+  @media(max-width:1199.98px){
+    .col-main > .sec,.col-main > .stats,.col-main > .band,.col-main > .hero{
+      margin-right:calc(-1 * var(--shell-inset));padding-right:var(--shell-inset)}
+  }
+
+  /* ---------- buttons (rectangular, uppercase) ---------- */
+  .btn{border-radius:3px;padding:12px 22px;font-size:11.5px;font-weight:800;
+    letter-spacing:.12em;text-transform:uppercase;border:1px solid transparent;line-height:1.2}
+  .btn-gold{background:var(--gold);color:#0f2036;border-color:var(--gold)}
+  .btn-gold:hover{background:var(--gold-soft);border-color:var(--gold-soft);transform:none}
+  .btn-ghost{background:transparent;border-color:rgba(255,255,255,.6);color:#fff}
+  .btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.08);color:#fff}
+  .btn-navy{background:var(--navy);border-color:var(--navy);color:#fff}
+  .btn-navy:hover{background:#12304f;border-color:#12304f}
+  .btn-outline{background:transparent;border-color:var(--navy);color:var(--navy)}
+  .btn-outline:hover{background:var(--navy);color:#fff}
+
+  /* ---------- nav ---------- */
+  header.nav{background:var(--navy);border-bottom:0;backdrop-filter:none}
+  .nav-in{height:64px;max-width:var(--shell);margin:0 auto;padding:0 var(--pad)}
+  .nav-links{gap:26px}
+  .nav-links a{position:relative;color:rgba(255,255,255,.8);font-size:11.5px;font-weight:800;
+    letter-spacing:.13em;text-transform:uppercase;padding:6px 0}
+  .nav-links a:hover{color:#fff}
+  .nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;
+    background:var(--gold);transform:scaleX(0);transition:transform .2s}
+  .nav-links a:hover::after,.nav-links a.on::after{transform:scaleX(1)}
+  .nav-links a.on{color:#fff}
+  .lang{border:1px solid rgba(255,255,255,.34);border-radius:3px;padding:2px}
+  .lang button{border-radius:2px;font-size:11px;font-weight:800;letter-spacing:.06em;color:rgba(255,255,255,.75)}
+  .lang button.on{background:var(--gold);color:#0f2036}
+  .signin>summary{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.8)}
+  .signin>summary:hover,.signin[open]>summary{color:#fff}
+  .signin-menu{background:#fff;border:1px solid var(--line-2);border-radius:4px;box-shadow:0 14px 34px rgba(15,32,54,.18)}
+  .signin-menu a{color:var(--tx);font-size:13px;border-radius:3px}
+  .signin-menu a:hover,.signin-menu a:focus-visible{background:var(--paper-2);color:var(--tx)}
+  .nav-cta{background:var(--gold);border:1px solid var(--gold);color:#0f2036;border-radius:3px;
+    padding:11px 20px;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+  .nav-cta:hover{background:var(--gold-soft);border-color:var(--gold-soft);color:#0f2036}
 
   /* ---------- hero ---------- */
-  .hero{padding:40px 0 48px}
-  .eyebrow{margin-bottom:20px;font-size:11px;letter-spacing:.28em}
-  .hero h1{font-size:clamp(34px,7vw,52px);max-width:15ch}
-  .hero p.lead{margin-top:18px;font-size:clamp(15px,2vw,17.5px);max-width:48ch}
+  .hero{position:relative;overflow:hidden;color:#fff;display:flex;align-items:center;
+    background:linear-gradient(180deg,#0c2444,var(--navy-2));
+    padding:54px 0;min-height:var(--hero-h)}
+  .hero-copy{max-width:600px;position:relative;z-index:2}
+  /* Photo: large, bottom-aligned to the band, right edge running under the JOIN card.
+     Its left/right mask fades are the untouched originals. */
+  .hero-photo{position:absolute;left:auto;top:auto;bottom:0;
+    right:calc(var(--shell-inset) + var(--rail) - 150px);
+    width:min(64vw,900px);max-width:none;margin:0;transform:none;z-index:0}
+  .hero-photo img{width:100%;height:auto;display:block}
+  /* Dark scrim over the photo's left side — what the mockup does — so the headline
+     always sits on navy and the photo can still be large. It lives INSIDE the figure
+     (not on .hero) so the photo credit, which is a child of the same figure, can paint
+     above it; a scrim on .hero would sit in a higher stacking context and swallow the
+     caption's left half. The img's own mask is untouched. */
+  .hero-photo::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(90deg,var(--navy) 0 48%,rgba(8,26,51,.62) 60%,rgba(8,26,51,.12) 71%,transparent 80%)}
+  .hero-photo figcaption{left:10px;bottom:10px;z-index:2;background:rgba(5,16,31,.82);font-size:10.5px;
+    padding:5px 10px;border-radius:3px;color:rgba(255,255,255,.82);border-top-right-radius:3px}
+  @media(max-width:1199.98px){.hero{min-height:0;padding:44px 0}}
+  /* eyebrow: a short gold rule then tiny letter-spaced uppercase text */
+  .hero .eyebrow{border:0;padding:0;margin-bottom:18px;gap:12px;color:#fff;
+    font-size:10.5px;letter-spacing:.22em;font-weight:800}
+  .hero .eyebrow i{width:26px;height:2px;border-radius:0;background:var(--gold);box-shadow:none}
+  /* Sized for the LONGEST translation (IT), so the navy band keeps the same height in
+     all three languages instead of ballooning when the copy runs long. */
+  .hero h1{font-size:clamp(25px,2.85vw,38px);max-width:19ch;line-height:1.04}
+  .hero h1 em{color:var(--gold)}
+  .hero p.lead{margin-top:18px;max-width:420px;font-size:15px;color:rgba(255,255,255,.84)}
   .hero-btns{margin-top:26px;gap:12px}
 
-  /* Stacked hero — everything below the 3-zone breakpoint. Copy, then the photo,
-     then the JOIN card as a full-width card underneath. Overrides the older
-     min-width:781px desktop block for the 781–1199px range. */
-  @media(max-width:1199.98px){
-    .hero-grid{display:flex;flex-direction:column;align-items:stretch;gap:0;position:static;min-height:0}
-    .hero-copy{flex:1 1 auto;max-width:none;position:relative;z-index:1}
-    /* relative, not static — the figcaption credit is absolutely positioned against it. */
-    .hero-photo{position:relative;transform:none;flex:1 1 auto;width:100%;max-width:460px;margin:24px auto 0;align-self:center}
-    .hero-photo img{-webkit-mask-image:linear-gradient(to right,transparent 0,#000 18%,#000 82%,transparent 100%);
-      mask-image:linear-gradient(to right,transparent 0,#000 18%,#000 82%,transparent 100%)}
-    .joinpanel{width:100%;margin:28px 0 0}
-  }
+  /* ---------- stats strip ---------- */
+  .stats{background:#0a1e39;border:0;border-bottom:1px solid rgba(255,255,255,.07)}
+  .stats-in{display:flex;grid-template-columns:none;max-width:none;margin:0;padding:0}
+  .stat{display:flex;align-items:center;gap:13px;padding:20px 30px;text-align:left;
+    border-right:1px solid rgba(255,255,255,.1);flex:0 0 auto}
+  .stat:last-child{border-right:0}
+  .stat-ic{width:26px;height:26px;color:var(--gold-soft);flex:none}
+  .stat b{font-family:'Anton',sans-serif;font-size:26px;color:#fff;display:block;line-height:1}
+  .stat span{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6);font-weight:700}
 
-  /* Three-zone hero: copy | photo gutter | JOIN card.
-     The hero breaks out of the 1080px .wrap so all three fit without crowding.
-     The photo is a grid item spanning the gutter AND the card column, sized to 75%
-     of that span — so its left three-quarters (bat, ball and the batter himself) sit
-     in the open gutter and only its right quarter passes behind the card. Its
-     left/right mask fades are the untouched originals. The copy column never
-     overlaps the image: the photo starts where column 1 ends. */
-  @media(min-width:1200px){
-    .hero{overflow:hidden;position:relative;padding:52px 0 66px}
-    .hero-grid{max-width:1320px;display:grid;
-      grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(330px,360px);
-      gap:0 30px;align-items:center;position:static;min-height:0}
-    .hero-copy{grid-column:1;grid-row:1;max-width:none;position:relative;z-index:3}
-    /* position:relative (not static) so the figcaption credit keeps anchoring to the
-       PHOTO's bottom-left, not to the .hero section's. */
-    .hero-photo{grid-column:2 / 4;grid-row:1;align-self:center;justify-self:start;
-      position:relative;transform:none;width:75%;max-width:none;margin:0;z-index:0}
-    .joinpanel{grid-column:3;grid-row:1;align-self:center;position:relative;z-index:2;margin:0}
-    .hero h1{font-size:clamp(32px,3.4vw,48px);max-width:13ch}
-    .hero p.lead{max-width:38ch;font-size:16px}
-  }
+  /* ---------- section shell + heads ---------- */
+  .sec{padding:60px 0;background:var(--paper)}
+  .sec-gray,.sec-alt{background:var(--paper-2);border:0}
+  .sec-head{margin-bottom:30px}
+  .sec-head h2{font-family:'Anton',sans-serif;text-transform:uppercase;color:var(--tx);
+    font-size:clamp(23px,2.4vw,30px);line-height:1.06;letter-spacing:.01em;margin:0;max-width:22ch}
+  .sec-head h2::after{content:"";display:block;width:40px;height:3px;background:var(--gold);margin-top:14px}
+  .sec-head .kicker{color:var(--gold);font-size:10.5px;letter-spacing:.22em;font-weight:800;margin-bottom:10px}
+  .sec-head p{color:var(--tx-m);font-size:13.5px;margin-top:14px;max-width:60ch}
+  .sec-head-c{text-align:center}
+  .sec-head-c h2{margin-left:auto;margin-right:auto}
+  .sec-head-c h2::after{margin-left:auto;margin-right:auto}
+  .sec-head-c p{margin-left:auto;margin-right:auto}
+  .sec-cta{text-align:center;margin-top:26px}
 
-  /* ---------- JOIN panel ---------- */
-  /* scroll-margin clears the 64px sticky header when an href="#join" anchor or a step
-     change scrolls the panel into view. */
-  .joinpanel{scroll-margin-top:86px;border:1px solid rgba(217,177,84,.42);border-radius:20px;padding:26px 24px 26px;
-    background:linear-gradient(180deg,rgba(13,37,71,.97),rgba(6,20,42,.985));
-    box-shadow:0 30px 70px -26px rgba(0,0,0,.85)}
-  .jp-head{margin-bottom:20px}
-  .jp-head h2{font-size:clamp(22px,2.1vw,29px);margin-top:9px;letter-spacing:.02em}
-  .jp-sub{color:var(--muted);font-size:13px;line-height:1.55;margin-top:9px}
-  .joinpanel .tagline{font-family:'Anton',sans-serif;text-transform:uppercase;color:var(--gold);
-    font-size:14.5px;letter-spacing:.03em;line-height:1.3;margin-bottom:9px}
-  .joinpanel .join-pitch{color:var(--muted);font-size:12.5px;line-height:1.6;margin:0 0 20px;max-width:none}
+  /* contracts headline band */
+  .contracts{text-align:center;padding:56px 0 50px}
+  .contracts h2{font-size:clamp(24px,3vw,38px);color:var(--tx);letter-spacing:.02em}
+  .contracts h2 em{color:var(--gold)}
+  .contracts .sub{color:var(--tx-m);font-size:14px;margin-top:12px}
+  .contracts .sub b{color:var(--tx)}
+  .contracts .rule{width:40px;height:3px;background:var(--gold);margin:20px auto 0;opacity:1}
 
-  /* Numbered step indicator */
-  .jp-steps{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:0 0 22px;padding:0}
-  .jp-steps li{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;position:relative;min-width:0}
-  .jp-steps li::before{content:"";position:absolute;top:13.25px;right:50%;width:100%;height:1.5px;background:var(--line);z-index:0}
-  .jp-steps li:first-child::before{display:none}
-  .jp-steps li b{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;position:relative;z-index:1;
-    font-family:'Anton',sans-serif;font-size:13px;line-height:1;font-weight:400;
-    border:1.5px solid var(--line);background:var(--navy-2);color:var(--muted);transition:.22s}
-  .jp-steps li span{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--muted);line-height:1.3;transition:.22s}
-  .jp-steps li.done b{background:rgba(217,177,84,.18);border-color:var(--gold);color:var(--gold-soft)}
-  .jp-steps li.done span{color:#cdd9ec}
-  .jp-steps li.done::before,.jp-steps li.on::before{background:var(--gold)}
-  .jp-steps li.on b{background:var(--gold);border-color:var(--gold);color:#05101f;box-shadow:0 0 0 4px rgba(217,177,84,.14)}
-  .jp-steps li.on span{color:var(--gold-soft)}
+  /* ---------- WHO I AM / mission ---------- */
+  .mission{display:grid;grid-template-columns:1fr 1fr;gap:38px;align-items:center}
+  @media(max-width:820px){.mission{grid-template-columns:1fr;gap:26px}}
+  .mission-copy p{color:var(--tx-m);font-size:14.5px;margin-bottom:12px;max-width:52ch}
+  .mission-strong{color:var(--tx)!important;font-weight:700;font-size:15px!important;margin-top:16px}
+  .mission-strong b{font-weight:800}
+  .mission .creds{margin:16px 0 20px}
+  .mission .cred{background:#fff;border:1px solid var(--line-2);color:var(--tx-m);font-size:11.5px;
+    border-radius:3px;padding:6px 11px;font-weight:600}
+  .sec-alt .mission .cred{background:#fff}
+  .mission .founder-contact{margin-top:0;display:inline-flex;gap:9px;align-items:center}
+  .mission-media{margin:0;border-radius:8px;overflow:hidden;border:1px solid var(--line-2);
+    box-shadow:0 14px 34px rgba(15,32,54,.12);background:var(--navy)}
+  .mm-shot{aspect-ratio:16/10;background-size:cover;background-position:center 18%}
+  .mm-cap{display:flex;align-items:center;gap:9px;background:var(--navy);color:#fff;
+    padding:11px 14px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+  .mm-cap::before{content:"";width:0;height:0;border-left:8px solid var(--gold);
+    border-top:5px solid transparent;border-bottom:5px solid transparent;flex:none}
+  .mm-nm{color:var(--gold-soft)}
+  .mm-cap span:last-child{color:rgba(255,255,255,.62);font-weight:600}
 
-  /* Denser controls inside the card than in a full-width section */
-  .joinpanel .field{margin-bottom:13px;gap:6px}
-  .joinpanel .field label{font-size:12px}
-  .joinpanel .field input,.joinpanel .field select,.joinpanel .field textarea{padding:11px 12px;font-size:14px;border-radius:10px}
-  .joinpanel .field textarea{min-height:86px}
-  .joinpanel .af-row{gap:12px}
-  .joinpanel .fhint{font-size:11.5px}
-  .joinpanel .tc{font-size:12.5px;margin:8px 0 0}
-  .joinpanel .form-msg{font-size:13.5px;padding:12px 14px}
+  /* ---------- roster / athlete carousel ---------- */
+  .roster-wrap{position:relative}
+  .roster-wrap.is-locked{min-height:0}
+  @media(max-width:560px){.roster-wrap.is-locked{min-height:0}}
+  .filters{gap:8px;margin-bottom:16px;justify-content:center}
+  .chip{border:1px solid var(--line-2);background:#fff;color:var(--tx-m);border-radius:3px;
+    font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:9px 15px}
+  .chip:hover{color:var(--tx);border-color:#c9cfd8}
+  .chip.active{background:var(--navy);border-color:var(--navy);color:#fff}
+  .unlocked-note{color:#2b7d6d;justify-content:center;margin-bottom:14px}
 
-  .jp-nav{display:flex;gap:10px;margin-top:20px}
-  .jp-nav .btn{flex:1 1 0;min-width:0;padding:13px 14px;font-size:13.5px;text-align:center;
-    letter-spacing:.06em;text-transform:uppercase;font-weight:800}
-
-  /* 16px controls stop iOS auto-zooming on focus — must win over the 14px above. */
+  .roster{display:flex;grid-template-columns:none;gap:16px;overflow-x:auto;padding:4px 2px 14px;
+    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .roster::-webkit-scrollbar{display:none}
+  .roster>.pcard{flex:0 0 clamp(186px,23%,215px);scroll-snap-align:start}
+  .roster-empty{flex:1 1 auto}
   @media(max-width:560px){
-    /* Uppercase + tracking makes the nav CTA wider than the sentence-case original —
-       "APLICA AHORA" overflowed a 390px viewport in ES. Tighten it back on phones. */
-    .nav-cta{padding:8px 10px;font-size:10.5px;letter-spacing:.07em}
-    .signin>summary{font-size:10.5px;letter-spacing:.07em}
-    .joinpanel{padding:22px 18px}
-    .joinpanel .field input,.joinpanel .field select,.joinpanel .field textarea{font-size:16px}
-    .jp-steps li span{font-size:8.5px;letter-spacing:.05em}
+    .roster{display:grid;grid-template-columns:1fr;overflow:visible}
+    .roster>.pcard{flex:none}
+  }
+  .ros-arrow{position:absolute;top:44%;z-index:4;width:34px;height:34px;border-radius:4px;
+    border:1px solid rgba(255,255,255,.18);background:var(--navy);color:#fff;font-size:19px;
+    line-height:1;cursor:pointer;display:grid;place-items:center;
+    box-shadow:0 6px 16px rgba(15,32,54,.28);transition:.18s}
+  .ros-arrow:hover{background:#12304f}
+  .ros-prev{left:-14px}.ros-next{right:-14px}
+  .roster-wrap.is-locked .ros-arrow{display:none}
+  @media(max-width:560px){.ros-arrow{display:none}}
+
+  /* athlete card — portrait, photo fading into navy */
+  .pcard{display:flex;flex-direction:column;border:0;border-radius:6px;overflow:hidden;
+    background:var(--navy);color:#fff;box-shadow:0 8px 22px rgba(15,32,54,.14)}
+  .pcard:hover{transform:translateY(-3px);border-color:transparent;box-shadow:0 16px 34px rgba(15,32,54,.24)}
+  .pcard .top{height:auto;aspect-ratio:3/4;flex:none;position:relative;background-size:cover;background-position:center 22%}
+  .pcard .top::after{opacity:0}
+  .pcard .top::before{content:"";position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg,transparent 45%,rgba(8,26,51,.65) 78%,var(--navy) 100%)}
+  .pcard .body{flex:1 1 auto;display:flex;flex-direction:column;align-items:flex-start;padding:0 15px 16px;margin-top:-30px;position:relative;z-index:2}
+  .pcard .pos{order:1;margin:0;background:none;border:0;padding:0;border-radius:0;
+    color:rgba(255,255,255,.66);font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}
+  .pcard .pos:empty{display:none}
+  .pcard .body h3{order:2;font-family:'Anton',sans-serif;font-size:17px;margin-top:5px;
+    letter-spacing:.03em;color:#fff;line-height:1.1}
+  .pcard .country{order:3;margin-top:9px;font-size:11.5px;color:rgba(255,255,255,.8);gap:7px}
+  .pcard .country .cflagimg{width:16px;height:16px;border-radius:50%;object-fit:cover;box-shadow:none}
+  .pcard .team{order:4;margin-top:7px;font-size:11.5px;color:rgba(255,255,255,.62);line-height:1.35}
+  .pcard .team::before{display:none}
+  .pcard .lvl{order:5;margin-top:8px;background:none;border:0;padding:0;color:rgba(255,255,255,.62);
+    font-size:10.5px;letter-spacing:.09em;font-weight:700}
+  .pcard .view{order:6;margin-top:11px;font-size:9.5px;font-weight:800;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--gold-soft)}
+  .pcard .tier{background:rgba(8,26,51,.8);border:0;color:var(--gold-soft);z-index:3}
+  .pcard .flag{z-index:3}
+  .pcard .mono{font-size:36px;width:76px;height:76px}
+  .roster-wrap.is-locked .roster{max-height:520px}
+
+  /* ---------- college ---------- */
+  .col-grid{gap:20px}
+  .col-list{border:1px solid var(--line-2);border-radius:6px;background:#fff;overflow:hidden}
+  .col-row{background:#fff;color:var(--tx);font-size:14px;padding:14px 17px;border-bottom:1px solid var(--line-2)}
+  .col-row:last-child{border-bottom:0}
+  .col-row:nth-child(even){background:#fff}
+  .col-row i{color:var(--gold);font-family:'Anton',sans-serif;font-size:14px}
+  .col-cta{background:var(--navy);border:0;border-radius:6px;color:#fff;padding:26px 22px}
+  .col-cta h3{font-family:'Anton',sans-serif;color:#fff;font-size:19px}
+  .col-cta p{color:rgba(255,255,255,.7);font-size:13.5px}
+
+  /* ---------- events ---------- */
+  .ev-grid{gap:18px}
+  .ev-card{background:#fff;border:1px solid var(--line-2);border-radius:6px;box-shadow:0 6px 18px rgba(15,32,54,.06)}
+  .ev-card:hover{transform:translateY(-3px);border-color:#cfd5de;box-shadow:0 14px 30px rgba(15,32,54,.12)}
+  .ev-body h3{font-family:'Anton',sans-serif;color:var(--tx);font-size:18px;letter-spacing:.02em}
+  .ev-meta{color:var(--tx-m);font-size:12px;font-weight:700}
+  .ev-body p{color:var(--tx-m);font-size:13.5px}
+  .ev-body .ev-tags{color:#2b7d6d;font-size:12px}
+  .ev-body .ev-link{color:var(--tx);font-size:10.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;
+    border-bottom:2px solid var(--gold);padding-bottom:2px}
+  .ev-status.past{background:#eceef1;color:var(--tx-m);border-color:#e0e3e8}
+  .ev-status.up{background:var(--gold);color:#0f2036}
+
+  /* ---------- testimonials list (photo left, quote right) ---------- */
+  .testi-list{display:grid;gap:26px;max-width:760px}
+  .testi{display:grid;grid-template-columns:74px 1fr;gap:20px;align-items:start;
+    background:none;border:0;border-radius:0;padding:0}
+  .testi .av{width:74px;height:74px;border-radius:50%;border:0;flex:none;
+    background-size:cover;background-position:center 18%;background-color:var(--navy);
+    color:var(--gold);font-family:'Anton',sans-serif;font-size:22px;display:grid;place-items:center}
+  .testi .q{font-family:'Anton',sans-serif;font-size:34px;color:var(--gold);line-height:.55;margin-bottom:12px}
+  .testi p{font-size:14.5px;color:var(--tx-m);margin:0 0 12px;line-height:1.65}
+  .testi .who{display:block}
+  .testi .nm{color:var(--tx);font-weight:800;font-size:13.5px}
+  .testi .rl{color:var(--tx-m);font-size:12.5px;margin-top:2px}
+
+  /* ---------- profile section ---------- */
+  .pcreate{display:block}
+  .pc-card{background:#fff;border:1px solid var(--line-2);border-radius:6px;padding:30px 28px;
+    box-shadow:0 8px 24px rgba(15,32,54,.07);text-align:center;max-width:760px;margin:0 auto}
+  .pc-card h3{font-family:'Anton',sans-serif;text-transform:uppercase;color:var(--tx);font-size:21px;margin-bottom:9px}
+  .pc-card>p{color:var(--tx-m);font-size:14px;margin-bottom:18px}
+  .pc-includes li{color:var(--tx);font-size:13.5px}
+  .pc-tier{background:var(--paper-2);border:1px solid var(--line-2);border-radius:6px}
+  .pc-tier-plus{border-color:var(--gold);background:linear-gradient(180deg,rgba(217,177,84,.10),var(--paper-2))}
+  .pc-tier-name{color:var(--tx-m)}
+  .pc-tier-desc{color:var(--tx-m)}
+  .gate-price{color:var(--tx);font-family:'Anton',sans-serif}
+  .gate-price small{color:var(--tx-m)}
+  .pc-access{color:var(--tx-m);font-weight:600}
+  .tc{color:var(--tx-m)}
+  .tc-more{color:var(--tx);text-decoration:underline}
+  .tc-c{justify-content:center}
+
+  /* ---------- closing band ---------- */
+  .band{background:var(--navy);border:0;margin:0;color:#fff;padding:56px 0;text-align:center}
+  .band-in{padding:56px 0}
+  .band h2{font-family:'Anton',sans-serif;font-size:clamp(24px,3vw,38px);color:#fff}
+  .band p{color:rgba(255,255,255,.72);margin:14px auto 24px}
+
+  /* ---------- JOIN card ---------- */
+  .joinpanel{scroll-margin-top:80px;background:#fff;border:1px solid var(--line-2);border-radius:6px;
+    overflow:hidden;box-shadow:0 12px 34px rgba(15,32,54,.13);padding:0}
+  .jp-head{background:var(--navy);color:#fff;padding:22px 22px 20px}
+  .jp-head .kicker{color:var(--gold);font-size:10px;letter-spacing:.22em;font-weight:800;margin-bottom:8px}
+  .jp-head h2{font-family:'Anton',sans-serif;text-transform:uppercase;color:#fff;
+    font-size:clamp(20px,1.9vw,26px);line-height:1.04;letter-spacing:.01em;margin:0}
+  .jp-sub{color:rgba(255,255,255,.72);font-size:12.5px;line-height:1.5;margin-top:9px}
+  .jp-steps{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:18px 0 0;padding:0}
+  .jp-steps li{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;position:relative;min-width:0}
+  .jp-steps li::before{content:"";position:absolute;top:14px;right:50%;width:100%;height:1px;
+    background:rgba(255,255,255,.24);z-index:0}
+  .jp-steps li:first-child::before{display:none}
+  .jp-steps li b{width:29px;height:29px;border-radius:50%;display:grid;place-items:center;position:relative;z-index:1;
+    font-family:'Hanken Grotesk',sans-serif;font-size:12.5px;font-weight:800;line-height:1;
+    border:1px solid rgba(255,255,255,.4);background:var(--navy);color:rgba(255,255,255,.8);transition:.22s}
+  .jp-steps li span{font-size:8.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
+    color:rgba(255,255,255,.6);line-height:1.3;transition:.22s}
+  .jp-steps li.done b{background:rgba(217,177,84,.2);border-color:var(--gold);color:var(--gold-soft)}
+  .jp-steps li.done span{color:rgba(255,255,255,.8)}
+  .jp-steps li.on b{background:var(--gold);border-color:var(--gold);color:#0f2036}
+  .jp-steps li.on span{color:#fff}
+
+  .jp-body{padding:22px 22px 24px;background:#fff}
+  .jp-steptitle{font-size:14px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--tx);margin-bottom:16px}
+  .jp-steptitle b{color:var(--gold)}
+  .joinpanel .jp-pitch{margin-bottom:16px}
+  .joinpanel .tagline{font-family:'Hanken Grotesk',system-ui,sans-serif;text-transform:uppercase;
+    color:var(--tx);font-size:11px;font-weight:800;letter-spacing:.06em;line-height:1.45;margin-bottom:8px}
+  .joinpanel .join-pitch{color:var(--tx-m);font-size:12.5px;line-height:1.6;margin:0;max-width:none}
+  .joinpanel .field{margin-bottom:13px;gap:5px}
+  .joinpanel .field label{font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#54637a}
+  .jp-body .field>label::after{content:"*";color:var(--gold);margin-left:3px}
+  .jp-body .field-code>label::after,.jp-body .field-opt>label::after{content:""}
+  .joinpanel .field{min-width:0}
+  .joinpanel .field input,.joinpanel .field select,.joinpanel .field textarea{
+    background:#fff;border:1px solid var(--field-line);border-radius:3px;padding:10px 11px;
+    font-size:13.5px;color:var(--tx);width:100%;min-width:0;max-width:100%}
+  .joinpanel .field input::placeholder{color:#9aa5b4}
+  .joinpanel .field input:focus,.joinpanel .field select:focus,.joinpanel .field textarea:focus{
+    border-color:var(--navy);box-shadow:0 0 0 2px rgba(15,32,54,.07)}
+  .joinpanel .field textarea{min-height:84px}
+  .joinpanel .af-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .joinpanel .af-phone{grid-template-columns:82px 1fr}
+  .joinpanel .fhint{color:var(--tx-m);font-size:10.5px}
+  .joinpanel .field.invalid input,.joinpanel .field.invalid select,.joinpanel .field.invalid textarea{border-color:#c8553d}
+  .joinpanel .tc{font-size:12px;color:var(--tx-m);margin:10px 0 0}
+  .joinpanel .form-msg{font-size:12.5px;padding:11px 13px;border-radius:3px;
+    background:rgba(217,177,84,.13);border-color:var(--gold);color:#7a5f1c}
+  .joinpanel .form-msg.err{background:rgba(200,85,61,.09);border-color:#c8553d;color:#a13f2a}
+  .jp-nav{display:flex;flex-direction:column;gap:9px;margin-top:18px}
+  .jp-nav .btn{width:100%;text-align:center;position:relative;padding:13px 20px}
+  .jp-next::after{content:"→";position:absolute;right:16px;top:50%;transform:translateY(-50%)}
+  .jp-back{background:none;border:0;padding:5px;font-family:inherit;color:var(--tx-m);
+    font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+    cursor:pointer;text-decoration:underline}
+  .jp-back:hover{color:var(--tx)}
+
+  /* ---------- rail cards ---------- */
+  .rail-card{border-radius:6px;padding:22px 20px}
+  .rail-title{font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+    text-align:center;margin-bottom:16px}
+  .svc-card{background:var(--navy);color:#fff}
+  .svc-card .rail-title{color:#fff}
+  /* Six-column track so the five services read as 3 + 2 with the SECOND row centred,
+     rather than leaving a hole in the bottom-right cell. */
+  .svc-grid{display:grid;grid-template-columns:repeat(6,1fr)}
+  .svc-cell{grid-column:span 2;display:flex;flex-direction:column;align-items:center;gap:9px;
+    text-align:center;padding:16px 6px;color:rgba(255,255,255,.86);
+    border-right:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);transition:.18s}
+  .svc-cell:nth-child(3){border-right:0}
+  .svc-cell:nth-child(4){grid-column:2/4}
+  .svc-cell:nth-child(5){grid-column:4/6;border-right:0}
+  .svc-cell:nth-child(n+4){border-bottom:0}
+  a.svc-cell:hover{color:var(--gold-soft)}
+  .svc-cell svg{width:30px;height:30px;flex:none}
+  .svc-t{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;line-height:1.35}
+  @media(max-width:520px){
+    .svc-grid{grid-template-columns:repeat(2,1fr)}
+    .svc-cell,.svc-cell:nth-child(4),.svc-cell:nth-child(5){grid-column:span 1}
+    .svc-cell:nth-child(3){border-right:1px solid rgba(255,255,255,.1)}
+    .svc-cell:nth-child(2n){border-right:0}
+    .svc-cell:nth-child(n+4){border-bottom:1px solid rgba(255,255,255,.1)}
+    .svc-cell:nth-child(n+5){border-bottom:0;border-right:0}
   }
 
-  /* ---------- sections ---------- */
-  .sec{padding:74px 0}
-  .sec-head{margin-bottom:44px}
-  .kicker{font-size:11px;letter-spacing:.28em}
-  .sec-head h2{font-size:clamp(28px,4.2vw,46px);letter-spacing:.02em;margin-top:14px;max-width:22ch}
-  .sec-head p{font-size:16px;margin-top:16px}
-  /* Alternating navy band, applied to every other section */
-  .sec-alt{background:linear-gradient(180deg,rgba(8,26,51,.6),rgba(6,20,42,.18));
-    border-top:1px solid rgba(217,177,84,.13);border-bottom:1px solid rgba(217,177,84,.13)}
+  .rail-testi{background:#fff;border:1px solid var(--line-2);box-shadow:0 8px 24px rgba(15,32,54,.07);
+    display:grid;grid-template-columns:1fr 92px;gap:14px;align-items:start;position:relative}
+  .rail-testi .rt-q{grid-column:1/-1;font-family:'Anton',sans-serif;font-size:38px;color:var(--gold);line-height:.5;margin-bottom:6px}
+  .rail-testi .qt{font-size:12.5px;color:var(--tx-m);line-height:1.6;font-style:normal}
+  .rail-testi .rt-who{margin-top:12px}
+  .rail-testi .nm{font-family:'Anton',sans-serif;font-size:13px;letter-spacing:.05em;color:var(--tx);text-transform:uppercase}
+  .rail-testi .rl{font-size:11.5px;color:var(--tx-m);margin-top:2px}
+  .rail-testi .rt-shot{width:92px;height:118px;border-radius:5px;background-size:cover;background-position:center 18%}
+  .rail-testi .sec-cta{grid-column:1/-1;margin-top:6px}
+  .rail-testi .sec-cta .btn{width:100%;padding:10px 14px}
 
-  /* ---------- roster cards ---------- */
-  .roster{gap:20px}
-  .pcard{border-radius:16px;border-color:rgba(217,177,84,.18);
-    background:linear-gradient(180deg,var(--card),rgba(6,20,42,.96))}
-  /* A player WITHOUT a static profile page renders as a <button>, and Chrome vertically
-     centres a stretched button's content — so a card with fewer lines (no level badge, no
-     team) floated its photo down the card. Making the card an explicit flex column pins the
-     photo to the top and lets the body take the slack, so every card in a row lines up. */
-  .pcard{display:flex;flex-direction:column}
-  .pcard .top{height:212px;flex:none}
-  .pcard .body{flex:1 1 auto}
-  /* An athlete with no position in the DB rendered an empty pill; hide the badge instead. */
-  .pcard .pos:empty{display:none}
-  .pcard .body{padding:16px 17px 19px;display:flex;flex-direction:column;align-items:flex-start}
-  /* Position becomes a badge and sits ABOVE the name (mockup order) — CSS-only reorder,
-     the DOM order is untouched so nothing in the render function changes. */
-  .pcard .pos{order:-1;margin-top:0;font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;
-    color:var(--gold-soft);background:rgba(217,177,84,.13);border:1px solid rgba(217,177,84,.34);
-    padding:5px 10px;border-radius:999px;line-height:1.1}
-  .pcard .body h3{font-size:20px;margin-top:11px;letter-spacing:.015em}
-  .pcard .lvl{margin-top:10px}
-  .pcard .country{margin-top:10px;font-size:12.5px}
-  .pcard .team{margin-top:9px;font-size:12.5px}
-  .pcard .view{margin-top:14px;font-size:10.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
-
-  /* ---------- testimonials ---------- */
-  .testi{border-radius:18px;padding:30px 26px 26px}
-  .testi .q{font-size:62px;line-height:.52;margin-bottom:16px;color:rgba(217,177,84,.3)}
-  .testi p{font-size:15.5px;line-height:1.7;margin:0 0 20px}
-  .testi .nm{letter-spacing:.03em;font-size:14px}
-  .tcard{border-radius:20px;padding:32px}
+  /* ---------- gate (sits over the blurred navy cards) ---------- */
+  .gate-in{background:var(--navy);border:1px solid rgba(255,255,255,.14);border-radius:6px;color:#fff;
+    box-shadow:0 26px 60px rgba(15,32,54,.4)}
+  .gate-in h3{font-family:'Anton',sans-serif;color:#fff}
+  .gate-in p{color:rgba(255,255,255,.72)}
+  .gate-or{color:rgba(255,255,255,.6)}
+  .gate-code input{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.22);color:#fff;border-radius:3px}
+  .gate-code button{border-radius:3px;border-color:var(--gold);color:var(--gold-soft);
+    font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+  .gate-code button:hover{background:var(--gold);color:#0f2036}
+  .gate-need{color:var(--gold-soft)}
+  .roster-wrap.is-locked::after{background:linear-gradient(180deg,rgba(244,245,247,.2),rgba(244,245,247,.75));border-radius:6px}
 
   /* ---------- footer ---------- */
-  .foot{display:grid;grid-template-columns:1.5fr .8fr 1.25fr;gap:36px;align-items:start}
+  footer{background:var(--navy);border-top:0;color:#fff;padding:52px 0 0}
+  .foot{display:grid;grid-template-columns:1.25fr .9fr .9fr 1.3fr;gap:34px;align-items:start;
+    padding-bottom:34px}
   .foot-col{min-width:0}
-  .foot-nav{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
-  .foot-nav a{color:var(--muted);font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;transition:.2s}
+  .foot-h{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#fff;margin-bottom:14px}
+  .foot-nav{display:flex;flex-direction:column;gap:9px;align-items:flex-start}
+  .foot-nav-nohead{padding-top:25px}
+  @media(max-width:900px){.foot-nav-nohead{padding-top:0}}
+  .foot-nav a{color:rgba(255,255,255,.62);font-size:12.5px;font-weight:500;letter-spacing:0;text-transform:none}
   .foot-nav a:hover{color:var(--gold-soft)}
-  .foot-links{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
-  @media(max-width:820px){.foot{grid-template-columns:1fr 1fr;gap:28px}}
+  .foot-contact{display:flex;flex-direction:column;gap:11px;align-items:flex-start}
+  .foot-contact a{display:inline-flex;align-items:center;gap:9px;color:rgba(255,255,255,.62);font-size:12.5px;word-break:break-word}
+  .foot-contact a:hover{color:var(--gold-soft)}
+  .foot-contact svg{flex:none;color:var(--gold-soft)}
+  .foot-social{display:flex;gap:9px;margin-top:16px}
+  .foot-social a{width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.28);
+    display:grid;place-items:center;color:rgba(255,255,255,.75);transition:.18s}
+  .foot-social a:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .foot-logo{height:52px}
+  footer .ceasai{margin-top:0;padding:20px 0;border-top:1px solid rgba(255,255,255,.09);border-bottom:0}
+  footer .ceasai a{color:rgba(255,255,255,.5)}
+  footer .ceasai a:hover{color:var(--gold-soft)}
+  footer .ceasai-social a{border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:50%}
+  .foot-bar{background:rgba(0,0,0,.22);padding:14px 0 8px}
+  .foot-bar-in{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+  .foot-bar .muted{color:rgba(255,255,255,.5);font-size:12px;margin:0}
+  .foot-bar .foot-admin{margin:0;font-size:11px;color:rgba(255,255,255,.32)}
+  .foot-bar .foot-admin:hover{color:var(--gold-soft)}
+  /* esm-legal.js appends its Privacy · Terms row as the last child of <footer>. Give it
+     the same darker ground as .foot-bar so the copyright line and the legal links read as
+     one bottom bar instead of two overlapping strips. */
+  footer .esml-foot{margin-top:0;background:rgba(0,0,0,.22);
+    padding:0 var(--pad) calc(15px + env(safe-area-inset-bottom,0px))}
+  @media(max-width:900px){.foot{grid-template-columns:1fr 1fr;gap:28px}}
   @media(max-width:560px){.foot{grid-template-columns:1fr;gap:24px}}
 
-  /* Very narrow phones (~320px). The 90px dial-code column + number field, and the long
-     email pill, both overflowed here BEFORE this redesign too — fixed while in the area. */
+  /* ---------- modal / install keep the dark treatment ---------- */
+  .sheet{border-radius:6px}
+  .install .box{border-radius:5px}
+  .install button{border-radius:3px;font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+
+  /* ---------- narrow phones ---------- */
+  @media(max-width:560px){
+    :root{--pad:16px}
+    .sec{padding:44px 0}
+    .joinpanel .field input,.joinpanel .field select,.joinpanel .field textarea{font-size:16px}
+    .jp-steps li span{font-size:8px;letter-spacing:.04em}
+    .nav-cta{padding:9px 12px;font-size:10.5px;letter-spacing:.07em}
+    .signin>summary{font-size:10.5px;letter-spacing:.07em}
+    .stat{padding:16px 18px;gap:10px}
+    .stat b{font-size:22px}
+  }
   @media(max-width:400px){
     .joinpanel .af-phone{grid-template-columns:1fr}
-    .foot-links .pill{max-width:100%;overflow-wrap:anywhere;font-size:12.5px}
+    .foot-contact a{font-size:11.5px}
   }
-  @media(max-width:380px){
-    .nav-cta{padding:7px 8px;font-size:10px;letter-spacing:.04em}
-    .signin>summary{font-size:10px;letter-spacing:.04em}
-  }
-  /* Below ~345px even the tightened uppercase CTA is wider than the sentence-case
-     original ("APLICA AHORA" in ES), so drop back to the pre-redesign casing there. */
   @media(max-width:344px){
-    .nav-cta{text-transform:none;letter-spacing:.01em;font-size:11px;padding:7px 9px}
+    .nav-cta{text-transform:none;letter-spacing:.01em;font-size:11px;padding:8px 10px}
   }
 </style>
 </head>
@@ -713,7 +1014,32 @@
 </div></header>
 
 <a id="top"></a>
-<section class="hero"><div class="wrap hero-grid">
+
+<!-- ============================================================================
+     HERO — full-bleed navy band. Its inner .shell matches the page shell, so the
+     copy lines up with the left column while the band itself runs edge to edge and
+     the Arath Zapien photo bleeds behind the JOIN card in the right rail.
+     The rail (below) is pulled up by --hero-h so the JOIN card's top edge sits
+     level with the hero's top, exactly as in the mockup.
+     ============================================================================ -->
+<!-- ============================================================================
+     PAGE SHELL — left main column (~68%) + right rail (~32%). The hero is the first
+     item of the main column, and its navy background is padded/negative-margined out
+     to the viewport edges so the band reads as full width while its copy stays in the
+     left column. Because the hero and the rail are the two cells of the SAME grid row,
+     the JOIN card's top edge lines up with the hero's top automatically — no magic
+     offset that could drift when a translation runs long.
+     ============================================================================ -->
+<div class="shell body-shell">
+
+<main class="col-main">
+
+<section class="hero">
+  <figure class="hero-photo">
+    <img src="assets/arath-zapien.jpg" alt="Arath Zapien, North Central Missouri Pirates"
+         loading="eager" fetchpriority="high" decoding="async" onerror="this.closest('figure').style.display='none'" />
+    <figcaption>Arath Zapien, North Central Missouri Pirates.</figcaption>
+  </figure>
   <div class="hero-copy">
     <span class="eyebrow"><i></i> <span data-i18n="hero_eyebrow"></span></span>
     <h1 class="display" data-i18n-html="hero_h1"></h1>
@@ -723,315 +1049,376 @@
       <a class="btn btn-ghost" href="#join" data-i18n="hero_btn2"></a>
     </div>
   </div>
-  <!-- Athlete photo shown in all languages (not IT-specific); the caption is a proper
-       name/credit so it is not translated. Sits in the empty space to the right of the
-       headline (stacks below it on mobile). Its edges fade into the navy hero background
-       via a CSS mask (see .hero-photo img). If the image file is missing the figure
-       hides itself (onerror) so the hero never shows a broken image. -->
-  <figure class="hero-photo">
-    <img src="assets/arath-zapien.jpg" alt="Arath Zapien, North Central Missouri Pirates"
-         loading="eager" fetchpriority="high" decoding="async" onerror="this.closest('figure').style.display='none'" />
-    <figcaption>Arath Zapien, North Central Missouri Pirates.</figcaption>
-  </figure>
-  <!-- ===== JOIN panel =====
-       The application form (formerly the bottom "#join" section) now lives beside the
-       hero as a card, per the 2026-09 redesign. Every string, field, name and behaviour
-       is the pre-existing one — only the ORDER and the step grouping are new. The panel
-       keeps id="join" so every existing href="#join" (nav, hero CTA, service cards,
-       college CTA, closing band) still lands on it.
+</section>
+
+  <!-- Stats strip: our two REAL figures, rendered in the mockup's icon+number+label
+       tile style. The icons are decorative inline SVG (aria-hidden), no new copy. -->
+  <div class="stats"><div class="stats-in">
+    <div class="stat">
+      <svg class="stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>
+      <div><b id="statAthletes">19</b><span data-i18n="stat1"></span></div>
+    </div>
+    <div class="stat">
+      <svg class="stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.2 2.4 3.3 5.4 3.3 8.5S14.2 18.1 12 20.5c-2.2-2.4-3.3-5.4-3.3-8.5S9.8 5.9 12 3.5Z"/></svg>
+      <div><b id="statCountries">7</b><span data-i18n="stat2"></span></div>
+    </div>
+  </div></div>
+
+  <!-- Contracts headline band (existing strings; the featured José testimonial that
+       used to sit here has moved into the right rail — see .rail-testi). -->
+  <section class="sec contracts">
+    <h2 class="display" data-i18n-html="contracts_h2"></h2>
+    <p class="sub" data-i18n-html="contracts_sub"></p>
+    <div class="rule"></div>
+  </section>
+
+  <!-- WHO I AM — laid out like the mockup's "OUR MISSION": copy left, media right
+       in a rounded frame with a thin navy caption bar (no video asset exists, so the
+       founder photo takes that frame). -->
+  <section class="sec sec-alt" id="who">
+    <div class="mission">
+      <div class="mission-copy">
+        <div class="sec-head"><h2 class="display" data-i18n="who_kicker"></h2></div>
+        <p data-i18n="who_bio"></p>
+        <p data-i18n="who_bio2"></p>
+        <p class="mission-strong"><b>Samuele Bruno</b> — <span data-i18n="who_role"></span></p>
+        <div class="creds">
+          <span class="cred" data-i18n="cred_italy"></span>
+          <span class="cred" data-i18n="cred_u18"></span>
+          <span class="cred" data-i18n="cred_cbl"></span>
+          <span class="cred" data-i18n="cred_pro"></span>
+          <span class="cred" data-i18n="cred_college"></span>
+          <span class="cred" data-i18n="cred_hastings"></span>
+          <span class="cred" data-i18n="cred_cod"></span>
+          <span class="cred" data-i18n="cred_ecc"></span>
+        </div>
+        <a class="btn btn-navy founder-contact" href="mailto:elitesportsmanagement50@gmail.com?subject=Inquiry%20-%20Elite%20Sports%20Management"><span class="ic">✉</span><span data-i18n="sam_contact"></span></a>
+      </div>
+      <figure class="mission-media">
+        <div class="mm-shot" id="founderPhoto" style="background-image:url('https://sbexwyvsgqayxrsrlrpm.supabase.co/storage/v1/object/public/player-photos/founder/sam.jpeg')"></div>
+        <figcaption class="mm-cap"><span class="mm-nm">Samuele Bruno</span><span data-i18n="who_role"></span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- OUR ATHLETES — light-gray band, centred head, horizontal scroll-snap row with
+       arrow buttons. Filters and the unlock gate behave exactly as before. -->
+  <section class="sec sec-gray full" id="roster">
+    <div class="sec-head sec-head-c">
+      <div class="kicker" data-i18n="roster_kicker"></div>
+      <h2 class="display" data-i18n="roster_h2"></h2>
+      <p data-i18n="roster_p"></p>
+    </div>
+    <div class="unlocked-note" id="unlockedNote">✓ <span data-i18n="gate_unlocked"></span></div>
+    <div class="filters" id="sportFilters"></div>
+    <div class="filters" id="filters"></div>
+
+    <!-- Roster paywall (€49.99): the public roster is blurred behind a client-side
+         unlock-code gate. A buyer arranges payment directly with ESM (Stripe link coming
+         soon) and enters the code he is sent (validated by SHA-256 against localStorage).
+         Scoped to the roster ONLY — the €129.99 profile and €599.99 Tenerife flows stay
+         account-based. -->
+    <div class="roster-wrap is-locked" id="rosterWrap">
+      <button type="button" class="ros-arrow ros-prev" id="rosPrev" aria-label="Previous athletes">‹</button>
+      <button type="button" class="ros-arrow ros-next" id="rosNext" aria-label="Next athletes">›</button>
+      <div class="roster" id="rosterList"></div>
+      <div class="gate">
+        <div class="gate-in">
+          <div class="gate-lock">🔒</div>
+          <h3 data-i18n="gate_h"></h3>
+          <p data-i18n="gate_p"></p>
+          <!-- On-site pay buttons were pulled site-wide (Stripe links coming soon).
+               Code-only gate: an access code is obtained by contacting ESM. -->
+          <div class="gate-or" data-i18n="gate_or"></div>
+          <form class="gate-code" id="gateForm">
+            <input id="gateInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="gate_ph" data-i18n-aria="gate_aria" />
+            <button type="submit" data-i18n="gate_unlock"></button>
+          </form>
+          <a class="gate-need" data-mail data-subject="Roster access code request — ESM" data-i18n="gate_need"></a>
+          <div class="gate-err" id="gateErr" data-i18n="gate_err"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec full" id="college">
+    <div class="sec-head"><div class="kicker" data-i18n="col_kicker"></div><h2 class="display" data-i18n="col_h2"></h2><p data-i18n="col_p"></p></div>
+    <div class="col-grid">
+      <div class="col-list">
+        <div class="col-row"><i>01</i><span data-i18n="col_1"></span></div>
+        <div class="col-row"><i>02</i><span data-i18n="col_2"></span></div>
+        <div class="col-row"><i>03</i><span data-i18n="col_3"></span></div>
+        <div class="col-row"><i>04</i><span data-i18n="col_4"></span></div>
+        <div class="col-row"><i>05</i><span data-i18n="col_5"></span></div>
+        <div class="col-row"><i>06</i><span data-i18n="col_6"></span></div>
+      </div>
+      <div class="col-cta">
+        <h3 data-i18n="col_cta_h"></h3>
+        <p data-i18n="col_cta_p"></p>
+        <a class="btn btn-gold svc-signup" id="collegePayBtn" href="#join" data-svc="College Placement" data-i18n="col_cta_btn"></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec sec-gray full" id="events">
+    <div class="sec-head"><div class="kicker" data-i18n="events_kicker"></div><h2 class="display" data-i18n="events_h2"></h2><p data-i18n="events_p"></p></div>
+    <div class="ev-grid" id="eventsList"></div>
+  </section>
+
+  <!-- Tenerife Winter League media (video reel + photo gallery) now lives inside the
+       Winter League event detail modal (see openEventModal), gated behind its event card. -->
+
+  <section class="sec full" id="testi">
+    <div class="sec-head"><div class="kicker" data-i18n="testi_kicker"></div><h2 class="display" data-i18n="testi_h2"></h2><p data-i18n="testi_p"></p></div>
+    <div class="testi-list" id="testiList"></div>
+    <div class="sec-cta"><button type="button" id="testiAll" class="btn btn-navy" style="display:none" data-i18n="testi_seeall"></button></div>
+  </section>
+
+  <!-- Profile-creation gate (€129.99). Independent second instance of the roster paywall:
+       its own code hash, its own localStorage key, and it directs to #join once unlocked. -->
+  <section class="sec sec-gray full" id="profile">
+    <div class="sec-head"><div class="kicker" data-i18n="pg_kicker"></div><h2 class="display" data-i18n="pg_h2"></h2><p data-i18n="pg_p2"></p></div>
+    <div class="pcreate">
+      <div class="pc-card">
+        <div class="gate-lock">🪪</div>
+        <h3 data-i18n="pg_h"></h3>
+        <p data-i18n="pg_p"></p>
+        <ul class="pc-includes">
+          <li data-i18n="pg_i1"></li>
+          <li data-i18n="pg_i2"></li>
+          <li data-i18n="pg_i3"></li>
+          <li data-i18n="pg_i4"></li>
+        </ul>
+        <!-- Two informational tiers (item 6). Payment happens off-site with Sam — there is
+             NO payment gate. Selecting a tier records the athlete's choice (stashed for the
+             /register/ flow, which writes it onto their profile so Sam sees it) and sends
+             them straight into profile creation. No paying first. -->
+        <div class="pc-tiers">
+          <div class="pc-tier">
+            <div class="pc-tier-name" data-i18n="pg_t1_name"></div>
+            <div class="gate-price">€129.99<small data-i18n="pg_price_note"></small></div>
+            <div class="pc-tier-desc" data-i18n="pg_t1_desc"></div>
+            <a class="btn btn-gold pc-tier-cta" href="register/" data-tier-name="Standard" data-tier-price="€129.99" data-i18n="pg_t1_btn"></a>
+          </div>
+          <div class="pc-tier pc-tier-plus">
+            <div class="pc-tier-name" data-i18n="pg_t2_name"></div>
+            <div class="gate-price">€149.99<small data-i18n="pg_price_note"></small></div>
+            <div class="pc-tier-desc" data-i18n="pg_t2_desc"></div>
+            <a class="btn btn-gold pc-tier-cta" href="register/" data-tier-name="Direct Contact" data-tier-price="€149.99" data-i18n="pg_t2_btn"></a>
+          </div>
+        </div>
+        <label class="tc tc-c"><input type="checkbox" class="tc-check" id="profileTc"><span data-i18n="tc_label"></span> <a class="tc-more" href="terms.html" target="_blank" rel="noopener" data-i18n="tc_more"></a></label>
+        <div class="gate-err" id="profileTcErr" data-i18n="tc_required"></div>
+        <div class="pc-access" data-i18n="pg_access"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="band full">
+    <h2 class="display" data-i18n="band_h2"></h2><p data-i18n="band_p"></p>
+    <a class="btn btn-gold" href="#join" data-i18n="band_btn"></a>
+  </div>
+
+</main>
+
+<!-- ============================================================================
+     RIGHT RAIL — JOIN card, services card, featured testimonial card.
+     Pulled up by --hero-h so its top edge is level with the hero band's top.
+     ============================================================================ -->
+<aside class="col-rail">
+
+  <!-- ===== JOIN card =====
+       White card with a navy header (title, one-line subtitle, step indicator) over a
+       white form body, per the mockup. Every string, field, name and behaviour is the
+       pre-existing one — only the ORDER and the step grouping are new. The panel keeps
+       id="join" so every existing href="#join" (nav, hero CTA, service cards, college
+       CTA, closing band) still lands on it.
 
        Multi-step: each block carries data-step="1..4"; the fields additionally keep their
        original data-cats so the category-driven show/hide is unchanged. A block is visible
        only when BOTH its step is current AND its category matches (see updateApplyFields).
        Hidden fields stay in the DOM, so FormData on submit still sees every step's values —
        the submit handler reads only the selected category's fields, exactly as before. -->
-  <aside class="joinpanel" id="join">
+  <section class="joinpanel" id="join">
     <div class="jp-head">
       <div class="kicker" data-i18n="join_kicker"></div>
       <h2 class="display" data-i18n="join_h2"></h2>
       <p class="jp-sub" data-i18n="join_p"></p>
+      <!-- Numbered step indicator. aria-hidden: it is a visual progress cue only — the
+           authoritative state is the step heading and the labels themselves. -->
+      <ol class="jp-steps" id="jpSteps" aria-hidden="true">
+        <li data-s="1"><b>1</b><span data-i18n="step_1_t"></span></li>
+        <li data-s="2"><b>2</b><span data-i18n="step_2_t"></span></li>
+        <li data-s="3"><b>3</b><span data-i18n="step_3_t"></span></li>
+        <li data-s="4"><b>4</b><span data-i18n="step_4_t"></span></li>
+      </ol>
     </div>
 
-    <!-- Numbered step indicator. aria-hidden: it is a visual progress cue only — the
-         authoritative state is announced by the fieldset legend/labels themselves. -->
-    <ol class="jp-steps" id="jpSteps" aria-hidden="true">
-      <li data-s="1"><b>1</b><span data-i18n="step_1_t"></span></li>
-      <li data-s="2"><b>2</b><span data-i18n="step_2_t"></span></li>
-      <li data-s="3"><b>3</b><span data-i18n="step_3_t"></span></li>
-      <li data-s="4"><b>4</b><span data-i18n="step_4_t"></span></li>
-    </ol>
+    <div class="jp-body">
+      <!-- "1. CATEGORY & CONTACT" — the number and the title are both filled in by
+           renderSteps() from the same step dictionary keys used by the indicator. -->
+      <div class="jp-steptitle"><b id="jpStepNum">1.</b> <span id="jpStepName"></span></div>
 
-    <form id="applyForm" novalidate>
-      <!-- ===== STEP 1 — category + contact ===== -->
-      <div class="jp-pitch" data-step="1">
-        <div class="tagline" data-i18n="join_tagline"></div>
-        <p class="join-pitch" data-i18n="join_pitch"></p>
-      </div>
-      <div class="field" data-step="1"><label data-i18n="f_applying"></label>
-        <select name="applying" id="applyingSelect">
-          <option value="Baseball Representation" data-i18n="opt_rep_baseball"></option>
-          <option value="Softball Representation" data-i18n="opt_rep_softball"></option>
-          <option value="College Placement" data-i18n="opt_college"></option>
-          <option value="Teams and Scouts" data-i18n="opt_teams"></option>
-        </select></div>
-      <div class="af af-row" data-step="1" data-cats="rep college">
-        <div class="field"><label data-i18n="f_first"></label><input type="text" name="first_name" autocomplete="given-name" /></div>
-        <div class="field"><label data-i18n="f_last"></label><input type="text" name="last_name" autocomplete="family-name" /></div>
-      </div>
-      <div class="field af" data-step="1" data-cats="teams"><label data-i18n="f_name_or_team"></label><input type="text" name="name_or_team" /></div>
-      <div class="field af" data-step="1" data-cats="rep college"><label data-i18n="f_email"></label><input type="email" name="email" autocomplete="email" /></div>
-      <div class="field af" data-step="1" data-cats="teams"><label data-i18n="f_email"></label><input type="email" name="ts_email" autocomplete="email" /></div>
-      <div class="af af-row af-phone" data-step="1" data-cats="rep college">
-        <div class="field field-code"><label data-i18n="f_phone_code"></label><input type="text" name="phone_code" placeholder="+39" inputmode="tel" /></div>
-        <div class="field"><label data-i18n="f_phone"></label><input type="tel" name="phone" autocomplete="tel-national" /></div>
-      </div>
-      <div class="af af-row af-phone" data-step="1" data-cats="teams">
-        <div class="field field-code"><label data-i18n="f_phone_code"></label><input type="text" name="ts_phone_code" placeholder="+1" inputmode="tel" /></div>
-        <div class="field"><label data-i18n="f_phone"></label><input type="tel" name="ts_phone" autocomplete="tel-national" /></div>
-      </div>
-
-      <!-- ===== STEP 2 — athlete details ===== -->
-      <div class="field af" data-step="2" data-cats="rep college"><label data-i18n="f_nationality"></label><input type="text" name="nationality" /></div>
-      <div class="field af" data-step="2" data-cats="teams"><label data-i18n="f_nationality"></label><input type="text" name="ts_nationality" /></div>
-      <div class="field af" data-step="2" data-cats="rep college"><label data-i18n="f_country"></label><input type="text" name="country" autocomplete="country-name" /></div>
-      <div class="field af" data-step="2" data-cats="teams"><label data-i18n="f_country"></label><input type="text" name="ts_country" autocomplete="country-name" /></div>
-      <div class="field af" data-step="2" data-cats="rep college"><label data-i18n="f_position"></label>
-        <select name="position">
-          <option value="" data-i18n="f_position_ph"></option>
-          <option value="Pitcher" data-i18n="pos_pitcher"></option>
-          <option value="Catcher" data-i18n="pos_catcher"></option>
-          <option value="Infield" data-i18n="pos_infield"></option>
-          <option value="Outfield" data-i18n="pos_outfield"></option>
-        </select></div>
-      <div class="field af" data-step="2" data-cats="rep college"><label data-i18n="f_age"></label><input type="number" name="age" min="1" max="99" inputmode="numeric" /></div>
-      <div class="field af" data-step="2" data-cats="teams"><label data-i18n="f_role"></label><input type="text" name="ts_role" /></div>
-
-      <!-- ===== STEP 3 — documents ===== -->
-      <div class="field af" data-step="3" data-cats="rep college"><label data-i18n="f_photo"></label>
-        <input type="file" name="photo" accept="image/jpeg,image/png" />
-        <small class="fhint" data-i18n="f_photo_hint"></small></div>
-      <div class="field af" data-step="3" data-cats="teams"><label data-i18n="f_photo"></label>
-        <input type="file" name="ts_photo" accept="image/jpeg,image/png" />
-        <small class="fhint" data-i18n="f_photo_hint"></small></div>
-      <div class="field af" data-step="3" data-cats="rep college"><label data-i18n="f_resume"></label>
-        <input type="file" name="resume" accept="application/pdf,.pdf" />
-        <small class="fhint" data-i18n="f_pdf_hint"></small></div>
-      <div class="field af" data-step="3" data-cats="college"><label data-i18n="f_english"></label>
-        <input type="file" name="english_cert" accept="application/pdf,.pdf" />
-        <small class="fhint" data-i18n="f_pdf_hint"></small></div>
-      <div class="field af" data-step="3" data-cats="college"><label data-i18n="f_education"></label><input type="text" name="education_level" /></div>
-      <div class="field af" data-step="3" data-cats="college"><label data-i18n="f_diploma"></label>
-        <input type="file" name="diploma" accept="application/pdf,.pdf" />
-        <small class="fhint" data-i18n="f_pdf_hint"></small></div>
-
-      <!-- ===== STEP 4 — goals + terms + submit ===== -->
-      <div class="field af" data-step="4" data-cats="rep"><label data-i18n="f_goals"></label><textarea name="goals"></textarea></div>
-      <div class="field af" data-step="4" data-cats="college"><label data-i18n="f_study"></label><textarea name="study_goals"></textarea></div>
-      <div class="field af" data-step="4" data-cats="teams"><label data-i18n="f_looking"></label><textarea name="looking_for"></textarea></div>
-      <label class="tc" data-step="4"><input type="checkbox" class="tc-check" id="joinTc"><span data-i18n="tc_label"></span> <a class="tc-more" href="terms.html" target="_blank" rel="noopener" data-i18n="tc_more"></a></label>
-
-      <!-- Anti-spam honeypot — hidden from real users; must stay empty. Deliberately has
-           NO data-step, so it is present on every step exactly as it was before. -->
-      <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
-
-      <div class="jp-nav">
-        <button type="button" class="btn btn-ghost jp-back" id="stepBack" data-i18n="step_back"></button>
-        <button type="button" class="btn btn-gold jp-next" id="stepNext" data-i18n="step_next"></button>
-        <button class="btn btn-gold jp-submit" type="submit" data-i18n="f_submit"></button>
-      </div>
-      <div class="form-msg" id="formMsg"></div>
-    </form>
-  </aside>
-</div></section>
-
-<section class="contracts"><div class="wrap">
-  <h2 class="display" data-i18n-html="contracts_h2"></h2>
-  <p class="sub" data-i18n-html="contracts_sub"></p>
-  <div class="rule"></div>
-
-  <div class="feature-grid">
-    <div class="tcard">
-      <div class="shot" style="background-image:url('media/photos/jose-cedeno-thumb.jpg')"></div>
-      <div>
-        <div class="qt" id="featQuote"></div>
-        <div class="nm">José Cedeño</div>
-        <div class="rl" data-i18n="feat_role"></div>
-      </div>
-    </div>
-  </div>
-  <!-- "See all testimonials" near the featured testimonial (item 1) — same modal + styling as the bottom one. -->
-  <div style="text-align:center;margin-top:22px"><button type="button" id="testiAllTop" class="btn btn-gold" style="display:none" data-i18n="testi_seeall"></button></div>
-</div></section>
-
-<div class="stats"><div class="wrap stats-in">
-  <div class="stat"><b id="statAthletes">19</b><span data-i18n="stat1"></span></div>
-  <div class="stat"><b id="statCountries">7</b><span data-i18n="stat2"></span></div>
-</div></div>
-
-<section class="sec" id="about"><div class="wrap">
-  <div class="sec-head"><div class="kicker" data-i18n="about_kicker"></div><h2 class="display" data-i18n="about_h2"></h2><p data-i18n="about_p"></p></div>
-  <div class="do-grid">
-    <div class="do"><div class="ic">🎓</div><h3 data-i18n="svc1_t"></h3><p data-i18n="svc1_d"></p><a class="svc-pay" href="#college" data-i18n="svc1_pay"></a></div>
-    <div class="do"><div class="ic">⚾</div><h3 data-i18n="svc_pro_t"></h3><p data-i18n="svc_pro_d"></p><a class="svc-pay svc-signup" href="#join" data-svc="Baseball Representation" data-i18n="svc_pro_pay"></a></div>
-    <div class="do"><div class="ic">🥎</div><h3 data-i18n="so_t"></h3><p data-i18n="so_d"></p><a class="svc-pay svc-signup" href="#join" data-svc="Softball" data-i18n="so_pay"></a></div>
-    <div class="do"><div class="ic">📣</div><h3 data-i18n="svc4_t"></h3><p data-i18n="svc4_d"></p></div>
-    <div class="do"><div class="ic">📈</div><h3 data-i18n="svc5_t"></h3><p data-i18n="svc5_d"></p>
-      <ul class="do-bul">
-        <li data-i18n="svc5_b1"></li>
-        <li data-i18n="svc5_b2"></li>
-        <li data-i18n="svc5_b3"></li>
-        <li data-i18n="svc5_b4"></li>
-        <li data-i18n="svc5_b5"></li>
-      </ul>
-      <div class="do-hl"><b data-i18n="svc5_hl_t"></b><span data-i18n="svc5_hl_d"></span></div></div>
-  </div>
-</div></section>
-
-<section class="sec sec-alt" id="college"><div class="wrap">
-  <div class="sec-head"><div class="kicker" data-i18n="col_kicker"></div><h2 class="display" data-i18n="col_h2"></h2><p data-i18n="col_p"></p></div>
-  <div class="col-grid">
-    <div class="col-list">
-      <div class="col-row"><i>01</i><span data-i18n="col_1"></span></div>
-      <div class="col-row"><i>02</i><span data-i18n="col_2"></span></div>
-      <div class="col-row"><i>03</i><span data-i18n="col_3"></span></div>
-      <div class="col-row"><i>04</i><span data-i18n="col_4"></span></div>
-      <div class="col-row"><i>05</i><span data-i18n="col_5"></span></div>
-      <div class="col-row"><i>06</i><span data-i18n="col_6"></span></div>
-    </div>
-    <div class="col-cta">
-      <h3 data-i18n="col_cta_h"></h3>
-      <p data-i18n="col_cta_p"></p>
-      <a class="btn btn-gold svc-signup" id="collegePayBtn" href="#join" data-svc="College Placement" data-i18n="col_cta_btn"></a>
-    </div>
-  </div>
-</div></section>
-
-<section class="sec" id="who"><div class="wrap">
-  <div class="sec-head"><div class="kicker" data-i18n="who_kicker"></div></div>
-  <div class="founder">
-    <div class="mono" id="founderPhoto" style="background-image:url('https://sbexwyvsgqayxrsrlrpm.supabase.co/storage/v1/object/public/player-photos/founder/sam.jpeg');background-size:cover;background-position:center top;font-size:0"></div>
-    <div>
-      <h3 class="display">Samuele Bruno</h3>
-      <div class="role" data-i18n="who_role"></div>
-      <p data-i18n="who_bio"></p>
-      <p data-i18n="who_bio2"></p>
-      <div class="creds">
-        <span class="cred" data-i18n="cred_italy"></span>
-        <span class="cred" data-i18n="cred_u18"></span>
-        <span class="cred" data-i18n="cred_cbl"></span>
-        <span class="cred" data-i18n="cred_pro"></span>
-        <span class="cred" data-i18n="cred_college"></span>
-        <span class="cred" data-i18n="cred_hastings"></span>
-        <span class="cred" data-i18n="cred_cod"></span>
-        <span class="cred" data-i18n="cred_ecc"></span>
-      </div>
-      <a class="founder-contact" href="mailto:elitesportsmanagement50@gmail.com?subject=Inquiry%20-%20Elite%20Sports%20Management"><span class="ic">✉</span><span data-i18n="sam_contact"></span></a>
-    </div>
-  </div>
-</div></section>
-
-<section class="sec sec-alt" id="roster"><div class="wrap">
-  <div class="sec-head"><div class="kicker" data-i18n="roster_kicker"></div><h2 class="display" data-i18n="roster_h2"></h2><p data-i18n="roster_p"></p></div>
-  <div class="unlocked-note" id="unlockedNote">✓ <span data-i18n="gate_unlocked"></span></div>
-  <div class="filters" id="sportFilters"></div>
-  <div class="filters" id="filters"></div>
-
-  <!-- Roster paywall (€49.99): the public roster is blurred behind a client-side
-       unlock-code gate. A buyer arranges payment directly with ESM (Stripe link coming
-       soon) and enters the code he is sent (validated by SHA-256 against localStorage).
-       Scoped to the roster ONLY — the €129.99 profile and €599.99 Tenerife flows stay
-       account-based. -->
-  <div class="roster-wrap is-locked" id="rosterWrap">
-    <div class="roster" id="rosterList"></div>
-    <div class="gate">
-      <div class="gate-in">
-        <div class="gate-lock">🔒</div>
-        <h3 data-i18n="gate_h"></h3>
-        <p data-i18n="gate_p"></p>
-        <!-- On-site pay buttons were pulled site-wide (Stripe links coming soon).
-             Code-only gate: an access code is obtained by contacting ESM. -->
-        <div class="gate-or" data-i18n="gate_or"></div>
-        <form class="gate-code" id="gateForm">
-          <input id="gateInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="gate_ph" data-i18n-aria="gate_aria" />
-          <button type="submit" data-i18n="gate_unlock"></button>
-        </form>
-        <a class="gate-need" data-mail data-subject="Roster access code request — ESM" data-i18n="gate_need"></a>
-        <div class="gate-err" id="gateErr" data-i18n="gate_err"></div>
-      </div>
-    </div>
-  </div>
-</div></section>
-
-<section class="sec" id="events"><div class="wrap">
-  <div class="sec-head"><div class="kicker" data-i18n="events_kicker"></div><h2 class="display" data-i18n="events_h2"></h2><p data-i18n="events_p"></p></div>
-  <div class="ev-grid" id="eventsList"></div>
-</div></section>
-
-<!-- Tenerife Winter League media (video reel + photo gallery) now lives inside the
-     Winter League event detail modal (see openEventModal), gated behind its event card. -->
-
-<section class="sec sec-alt" id="testi"><div class="wrap">
-  <div class="sec-head"><div class="kicker" data-i18n="testi_kicker"></div><h2 class="display" data-i18n="testi_h2"></h2><p data-i18n="testi_p"></p></div>
-  <div class="testi-grid" id="testiList"></div>
-  <div style="text-align:center;margin-top:28px"><button type="button" id="testiAll" class="btn btn-gold" style="display:none" data-i18n="testi_seeall"></button></div>
-</div></section>
-
-<!-- Profile-creation gate (€129.99). Independent second instance of the roster paywall:
-     its own code hash, its own localStorage key, and it directs to #join once unlocked. -->
-<section class="sec" id="profile"><div class="wrap">
-  <div class="sec-head"><div class="kicker" data-i18n="pg_kicker"></div><h2 class="display" data-i18n="pg_h2"></h2><p data-i18n="pg_p2"></p></div>
-  <div class="pcreate">
-    <div class="gate-in">
-      <div class="gate-lock">🪪</div>
-      <h3 data-i18n="pg_h"></h3>
-      <p data-i18n="pg_p"></p>
-      <ul class="pc-includes">
-        <li data-i18n="pg_i1"></li>
-        <li data-i18n="pg_i2"></li>
-        <li data-i18n="pg_i3"></li>
-        <li data-i18n="pg_i4"></li>
-      </ul>
-      <!-- Two informational tiers (item 6). Payment happens off-site with Sam — there is
-           NO payment gate. Selecting a tier records the athlete's choice (stashed for the
-           /register/ flow, which writes it onto their profile so Sam sees it) and sends
-           them straight into profile creation. No paying first. -->
-      <div class="pc-tiers">
-        <div class="pc-tier">
-          <div class="pc-tier-name" data-i18n="pg_t1_name"></div>
-          <div class="gate-price">€129.99<small data-i18n="pg_price_note"></small></div>
-          <div class="pc-tier-desc" data-i18n="pg_t1_desc"></div>
-          <a class="btn btn-gold pc-tier-cta" href="register/" data-tier-name="Standard" data-tier-price="€129.99" data-i18n="pg_t1_btn"></a>
+      <form id="applyForm" novalidate>
+        <!-- ===== STEP 1 — category + contact ===== -->
+        <div class="jp-pitch" data-step="1">
+          <div class="tagline" data-i18n="join_tagline"></div>
+          <p class="join-pitch" data-i18n="join_pitch"></p>
         </div>
-        <div class="pc-tier pc-tier-plus">
-          <div class="pc-tier-name" data-i18n="pg_t2_name"></div>
-          <div class="gate-price">€149.99<small data-i18n="pg_price_note"></small></div>
-          <div class="pc-tier-desc" data-i18n="pg_t2_desc"></div>
-          <a class="btn btn-gold pc-tier-cta" href="register/" data-tier-name="Direct Contact" data-tier-price="€149.99" data-i18n="pg_t2_btn"></a>
+        <div class="field jp-wide" data-step="1"><label data-i18n="f_applying"></label>
+          <select name="applying" id="applyingSelect">
+            <option value="Baseball Representation" data-i18n="opt_rep_baseball"></option>
+            <option value="Softball Representation" data-i18n="opt_rep_softball"></option>
+            <option value="College Placement" data-i18n="opt_college"></option>
+            <option value="Teams and Scouts" data-i18n="opt_teams"></option>
+          </select></div>
+        <div class="af af-row" data-step="1" data-cats="rep college">
+          <div class="field"><label data-i18n="f_first"></label><input type="text" name="first_name" autocomplete="given-name" /></div>
+          <div class="field"><label data-i18n="f_last"></label><input type="text" name="last_name" autocomplete="family-name" /></div>
         </div>
-      </div>
-      <label class="tc" style="justify-content:center"><input type="checkbox" class="tc-check" id="profileTc"><span data-i18n="tc_label"></span> <a class="tc-more" href="terms.html" target="_blank" rel="noopener" data-i18n="tc_more"></a></label>
-      <div class="gate-err" id="profileTcErr" data-i18n="tc_required"></div>
-      <div class="pc-access" data-i18n="pg_access"></div>
+        <div class="field af jp-wide" data-step="1" data-cats="teams"><label data-i18n="f_name_or_team"></label><input type="text" name="name_or_team" /></div>
+        <div class="field af jp-wide" data-step="1" data-cats="rep college"><label data-i18n="f_email"></label><input type="email" name="email" autocomplete="email" /></div>
+        <div class="field af jp-wide" data-step="1" data-cats="teams"><label data-i18n="f_email"></label><input type="email" name="ts_email" autocomplete="email" /></div>
+        <div class="af af-row af-phone" data-step="1" data-cats="rep college">
+          <div class="field field-code"><label data-i18n="f_phone_code"></label><input type="text" name="phone_code" placeholder="+39" inputmode="tel" /></div>
+          <div class="field"><label data-i18n="f_phone"></label><input type="tel" name="phone" autocomplete="tel-national" /></div>
+        </div>
+        <div class="af af-row af-phone" data-step="1" data-cats="teams">
+          <div class="field field-code"><label data-i18n="f_phone_code"></label><input type="text" name="ts_phone_code" placeholder="+1" inputmode="tel" /></div>
+          <div class="field"><label data-i18n="f_phone"></label><input type="tel" name="ts_phone" autocomplete="tel-national" /></div>
+        </div>
+
+        <!-- ===== STEP 2 — athlete details ===== -->
+        <div class="af af-row" data-step="2" data-cats="rep college">
+          <div class="field"><label data-i18n="f_nationality"></label><input type="text" name="nationality" /></div>
+          <div class="field"><label data-i18n="f_country"></label><input type="text" name="country" autocomplete="country-name" /></div>
+        </div>
+        <div class="af af-row" data-step="2" data-cats="teams">
+          <div class="field"><label data-i18n="f_nationality"></label><input type="text" name="ts_nationality" /></div>
+          <div class="field"><label data-i18n="f_country"></label><input type="text" name="ts_country" autocomplete="country-name" /></div>
+        </div>
+        <div class="af af-row" data-step="2" data-cats="rep college">
+          <div class="field"><label data-i18n="f_position"></label>
+            <select name="position">
+              <option value="" data-i18n="f_position_ph"></option>
+              <option value="Pitcher" data-i18n="pos_pitcher"></option>
+              <option value="Catcher" data-i18n="pos_catcher"></option>
+              <option value="Infield" data-i18n="pos_infield"></option>
+              <option value="Outfield" data-i18n="pos_outfield"></option>
+            </select></div>
+          <div class="field"><label data-i18n="f_age"></label><input type="number" name="age" min="1" max="99" inputmode="numeric" /></div>
+        </div>
+        <div class="field af jp-wide" data-step="2" data-cats="teams"><label data-i18n="f_role"></label><input type="text" name="ts_role" /></div>
+
+        <!-- ===== STEP 3 — documents ===== -->
+        <div class="field af jp-wide" data-step="3" data-cats="rep college"><label data-i18n="f_photo"></label>
+          <input type="file" name="photo" accept="image/jpeg,image/png" />
+          <small class="fhint" data-i18n="f_photo_hint"></small></div>
+        <div class="field af jp-wide field-opt" data-step="3" data-cats="teams"><label data-i18n="f_photo"></label>
+          <input type="file" name="ts_photo" accept="image/jpeg,image/png" />
+          <small class="fhint" data-i18n="f_photo_hint"></small></div>
+        <div class="field af jp-wide" data-step="3" data-cats="rep college"><label data-i18n="f_resume"></label>
+          <input type="file" name="resume" accept="application/pdf,.pdf" />
+          <small class="fhint" data-i18n="f_pdf_hint"></small></div>
+        <div class="field af jp-wide" data-step="3" data-cats="college"><label data-i18n="f_english"></label>
+          <input type="file" name="english_cert" accept="application/pdf,.pdf" />
+          <small class="fhint" data-i18n="f_pdf_hint"></small></div>
+        <div class="field af jp-wide" data-step="3" data-cats="college"><label data-i18n="f_education"></label><input type="text" name="education_level" /></div>
+        <div class="field af jp-wide" data-step="3" data-cats="college"><label data-i18n="f_diploma"></label>
+          <input type="file" name="diploma" accept="application/pdf,.pdf" />
+          <small class="fhint" data-i18n="f_pdf_hint"></small></div>
+
+        <!-- ===== STEP 4 — goals + terms + submit ===== -->
+        <div class="field af jp-wide" data-step="4" data-cats="rep"><label data-i18n="f_goals"></label><textarea name="goals"></textarea></div>
+        <div class="field af jp-wide" data-step="4" data-cats="college"><label data-i18n="f_study"></label><textarea name="study_goals"></textarea></div>
+        <div class="field af jp-wide" data-step="4" data-cats="teams"><label data-i18n="f_looking"></label><textarea name="looking_for"></textarea></div>
+        <label class="tc" data-step="4"><input type="checkbox" class="tc-check" id="joinTc"><span data-i18n="tc_label"></span> <a class="tc-more" href="terms.html" target="_blank" rel="noopener" data-i18n="tc_more"></a></label>
+
+        <!-- Anti-spam honeypot — hidden from real users; must stay empty. Deliberately has
+             NO data-step, so it is present on every step exactly as it was before. -->
+        <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <div class="jp-nav">
+          <button type="button" class="btn btn-gold jp-next" id="stepNext" data-i18n="step_next"></button>
+          <button class="btn btn-gold jp-submit" type="submit" data-i18n="f_submit"></button>
+          <button type="button" class="jp-back" id="stepBack" data-i18n="step_back"></button>
+        </div>
+        <div class="form-msg" id="formMsg"></div>
+      </form>
     </div>
-  </div>
-</div></section>
+  </section>
 
-<div class="band"><div class="wrap band-in">
-  <h2 class="display" data-i18n="band_h2"></h2><p data-i18n="band_p"></p>
-  <a class="btn btn-gold" href="#join" data-i18n="band_btn"></a>
-</div></div>
+  <!-- ===== Services card (mirrors the mockup's "WHAT YOU RECEIVE") =====
+       The five existing "What We Do" services, relocated here as icon + title.
+       Each service's full description / bullets / highlight text is preserved in the
+       DOM as visually-hidden text (.sr-only) so no string is lost and every existing
+       i18n key still resolves — see the round-2 notes in ENGINEERING_LOG.md. -->
+  <section class="rail-card svc-card" id="about">
+    <h2 class="rail-title" data-i18n="about_kicker"></h2>
+    <div class="svc-grid">
+      <a class="svc-cell" href="#college">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.5 8.5 12 13l9.5-4.5L12 4Z"/><path d="M6 10.6V15c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.4"/><path d="M20.5 9v5"/></svg>
+        <span class="svc-t" data-i18n="svc1_t"></span>
+        <span class="sr-only" data-i18n="svc1_d"></span><span class="sr-only" data-i18n="svc1_pay"></span>
+      </a>
+      <a class="svc-cell svc-signup" href="#join" data-svc="Baseball Representation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M7.6 5.2c1.6 2 2.4 4.3 2.4 6.8s-.8 4.8-2.4 6.8M16.4 5.2c-1.6 2-2.4 4.3-2.4 6.8s.8 4.8 2.4 6.8"/></svg>
+        <span class="svc-t" data-i18n="svc_pro_t"></span>
+        <span class="sr-only" data-i18n="svc_pro_d"></span><span class="sr-only" data-i18n="svc_pro_pay"></span>
+      </a>
+      <a class="svc-cell svc-signup" href="#join" data-svc="Softball">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M5.4 8.2c2.6.6 4.7 2.1 6 4.2 1.3 2.1 1.7 4.6 1.2 7.2M18.6 8.2c-2.6.6-4.7 2.1-6 4.2"/></svg>
+        <span class="svc-t" data-i18n="so_t"></span>
+        <span class="sr-only" data-i18n="so_d"></span><span class="sr-only" data-i18n="so_pay"></span>
+      </a>
+      <div class="svc-cell">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3l7-4v13l-7-4H4a1.5 1.5 0 0 1-1.5-1.5v-2A1.5 1.5 0 0 1 4 9.5Z"/><path d="M17.5 9a4 4 0 0 1 0 6"/></svg>
+        <span class="svc-t" data-i18n="svc4_t"></span>
+        <span class="sr-only" data-i18n="svc4_d"></span>
+      </div>
+      <div class="svc-cell">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 17.5 9 12l3.5 3.5L20.5 7"/><path d="M15.5 7h5v5"/></svg>
+        <span class="svc-t" data-i18n="svc5_t"></span>
+        <span class="sr-only" data-i18n="svc5_d"></span>
+        <span class="sr-only" data-i18n="svc5_b1"></span><span class="sr-only" data-i18n="svc5_b2"></span><span class="sr-only" data-i18n="svc5_b3"></span><span class="sr-only" data-i18n="svc5_b4"></span><span class="sr-only" data-i18n="svc5_b5"></span>
+        <span class="sr-only" data-i18n="svc5_hl_t"></span><span class="sr-only" data-i18n="svc5_hl_d"></span>
+      </div>
+    </div>
+    <span class="sr-only" data-i18n="about_h2"></span><span class="sr-only" data-i18n="about_p"></span>
+  </section>
 
-<!-- Multi-column footer (2026-09 redesign): brand + rights, quick links, contact.
-     The "quick links" column re-uses the SIX EXISTING nav anchors and their existing
-     i18n keys — no new destinations and no new strings. esm-legal.js still appends its
-     Privacy · Terms row as a direct child of <footer>, below this grid. -->
-<footer><div class="wrap foot">
+  <!-- ===== Featured testimonial card (José Cedeño) — relocated from the contracts band. -->
+  <section class="rail-card rail-testi">
+    <div class="rt-q">“</div>
+    <div class="rt-body">
+      <div class="qt" id="featQuote"></div>
+      <div class="rt-who"><div class="nm">José Cedeño</div><div class="rl" data-i18n="feat_role"></div></div>
+    </div>
+    <div class="rt-shot" style="background-image:url('media/photos/jose-cedeno-thumb.jpg')"></div>
+    <div class="sec-cta"><button type="button" id="testiAllTop" class="btn btn-outline" style="display:none" data-i18n="testi_seeall"></button></div>
+  </section>
+
+</aside>
+</div><!-- /.shell -->
+
+<!-- ============================================================================
+     FOOTER — navy, four columns + a thin darker copyright bar. Every link and label
+     already exists on the page: Quick Links are the six nav anchors, Resources are the
+     four Sign In destinations, Contact is the existing email + Instagram.
+     esm-legal.js still appends its Privacy · Terms row as a direct child of <footer>.
+     ============================================================================ -->
+<footer>
+ <div class="shell foot">
   <div class="foot-col foot-brand">
     <a class="brand" href="#top"><img class="logo-img foot-logo" src="logo.png" alt="ESM Sports Network" width="88" height="64" loading="lazy" /></a>
-    <p class="muted">© <span id="yr"></span> ESM Sports Network. <span data-i18n="foot_rights"></span></p>
-    <a class="foot-admin" href="admin/" data-i18n="admin_link"></a>
+    <div class="foot-social">
+      <a href="https://www.instagram.com/esm_sports_network__01/" target="_blank" rel="noopener" aria-label="ESM Sports Network on Instagram"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+      <a href="mailto:elitesportsmanagement50@gmail.com" aria-label="elitesportsmanagement50@gmail.com"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></a>
+    </div>
   </div>
-  <nav class="foot-col foot-nav">
+  <!-- The mockup's "QUICK LINKS" heading has no existing string behind it and
+       reusing "Join Us" here would mislabel the column, so this one runs unlabelled. -->
+  <nav class="foot-col foot-nav foot-nav-nohead">
     <a href="#about" data-i18n="nav_about"></a>
     <a href="#who" data-i18n="nav_who"></a>
     <a href="#college" data-i18n="nav_college"></a>
@@ -1039,20 +1426,35 @@
     <a href="#events" data-i18n="nav_events"></a>
     <a href="#join" data-i18n="nav_join"></a>
   </nav>
-  <div class="foot-col foot-links">
-    <a class="pill" href="https://www.instagram.com/esm_sports_network__01/" target="_blank" rel="noopener" aria-label="ESM Sports Network on Instagram"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>@esm_sports_network__01</a>
-    <a class="pill" href="mailto:elitesportsmanagement50@gmail.com">✉ elitesportsmanagement50@gmail.com</a>
+  <nav class="foot-col foot-nav">
+    <h3 class="foot-h" data-i18n="nav_signin"></h3>
+    <a href="register/" data-i18n="nav_signin_create"></a>
+    <a href="portal/" data-i18n="nav_signin_player"></a>
+    <a href="scout/" data-i18n="nav_signin_scout"></a>
+    <a href="admin/" data-i18n="nav_signin_admin"></a>
+  </nav>
+  <div class="foot-col foot-contact">
+    <h3 class="foot-h" data-i18n="sam_contact"></h3>
+    <a href="mailto:elitesportsmanagement50@gmail.com"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>elitesportsmanagement50@gmail.com</a>
+    <a href="https://www.instagram.com/esm_sports_network__01/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>@esm_sports_network__01</a>
   </div>
-</div>
-<div class="wrap ceasai">
+ </div>
+
+ <div class="shell ceasai">
   <a href="https://protiqai.com" target="_blank" rel="noopener"><img class="ceasai-logo" src="ceasai-logo.jpeg" alt="CeasAI — Custom Solutions" width="34" height="34" loading="lazy" /><span data-i18n="ceasai_cta"></span></a>
   <div class="ceasai-social">
     <a href="https://www.instagram.com/ceas_ai/" target="_blank" rel="noopener noreferrer" data-i18n-aria="ceasai_ig"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a>
     <a href="mailto:ceasai.solutions@gmail.com" data-i18n-aria="ceasai_email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></a>
     <a href="https://www.tiktok.com/@ceas_ai" target="_blank" rel="noopener noreferrer" data-i18n-aria="ceasai_tiktok"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M16.5 3c.3 2.1 1.6 3.6 3.5 3.9v2.4c-1.3.1-2.5-.3-3.5-1v5.5c0 3.2-2.4 5.2-5.2 5.2-2.7 0-4.8-2-4.8-4.7 0-2.8 2.3-4.8 5.1-4.6v2.5c-.3-.1-.7-.1-1-.1-1.2 0-2.2.9-2.2 2.2 0 1.3 1 2.2 2.2 2.2 1.4 0 2.4-1 2.4-2.7V3h3z"/></svg></a>
   </div>
-</div>
+ </div>
+
+ <div class="foot-bar"><div class="shell foot-bar-in">
+   <p class="muted">© <span id="yr"></span> ESM Sports Network. <span data-i18n="foot_rights"></span></p>
+   <a class="foot-admin" href="admin/" data-i18n="admin_link"></a>
+ </div></div>
 </footer>
+
 
 <div class="modal" id="modal"><div class="scrim" data-close></div><div class="sheet"><button type="button" class="close" data-close aria-label="Close">✕</button><div id="sheetContent"></div></div></div>
 
@@ -1868,6 +2270,8 @@ function applyI18n(){
   document.querySelectorAll("[data-i18n-aria]").forEach(el=>el.setAttribute("aria-label",t(el.dataset.i18nAria)));
   document.querySelectorAll("[data-i18n-ph]").forEach(el=>el.setAttribute("placeholder",t(el.dataset.i18nPh)));
   document.querySelectorAll("#lang button").forEach(b=>b.classList.toggle("on",b.dataset.l===lang));
+  // The step heading is written imperatively (not via data-i18n), so refresh it here too.
+  if(typeof renderSteps==="function")renderSteps();
 }
 function setLang(l){lang=l;try{localStorage.setItem("esm_lang",l);}catch(e){}applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();}
 
@@ -1902,6 +2306,7 @@ function renderRoster(){
   }).join("");
   document.getElementById("rosterList").innerHTML=cards||`<div class="roster-empty">${t("roster_empty")}</div>`;
   document.querySelectorAll(".pcard[data-slug]").forEach(c=>c.onclick=()=>openModal(c.dataset.slug));
+  if(typeof syncRosterArrows==="function")syncRosterArrows();
   // Headline stats are set by ESM, not derived from the roster: the public roster
   // only lists approved athletes, which undercounts who's actually represented.
 }
@@ -1964,11 +2369,13 @@ const loc=v=>(v&&typeof v==="object")?(v[lang]||v.en||Object.values(v)[0]||""):(
 // and featured on the main grid; the DB set fills out the full "See all" list.
 let DB_TESTI=[];
 const testiCard=x=>`
-    <div class="testi"><div class="q">“</div><p>${esc(loc(x.q))}</p>
-      <div class="who">
-        <div class="av" ${x.photo?`style="background-image:url('${x.photo}');background-size:cover;background-position:center 20%;border-color:var(--gold)"`:""}>${x.photo?"":initials(x.n)}</div>
-        <div><div class="nm">${esc(x.n)}</div><div class="rl">${esc(loc(x.r))}</div></div>
-      </div></div>`;
+    <div class="testi">
+      <div class="av" ${x.photo?`style="background-image:url('${x.photo}')"`:""}>${x.photo?"":initials(x.n)}</div>
+      <div class="ti-body">
+        <div class="q">“</div><p>${esc(loc(x.q))}</p>
+        <div class="who"><div class="nm">${esc(x.n)}</div><div class="rl">${esc(loc(x.r))}</div></div>
+      </div>
+    </div>`;
 function renderTesti(){
   // Lower grid shows the admin-managed (DB) testimonials; Jos\u00E9 stays the featured
   // card at the top only (item 4 \u2014 no duplicate). Falls back to the embedded set if
@@ -2275,6 +2682,11 @@ function renderSteps(){
     li.classList.toggle("on",n===STEP);
     li.classList.toggle("done",n<STEP);
   });
+  // "1. CATEGORY & CONTACT" heading — same step keys as the indicator, so the two
+  // can never disagree and both re-translate together.
+  const num=document.getElementById("jpStepNum"), nm=document.getElementById("jpStepName");
+  if(num)num.textContent=STEP+".";
+  if(nm)nm.textContent=t("step_"+STEP+"_t");
 }
 function syncStepNav(){
   const back=document.getElementById("stepBack"), next=document.getElementById("stepNext"),
@@ -2566,6 +2978,54 @@ form.addEventListener("submit",async e=>{
   msg.textContent=t("f_success");msg.classList.add("show");
   msg.scrollIntoView({behavior:"smooth",block:"center"});
 });
+
+/* ===== Athlete carousel (2026-09 round 2) =====
+   The roster is a horizontal scroll-snap row; these arrows nudge it two cards at a
+   time and hide themselves at each end. Purely a scroll helper — the roster data,
+   filters and unlock gate are untouched. */
+(function(){
+  const list=document.getElementById("rosterList"),
+        prev=document.getElementById("rosPrev"), next=document.getElementById("rosNext");
+  if(!list||!prev||!next)return;
+  const cardStep=()=>{const c=list.querySelector(".pcard");return c?c.getBoundingClientRect().width+16:216;};
+  const nudge=d=>list.scrollBy({left:d*cardStep()*2,behavior:"smooth"});
+  prev.addEventListener("click",()=>nudge(-1));
+  next.addEventListener("click",()=>nudge(1));
+  function sync(){
+    // grid mode (narrow phones) or nothing to scroll -> no arrows
+    const max=list.scrollWidth-list.clientWidth-2;
+    const off=getComputedStyle(list).display!=="flex"||max<=0;
+    prev.style.visibility=(off||list.scrollLeft<=2)?"hidden":"visible";
+    next.style.visibility=(off||list.scrollLeft>=max)?"hidden":"visible";
+  }
+  list.addEventListener("scroll",sync,{passive:true});
+  addEventListener("resize",sync);
+  window.syncRosterArrows=sync;
+  sync();
+})();
+
+/* ===== Nav active-link underline =====
+   The mockup marks the current section with a short gold underline. Recomputed on
+   scroll via IntersectionObserver; read-only, affects nothing but a CSS class. */
+(function(){
+  const links=[...document.querySelectorAll(".nav-links a[href^='#']")];
+  if(!links.length||!("IntersectionObserver" in window))return;
+  const map=new Map();
+  links.forEach(a=>{ const el=document.querySelector(a.getAttribute("href")); if(el)map.set(el,a); });
+  if(!map.size)return;
+  function pick(){
+    let best=null,bestTop=Infinity;
+    map.forEach((a,el)=>{
+      const r=el.getBoundingClientRect();
+      if(r.bottom>90 && r.top<innerHeight*0.55 && r.top<bestTop){ bestTop=r.top; best=a; }
+    });
+    links.forEach(l=>l.classList.toggle("on",l===best));
+  }
+  const io=new IntersectionObserver(pick,{rootMargin:"-64px 0px -45% 0px",threshold:[0,.25,.5,1]});
+  map.forEach((a,el)=>io.observe(el));
+  addEventListener("scroll",pick,{passive:true});
+  pick();
+})();
 
 /* install prompt */
 let deferredPrompt=null;

@@ -1469,3 +1469,99 @@ the video player and its play button/duration (no video asset — the founder ph
 that frame) · the mockup's per-step helper line ("Tell us who you are") · the hero's
 small-caps subline and the "BASEBALL & SOFTBALL" label above the hero buttons — we have no
 second short hero string and inventing one is out of scope.
+
+### ROUND 2 — what was built
+
+Files touched: `site/index.html`, `site/sw.js` (`esm-v17` → `esm-v18`),
+`site/design/homepage-mockup.jpg` (new), this log. Nothing else — `register/`, `scout/`,
+`portal/`, `admin/`, `tenerife/`, `players/`, `privacy/`, `terms.html`, the generators and
+`esm-legal.js` are all untouched.
+
+**Theme.** The page is now light: white and `#f4f5f7` bands with navy text. Navy survives in
+the nav, hero band, athlete cards, services card, JOIN card header, closing band and footer.
+`.bg-fx` (the old fixed dark gradient) is disabled. No red anywhere — every red in the
+mockup is rendered in `--gold`.
+
+**Shell.** A `--shell:1280px` container with a `minmax(0,1fr) 380px` grid and a 24px gutter
+(≈69/31). The hero is the first item of the main column and negative-margins/pads itself out
+to the viewport edges, so the navy band reads as full width while its copy stays in the left
+column. Because the hero and the rail are the two cells of the *same grid row*, the JOIN
+card's top edge lines up with the hero's top structurally — measured at exactly 0px offset
+at 1366/1440/1920 in all three languages, with no magic number to drift.
+Below 1200px `.col-main` becomes `display:contents` so the hero, stats strip and rail become
+siblings of one flex column, and the rail cards drop in directly below the navy hero block
+(order: hero → stats → JOIN → services → testimonial → the rest).
+Sections below the end of the rail carry `.full` and reclaim the rail's width, so the page
+never shows an empty right third.
+
+**Hero.** Gold rule + tiny letter-spaced eyebrow, stacked Anton headline with the existing
+gold phrase, lead, two rectangular buttons. The Arath Zapien photo is sized
+`min(64vw,900px)` and bottom-aligned so it fills the band's full height (its top edge is
+clipped rather than showing as a hard line) and runs 150px under the JOIN card. Its
+left/right mask fades are the untouched originals. The darkening scrim lives INSIDE the
+figure (`.hero-photo::before`), not on `.hero` — a scrim on `.hero` sits in a higher stacking
+context and swallowed the left half of the photo credit. Headline type is sized for the
+longest translation so the band is 580px in EN, ES and IT alike.
+
+**JOIN card.** White card, ~180px navy header (kicker, Anton title, one-line subtitle,
+4-step indicator with gold-filled active circle and a hairline connector), then a white form
+body opening with a "1. CATEGORY & CONTACT" heading driven by the same `step_N_t` keys as the
+indicator. Inputs are white with small uppercase labels and gold required asterisks in a
+2-column grid. Full-width gold "NEXT →" button; Back is a text link. Same four steps, same
+fields, same names, same validation — no field added, renamed or removed. The mockup's
+€129.99 block is not built.
+
+**Rail.** JOIN card → navy services card (the five existing "What We Do" services as line
+icon + uppercase title, 3 + 2 with the second row centred) → white featured José Cedeño
+testimonial (quote mark, quote, name, role, photo) carrying the "See all testimonials"
+button. "Trusted by" is not built.
+
+**Left column.** Uppercase Anton navy section titles with a 40×3px gold underline and a
+subtitle; existing kickers retained above them. "Who I Am" is laid out like the mockup's OUR
+MISSION (copy left; founder photo right in a rounded frame with a thin navy caption bar — no
+video asset exists). "Our Athletes" is a light-gray band with a centred head and a real
+horizontal scroll-snap carousel with navy arrow buttons; the athlete card is portrait, photo
+fading into navy, position abbreviation above the name (CSS `order`, DOM untouched), bold
+uppercase name, round flag chip, affiliation, level. Filter tabs and the code gate behave
+exactly as before. Testimonials became two-column quote items (round photo left).
+
+**Footer.** Four columns — brand + social icons · site links · Sign In destinations ·
+contact with line icons — then the CeasAI credit row and a darker copyright bar. The
+`esm-legal.js` Privacy · Terms row is given the same dark ground so the bottom reads as one
+bar instead of two overlapping strips.
+
+**Content ledger.** All 164 `data-i18n*` keys, all 29 form field names and all 19 hrefs that
+were in the round-1 body are still in the round-2 body (diffed programmatically before and
+after the rebuild). No new i18n keys were added in round 2.
+
+Relocated: the whole application form + Join copy into the rail card (round 1); the five
+service titles into the rail services card; the featured José testimonial from the contracts
+band into the rail; the "Who I Am" block into the mission layout.
+
+Not built, and why: the €129.99 JOIN block, "How It Works", "Meet the Team", "Trusted By",
+the 850+/25+/180+/120+/35+ counters, the video player, the mockup's per-step helper line, the
+hero small-caps subline and the "BASEBALL & SOFTBALL" label, a footer brand tagline, and the
+carousel's "VIEW MORE ATHLETES" button — none of these have real content or an existing
+string behind them.
+
+One compromise worth flagging: the services card shows icon + title only. Each service's
+description, bullets and highlight text are preserved in the DOM as `.sr-only` text (so no
+string is lost, every key still resolves, and screen readers still read them) but they are no
+longer visible. If Sam wants that copy back on screen it needs its own left-column section.
+
+### ROUND 2 — verification
+
+| Check | Result |
+|---|---|
+| `validate_i18n.mjs` | **0 hard problems** (236 EN keys, 160 used; only pre-existing LEN-FLAG advisories) |
+| Automated suite (`verify2.js`) | **66/66 pass, 0 console errors** |
+| Structure | light theme · 69/31 shell · JOIN card 0px offset from the hero top · 580px band · 3 rail cards · 5 service cells · footer 4 columns · roster is a scroll row · **no red in the computed palette** |
+| Roster | live Supabase (27 approved players, all with DB ids) · sport filters partition exactly (27 = 27 + 0) · position filter narrows (10 pitchers) · gate locks/errors/unlocks/re-locks · carousel arrow scrolls (0 → 464) |
+| Athlete card | order is position → name → country → affiliation → level · round flag chip · 3:4 portrait photo |
+| Form | all 4 categories × 4 steps show exactly the expected fields (16 assertions) · empty step refuses to advance with the error + red border in every category |
+| Uploads | non-PDF, oversize, wrong image type all rejected; valid JPG accepted |
+| Real submission | Teams and Scouts submitted end to end with a photo upload → row 133 in `public.players` (status `pending`, every step's field mapped) → **deleted** (0 test rows; 28 players, 27 approved) |
+| i18n | EN/ES/IT switch translates step titles, the step heading, Back/Next/Submit, the rail card title, service titles, section titles and the footer |
+| Layout | 1366 / 1440 / 1920 / 390 × EN/ES/IT — **no horizontal overflow anywhere**; hero band a constant 580px on desktop in all three languages |
+| Stacking | below 1200px: hero → stats → JOIN → services → testimonial → sections, verified at 390/768/1024/1199 |
+| Hero photo | mask fades byte-identical to the originals; photo credit paints above the scrim |
