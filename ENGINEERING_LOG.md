@@ -1422,3 +1422,50 @@ Tooling: Playwright (Chromium 1234) against a local static server, live Supabase
 `delete from storage.objects` (`storage.protect_delete()`), and no service-role key is
 available locally, so they need deleting from the Supabase dashboard's Storage browser.
 The `players` row they belonged to is already deleted, so nothing references them.
+
+---
+
+## Homepage redesign — ROUND 2 · mockup diff list
+*(2026-09-07, branch `homepage-redesign`. Mockup committed at
+`site/design/homepage-mockup.jpg`, 756×1600. Compared against a 1440px full-page
+screenshot of the round-1 branch build. Written BEFORE any round-2 code change.)*
+
+**Correction carried into this round:** the round-1 instruction "keep the dark base, no
+white background" is withdrawn. The mockup is a LIGHT-theme page — white and light-gray
+(#f4f5f7) content bands with navy text. Navy survives only in the nav, hero band, athlete
+cards, the JOIN card's header block, the services card, and the footer.
+
+### Structural differences (must fix)
+
+| # | Round-1 build | Mockup |
+|---|---|---|
+| 1 | Dark navy page throughout; fixed radial-gradient `.bg-fx` behind everything | Light page. White / #f4f5f7 alternating bands, navy body text. Navy used only for nav, hero, athlete cards, services card, JOIN header, footer |
+| 2 | Single full-width column; the JOIN card sits beside the hero only, then the page goes full width | A persistent two-column shell (~68% main / ~32% rail, 24px gutter, max-width ~1280px). The rail starts level with the hero top and continues down the page as a stack of cards |
+| 3 | Right rail holds one card (JOIN) | Rail = JOIN card → "WHAT YOU RECEIVE" navy icon card → white featured-testimonial card → "Trusted by" (skipped, no content) |
+| 4 | Hero headline wraps to 6 lines in a 428px column; photo is a 614px inset in a gutter | Hero headline is 3 stacked lines; the photo is large, right-aligned, bottom-aligned to the band and bleeds behind the JOIN card. Band ≈ 560–620px |
+| 5 | JOIN card is dark navy with gold labels; the tagline + pitch sit inside step 1 | White card with a ~180px NAVY HEADER (title, one-line subtitle, step indicator), then a white form body |
+| 6 | Step indicator: small gold circles, labels beneath, inside the dark card | Larger numbered circles on navy — gold filled = active, thin outlined = inactive — joined by a thin rule, uppercase labels beneath |
+| 7 | Form: single-column fields, gold labels on navy, pill NEXT button | "1. STEP TITLE" bold uppercase heading, 2-column input grid, small uppercase dark labels above white inputs, gold required asterisks, full-width gold "NEXT STEP →" button |
+| 8 | "What We Do" = full-width 3-column grid of dark cards with descriptions, bullets and a highlight box | Compact navy rail card: centred uppercase title + a 3×2 grid of thin line icons with 1–2-word uppercase labels, separated by hairline dividers |
+| 9 | Featured José Cedeño testimonial sits inline in the full-width "50+ contracts" band | It is a white rail card: large quote mark, quote, name + role, photo at the right |
+| 10 | Section titles: teal kicker + huge white Anton headline, no rule | Uppercase Anton navy 26–30px + a 40×3px gold underline + a 13–14px subtitle, left-aligned |
+| 11 | Roster: 3-column grid of navy cards on a navy band | Light-gray band, centred title/subtitle, a horizontal scrolling ROW of navy portrait cards with round arrow buttons at each side, centred outlined CTA below |
+| 12 | Athlete card: landscape photo, gold pill position badge, rectangular flag | Portrait card, photo fading into navy, small plain uppercase position abbreviation, bold uppercase name, ROUND flag chip, affiliation, level |
+| 13 | "Who I Am": circular founder avatar + text inside one bordered dark card | Two-column "OUR MISSION" band: text left (title, paragraph, bold line, button), media right in a rounded frame with a thin navy caption bar |
+| 14 | Testimonials: grid of dark quote cards | Two-column quote items — small round photo left, quote + name + role right — then an outlined "see all" button |
+| 15 | Footer: 3 columns on navy | 4 columns (brand + socials · Quick Links · Resources · Contact) plus a thin darker copyright bar |
+| 16 | Buttons are fully-rounded pills (`border-radius:999px`) | Rectangular, radius ~3px, uppercase 11–12px/700, padding ~12px 22px |
+| 17 | Cards: radius 16–20px, navy gradient fills, gold borders | Radius ~6px, white, 1px #e5e7eb border, soft shadow |
+| 18 | Nav: gold-outlined pill CTA, pill language switcher, no active-link marker | Rectangular filled gold button, small outlined language pill, short gold underline under the active link |
+| 19 | Hero eyebrow is a bordered pill with a teal dot | A short gold rule followed by tiny letter-spaced uppercase text |
+| 20 | Stats strip: two large gold numbers, centred, no icons or dividers | A row of tiles, each a thin line icon + number + small uppercase label, separated by hairline vertical dividers |
+
+### Mockup elements deliberately NOT built (no real content behind them)
+
+Stat counters 850+/25+/180+/120+/35+ (we render our two real stats in that strip style
+instead) · "How It Works" · "Meet the Team" · "Trusted By" logo row (NCAA/NAIA/NJCAA/
+Perfect Game/PBR/WBSC are trademarks) · the €129.99 pricing block inside the JOIN card ·
+the video player and its play button/duration (no video asset — the founder photo takes
+that frame) · the mockup's per-step helper line ("Tell us who you are") · the hero's
+small-caps subline and the "BASEBALL & SOFTBALL" label above the hero buttons — we have no
+second short hero string and inventing one is out of scope.
