@@ -2047,11 +2047,22 @@ function fileError(file,kind){
   return null;
 }
 
-// Upload one file to a bucket under key/<label>.<ext>. Returns the object path.
+/* Upload one file to a bucket under key/<label>.<ext>. Returns the object path.
+
+   NOTE (2026-09): upsert was REMOVED here. `upsert:true` sends the x-upsert header, and
+   Supabase Storage then requires an UPDATE policy on storage.objects as well as INSERT.
+   The application-photos / application-docs buckets have INSERT policies only (for anon
+   AND for authenticated), so every upload came back 403 "new row violates row-level
+   security policy" and the submit handler fell into its generic "something went wrong"
+   branch. A photo is required for every category, so NO public application could be filed.
+   Verified with direct REST calls: x-upsert:true -> 403, without it -> 200.
+   upsert was never needed — the object key already carries a unique timestamp, so every
+   upload is a fresh object. The alternative fix, granting UPDATE on those buckets, was not
+   taken because it would loosen production RLS. */
 async function uploadApplicationFile(bucket,key,label,file){
   const ext=extFor(file)|| (bucket==="application-docs"?"pdf":"jpg");
   const path=`${key}/${label}.${ext}`;
-  const {error}=await SB.storage.from(bucket).upload(path,file,{contentType:file.type||undefined,upsert:true});
+  const {error}=await SB.storage.from(bucket).upload(path,file,{contentType:file.type||undefined});
   if(error) throw error;
   return path;
 }
