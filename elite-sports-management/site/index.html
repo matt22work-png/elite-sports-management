@@ -685,7 +685,10 @@
     border-radius:3px;padding:6px 11px;font-weight:600}
   .sec-alt .mission .cred{background:#fff}
   .mission .founder-contact{margin-top:0;display:inline-flex;gap:9px;align-items:center}
-  .mission-media{margin:0;border-radius:8px;overflow:hidden;border:1px solid var(--line-2);
+  /* The copy column runs ~500px taller than this figure, so the grid's align-items:center
+     stranded the photo mid-row with dead space above and below it. Top-align just the figure
+     (leaving .mission's align-items alone) so it reads as paired with the text. */
+  .mission-media{margin:0;align-self:start;border-radius:8px;overflow:hidden;border:1px solid var(--line-2);
     box-shadow:0 14px 34px rgba(15,32,54,.12);background:var(--navy)}
   .mm-shot{aspect-ratio:16/10;background-size:cover;background-position:center 18%}
   .mm-cap{display:flex;align-items:center;gap:9px;background:var(--navy);color:#fff;
