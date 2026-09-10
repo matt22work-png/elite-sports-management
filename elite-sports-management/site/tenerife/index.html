@@ -128,13 +128,14 @@
 </div>
 
 <script type="module">
-/* ⚠️ PLACEHOLDER CONTACT ADDRESS — change in one place.
-   On-site pay links were removed 2026-08 (Stripe replacement via STRIPE_TENERIFE_URL above,
-   coming soon). The registration itself is what reaches Sam: the tenerife_registrations
-   INSERT below triggers the send-form-notification
-   Edge Function, which emails ESM. This constant is used only for the contact links.
-   Swap in Sam's NEW email here once it exists — nothing else needs to change. */
-const CONTACT_EMAIL = "esmsportsnetworkinfo@gmail.com";
+/* DIRECT-CONTACT ADDRESS — the inbox a HUMAN reads (2026-09, per Sam).
+   TWO addresses, TWO jobs, both intentional — do NOT unify them again:
+     elitesportsmanagement50@gmail.com  <- THIS constant. Every "Contact ESM" /
+        "Contact Us" mailto CTA a visitor clicks to write to Sam directly.
+     esmsportsnetworkinfo@gmail.com     <- supabase/functions/send-form-notification
+        ONLY (FROM_EMAIL + OPS_INBOX): the automated form-submission notifications.
+        Leave that one alone; changing it breaks the SMTP app-password binding. */
+const CONTACT_EMAIL = "elitesportsmanagement50@gmail.com";
 
 /* ===== Stripe Payment Link (Tenerife €599.99) =====
    Legacy off-site pay links were pulled site-wide; paste the Stripe Payment Link here when Sam provides

@@ -17,7 +17,7 @@ const idx = fs.readFileSync(path.join(SITE_DIR, "index.html"), "utf-8");
 const SHARED_CSS = idx.match(/<style>([\s\S]*?)<\/style>/)[1];
 const players = JSON.parse(fs.readFileSync(path.join(SITE_DIR, "players.json"), "utf-8"));
 
-const CONTACT_EMAIL = "esmsportsnetworkinfo@gmail.com";
+const CONTACT_EMAIL = "elitesportsmanagement50@gmail.com";
 
 // Mirrors Python html.escape(s, quote=True): & < > " ' → entities (apostrophe → &#x27;).
 const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
@@ -235,7 +235,7 @@ ${EXTRA_CSS}
   </div>
   <div class="foot-links">
     <a class="pill" href="https://www.instagram.com/esm_sports_network__01/" target="_blank" rel="noopener">&#9678; @esm_sports_network__01</a>
-    <a class="pill" href="mailto:esmsportsnetworkinfo@gmail.com">&#9993; esmsportsnetworkinfo@gmail.com</a>
+    <a class="pill" href="mailto:elitesportsmanagement50@gmail.com">&#9993; elitesportsmanagement50@gmail.com</a>
   </div>
 </div></footer>
 

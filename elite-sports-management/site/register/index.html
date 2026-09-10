@@ -255,10 +255,14 @@ const STRIPE_ROSTER_URL  = "";   // scout  — €49.99 roster access
 // No payment is taken here — it's recorded for Sam's reference only.
 const TIER_KEY = "esm_reg_tier";
 function readTier(){ try{ return JSON.parse(localStorage.getItem(TIER_KEY) || "null"); }catch(_){ return null; } }
-/* ⚠️ PLACEHOLDER CONTACT ADDRESS — change in one place. Payment links removed 2026-08;
-   the account/profile submission itself reaches Sam (the profiles INSERT triggers the
-   send-form-notification Edge Function). Swap in Sam's NEW email here once it exists. */
-const CONTACT_EMAIL = "esmsportsnetworkinfo@gmail.com";
+/* DIRECT-CONTACT ADDRESS — the inbox a HUMAN reads (2026-09, per Sam).
+   TWO addresses, TWO jobs, both intentional — do NOT unify them again:
+     elitesportsmanagement50@gmail.com  <- THIS constant. Every "Contact ESM" /
+        "Contact Us" mailto CTA a visitor clicks to write to Sam directly.
+     esmsportsnetworkinfo@gmail.com     <- supabase/functions/send-form-notification
+        ONLY (FROM_EMAIL + OPS_INBOX): the automated form-submission notifications.
+        Leave that one alone; changing it breaks the SMTP app-password binding. */
+const CONTACT_EMAIL = "elitesportsmanagement50@gmail.com";
 // Country → flag emoji, so a registered athlete's roster card shows their flag
 // (mirrors the public site's FLAGS map). Unknown country → left null (site falls back).
 const FLAGS = {"Dominican Republic":"🇩🇴","República Dominicana":"🇩🇴","Repubblica Dominicana":"🇩🇴","Venezuela":"🇻🇪","Spain":"🇪🇸","España":"🇪🇸","Spagna":"🇪🇸","Colombia":"🇨🇴","Italy":"🇮🇹","Italia":"🇮🇹","United States":"🇺🇸","USA":"🇺🇸","Estados Unidos":"🇺🇸","Stati Uniti":"🇺🇸","Germany":"🇩🇪","Alemania":"🇩🇪","Germania":"🇩🇪","Portugal":"🇵🇹","Canada":"🇨🇦","Mexico":"🇲🇽","México":"🇲🇽"};

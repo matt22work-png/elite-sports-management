@@ -129,8 +129,14 @@
 </div>
 
 <script type="module">
-/* ⚠️ PLACEHOLDER CONTACT ADDRESS — change in one place (payment links removed 2026-08). */
-const CONTACT_EMAIL = "esmsportsnetworkinfo@gmail.com";
+/* DIRECT-CONTACT ADDRESS — the inbox a HUMAN reads (2026-09, per Sam).
+   TWO addresses, TWO jobs, both intentional — do NOT unify them again:
+     elitesportsmanagement50@gmail.com  <- THIS constant. Every "Contact ESM" /
+        "Contact Us" mailto CTA a visitor clicks to write to Sam directly.
+     esmsportsnetworkinfo@gmail.com     <- supabase/functions/send-form-notification
+        ONLY (FROM_EMAIL + OPS_INBOX): the automated form-submission notifications.
+        Leave that one alone; changing it breaks the SMTP app-password binding. */
+const CONTACT_EMAIL = "elitesportsmanagement50@gmail.com";
 const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
 const PHOTO_BUCKET = "player-photos";
@@ -192,7 +198,7 @@ const DICT = {
     p_edit_note:"Update your own bio, contact details and photo below. Your career stats, position and roster status are managed by ESM Sports Network.",
     p_l_photo:"Profile photo", p_l_bio:"Bio", p_l_phone:"Phone",
     p_save:"Save my changes", p_saving:"Saving…", p_saved:"Saved ✓", p_save_fail:"Couldn't save: ",
-    p_help:'Need a stat or your position updated? <a href="mailto:esmsportsnetworkinfo@gmail.com?subject=Profile%20update%20request">Email us</a>.',
+    p_help:'Need a stat or your position updated? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Profile%20update%20request">Email us</a>.',
     p_batting:"Batting", p_pitching:"Pitching", p_fielding:"Fielding",
   },
   es:{
@@ -231,7 +237,7 @@ const DICT = {
     p_edit_note:"Actualiza tu bio, datos de contacto y foto abajo. Tus estadísticas de carrera, posición y estado en el roster los gestiona ESM Sports Network.",
     p_l_photo:"Foto de perfil", p_l_bio:"Bio", p_l_phone:"Teléfono",
     p_save:"Guardar mis cambios", p_saving:"Guardando…", p_saved:"Guardado ✓", p_save_fail:"No se pudo guardar: ",
-    p_help:'¿Necesitas actualizar una estadística o tu posición? <a href="mailto:esmsportsnetworkinfo@gmail.com?subject=Profile%20update%20request">Escríbenos</a>.',
+    p_help:'¿Necesitas actualizar una estadística o tu posición? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Profile%20update%20request">Escríbenos</a>.',
     p_batting:"Bateo", p_pitching:"Pitcheo", p_fielding:"Defensa",
   },
   it:{
@@ -270,7 +276,7 @@ const DICT = {
     p_edit_note:"Aggiorna qui la tua bio, i contatti e la foto. Le tue statistiche di carriera, il ruolo e lo stato sul roster sono gestiti da ESM Sports Network.",
     p_l_photo:"Foto profilo", p_l_bio:"Bio", p_l_phone:"Telefono",
     p_save:"Salva le modifiche", p_saving:"Salvataggio…", p_saved:"Salvato ✓", p_save_fail:"Impossibile salvare: ",
-    p_help:'Serve aggiornare una statistica o il tuo ruolo? <a href="mailto:esmsportsnetworkinfo@gmail.com?subject=Profile%20update%20request">Scrivici</a>.',
+    p_help:'Serve aggiornare una statistica o il tuo ruolo? <a href="mailto:elitesportsmanagement50@gmail.com?subject=Profile%20update%20request">Scrivici</a>.',
     p_batting:"Battuta", p_pitching:"Lancio", p_fielding:"Difesa",
   },
 };

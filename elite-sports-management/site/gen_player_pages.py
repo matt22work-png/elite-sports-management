@@ -19,7 +19,7 @@ SHARED_CSS = style_match.group(1)
 with open(os.path.join(SITE_DIR, "players.json"), encoding="utf-8") as f:
     players = json.load(f)
 
-CONTACT_EMAIL = "esmsportsnetworkinfo@gmail.com"
+CONTACT_EMAIL = "elitesportsmanagement50@gmail.com"
 
 def esc(s):
     return html.escape(s or "", quote=True)
@@ -250,7 +250,7 @@ def render_page(p):
   </div>
   <div class="foot-links">
     <a class="pill" href="https://www.instagram.com/esm_sports_network__01/" target="_blank" rel="noopener">&#9678; @esm_sports_network__01</a>
-    <a class="pill" href="mailto:esmsportsnetworkinfo@gmail.com">&#9993; esmsportsnetworkinfo@gmail.com</a>
+    <a class="pill" href="mailto:elitesportsmanagement50@gmail.com">&#9993; elitesportsmanagement50@gmail.com</a>
   </div>
 </div></footer>
 

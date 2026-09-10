@@ -120,8 +120,14 @@
 </div>
 
 <script type="module">
-/* ⚠️ PLACEHOLDER CONTACT ADDRESS — change in one place (payment links removed 2026-08). */
-const CONTACT_EMAIL = "esmsportsnetworkinfo@gmail.com";
+/* DIRECT-CONTACT ADDRESS — the inbox a HUMAN reads (2026-09, per Sam).
+   TWO addresses, TWO jobs, both intentional — do NOT unify them again:
+     elitesportsmanagement50@gmail.com  <- THIS constant. Every "Contact ESM" /
+        "Contact Us" mailto CTA a visitor clicks to write to Sam directly.
+     esmsportsnetworkinfo@gmail.com     <- supabase/functions/send-form-notification
+        ONLY (FROM_EMAIL + OPS_INBOX): the automated form-submission notifications.
+        Leave that one alone; changing it breaks the SMTP app-password binding. */
+const CONTACT_EMAIL = "elitesportsmanagement50@gmail.com";
 const SUPABASE_URL = "https://sbexwyvsgqayxrsrlrpm.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZXh3eXZzZ3FheXhyc3JscnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjY5NTYsImV4cCI6MjA5NjA0Mjk1Nn0.PWBwZ0oEYvQeA_ZMdahRA9cVqQv27fwN-1npU1XqTdw";
 
