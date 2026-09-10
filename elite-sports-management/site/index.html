@@ -982,7 +982,7 @@ const TESTIMONIALS = [
 const STATIC_PLAYER_PAGES = new Set(["brayan-hernandez", "gianni-westphal", "jose-cedeno", "danyer-sanabria", "francesco-mazzei", "anderson-pena", "jesus-delgado", "lorenzo-gonzalez", "jaider-morelos", "bret-bowers", "osiris-german", "adam-moser", "yerardo-ciofani", "javier-useche", "david-chavez", "matteo-colalucci", "anthony-quattrocchi"]);
 
 const T = {
-  en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_signin:"Sign In",nav_myprofile:"My Profile",nav_signin_create:"Create Account",nav_signin_player:"Player Portal",nav_signin_scout:"Scout Portal",nav_signin_admin:"Admin Portal",nav_cta:"Apply Now",
+  en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_signin:"Sign In",nav_myprofile:"My Profile",nav_signin_create:"Create Account",nav_signin_player:"Player Portal",nav_signin_scout:"Scout and Teams Portal",nav_signin_admin:"Admin Portal",nav_cta:"Apply Now",
     contracts_h2:'50+ contracts signed <em>since 2025</em>',
     contracts_sub:'Our athletes have signed contracts in <b>7 different countries</b> to date.',
     feat_role:"Former Cleveland Indians organization",
@@ -1050,7 +1050,7 @@ const T = {
     join_pitch:"Talent alone rarely opens the door. The right agent turns tryouts into contracts — negotiating your deals, opening leagues at home and abroad, and putting your name in front of the scouts and coaches who decide careers.",
     f_applying:"I'm applying for",opt_rep_baseball:"Baseball Representation",opt_rep_softball:"Softball Representation",opt_college:"College Placement",opt_teams:"Teams and Scouts",
     f_name_or_team:"Full Name / Team Name",f_role:"Role within the team / organization",f_looking:"Positions to fill / players you're looking for",
-    f_photo:"Photo",f_photo_hint:"JPG or PNG, up to 10 MB.",
+    f_photo:"Photo",f_photo_hint:"Optional — JPG or PNG, up to 10 MB.",
     f_first:"First name",f_last:"Last name",f_nationality:"Nationality",f_email:"Email",
     f_phone_code:"Code",f_phone:"Phone number",f_country:"Country",
     f_position:"Position",f_position_ph:"Select a position…",pos_pitcher:"Pitcher",pos_catcher:"Catcher",pos_infield:"Infield",pos_outfield:"Outfield",
@@ -1069,7 +1069,7 @@ const T = {
     foot_tagline:"Join us in celebrating",foot_rights:"All rights reserved.",ceasai_cta:"Website built by CeasAI — Create your own site like this →",ceasai_ig:"Follow CeasAI on Instagram",ceasai_email:"Email CeasAI",ceasai_tiktok:"Follow CeasAI on TikTok",
     install_t:"Install the ESM app",install_d:"Add to your home screen",install_btn:"Install",
     admin_link:"Admin",login_h:"Admin Login",login_sub:"Manage athletes, stats & photos",login_email:"Email",login_pass:"Password",login_btn:"Log in"},
-  es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_signin:"Entrar",nav_myprofile:"Mi Perfil",nav_signin_create:"Crear Cuenta",nav_signin_player:"Portal Jugador",nav_signin_scout:"Portal Scout",nav_signin_admin:"Portal Admin",nav_cta:"Aplica Ahora",
+  es:{nav_about:"Qué Hacemos",nav_college:"College",nav_who:"Quién Soy",nav_roster:"Jugadores",nav_events:"Eventos",nav_media:"Media",nav_join:"Únete",nav_signin:"Entrar",nav_myprofile:"Mi Perfil",nav_signin_create:"Crear Cuenta",nav_signin_player:"Portal Jugador",nav_signin_scout:"Portal Scout y Equipos",nav_signin_admin:"Portal Admin",nav_cta:"Aplica Ahora",
     contracts_h2:'Más de 50 contratos firmados <em>desde 2025</em>',
     contracts_sub:'Nuestros atletas han firmado contratos en <b>7 países diferentes</b> hasta la fecha.',
     feat_role:"Ex organización de los Cleveland Indians",
@@ -1137,7 +1137,7 @@ const T = {
     join_pitch:"El talento por sí solo casi nunca abre la puerta. El agente adecuado convierte las pruebas en contratos: negocia tus acuerdos, te abre ligas dentro y fuera del país y pone tu nombre frente a los scouts y entrenadores que deciden carreras.",
     f_applying:"Aplico para",opt_rep_baseball:"Representación de Béisbol",opt_rep_softball:"Representación de Sóftbol",opt_college:"Colocación en College",opt_teams:"Equipos y Scouts",
     f_name_or_team:"Nombre completo / Nombre del equipo",f_role:"Rol dentro del equipo / la organización",f_looking:"Posiciones a cubrir / jugadores que buscas",
-    f_photo:"Foto",f_photo_hint:"JPG o PNG, hasta 10 MB.",
+    f_photo:"Foto",f_photo_hint:"Opcional — JPG o PNG, hasta 10 MB.",
     f_first:"Nombre",f_last:"Apellido",f_nationality:"Nacionalidad",f_email:"Correo electrónico",
     f_phone_code:"Código",f_phone:"Número de teléfono",f_country:"País",
     f_position:"Posición",f_position_ph:"Elige una posición…",pos_pitcher:"Lanzador",pos_catcher:"Receptor",pos_infield:"Cuadro interior",pos_outfield:"Jardinero",
@@ -1156,7 +1156,7 @@ const T = {
     foot_tagline:"Únete a celebrarlo",foot_rights:"Todos los derechos reservados.",ceasai_cta:"Sitio web creado por CeasAI — Crea tu propio sitio como este →",ceasai_ig:"Sigue a CeasAI en Instagram",ceasai_email:"Escríbele un correo a CeasAI",ceasai_tiktok:"Sigue a CeasAI en TikTok",
     install_t:"Instala la app de ESM",install_d:"Añádela a tu pantalla de inicio",install_btn:"Instalar",
     admin_link:"Admin",login_h:"Acceso Admin",login_sub:"Gestiona atletas, estadísticas y fotos",login_email:"Correo",login_pass:"Contraseña",login_btn:"Entrar"},
-  it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_signin:"Accedi",nav_myprofile:"Il Mio Profilo",nav_signin_create:"Crea Account",nav_signin_player:"Portale Giocatore",nav_signin_scout:"Portale Scout",nav_signin_admin:"Portale Admin",nav_cta:"Candidati",
+  it:{nav_about:"Cosa Facciamo",nav_college:"College",nav_who:"Chi Sono",nav_roster:"Roster",nav_events:"Eventi",nav_media:"Media",nav_join:"Unisciti",nav_signin:"Accedi",nav_myprofile:"Il Mio Profilo",nav_signin_create:"Crea Account",nav_signin_player:"Portale Giocatore",nav_signin_scout:"Portale Scout e Squadre",nav_signin_admin:"Portale Admin",nav_cta:"Candidati",
     contracts_h2:'Oltre 50 contratti firmati <em>dal 2025</em>',
     contracts_sub:'I nostri atleti hanno firmato contratti in <b>7 paesi diversi</b> a oggi.',
     feat_role:"Ex organizzazione Cleveland Indians",
@@ -1224,7 +1224,7 @@ const T = {
     join_pitch:"Il solo talento raramente apre le porte. L'agente giusto trasforma i provini in contratti: negozia i tuoi accordi, ti apre le leghe in patria e all'estero e mette il tuo nome davanti agli scout e agli allenatori che decidono le carriere.",
     f_applying:"Mi candido per",opt_rep_baseball:"Rappresentanza Baseball",opt_rep_softball:"Rappresentanza Softball",opt_college:"Collocamento College",opt_teams:"Squadre e Scout",
     f_name_or_team:"Nome completo / Nome della squadra",f_role:"Ruolo all'interno della squadra / organizzazione",f_looking:"Posizioni da coprire / giocatori che cerchi",
-    f_photo:"Foto",f_photo_hint:"JPG o PNG, fino a 10 MB.",
+    f_photo:"Foto",f_photo_hint:"Facoltativa — JPG o PNG, fino a 10 MB.",
     f_first:"Nome",f_last:"Cognome",f_nationality:"Nazionalità",f_email:"Email",
     f_phone_code:"Prefisso",f_phone:"Numero di telefono",f_country:"Paese",
     f_position:"Ruolo",f_position_ph:"Scegli un ruolo…",pos_pitcher:"Lanciatore",pos_catcher:"Ricevitore",pos_infield:"Interno",pos_outfield:"Esterno",
@@ -2066,7 +2066,10 @@ function fileError(file,kind){
    Verified with direct REST calls: x-upsert:true -> 403, without it -> 200.
    upsert was never needed — the object key already carries a unique timestamp, so every
    upload is a fresh object. The alternative fix, granting UPDATE on those buckets, was not
-   taken because it would loosen production RLS. */
+   taken because it would loosen production RLS.
+   (The "a photo is required for every category" note above describes the state at the
+   time of that bug. The picture became OPTIONAL for every category in 2026-09 — see
+   the REQ table in the submit handler below.) */
 async function uploadApplicationFile(bucket,key,label,file){
   const ext=extFor(file)|| (bucket==="application-docs"?"pdf":"jpg");
   const path=`${key}/${label}.${ext}`;
@@ -2108,11 +2111,14 @@ form.addEventListener("submit",async e=>{
 
   // ---- Per-category required fields (item 1) ----
   // Baseball/Softball Representation and College share the full profile; College
-  // adds the academic docs. "Teams and Scouts" collects a team/scout lead. File
-  // fields are required too, per Sam's field lists.
+  // adds the academic docs. "Teams and Scouts" collects a team/scout lead.
+  // PDF doc fields (resume / english_cert / diploma) are required where they appear.
+  // The PICTURE is deliberately NOT listed: photo (rep/college) and ts_photo (teams)
+  // are optional as of 2026-09 — an applicant can submit without one. If they DO
+  // attach one it is still type/size-checked by the optional-file loop below.
   const REQ={
-    rep:    ["photo","first_name","last_name","nationality","email","phone","country","position","resume","age","goals"],
-    college:["photo","first_name","last_name","nationality","email","phone","country","position","resume","age","english_cert","education_level","diploma","study_goals"],
+    rep:    ["first_name","last_name","nationality","email","phone","country","position","resume","age","goals"],
+    college:["first_name","last_name","nationality","email","phone","country","position","resume","age","english_cert","education_level","diploma","study_goals"],
     teams:  ["name_or_team","ts_nationality","ts_email","ts_phone","ts_country","ts_role","looking_for"],
   }[cat];
   const FILE_FIELDS={photo:"image",ts_photo:"image",resume:"pdf",english_cert:"pdf",diploma:"pdf"};

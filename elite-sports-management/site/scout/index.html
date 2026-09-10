@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Scout Portal — ESM Sports Network</title>
+<title>Scout and Teams Portal — ESM Sports Network</title>
 <meta name="robots" content="noindex,nofollow" />
 <link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
 <link rel="shortcut icon" href="../icons/icon-192.png" />
@@ -72,7 +72,7 @@
 <div class="wrap">
   <header>
     <a href="../index.html"><img class="logo-img" src="../logo.png" alt="ESM Sports Network" /></a>
-    <div><b>ESM Sports Network</b><small data-i18n="s_kicker">SCOUT PORTAL</small></div>
+    <div><b>ESM Sports Network</b><small data-i18n="s_kicker">SCOUT AND TEAMS PORTAL</small></div>
     <div class="spacer"></div>
     <div class="langsw" id="langsw" role="group" aria-label="Language"><button data-l="en" type="button">EN</button><button data-l="es" type="button">ES</button><button data-l="it" type="button">IT</button></div>
     <button class="btn btn-ghost" id="signOut" style="display:none" data-i18n="s_signout">Sign out</button>
@@ -82,7 +82,7 @@
 
   <!-- LOGIN -->
   <div id="loginBox" class="card" style="max-width:420px;margin:8vh auto">
-    <h1 class="display" style="margin-bottom:6px" data-i18n-html="s_login_h">Scout <em>Portal</em></h1>
+    <h1 class="display" style="margin-bottom:6px" data-i18n-html="s_login_h">Scout and Teams <em>Portal</em></h1>
     <p class="note" style="margin:0 0 18px" data-i18n="s_login_note">Sign in with the email &amp; password you created at registration.</p>
     <form id="pwForm">
       <div class="field"><label for="email" data-i18n="s_email">Email</label><input type="email" id="email" autocomplete="username" required placeholder="you@email.com" /></div>
@@ -91,8 +91,6 @@
       <div class="msg" id="loginMsg" role="alert" aria-live="assertive"></div>
     </form>
     <div style="text-align:center;margin-top:12px"><button type="button" id="forgotBtn" class="linklike" data-i18n="s_forgot">Forgot your password?</button></div>
-    <div style="text-align:center;margin:14px 0 4px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)" data-i18n="s_or">or</div>
-    <button class="btn btn-ghost" style="width:100%" type="button" id="magicBtn" data-i18n="s_magic">Email me a sign-in link</button>
     <p class="note" style="margin-top:16px" data-i18n-html="s_login_new">New here? <a href="../register/">Create a scout account</a>.</p>
   </div>
 
@@ -147,14 +145,13 @@ const initials = n => (n||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toU
    matching the admin panel and public profile pages. ---------- */
 const DICT = {
   en:{
-    s_kicker:"SCOUT PORTAL", s_signout:"Sign out", s_checking:"Checking session…",
-    s_login_h:'Scout <em>Portal</em>', s_login_note:"Sign in with the email & password you created at registration.",
+    s_kicker:"SCOUT AND TEAMS PORTAL", s_signout:"Sign out", s_checking:"Checking session…",
+    s_login_h:'Scout and Teams <em>Portal</em>', s_login_note:"Sign in with the email & password you created at registration.",
     s_email:"Email", s_password:"Password", s_signin:"Sign in", s_forgot:"Forgot your password?",
-    s_or:"or", s_magic:"Email me a sign-in link", s_login_new:'New here? <a href="../register/">Create a scout account</a>.',
+    s_login_new:'New here? <a href="../register/">Create a scout account</a>.',
     s_reset_h:'Set a new <em>password</em>', s_reset_note:"Choose a new password for your account.",
     s_newpass:"New password", s_newpass_ph:"At least 8 characters", s_update_pw:"Update password",
-    s_enter_email:"Enter your email first.", s_sending:"Sending…",
-    s_magic_sent:"Check your inbox — we sent you a sign-in link.",
+    s_sending:"Sending…",
     s_forgot_enter:"Enter your email first, then tap “Forgot your password?”.",
     s_reset_sent:"Check your inbox — we sent a link to reset your password.",
     s_pw_updated:"Password updated — signing you in…",
@@ -175,14 +172,13 @@ const DICT = {
     s_go_register:"Create a scout account", s_go_player:"Go to Player Portal",
   },
   es:{
-    s_kicker:"PORTAL SCOUT", s_signout:"Cerrar sesión", s_checking:"Verificando sesión…",
-    s_login_h:'Portal <em>Scout</em>', s_login_note:"Entra con el correo y la contraseña que creaste al registrarte.",
+    s_kicker:"PORTAL SCOUT Y EQUIPOS", s_signout:"Cerrar sesión", s_checking:"Verificando sesión…",
+    s_login_h:'Portal <em>Scout y Equipos</em>', s_login_note:"Entra con el correo y la contraseña que creaste al registrarte.",
     s_email:"Correo", s_password:"Contraseña", s_signin:"Entrar", s_forgot:"¿Olvidaste tu contraseña?",
-    s_or:"o", s_magic:"Envíame un enlace de acceso", s_login_new:'¿Nuevo aquí? <a href="../register/">Crea una cuenta de scout</a>.',
+    s_login_new:'¿Nuevo aquí? <a href="../register/">Crea una cuenta de scout</a>.',
     s_reset_h:'Establece una nueva <em>contraseña</em>', s_reset_note:"Elige una nueva contraseña para tu cuenta.",
     s_newpass:"Nueva contraseña", s_newpass_ph:"Al menos 8 caracteres", s_update_pw:"Actualizar contraseña",
-    s_enter_email:"Introduce tu correo primero.", s_sending:"Enviando…",
-    s_magic_sent:"Revisa tu correo — te enviamos un enlace de acceso.",
+    s_sending:"Enviando…",
     s_forgot_enter:"Introduce tu correo primero y luego pulsa “¿Olvidaste tu contraseña?”.",
     s_reset_sent:"Revisa tu correo — te enviamos un enlace para restablecer tu contraseña.",
     s_pw_updated:"Contraseña actualizada — iniciando sesión…",
@@ -203,14 +199,13 @@ const DICT = {
     s_go_register:"Crear una cuenta de scout", s_go_player:"Ir al Portal de Jugador",
   },
   it:{
-    s_kicker:"PORTALE SCOUT", s_signout:"Esci", s_checking:"Verifica sessione…",
-    s_login_h:'Portale <em>Scout</em>', s_login_note:"Accedi con l'email e la password create in fase di registrazione.",
+    s_kicker:"PORTALE SCOUT E SQUADRE", s_signout:"Esci", s_checking:"Verifica sessione…",
+    s_login_h:'Portale <em>Scout e Squadre</em>', s_login_note:"Accedi con l'email e la password create in fase di registrazione.",
     s_email:"Email", s_password:"Password", s_signin:"Accedi", s_forgot:"Password dimenticata?",
-    s_or:"oppure", s_magic:"Inviami un link di accesso", s_login_new:'Nuovo qui? <a href="../register/">Crea un account scout</a>.',
+    s_login_new:'Nuovo qui? <a href="../register/">Crea un account scout</a>.',
     s_reset_h:'Imposta una nuova <em>password</em>', s_reset_note:"Scegli una nuova password per il tuo account.",
     s_newpass:"Nuova password", s_newpass_ph:"Almeno 8 caratteri", s_update_pw:"Aggiorna password",
-    s_enter_email:"Inserisci prima la tua email.", s_sending:"Invio…",
-    s_magic_sent:"Controlla la posta — ti abbiamo inviato un link di accesso.",
+    s_sending:"Invio…",
     s_forgot_enter:"Inserisci prima la tua email, poi tocca “Password dimenticata?”.",
     s_reset_sent:"Controlla la posta — ti abbiamo inviato un link per reimpostare la password.",
     s_pw_updated:"Password aggiornata — accesso in corso…",
@@ -271,16 +266,6 @@ $("pwForm").addEventListener("submit", async e => {
   btn.disabled = false;
   if (error){ m.textContent = error.message; m.classList.add("show"); $("password").value = ""; return; }
 });
-$("magicBtn").onclick = async () => {
-  const m = $("loginMsg"); m.classList.remove("show","ok");
-  const email = $("email").value.trim();
-  if (!email){ m.textContent = t("s_enter_email"); m.classList.add("show"); $("email").focus(); return; }
-  const btn = $("magicBtn"); btn.disabled = true; btn.textContent = t("s_sending");
-  const { error } = await SB.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href.split("#")[0] } });
-  btn.disabled = false; btn.textContent = t("s_magic");
-  if (error){ m.textContent = error.message; m.classList.add("show"); return; }
-  m.textContent = t("s_magic_sent"); m.classList.add("show","ok");
-};
 $("signOut").onclick = async () => { await SB.auth.signOut(); };
 
 $("forgotBtn").onclick = async () => {
