@@ -3,67 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<!-- iOS Safari auto-detects number strings (e.g. the "€49.99" roster price) as phone
-     numbers and turns them into tappable links; scrolling/tapping then surfaces an
-     unwanted iOS action sheet. Disable data detectors so it never happens in any locale. -->
-<meta name="format-detection" content="telephone=no" />
-<title>ESM Sports Network — Athlete Representation</title>
-<meta name="description" content="ESM Sports Network — baseball and softball athlete representation and development across college recruiting, independent pro ball and Europe. Founded by professional baseball player Samuele Bruno (Hastings College NAIA, scholarship athlete, class of 2027). Browse the roster, upcoming events and individual athlete profiles." />
-<link rel="canonical" href="https://elite-sports-management.vercel.app/" />
-
-<!-- Open Graph / Twitter share cards so links unfurl with a title, description and image
-     instead of a bare URL. og:image is a dedicated 1200x630 branded card (og-image.png):
-     the ESM Sports Network logo centered on the site's navy gradient. Tags are English-only:
-     social scrapers read the raw HTML and don't run the JS i18n. -->
-<meta property="og:type" content="website" />
-<meta property="og:site_name" content="ESM Sports Network" />
-<meta property="og:title" content="ESM Sports Network — Athlete Representation" />
-<meta property="og:description" content="Baseball and softball athlete representation and development — college recruiting, independent pro ball, winter leagues and Europe. Browse the roster and upcoming events." />
-<meta property="og:url" content="https://elite-sports-management.vercel.app/" />
-<meta property="og:image" content="https://elite-sports-management.vercel.app/og-image.png" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="ESM Sports Network logo" />
-<meta property="og:locale" content="en_US" />
-<meta property="og:locale:alternate" content="es_ES" />
-<meta property="og:locale:alternate" content="it_IT" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="ESM Sports Network — Athlete Representation" />
-<meta name="twitter:description" content="Baseball and softball athlete representation — college, pro ball, winter leagues and Europe." />
-<meta name="twitter:image" content="https://elite-sports-management.vercel.app/og-image.png" />
-
-<!-- Structured data: helps search engines and social platforms understand the brand. -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SportsOrganization",
-  "name": "ESM Sports Network",
-  "alternateName": "ESM",
-  "url": "https://elite-sports-management.vercel.app/",
-  "logo": "https://elite-sports-management.vercel.app/logo.png",
-  "image": "https://elite-sports-management.vercel.app/media/photos/twl-champions.jpg",
-  "description": "Baseball and softball athlete representation and development — college recruiting, independent pro ball, winter leagues and Europe.",
-  "sport": ["Baseball", "Softball"],
-  "founder": { "@type": "Person", "name": "Samuele Bruno" },
-  "sameAs": ["https://www.instagram.com/esm_sports_network__01/"],
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "contactType": "customer service",
-    "email": "elitesportsmanagement50@gmail.com",
-    "availableLanguage": ["English", "Spanish", "Italian"]
-  }
-}
-</script>
-
-<link rel="manifest" href="manifest.json" />
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
-<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
-<link rel="shortcut icon" href="icons/icon-192.png" />
-<meta name="theme-color" content="#081a33" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="ESM" />
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<title>Roster — ESM Sports Network</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
+<link rel="manifest" href="../manifest.json" />
+<meta name="theme-color" content="#0f2036" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -1030,478 +974,91 @@
   @media(max-width:344px){
     .nav-cta{text-transform:none;letter-spacing:.01em;font-size:11px;padding:8px 10px}
   }
+  /* ---------- /roster/ page-specific ---------- */
+  .rp-main{padding:34px 0 60px}
+  .rp-back{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--tx-m);margin-bottom:18px}
+  .rp-back:hover{color:var(--tx)}
+  /* On the homepage the roster lives in a horizontal scroll-snap rail. This is a
+     dedicated page, so it becomes a proper wrapping grid with room to breathe. */
+  #rosterList.roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));
+    overflow:visible;scroll-snap-type:none;gap:18px}
+  @media(max-width:560px){#rosterList.roster{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}}
+  .roster-wrap.is-locked{min-height:520px}
+  .rp-count{color:var(--tx-m);font-size:12.5px;text-align:center;margin:-4px 0 16px}
 </style>
 </head>
 <body>
+
 <div class="bg-fx"></div>
 
 <header class="nav"><div class="wrap nav-in">
-  <a class="brand" href="#top"><img class="logo-img" src="logo.png" alt="ESM Sports Network" width="55" height="40" fetchpriority="high" /></a>
+  <a class="brand" href="../index.html"><img class="logo-img" src="../logo.png" alt="ESM Sports Network" width="55" height="40" fetchpriority="high" /></a>
   <div class="nav-right">
     <nav class="nav-links">
-      <a href="#about" data-i18n="nav_about"></a>
-      <a href="#who" data-i18n="nav_who"></a>
-      <a href="#college" data-i18n="nav_college"></a>
-      <a href="#roster" data-i18n="nav_roster"></a>
-      <a href="#events" data-i18n="nav_events"></a>
-      <a href="#join" data-i18n="nav_join"></a>
+      <a href="../index.html#about" data-i18n="nav_about"></a>
+      <a href="../index.html#who" data-i18n="nav_who"></a>
+      <a href="../index.html#college" data-i18n="nav_college"></a>
+      <a href="../index.html#events" data-i18n="nav_events"></a>
+      <a href="../index.html#join" data-i18n="nav_join"></a>
     </nav>
     <div class="lang" id="lang"><button type="button" data-l="en" class="on" aria-label="English">EN</button><button type="button" data-l="es" aria-label="Español">ES</button><button type="button" data-l="it" aria-label="Italiano">IT</button></div>
-    <details class="signin" id="signin">
-      <summary><span data-i18n="nav_signin"></span></summary>
-      <div class="signin-menu">
-        <a href="register/" data-i18n="nav_signin_create"></a>
-        <a href="portal/" data-i18n="nav_signin_player"></a>
-        <a href="scout/" data-i18n="nav_signin_scout"></a>
-        <a href="admin/" data-i18n="nav_signin_admin"></a>
-      </div>
-    </details>
-    <a class="nav-cta" href="#join" data-i18n="nav_cta"></a>
+    <a class="nav-cta" href="../index.html#join" data-i18n="nav_cta"></a>
   </div>
 </div></header>
 
-<a id="top"></a>
-
-<!-- ============================================================================
-     HERO — full-bleed navy band. Its inner .shell matches the page shell, so the
-     copy lines up with the left column while the band itself runs edge to edge and
-     the Arath Zapien photo bleeds behind the JOIN card in the right rail.
-     The rail (below) is pulled up by --hero-h so the JOIN card's top edge sits
-     level with the hero's top, exactly as in the mockup.
-     ============================================================================ -->
-<!-- ============================================================================
-     PAGE SHELL — left main column (~68%) + right rail (~32%). The hero is the first
-     item of the main column, and its navy background is padded/negative-margined out
-     to the viewport edges so the band reads as full width while its copy stays in the
-     left column. Because the hero and the rail are the two cells of the SAME grid row,
-     the JOIN card's top edge lines up with the hero's top automatically — no magic
-     offset that could drift when a translation runs long.
-     ============================================================================ -->
-<div class="shell body-shell">
-
-<main class="col-main">
-
-<section class="hero">
-  <figure class="hero-photo">
-    <img src="assets/arath-zapien.jpg" alt="Arath Zapien, North Central Missouri Pirates"
-         loading="eager" fetchpriority="high" decoding="async" onerror="this.closest('figure').style.display='none'" />
-    <figcaption>Arath Zapien, North Central Missouri Pirates.</figcaption>
-  </figure>
-  <div class="hero-copy">
-    <span class="eyebrow"><i></i> <span data-i18n="hero_eyebrow"></span></span>
-    <h1 class="display" data-i18n-html="hero_h1"></h1>
-    <p class="lead" data-i18n="hero_lead"></p>
-    <div class="hero-btns">
-      <a class="btn btn-gold" href="#roster" data-i18n="hero_btn1"></a>
-      <a class="btn btn-ghost" href="#join" data-i18n="hero_btn2"></a>
-    </div>
+<main class="wrap rp-main">
+  <a class="rp-back" href="../index.html">&larr; <span data-i18n="rp_back"></span></a>
+  <div class="sec-head sec-head-c">
+    <div class="kicker" data-i18n="roster_kicker"></div>
+    <h2 class="display" data-i18n="roster_h2"></h2>
+    <p data-i18n="roster_p"></p>
   </div>
-</section>
+  <div class="unlocked-note" id="unlockedNote">&#10003; <span data-i18n="gate_unlocked"></span></div>
+  <div class="filters" id="sportFilters"></div>
+  <div class="filters" id="filters"></div>
+  <div class="rp-count" id="rpCount"></div>
 
-  <!-- Stats strip: our two REAL figures, rendered in the mockup's icon+number+label
-       tile style. The icons are decorative inline SVG (aria-hidden), no new copy. -->
-  <div class="stats"><div class="stats-in">
-    <div class="stat">
-      <svg class="stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>
-      <div><b id="statAthletes">19</b><span data-i18n="stat1"></span></div>
-    </div>
-    <div class="stat">
-      <svg class="stat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.2 2.4 3.3 5.4 3.3 8.5S14.2 18.1 12 20.5c-2.2-2.4-3.3-5.4-3.3-8.5S9.8 5.9 12 3.5Z"/></svg>
-      <div><b id="statCountries">7</b><span data-i18n="stat2"></span></div>
-    </div>
-  </div></div>
-
-  <!-- Contracts headline band (existing strings; the featured José testimonial that
-       used to sit here has moved into the right rail — see .rail-testi). -->
-  <section class="sec contracts">
-    <h2 class="display" data-i18n-html="contracts_h2"></h2>
-    <p class="sub" data-i18n-html="contracts_sub"></p>
-    <div class="rule"></div>
-  </section>
-
-  <!-- WHO I AM — laid out like the mockup's "OUR MISSION": copy left, media right
-       in a rounded frame with a thin navy caption bar (no video asset exists, so the
-       founder photo takes that frame). -->
-  <section class="sec sec-alt" id="who">
-    <div class="mission">
-      <div class="mission-copy">
-        <div class="sec-head"><h2 class="display" data-i18n="who_kicker"></h2></div>
-        <p data-i18n="who_bio"></p>
-        <p data-i18n="who_bio2"></p>
-        <p class="mission-strong"><b>Samuele Bruno</b> — <span data-i18n="who_role"></span></p>
-        <div class="creds">
-          <span class="cred" data-i18n="cred_italy"></span>
-          <span class="cred" data-i18n="cred_u18"></span>
-          <span class="cred" data-i18n="cred_cbl"></span>
-          <span class="cred" data-i18n="cred_pro"></span>
-          <span class="cred" data-i18n="cred_college"></span>
-          <span class="cred" data-i18n="cred_hastings"></span>
-          <span class="cred" data-i18n="cred_cod"></span>
-          <span class="cred" data-i18n="cred_ecc"></span>
-        </div>
-        <a class="btn btn-navy founder-contact" href="mailto:elitesportsmanagement50@gmail.com?subject=Inquiry%20-%20Elite%20Sports%20Management"><span class="ic">✉</span><span data-i18n="sam_contact"></span></a>
-      </div>
-      <figure class="mission-media">
-        <div class="mm-shot" id="founderPhoto" style="background-image:url('https://sbexwyvsgqayxrsrlrpm.supabase.co/storage/v1/object/public/player-photos/founder/sam.jpeg')"></div>
-        <figcaption class="mm-cap"><span class="mm-nm">Samuele Bruno</span><span data-i18n="who_role"></span></figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <!-- OUR ATHLETES — light-gray band, centred head, horizontal scroll-snap row with
-       arrow buttons. Filters and the unlock gate behave exactly as before. -->
-  <!-- ROSTER TEASER — the roster itself moved to /roster/ (2026-09). This section is now
-       the entry point only: the same access-code form, which REDIRECTS to /roster/ on a
-       valid code instead of revealing the list in place. An already-unlocked visitor gets
-       a direct button rather than being asked for a code they have already used. -->
-  <section class="sec sec-gray full" id="roster">
-    <div class="sec-head sec-head-c">
-      <div class="kicker" data-i18n="roster_kicker"></div>
-      <h2 class="display" data-i18n="roster_h2"></h2>
-      <p data-i18n="roster_p"></p>
-    </div>
-    <div class="roster-teaser">
+  <!-- Same client-side unlock gate as before, just relocated. An unlocked visitor sees
+       the grid; a locked or REVOKED one sees the code form right here, so landing on
+       /roster/ directly is never a dead end. -->
+  <div class="roster-wrap is-locked" id="rosterWrap">
+    <div class="roster" id="rosterList"></div>
+    <div class="gate">
       <div class="gate-in">
         <div class="gate-lock">&#128274;</div>
         <h3 data-i18n="gate_h"></h3>
-        <p data-i18n="rp_teaser"></p>
-        <!-- Shown instead of the code form once this browser holds a valid unlock. -->
-        <a class="btn btn-gold rt-open" id="rosterOpen" href="roster/" hidden data-i18n="rp_open"></a>
-        <div id="rosterGateBox">
-          <div class="gate-or" data-i18n="gate_or"></div>
-          <form class="gate-code" id="gateForm">
-            <input id="gateInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="gate_ph" data-i18n-aria="gate_aria" />
-            <button type="submit" data-i18n="gate_unlock"></button>
-          </form>
-          <a class="gate-need" data-mail data-subject="Roster access code request — ESM" data-i18n="gate_need"></a>
-          <div class="gate-err" id="gateErr" data-i18n="gate_err"></div>
-        </div>
+        <p data-i18n="gate_p"></p>
+        <div class="gate-or" data-i18n="gate_or"></div>
+        <form class="gate-code" id="gateForm">
+          <input id="gateInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="gate_ph" data-i18n-aria="gate_aria" />
+          <button type="submit" data-i18n="gate_unlock"></button>
+        </form>
+        <a class="gate-need" data-mail data-subject="Roster access code request — ESM" data-i18n="gate_need"></a>
+        <div class="gate-err" id="gateErr" data-i18n="gate_err"></div>
       </div>
     </div>
-  </section>
-
-  <section class="sec full" id="college">
-    <div class="sec-head"><div class="kicker" data-i18n="col_kicker"></div><h2 class="display" data-i18n="col_h2"></h2><p data-i18n="col_p"></p></div>
-    <div class="col-grid">
-      <div class="col-list">
-        <div class="col-row"><i>01</i><span data-i18n="col_1"></span></div>
-        <div class="col-row"><i>02</i><span data-i18n="col_2"></span></div>
-        <div class="col-row"><i>03</i><span data-i18n="col_3"></span></div>
-        <div class="col-row"><i>04</i><span data-i18n="col_4"></span></div>
-        <div class="col-row"><i>05</i><span data-i18n="col_5"></span></div>
-        <div class="col-row"><i>06</i><span data-i18n="col_6"></span></div>
-      </div>
-      <div class="col-cta">
-        <h3 data-i18n="col_cta_h"></h3>
-        <p data-i18n="col_cta_p"></p>
-        <a class="btn btn-gold svc-signup" id="collegePayBtn" href="#join" data-svc="College Placement" data-i18n="col_cta_btn"></a>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec sec-gray full" id="events">
-    <div class="sec-head"><div class="kicker" data-i18n="events_kicker"></div><h2 class="display" data-i18n="events_h2"></h2><p data-i18n="events_p"></p></div>
-    <div class="ev-grid" id="eventsList"></div>
-  </section>
-
-  <!-- Tenerife Winter League media (video reel + photo gallery) now lives inside the
-       Winter League event detail modal (see openEventModal), gated behind its event card. -->
-
-  <section class="sec full" id="testi">
-    <div class="sec-head"><div class="kicker" data-i18n="testi_kicker"></div><h2 class="display" data-i18n="testi_h2"></h2><p data-i18n="testi_p"></p></div>
-    <div class="testi-list" id="testiList"></div>
-    <div class="sec-cta"><button type="button" id="testiAll" class="btn btn-navy" style="display:none" data-i18n="testi_seeall"></button></div>
-  </section>
-
-  <!-- Profile-creation gate (€129.99). Independent second instance of the roster paywall:
-       its own code hash, its own localStorage key, and it directs to #join once unlocked. -->
-  <section class="sec sec-gray full" id="profile">
-    <div class="sec-head"><div class="kicker" data-i18n="pg_kicker"></div><h2 class="display" data-i18n="pg_h2"></h2><p data-i18n="pg_p2"></p></div>
-    <div class="pcreate">
-      <div class="pc-card">
-        <div class="gate-lock">🪪</div>
-        <h3 data-i18n="pg_h"></h3>
-        <p data-i18n="pg_p"></p>
-        <ul class="pc-includes">
-          <li data-i18n="pg_i1"></li>
-          <li data-i18n="pg_i2"></li>
-          <li data-i18n="pg_i3"></li>
-          <li data-i18n="pg_i4"></li>
-        </ul>
-        <!-- Two informational tiers (item 6). Payment happens off-site with Sam — there is
-             NO payment gate. Selecting a tier records the athlete's choice (stashed for the
-             /register/ flow, which writes it onto their profile so Sam sees it) and sends
-             them straight into profile creation. No paying first. -->
-        <div class="pc-tiers">
-          <div class="pc-tier">
-            <div class="pc-tier-name" data-i18n="pg_t1_name"></div>
-            <div class="gate-price">€129.99<small data-i18n="pg_price_note"></small></div>
-            <div class="pc-tier-desc" data-i18n="pg_t1_desc"></div>
-            <a class="btn btn-gold pc-tier-cta" href="register/" data-tier-name="Standard" data-tier-price="€129.99" data-i18n="pg_t1_btn"></a>
-          </div>
-          <div class="pc-tier pc-tier-plus">
-            <div class="pc-tier-name" data-i18n="pg_t2_name"></div>
-            <div class="gate-price">€149.99<small data-i18n="pg_price_note"></small></div>
-            <div class="pc-tier-desc" data-i18n="pg_t2_desc"></div>
-            <a class="btn btn-gold pc-tier-cta" href="register/" data-tier-name="Direct Contact" data-tier-price="€149.99" data-i18n="pg_t2_btn"></a>
-          </div>
-        </div>
-        <label class="tc tc-c"><input type="checkbox" class="tc-check" id="profileTc"><span data-i18n="tc_label"></span> <a class="tc-more" href="terms.html" target="_blank" rel="noopener" data-i18n="tc_more"></a></label>
-        <div class="gate-err" id="profileTcErr" data-i18n="tc_required"></div>
-        <div class="pc-access" data-i18n="pg_access"></div>
-      </div>
-    </div>
-  </section>
-
-  <div class="band full">
-    <h2 class="display" data-i18n="band_h2"></h2><p data-i18n="band_p"></p>
-    <a class="btn btn-gold" href="#join" data-i18n="band_btn"></a>
   </div>
-
 </main>
 
-<!-- ============================================================================
-     RIGHT RAIL — JOIN card, services card, featured testimonial card.
-     Pulled up by --hero-h so its top edge is level with the hero band's top.
-     ============================================================================ -->
-<aside class="col-rail">
+<footer><div class="wrap foot" style="display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap">
+  <a class="brand" href="../index.html"><img class="logo-img foot-logo" src="../logo.png" alt="ESM Sports Network" width="88" height="64" loading="lazy" /></a>
+  <span style="color:rgba(255,255,255,.6);font-size:12.5px">&copy; <span id="yr"></span> ESM Sports Network</span>
+</div></footer>
 
-  <!-- ===== JOIN card =====
-       White card with a navy header (title, one-line subtitle, step indicator) over a
-       white form body, per the mockup. Every string, field, name and behaviour is the
-       pre-existing one — only the ORDER and the step grouping are new. The panel keeps
-       id="join" so every existing href="#join" (nav, hero CTA, service cards, college
-       CTA, closing band) still lands on it.
+<div class="modal" id="modal"><div class="scrim" data-close></div><div class="sheet"><button type="button" class="close" data-close aria-label="Close">&#10005;</button><div id="sheetContent"></div></div></div>
 
-       Multi-step: each block carries data-step="1..4"; the fields additionally keep their
-       original data-cats so the category-driven show/hide is unchanged. A block is visible
-       only when BOTH its step is current AND its category matches (see updateApplyFields).
-       Hidden fields stay in the DOM, so FormData on submit still sees every step's values —
-       the submit handler reads only the selected category's fields, exactly as before. -->
-  <section class="joinpanel" id="join">
-    <div class="jp-head">
-      <div class="kicker" data-i18n="join_kicker"></div>
-      <h2 class="display" data-i18n="join_h2"></h2>
-      <p class="jp-sub" data-i18n="join_p"></p>
-      <!-- Numbered step indicator. aria-hidden: it is a visual progress cue only — the
-           authoritative state is the step heading and the labels themselves. -->
-      <ol class="jp-steps" id="jpSteps" aria-hidden="true">
-        <li data-s="1"><b>1</b><span data-i18n="step_1_t"></span></li>
-        <li data-s="2"><b>2</b><span data-i18n="step_2_t"></span></li>
-        <li data-s="3"><b>3</b><span data-i18n="step_3_t"></span></li>
-        <li data-s="4"><b>4</b><span data-i18n="step_4_t"></span></li>
-      </ol>
-    </div>
-
-    <div class="jp-body">
-      <!-- "1. CATEGORY & CONTACT" — the number and the title are both filled in by
-           renderSteps() from the same step dictionary keys used by the indicator. -->
-      <div class="jp-steptitle"><b id="jpStepNum">1.</b> <span id="jpStepName"></span></div>
-
-      <form id="applyForm" novalidate>
-        <!-- ===== STEP 1 — category + contact ===== -->
-        <div class="jp-pitch" data-step="1">
-          <div class="tagline" data-i18n="join_tagline"></div>
-          <p class="join-pitch" data-i18n="join_pitch"></p>
-        </div>
-        <div class="field jp-wide" data-step="1"><label data-i18n="f_applying"></label>
-          <select name="applying" id="applyingSelect">
-            <option value="Baseball Representation" data-i18n="opt_rep_baseball"></option>
-            <option value="Softball Representation" data-i18n="opt_rep_softball"></option>
-            <option value="College Placement" data-i18n="opt_college"></option>
-            <option value="Teams and Scouts" data-i18n="opt_teams"></option>
-          </select></div>
-        <div class="af af-row" data-step="1" data-cats="rep college">
-          <div class="field"><label data-i18n="f_first"></label><input type="text" name="first_name" autocomplete="given-name" /></div>
-          <div class="field"><label data-i18n="f_last"></label><input type="text" name="last_name" autocomplete="family-name" /></div>
-        </div>
-        <div class="field af jp-wide" data-step="1" data-cats="teams"><label data-i18n="f_name_or_team"></label><input type="text" name="name_or_team" /></div>
-        <div class="field af jp-wide" data-step="1" data-cats="rep college"><label data-i18n="f_email"></label><input type="email" name="email" autocomplete="email" /></div>
-        <div class="field af jp-wide" data-step="1" data-cats="teams"><label data-i18n="f_email"></label><input type="email" name="ts_email" autocomplete="email" /></div>
-        <div class="af af-row af-phone" data-step="1" data-cats="rep college">
-          <div class="field field-code"><label data-i18n="f_phone_code"></label><input type="text" name="phone_code" placeholder="+39" inputmode="tel" /></div>
-          <div class="field"><label data-i18n="f_phone"></label><input type="tel" name="phone" autocomplete="tel-national" /></div>
-        </div>
-        <div class="af af-row af-phone" data-step="1" data-cats="teams">
-          <div class="field field-code"><label data-i18n="f_phone_code"></label><input type="text" name="ts_phone_code" placeholder="+1" inputmode="tel" /></div>
-          <div class="field"><label data-i18n="f_phone"></label><input type="tel" name="ts_phone" autocomplete="tel-national" /></div>
-        </div>
-
-        <!-- ===== STEP 2 — athlete details ===== -->
-        <div class="af af-row" data-step="2" data-cats="rep college">
-          <div class="field"><label data-i18n="f_nationality"></label><input type="text" name="nationality" /></div>
-          <div class="field"><label data-i18n="f_country"></label><input type="text" name="country" autocomplete="country-name" /></div>
-        </div>
-        <div class="af af-row" data-step="2" data-cats="teams">
-          <div class="field"><label data-i18n="f_nationality"></label><input type="text" name="ts_nationality" /></div>
-          <div class="field"><label data-i18n="f_country"></label><input type="text" name="ts_country" autocomplete="country-name" /></div>
-        </div>
-        <div class="af af-row" data-step="2" data-cats="rep college">
-          <div class="field"><label data-i18n="f_position"></label>
-            <select name="position">
-              <option value="" data-i18n="f_position_ph"></option>
-              <option value="Pitcher" data-i18n="pos_pitcher"></option>
-              <option value="Catcher" data-i18n="pos_catcher"></option>
-              <option value="Infield" data-i18n="pos_infield"></option>
-              <option value="Outfield" data-i18n="pos_outfield"></option>
-            </select></div>
-          <div class="field"><label data-i18n="f_age"></label><input type="number" name="age" min="1" max="99" inputmode="numeric" /></div>
-        </div>
-        <div class="field af jp-wide" data-step="2" data-cats="teams"><label data-i18n="f_role"></label><input type="text" name="ts_role" /></div>
-
-        <!-- ===== STEP 3 — documents ===== -->
-        <div class="field af jp-wide" data-step="3" data-cats="rep college"><label data-i18n="f_photo"></label>
-          <input type="file" name="photo" accept="image/jpeg,image/png" />
-          <small class="fhint" data-i18n="f_photo_hint"></small></div>
-        <div class="field af jp-wide field-opt" data-step="3" data-cats="teams"><label data-i18n="f_photo"></label>
-          <input type="file" name="ts_photo" accept="image/jpeg,image/png" />
-          <small class="fhint" data-i18n="f_photo_hint"></small></div>
-        <div class="field af jp-wide" data-step="3" data-cats="rep college"><label data-i18n="f_resume"></label>
-          <input type="file" name="resume" accept="application/pdf,.pdf" />
-          <small class="fhint" data-i18n="f_pdf_hint"></small></div>
-        <div class="field af jp-wide" data-step="3" data-cats="college"><label data-i18n="f_english"></label>
-          <input type="file" name="english_cert" accept="application/pdf,.pdf" />
-          <small class="fhint" data-i18n="f_pdf_hint"></small></div>
-        <div class="field af jp-wide" data-step="3" data-cats="college"><label data-i18n="f_education"></label><input type="text" name="education_level" /></div>
-        <div class="field af jp-wide" data-step="3" data-cats="college"><label data-i18n="f_diploma"></label>
-          <input type="file" name="diploma" accept="application/pdf,.pdf" />
-          <small class="fhint" data-i18n="f_pdf_hint"></small></div>
-
-        <!-- ===== STEP 4 — goals + terms + submit ===== -->
-        <div class="field af jp-wide" data-step="4" data-cats="rep"><label data-i18n="f_goals"></label><textarea name="goals"></textarea></div>
-        <div class="field af jp-wide" data-step="4" data-cats="college"><label data-i18n="f_study"></label><textarea name="study_goals"></textarea></div>
-        <div class="field af jp-wide" data-step="4" data-cats="teams"><label data-i18n="f_looking"></label><textarea name="looking_for"></textarea></div>
-        <label class="tc" data-step="4"><input type="checkbox" class="tc-check" id="joinTc"><span data-i18n="tc_label"></span> <a class="tc-more" href="terms.html" target="_blank" rel="noopener" data-i18n="tc_more"></a></label>
-
-        <!-- Anti-spam honeypot — hidden from real users; must stay empty. Deliberately has
-             NO data-step, so it is present on every step exactly as it was before. -->
-        <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
-
-        <div class="jp-nav">
-          <button type="button" class="btn btn-gold jp-next" id="stepNext" data-i18n="step_next"></button>
-          <button class="btn btn-gold jp-submit" type="submit" data-i18n="f_submit"></button>
-          <button type="button" class="jp-back" id="stepBack" data-i18n="step_back"></button>
-        </div>
-        <div class="form-msg" id="formMsg"></div>
-      </form>
-    </div>
-  </section>
-
-  <!-- ===== Services card (mirrors the mockup's "WHAT YOU RECEIVE") =====
-       The five existing "What We Do" services, relocated here as icon + title.
-       Each service's full description / bullets / highlight text is preserved in the
-       DOM as visually-hidden text (.sr-only) so no string is lost and every existing
-       i18n key still resolves — see the round-2 notes in ENGINEERING_LOG.md. -->
-  <section class="rail-card svc-card" id="about">
-    <h2 class="rail-title" data-i18n="about_kicker"></h2>
-    <div class="svc-grid">
-      <a class="svc-cell" href="#college">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.5 8.5 12 13l9.5-4.5L12 4Z"/><path d="M6 10.6V15c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.4"/><path d="M20.5 9v5"/></svg>
-        <span class="svc-t" data-i18n="svc1_t"></span>
-        <span class="sr-only" data-i18n="svc1_d"></span><span class="sr-only" data-i18n="svc1_pay"></span>
-      </a>
-      <a class="svc-cell svc-signup" href="#join" data-svc="Baseball Representation">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M7.6 5.2c1.6 2 2.4 4.3 2.4 6.8s-.8 4.8-2.4 6.8M16.4 5.2c-1.6 2-2.4 4.3-2.4 6.8s.8 4.8 2.4 6.8"/></svg>
-        <span class="svc-t" data-i18n="svc_pro_t"></span>
-        <span class="sr-only" data-i18n="svc_pro_d"></span><span class="sr-only" data-i18n="svc_pro_pay"></span>
-      </a>
-      <a class="svc-cell svc-signup" href="#join" data-svc="Softball">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M5.4 8.2c2.6.6 4.7 2.1 6 4.2 1.3 2.1 1.7 4.6 1.2 7.2M18.6 8.2c-2.6.6-4.7 2.1-6 4.2"/></svg>
-        <span class="svc-t" data-i18n="so_t"></span>
-        <span class="sr-only" data-i18n="so_d"></span><span class="sr-only" data-i18n="so_pay"></span>
-      </a>
-      <div class="svc-cell">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3l7-4v13l-7-4H4a1.5 1.5 0 0 1-1.5-1.5v-2A1.5 1.5 0 0 1 4 9.5Z"/><path d="M17.5 9a4 4 0 0 1 0 6"/></svg>
-        <span class="svc-t" data-i18n="svc4_t"></span>
-        <span class="sr-only" data-i18n="svc4_d"></span>
-      </div>
-      <div class="svc-cell">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 17.5 9 12l3.5 3.5L20.5 7"/><path d="M15.5 7h5v5"/></svg>
-        <span class="svc-t" data-i18n="svc5_t"></span>
-        <span class="sr-only" data-i18n="svc5_d"></span>
-        <span class="sr-only" data-i18n="svc5_b1"></span><span class="sr-only" data-i18n="svc5_b2"></span><span class="sr-only" data-i18n="svc5_b3"></span><span class="sr-only" data-i18n="svc5_b4"></span><span class="sr-only" data-i18n="svc5_b5"></span>
-        <span class="sr-only" data-i18n="svc5_hl_t"></span><span class="sr-only" data-i18n="svc5_hl_d"></span>
-      </div>
-    </div>
-    <span class="sr-only" data-i18n="about_h2"></span><span class="sr-only" data-i18n="about_p"></span>
-  </section>
-
-  <!-- ===== Featured testimonial card (José Cedeño) — relocated from the contracts band. -->
-  <section class="rail-card rail-testi">
-    <div class="rt-q">“</div>
-    <div class="rt-body">
-      <div class="qt" id="featQuote"></div>
-      <div class="rt-who"><div class="nm">José Cedeño</div><div class="rl" data-i18n="feat_role"></div></div>
-    </div>
-    <div class="rt-shot" style="background-image:url('media/photos/jose-cedeno-thumb.jpg')"></div>
-    <div class="sec-cta"><button type="button" id="testiAllTop" class="btn btn-outline" style="display:none" data-i18n="testi_seeall"></button></div>
-  </section>
-
-</aside>
-</div><!-- /.shell -->
-
-<!-- ============================================================================
-     FOOTER — navy, four columns + a thin darker copyright bar. Every link and label
-     already exists on the page: Quick Links are the six nav anchors, Resources are the
-     four Sign In destinations, Contact is the existing email + Instagram.
-     esm-legal.js still appends its Privacy · Terms row as a direct child of <footer>.
-     ============================================================================ -->
-<footer>
- <div class="shell foot">
-  <div class="foot-col foot-brand">
-    <a class="brand" href="#top"><img class="logo-img foot-logo" src="logo.png" alt="ESM Sports Network" width="88" height="64" loading="lazy" /></a>
-    <div class="foot-social">
-      <a href="https://www.instagram.com/esm_sports_network__01/" target="_blank" rel="noopener" aria-label="ESM Sports Network on Instagram"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a>
-      <a href="mailto:elitesportsmanagement50@gmail.com" aria-label="elitesportsmanagement50@gmail.com"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></a>
-    </div>
-  </div>
-  <!-- The mockup's "QUICK LINKS" heading has no existing string behind it and
-       reusing "Join Us" here would mislabel the column, so this one runs unlabelled. -->
-  <nav class="foot-col foot-nav foot-nav-nohead">
-    <a href="#about" data-i18n="nav_about"></a>
-    <a href="#who" data-i18n="nav_who"></a>
-    <a href="#college" data-i18n="nav_college"></a>
-    <a href="#roster" data-i18n="nav_roster"></a>
-    <a href="#events" data-i18n="nav_events"></a>
-    <a href="#join" data-i18n="nav_join"></a>
-  </nav>
-  <nav class="foot-col foot-nav">
-    <h3 class="foot-h" data-i18n="nav_signin"></h3>
-    <a href="register/" data-i18n="nav_signin_create"></a>
-    <a href="portal/" data-i18n="nav_signin_player"></a>
-    <a href="scout/" data-i18n="nav_signin_scout"></a>
-    <a href="admin/" data-i18n="nav_signin_admin"></a>
-  </nav>
-  <div class="foot-col foot-contact">
-    <h3 class="foot-h" data-i18n="sam_contact"></h3>
-    <a href="mailto:elitesportsmanagement50@gmail.com"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>elitesportsmanagement50@gmail.com</a>
-    <a href="https://www.instagram.com/esm_sports_network__01/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>@esm_sports_network__01</a>
-  </div>
- </div>
-
- <div class="shell ceasai">
-  <a href="https://protiqai.com" target="_blank" rel="noopener"><img class="ceasai-logo" src="ceasai-logo.jpeg" alt="CeasAI — Custom Solutions" width="34" height="34" loading="lazy" /><span data-i18n="ceasai_cta"></span></a>
-  <div class="ceasai-social">
-    <a href="https://www.instagram.com/ceas_ai/" target="_blank" rel="noopener noreferrer" data-i18n-aria="ceasai_ig"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a>
-    <a href="mailto:ceasai.solutions@gmail.com" data-i18n-aria="ceasai_email"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></a>
-    <a href="https://www.tiktok.com/@ceas_ai" target="_blank" rel="noopener noreferrer" data-i18n-aria="ceasai_tiktok"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M16.5 3c.3 2.1 1.6 3.6 3.5 3.9v2.4c-1.3.1-2.5-.3-3.5-1v5.5c0 3.2-2.4 5.2-5.2 5.2-2.7 0-4.8-2-4.8-4.7 0-2.8 2.3-4.8 5.1-4.6v2.5c-.3-.1-.7-.1-1-.1-1.2 0-2.2.9-2.2 2.2 0 1.3 1 2.2 2.2 2.2 1.4 0 2.4-1 2.4-2.7V3h3z"/></svg></a>
-  </div>
- </div>
-
- <div class="foot-bar"><div class="shell foot-bar-in">
-   <p class="muted">© <span id="yr"></span> ESM Sports Network. <span data-i18n="foot_rights"></span></p>
-   <a class="foot-admin" href="admin/" data-i18n="admin_link"></a>
- </div></div>
-</footer>
-
-
-<div class="modal" id="modal"><div class="scrim" data-close></div><div class="sheet"><button type="button" class="close" data-close aria-label="Close">✕</button><div id="sheetContent"></div></div></div>
-
-<div class="install" id="install"><div class="box"><div><b data-i18n="install_t"></b><span data-i18n="install_d"></span></div><button type="button" id="installBtn" data-i18n="install_btn"></button><button type="button" class="x" id="installX" aria-label="Dismiss">✕</button></div></div>
-
-<!-- Shared Baseball-Reference stats module (read-only render on player modals). -->
-<script src="bbref-stats.js"></script>
+<script src="../bbref-stats.js"></script>
 <script>
+/* =====================================================================
+   /roster/ — the unlocked roster, moved off the homepage (2026-09).
+   The homepage #roster section is now a teaser: it takes the access code and
+   redirects here on success. Everything security-relevant below — the code
+   hashes, the versioned unlock record, master-code caching and revalidation,
+   and the three-step submit path (personal hash → cached master → live RPC) —
+   is the SAME code that ran on the homepage, moved verbatim, so gate
+   versioning and revocation behave exactly as they did before.
+   ===================================================================== */
 /* ===== CONFIG: Supabase (live roster + applications) =====
    The anon key is browser-safe: RLS only allows reading approved players and
    inserting applications as `pending`. If Supabase is unreachable the site
@@ -1576,56 +1133,8 @@ function cacheMasterCode(v){
   }catch(e){}
 }
 
-/* ===== Media (Tenerife Winter League) ===== */
-const GALLERY = [
-  {f:"twl-field-aerial",  c:"The seaside field — Tenerife"},
-  {f:"twl-champions",     c:"Champions — Tenerife Winter League"},
-  {f:"twl-allstars-team", c:"All-Stars — Tenerife"},
-  {f:"twl-trophy-pair",   c:"Trophy night"},
-  {f:"twl-medal",         c:"Medal ceremony"},
-  {f:"twl-huddle-2",      c:"Pregame huddle"},
-  {f:"twl-mound-visit",   c:"Mound visit"},
-  {f:"twl-on-deck",       c:"On deck"},
-  {f:"twl-teammates",     c:"Teammates"},
-  {f:"twl-infield",       c:"Infield talk"},
-  {f:"twl-batter-13",     c:"At the plate"},
-  {f:"twl-huddle-1",      c:"Team meeting"}
-];
-const CLIPS = [1,2,3,4,5,6,7,8,9];
-
-/* Player photos committed to the repo. A Supabase `image_url` always wins. */
 const LOCAL_PHOTOS = { "jose-cedeno":"media/photos/jose-cedeno.jpg" };
-
-/* ===== EVENTS ===== */
-const EVENTS = [
-  // Upcoming registration (item 14) — no inline gallery; the card links straight to /tenerife/.
-  { title:"Tenerife Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", icon:"🏝️", image:"media/photos/twl-field-aerial-thumb.jpg", blurb:"Adult division winter league on the coast of Tenerife, Spain — Dec 8–15, 2026. Includes tournament entry, hotel with meals, transport to the seaside field, official jersey and cap, laundry service, and a showcase in front of MLB and college scouts. Registration is open; the first 20 players to sign up get a bonus surprise.", tags:"⚾ Adult Division  ·  🔭 MLB & College Scouts  ·  🎁 First 20 get a bonus", reg_url:"tenerife/" },
-  // Past edition gallery (item 13) — clicking opens a dedicated modal titled "Tenerife 2025 Edition"
-  // with the video reel + photo gallery (not shown inline on the main page).
-  { title:"Tenerife 2025 Edition", date:"2025-12-13", loc:"Tenerife, Spain", status:"past", media:true, icon:"🏝️", image:"media/photos/twl-champions-thumb.jpg", blurb:"Photos and video from our 2025 Tenerife Winter League edition — champions, all-stars and life on the seaside field.", tags:"🏆 Champions  ·  ⭐ All-Stars  ·  🎥 Highlights" }
-];
-
-/* ===== TESTIMONIALS =====
-   José's words are quoted in his own Spanish under q.es; q.en / q.it are
-   translations so the card reads naturally in every language. */
-const TESTIMONIALS = [
-  {
-    q:{
-      es:"Agradezco mucho a la agencia ESM Sports Network y a Samuele Bruno por ayudarme a conseguir oportunidades y por hacerme creer en mi talento. 100% recomendado — excelente agencia y excelente persona, todo un profesional en lo que haces. Dios te bendiga grandemente, hermano. Bendiciones.",
-      en:"I'm deeply grateful to ESM Sports Network and to Samuele Bruno for helping me find opportunities and for making me believe in my talent. 100% recommended — an excellent agency and an excellent person, a true professional in what you do. God bless you greatly, brother. Blessings.",
-      it:"Ringrazio moltissimo l'agenzia ESM Sports Network e Samuele Bruno per avermi aiutato a trovare opportunità e per avermi fatto credere nel mio talento. 100% raccomandato — ottima agenzia e ottima persona, un vero professionista in quello che fai. Dio ti benedica, fratello. Benedizioni."
-    },
-    n:"José Cedeño",
-    r:{ en:"Former Cleveland Indians organization", es:"Ex organización de los Cleveland Indians", it:"Ex organizzazione Cleveland Indians" },
-    photo:"media/photos/jose-cedeno-thumb.jpg"
-  }
-];
-
-/* Players with a real static profile page at players/<slug>.html (built via
-   gen_player_pages.py). Anyone not in this set falls back to the in-page modal
-   -- e.g. new applicants approved via the Join form before pages are regenerated. */
 const STATIC_PLAYER_PAGES = new Set(["brayan-hernandez", "gianni-westphal", "jose-cedeno", "danyer-sanabria", "francesco-mazzei", "anderson-pena", "jesus-delgado", "lorenzo-gonzalez", "jaider-morelos", "bret-bowers", "osiris-german", "adam-moser", "yerardo-ciofani", "javier-useche", "david-chavez", "matteo-colalucci", "anthony-quattrocchi"]);
-
 const T = {
   en:{nav_about:"What We Do",nav_college:"College",nav_who:"Who I Am",nav_roster:"Roster",nav_events:"Events",nav_media:"Media",nav_join:"Join Us",nav_signin:"Sign In",nav_myprofile:"My Profile",nav_signin_create:"Create Account",nav_signin_player:"Player Portal",nav_signin_scout:"Scout Portal",nav_signin_admin:"Admin Portal",nav_cta:"Apply Now",
     contracts_h2:'50+ contracts signed <em>since 2025</em>',
@@ -1900,13 +1409,6 @@ const T = {
     install_t:"Installa l'app ESM",install_d:"Aggiungila alla schermata Home",install_btn:"Installa",
     admin_link:"Admin",login_h:"Accesso Admin",login_sub:"Gestisci atleti, statistiche e foto",login_email:"Email",login_pass:"Password",login_btn:"Accedi"}
 };
-
-// (Country flags moved to image-based flagcdn rendering — see the resolver just below the
-//  DIAL_CODES table. Emoji flags don't render on Windows, so they're no longer used.)
-
-/* Country-code phone input: a dial-code <select> + a number field, combined into a
-   proper international string ("+39 340…") on submit. Curated to ESM's markets
-   (Caribbean / Latin America / Europe / US) — the number field takes the rest. */
 const DIAL_CODES=[
   {c:"IT",n:"Italy",d:"+39",f:"🇮🇹"},{c:"US",n:"United States",d:"+1",f:"🇺🇸"},
   {c:"DO",n:"Dominican Republic",d:"+1",f:"🇩🇴"},{c:"VE",n:"Venezuela",d:"+58",f:"🇻🇪"},
@@ -2315,7 +1817,7 @@ function applyI18n(){
   // The step heading is written imperatively (not via data-i18n), so refresh it here too.
   if(typeof renderSteps==="function")renderSteps();
 }
-function setLang(l){lang=l;try{localStorage.setItem("esm_lang",l);}catch(e){}applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();}
+function setLang(l){lang=l;try{localStorage.setItem("esm_lang",l);}catch(e){}applyI18n();renderSportFilters();renderFilters();renderRoster();}
 
 const SPORT_FILTERS=["All","Baseball","Softball"];
 function renderSportFilters(){
@@ -2338,7 +1840,7 @@ function renderRoster(){
   const cards=list.map(p=>{
     const hasPage=STATIC_PLAYER_PAGES.has(p.slug);
     const tag=hasPage?"a":"button";
-    const linkAttr=hasPage?`href="players/${encodeURIComponent(p.slug)}.html"`:`data-slug="${esc(p.slug)}"`;
+    const linkAttr=hasPage?`href="../players/${encodeURIComponent(p.slug)}.html"`:`data-slug="${esc(p.slug)}"`;
     return `
     <${tag} class="pcard" ${linkAttr}>
       <div class="top" style="${photoBg(p)}"><span class="flag">${flagImg(iso2For(p),"flagimg",displayCountry(p))}${p.heritage?flagImg(emojiToIso(p.heritage),"flagimg heritageimg",""):""}</span>
@@ -2355,114 +1857,7 @@ function renderRoster(){
   // Headline stats are set by ESM, not derived from the roster: the public roster
   // only lists approved athletes, which undercounts who's actually represented.
 }
-function fmtDate(d){try{return new Date(d+"T00:00").toLocaleDateString(lang,{day:"numeric",month:"short",year:"numeric"})}catch(e){return d}}
-let EV_VIEW=[];
-function renderEvents(){
-  const order={upcoming:0,past:1};
-  EV_VIEW=[...EVENTS].sort((a,b)=>(order[a.status]-order[b.status])||a.date.localeCompare(b.date));
-  document.getElementById("eventsList").innerHTML=EV_VIEW.map((e,i)=>`
-    <div class="ev-card${e.media?' has-media':''}"${e.media?` data-ev="${i}" role="button" tabindex="0" aria-label="${esc(e.title)}"`:""}><div class="ev-img" style="${bgImg(e.image)}">
-      <span class="ev-status ${e.status==='upcoming'?'up':'past'}">${e.status==='upcoming'?t("ev_upcoming"):t("ev_past")}</span>
-      ${e.image?"":(e.icon||"⚾")}</div>
-      <div class="ev-body"><h3 class="display">${esc(e.title)}</h3>
-        <div class="ev-meta"><span>📅 ${fmtDate(e.date)}</span><span>📍 ${esc(e.loc)}</span></div>
-        <p>${esc(e.blurb)}</p>
-        ${e.tags?`<div class="ev-tags">${esc(e.tags)}</div>`:""}
-        <div class="ev-actions">
-          ${e.media?`<button type="button" class="ev-link ev-media-btn" data-ev="${i}">${t("ev_gallery")} \u2192</button>`:""}
-          ${e.reg_url?`<a class="ev-link" href="${esc(e.reg_url)}">${t("ev_register")} \u2192</a>`:""}
-          ${e.email?`<a class="ev-link" href="mailto:${e.email}">${t("ev_register")} \u2192</a>`:""}
-        </div>
-        </div></div>`).join("");
-  const el=document.getElementById("eventsList");
-  el.querySelectorAll(".ev-media-btn").forEach(b=>b.onclick=ev=>{ev.stopPropagation();openEventModal(+b.dataset.ev);});
-  el.querySelectorAll(".ev-card.has-media").forEach(c=>{
-    // Whole card opens the event detail (gallery lives inside it); the register
-    // mailto and the explicit media button handle their own clicks.
-    c.addEventListener("click",ev=>{if(ev.target.closest("a")||ev.target.closest(".ev-media-btn"))return;openEventModal(+c.dataset.ev);});
-    c.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();openEventModal(+c.dataset.ev);}});
-  });
-}
-/* Event detail modal \u2014 reuses the shared #modal sheet. The Tenerife Winter League
-   media (video reel + photo gallery) is rendered here so it only appears once the
-   athlete clicks into that event, rather than on the main page. */
-function openEventModal(i){
-  const e=EV_VIEW[i];if(!e)return;
-  const media=e.media?`
-      <div class="sub-label">${t("media_video_label")}</div>
-      <div class="reel">${CLIPS.map(n=>`<video src="media/video/clip-${n}.mp4" poster="media/video/clip-${n}-poster.jpg" controls playsinline preload="none"></video>`).join("")}</div>
-      <div class="sub-label">${t("media_photo_label")}</div>
-      <div class="gal">${GALLERY.map(g=>`<button type="button" data-full="media/photos/${g.f}.jpg" data-cap="${g.c}"><img src="media/photos/${g.f}-thumb.jpg" alt="${g.c}" loading="lazy" decoding="async" /></button>`).join("")}</div>`:"";
-  document.getElementById("sheetContent").innerHTML=`
-    <div class="sh-top"><span class="sh-mono" style="${bgImg(e.image)}">${e.image?"":(e.icon||"\u26be")}</span>
-      <div><h3 class="display">${esc(e.title)}</h3>
-      <div class="sh-pos">\ud83d\udcc5 ${fmtDate(e.date)}</div>
-      <div class="sh-meta">\ud83d\udccd ${esc(e.loc)}</div></div></div>
-    <div class="sh-body">
-      <p class="bio">${esc(e.blurb)}</p>
-      ${e.tags?`<div class="ev-tags" style="margin:-10px 0 24px">${esc(e.tags)}</div>`:""}
-      ${media}
-      ${(e.reg_url||e.email)?`<div style="margin-top:28px"><a class="btn btn-gold" href="${e.reg_url?esc(e.reg_url):("mailto:"+e.email+"?subject="+encodeURIComponent(e.title+" \u2014 Registration"))}">${t("ev_register")} \u2192</a></div>`:""}
-    </div>`;
-  document.querySelectorAll("#sheetContent .gal button").forEach(b=>b.onclick=()=>openLightbox(b.dataset.full,b.dataset.cap));
-  document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
-}
-/* Testimonial fields may be a plain string or an {en,es,it} object. */
 const loc=v=>(v&&typeof v==="object")?(v[lang]||v.en||Object.values(v)[0]||""):(v||"");
-
-// Extra testimonials from the DB (the CMS). The named, photo'd ones stay embedded
-// and featured on the main grid; the DB set fills out the full "See all" list.
-let DB_TESTI=[];
-const testiCard=x=>`
-    <div class="testi">
-      <div class="av" ${x.photo?`style="background-image:url('${x.photo}')"`:""}>${x.photo?"":initials(x.n)}</div>
-      <div class="ti-body">
-        <div class="q">“</div><p>${esc(loc(x.q))}</p>
-        <div class="who"><div class="nm">${esc(x.n)}</div><div class="rl">${esc(loc(x.r))}</div></div>
-      </div>
-    </div>`;
-function renderTesti(){
-  // Lower grid shows the admin-managed (DB) testimonials; Jos\u00E9 stays the featured
-  // card at the top only (item 4 \u2014 no duplicate). Falls back to the embedded set if
-  // the DB is unreachable so the section is never empty.
-  const lower=DB_TESTI.length?DB_TESTI:TESTIMONIALS;
-  document.getElementById("testiList").innerHTML=lower.map(testiCard).join("");
-  const feat=document.getElementById("featQuote");
-  if(feat&&TESTIMONIALS[0])feat.textContent="\u201C"+loc(TESTIMONIALS[0].q)+"\u201D";
-  // Both "See all testimonials" buttons (top, by the featured card; and bottom) show
-  // only when there are extra testimonials in the modal beyond the featured one.
-  [document.getElementById("testiAll"),document.getElementById("testiAllTop")].forEach(more=>{
-    if(more){ more.textContent=t("testi_seeall"); more.style.display=DB_TESTI.length?"":"none"; }
-  });
-}
-function openTestiModal(){
-  const all=[...TESTIMONIALS,...DB_TESTI];
-  document.getElementById("sheetContent").innerHTML=`
-    <div class="sh-top"><div><h3 class="display">${t("testi_all_h")}</h3></div></div>
-    <div class="sh-body"><div class="testi-all">${all.map(testiCard).join("")}</div></div>`;
-  document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
-}
-document.getElementById("testiAll").onclick=openTestiModal;
-{const tt=document.getElementById("testiAllTop");if(tt)tt.onclick=openTestiModal;}
-
-// Two-tier profile CTAs: record the chosen tier, then send the athlete straight into
-// /register/ to build their profile. NO payment gate — payment is arranged off-site by
-// ESM; the tier is stashed so /register/ can write it onto the profile for Sam's
-// reference. Terms & Conditions acceptance is still required before proceeding (item 8).
-(function(){
-  const tc=document.getElementById("profileTc"), err=document.getElementById("profileTcErr");
-  document.querySelectorAll(".pc-tier-cta").forEach(a=>a.addEventListener("click",e=>{
-    if(tc&&!tc.checked){ e.preventDefault(); if(err)err.classList.add("show"); return; }
-    try{ localStorage.setItem("esm_reg_tier", JSON.stringify({
-      name:  a.getAttribute("data-tier-name")  || "",
-      price: a.getAttribute("data-tier-price") || "",
-    })); }catch(_){}
-    // href="register/" then carries them into profile creation.
-  }));
-  if(tc)tc.addEventListener("change",()=>{ if(tc.checked&&err)err.classList.remove("show"); });
-})();
-
-/* ===== media lightbox (opened from the event detail modal's photo gallery) ===== */
 function openLightbox(src,cap){
   document.getElementById("sheetContent").innerHTML=
     `<div class="lightbox"><img src="${src}" alt="${cap}" /><p style="color:var(--muted);font-size:13.5px;margin-top:12px;text-align:center">${cap}</p></div>`;
@@ -2609,7 +2004,6 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
   catch(ex){console.warn("crypto.subtle unavailable",ex);}
   if(hash&&ROSTER_CODE_HASHES.includes(hash)){
     unlockRoster({m:"user",h:hash});
-    location.href="roster/";
     return;
   }
   // 2) Master roster code — FAST PATH: compare against the admin-set code this browser cached
@@ -2620,7 +2014,6 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
   const cached=cachedMasterCode();
   if(cached&&val===cached){
     unlockRoster({m:"master",c:cached});
-    location.href="roster/";
     return;
   }
   // 3) Master roster code — LIVE PATH: verify against the DB in case Sam JUST changed the code
@@ -2633,7 +2026,6 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
       if(!error&&ok===true){
         cacheMasterCode(val); // val is confirmed-current -> seed the offline cache
         unlockRoster({m:"master",c:val});
-        location.href="roster/";
         return;
       }
     }
@@ -2646,570 +2038,52 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
 revalidateUnlock();
 applyLockState();
 
-/* Service cards (College, Indy Ball, Winter League, Representation) drop the athlete
-   into the Join form with their service already chosen, so the application says what
-   they actually want. */
-function wireServiceSignups(){
-  document.querySelectorAll(".svc-signup").forEach(a=>{
-    a.addEventListener("click",()=>{
-      const svc=a.dataset.svc;
-      const sel=document.getElementById("applyingSelect");
-      if(sel&&svc&&[...sel.options].some(o=>o.value===svc)){
-        sel.value=svc;
-        // Setting .value does NOT fire "change", so the field set has to be refreshed
-        // explicitly — and the visitor restarts at step 1 for the service they picked.
-        goToStep(1);
-      }
-    });
-  });
-}
-
-/* Point each pay button at its Stripe link; fall back to email until they exist. */
-function wirePayButtons(){
-  const col=document.getElementById("collegePayBtn");
-  if(col)col.href=STRIPE_COLLEGE_URL||"#join";
-  // Centralized "route to email" wiring: any [data-mail] element points at the single
-  // CONTACT_MAILTO constant (+ optional data-subject). Swapping Sam's address updates
-  // every one of these at once. (Payment links were removed 2026-08; purchase/contact
-  // CTAs now email ESM instead.)
-  document.querySelectorAll("[data-mail]").forEach(el=>{
-    const subj=el.getAttribute("data-subject"), body=el.getAttribute("data-body");
-    const q=[]; if(subj)q.push("subject="+encodeURIComponent(subj)); if(body)q.push("body="+encodeURIComponent(body));
-    el.href=CONTACT_MAILTO+(q.length?("?"+q.join("&")):"");
-  });
-}
-
 function closeModal(){document.getElementById("modal").classList.remove("open");document.body.style.overflow="";}
 document.querySelectorAll("[data-close]").forEach(e=>e.onclick=closeModal);
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
 document.getElementById("lang").querySelectorAll("button").forEach(b=>b.onclick=()=>setLang(b.dataset.l));
 document.getElementById("yr").textContent=new Date().getFullYear();
-
-// Sign In dropdown: close when clicking outside or pressing Escape.
-(function(){
-  const si=document.getElementById("signin");
-  if(!si)return;
-  document.addEventListener("click",e=>{if(si.open&&!si.contains(e.target))si.open=false;});
-  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&si.open)si.open=false;});
-})();
-
-const form=document.getElementById("applyForm");
-const applyingSelect=document.getElementById("applyingSelect");
-const FORM_T0=Date.now();   // page-load time, for the anti-spam time trap below
-
-/* Map the "I'm applying for" value → a category token used by data-cats.
-   Baseball + Softball Representation share the same field set ("rep"); "Teams and
-   Scouts" (which replaced Coaching) uses its own team/scout field set ("teams"). */
-function applyCat(v){
-  v=String(v||"");
-  return /college/i.test(v) ? "college" : /team|scout/i.test(v) ? "teams" : "rep";
-}
-/* ===== Per-category required fields (hoisted 2026-09) =====
-   Baseball/Softball Representation and College share the full profile; College adds the
-   academic docs. "Teams and Scouts" collects a team/scout lead. File fields are required
-   too, per Sam's field lists. Hoisted out of the submit handler so the multi-step "Next"
-   gate and the final submit validate against the SAME list and can never drift apart. */
-const REQ_BY_CAT={
-  rep:    ["photo","first_name","last_name","nationality","email","phone","country","position","resume","age","goals"],
-  college:["photo","first_name","last_name","nationality","email","phone","country","position","resume","age","english_cert","education_level","diploma","study_goals"],
-  teams:  ["name_or_team","ts_nationality","ts_email","ts_phone","ts_country","ts_role","looking_for"],
-};
-const FILE_FIELDS={photo:"image",ts_photo:"image",resume:"pdf",english_cert:"pdf",diploma:"pdf"};
-// Mark the .field wrapper of a named control invalid (for the red-border hint).
-const markInvalid=name=>{const c=form.querySelector(`[name="${name}"]`);const fld=c&&c.closest(".field");if(fld)fld.classList.add("invalid");};
-
-/* ===== Multi-step application panel (2026-09) =====
-   Step 1 category + contact · 2 athlete details · 3 documents · 4 goals + terms + submit.
-   Every block carries data-step, and the field blocks keep their original data-cats, so a
-   block shows only when its step is current AND its category matches. Nothing is removed
-   from the DOM, so FormData on submit still sees every step's values — exactly the property
-   the original single-page form relied on. */
-const STEP_MAX=4;
-let STEP=1;
-const inCat=(el,cat)=>!el.dataset.cats||el.dataset.cats.split(" ").includes(cat);
-
-function renderSteps(){
-  document.querySelectorAll("#jpSteps li").forEach(li=>{
-    const n=+li.dataset.s;
-    li.classList.toggle("on",n===STEP);
-    li.classList.toggle("done",n<STEP);
-  });
-  // "1. CATEGORY & CONTACT" heading — same step keys as the indicator, so the two
-  // can never disagree and both re-translate together.
-  const num=document.getElementById("jpStepNum"), nm=document.getElementById("jpStepName");
-  if(num)num.textContent=STEP+".";
-  if(nm)nm.textContent=t("step_"+STEP+"_t");
-}
-function syncStepNav(){
-  const back=document.getElementById("stepBack"), next=document.getElementById("stepNext"),
-        sub=form.querySelector(".jp-submit");
-  if(back)back.hidden=(STEP===1);
-  if(next)next.hidden=(STEP===STEP_MAX);
-  if(sub) sub.hidden =(STEP!==STEP_MAX);
-}
-/* Show only the blocks whose step is current AND whose data-cats includes the selected
-   category, and clear any stale validation highlight. */
-function updateApplyFields(){
-  const cat=applyCat(applyingSelect.value);
-  form.querySelectorAll("[data-step]").forEach(el=>{
-    el.hidden=!(+el.dataset.step===STEP && inCat(el,cat));
-  });
-  // Defensive: a category block without a step (none today) still respects the category gate.
-  form.querySelectorAll(".af:not([data-step])").forEach(el=>{ el.hidden=!inCat(el,cat); });
-  form.querySelectorAll(".invalid").forEach(el=>el.classList.remove("invalid"));
-  renderSteps();
-  syncStepNav();
-}
-function goToStep(n){
-  STEP=Math.min(STEP_MAX,Math.max(1,n));
-  updateApplyFields();
-  const msg=document.getElementById("formMsg");
-  if(msg)msg.classList.remove("show","err");
-}
-// Bring the panel back into view when a step change would otherwise leave the user
-// looking at the middle of a taller step. No-op when the panel top is already comfortable.
-function revealPanel(){
-  const el=document.getElementById("join"); if(!el)return;
-  const top=el.getBoundingClientRect().top;
-  if(top<70||top>innerHeight*0.55) el.scrollIntoView({behavior:"smooth",block:"start"});
-}
-/* A step advances only when every required field IT OWNS for the current category is
-   filled, and any file on it passes the same size/type check the submit handler uses. */
-function validateStep(n){
-  const cat=applyCat(applyingSelect.value);
-  const req=REQ_BY_CAT[cat]||[];
-  const msg=document.getElementById("formMsg");
-  form.querySelectorAll(".invalid").forEach(el=>el.classList.remove("invalid"));
-  let firstBad=null, fileMsgKey=null;
-  for(const name of req){
-    const ctrl=form.querySelector(`[name="${name}"]`);
-    if(!ctrl) continue;
-    const block=ctrl.closest("[data-step]");
-    if(!block || +block.dataset.step!==n) continue;
-    if(FILE_FIELDS[name]){
-      const f=ctrl.files&&ctrl.files[0];
-      if(!f||!f.size){ markInvalid(name); firstBad=firstBad||name; continue; }
-      const err=fileError(f,FILE_FIELDS[name]);
-      if(err){ markInvalid(name); firstBad=firstBad||name; fileMsgKey=fileMsgKey||err; }
-    }else if(!String(ctrl.value||"").trim()){
-      markInvalid(name); firstBad=firstBad||name;
-    }
-  }
-  if(firstBad){
-    msg.textContent=t(fileMsgKey||"f_err_required");
-    msg.classList.add("show","err");
-    const bad=form.querySelector(`[name="${firstBad}"]`);
-    (bad||msg).scrollIntoView({behavior:"smooth",block:"center"});
-    if(bad&&bad.focus)try{bad.focus({preventScroll:true});}catch(_){}
-    return false;
-  }
-  msg.classList.remove("show","err");
-  return true;
-}
-// Which step owns a named control — used to jump straight to the offending step when the
-// final submit finds a gap (e.g. the visitor skipped ahead with the Enter key).
-function stepOf(name){
-  const c=form.querySelector(`[name="${name}"]`);
-  const b=c&&c.closest("[data-step]");
-  return b?+b.dataset.step:STEP;
-}
-{
-  const next=document.getElementById("stepNext"), back=document.getElementById("stepBack");
-  if(next)next.addEventListener("click",()=>{ if(validateStep(STEP)){ goToStep(STEP+1); revealPanel(); } });
-  if(back)back.addEventListener("click",()=>{ goToStep(STEP-1); revealPanel(); });
-}
-// Changing the category re-evaluates which fields this step owns (the select lives on
-// step 1, so this cannot strand the visitor mid-form).
-applyingSelect.addEventListener("change",updateApplyFields);
-
-/* Upload limits — mirrored server-side by the bucket file_size_limit + allowed_mime_types. */
-const MAX_UPLOAD=10*1024*1024;                 // 10 MB
-const IMG_TYPES=["image/jpeg","image/png"];
-const PDF_TYPE="application/pdf";
-const extFor=f=>{const n=(f&&f.name||"").toLowerCase();const i=n.lastIndexOf(".");return i>=0?n.slice(i+1):"";};
-
-// Validate a File against a kind ("image"|"pdf"); returns an error i18n-key or null.
-function fileError(file,kind){
-  if(!file||!file.size) return null;             // caller decides if required
-  if(file.size>MAX_UPLOAD) return "f_err_size";
-  if(kind==="image" && !IMG_TYPES.includes(file.type) && !["jpg","jpeg","png"].includes(extFor(file))) return "f_err_img";
-  if(kind==="pdf"   && file.type!==PDF_TYPE && extFor(file)!=="pdf") return "f_err_pdf";
-  return null;
-}
-
-/* Upload one file to a bucket under key/<label>.<ext>. Returns the object path.
-
-   NOTE (2026-09): upsert was REMOVED here because it broke every public application.
-   `upsert:true` sends the x-upsert header, and Supabase Storage then needs an UPDATE
-   policy on storage.objects as well as INSERT. The anon role has only
-   "public can upload application photos"/"...docs" (INSERT), so every upload came back
-   403 "new row violates row-level security policy" and the whole submission failed —
-   silently, behind the generic "something went wrong" message. Verified against main:
-   same failure, so this predates the redesign.
-   upsert was never actually needed: `key` is slugify(applying)+"-"+Date.now().toString(36),
-   unique per submission, and each file within a submission has its own label. A plain
-   insert is therefore always a fresh object. Alternative fix (not taken, since it would
-   loosen production RLS) was to grant anon UPDATE on both buckets. */
-async function uploadApplicationFile(bucket,key,label,file){
-  const ext=extFor(file)|| (bucket==="application-docs"?"pdf":"jpg");
-  const path=`${key}/${label}.${ext}`;
-  const {error}=await SB.storage.from(bucket).upload(path,file,{contentType:file.type||undefined});
-  if(error) throw error;
-  return path;
-}
-
-form.addEventListener("submit",async e=>{
-  e.preventDefault();
-  // The submit button only renders on the last step, but pressing Enter in any text field
-  // still fires submit. Treat that as "Next" so the visitor advances instead of being told
-  // about fields three steps ahead that they haven't reached yet.
-  if(STEP<STEP_MAX){ if(validateStep(STEP)){ goToStep(STEP+1); revealPanel(); } return; }
-  const fd=new FormData(form);
-  const btn=form.querySelector("button[type=submit]");
-  const msg=document.getElementById("formMsg");
-  msg.classList.remove("show","err");
-  form.querySelectorAll(".invalid").forEach(el=>el.classList.remove("invalid"));
-
-  // Dependency-free spam guard: bots auto-fill the hidden honeypot ("company"), and no
-  // real user reaches and submits this bottom-of-page form within 1.5s of load. Either
-  // signal → show the success UI but skip the insert, so bots don't retry or spam the
-  // moderation queue. Real submissions are unaffected.
-  if((fd.get("company")||"").trim() || (Date.now()-FORM_T0)<1500){
-    form.reset();goToStep(1);msg.textContent=t("f_success");msg.classList.add("show");
-    return;
-  }
-
-  // Terms & Conditions must be accepted before the submission is saved (item 8).
-  if(!document.getElementById("joinTc")?.checked){
-    msg.textContent=t("tc_required");msg.classList.add("show","err");
-    msg.scrollIntoView({behavior:"smooth",block:"center"});return;
-  }
-
-  // Applications require the live database; without it we can't save them.
-  if(!SB){msg.textContent=t("f_error");msg.classList.add("show","err");msg.scrollIntoView({behavior:"smooth",block:"center"});return;}
-
-  const applying=(fd.get("applying")||"").trim()||"General application";
-  const cat=applyCat(applying);
-  const g=n=>(fd.get(n)||"").toString().trim();
-  const gf=n=>{const f=fd.get(n);return f&&f.size?f:null;};
-
-  // Per-category required fields + file kinds + markInvalid are defined once near
-  // updateApplyFields, so the step "Next" gate and this final check share one source.
-  const REQ=REQ_BY_CAT[cat];
-
-  let firstBad=null, fileMsgKey=null;
-  for(const name of REQ){
-    if(FILE_FIELDS[name]){
-      const file=gf(name);
-      if(!file){ markInvalid(name); firstBad=firstBad||name; continue; }
-      const err=fileError(file,FILE_FIELDS[name]);
-      if(err){ markInvalid(name); firstBad=firstBad||name; fileMsgKey=fileMsgKey||err; }
-    }else if(!g(name)){
-      markInvalid(name); firstBad=firstBad||name;
-    }
-  }
-  // Also validate any optionally-present file even if not required (defensive).
-  for(const [name,kind] of Object.entries(FILE_FIELDS)){
-    if(REQ.includes(name)) continue;
-    const err=fileError(gf(name),kind);
-    if(err){ markInvalid(name); firstBad=firstBad||name; fileMsgKey=fileMsgKey||err; }
-  }
-  if(firstBad){
-    // Jump to the step that actually owns the gap, so the highlighted field is on screen.
-    const badStep=stepOf(firstBad);
-    if(badStep!==STEP) goToStep(badStep);
-    msg.textContent=t(fileMsgKey||"f_err_required");
-    msg.classList.add("show","err");
-    const bad=form.querySelector(`[name="${firstBad}"]`);
-    (bad||msg).scrollIntoView({behavior:"smooth",block:"center"});
-    if(bad&&bad.focus)try{bad.focus({preventScroll:true});}catch(_){}
-    return;
-  }
-
-  btn.disabled=true;
-  const oldLabel=btn.textContent; btn.textContent=t("f_submitting");
-  try{
-    // A stable key groups this applicant's uploads under one folder in each bucket.
-    const key=slugify(applying)+"-"+Date.now().toString(36);
-
-    // ---- File uploads (item 2) ----
-    // Headshot → public application-photos bucket (renders in admin + any profile).
-    // PDFs → private application-docs bucket; we store the object PATH and the admin
-    // panel mints short-lived signed URLs to download them.
-    let image_url=null, resume_url=null, english_cert_url=null, diploma_url=null;
-    if(cat==="rep"||cat==="college"){
-      const photo=gf("photo");
-      if(photo){
-        const p=await uploadApplicationFile("application-photos",key,"photo",photo);
-        image_url=SB.storage.from("application-photos").getPublicUrl(p).data.publicUrl;
-      }
-      const resume=gf("resume");
-      if(resume) resume_url=await uploadApplicationFile("application-docs",key,"resume",resume);
-    }
-    if(cat==="college"){
-      const eng=gf("english_cert");
-      if(eng) english_cert_url=await uploadApplicationFile("application-docs",key,"english-cert",eng);
-      const dip=gf("diploma");
-      if(dip) diploma_url=await uploadApplicationFile("application-docs",key,"diploma",dip);
-    }
-    if(cat==="teams"){
-      const photo=gf("ts_photo");
-      if(photo){
-        const p=await uploadApplicationFile("application-photos",key,"photo",photo);
-        image_url=SB.storage.from("application-photos").getPublicUrl(p).data.publicUrl;
-      }
-    }
-
-    // ---- Build the row (item 3) ----
-    // players.name and players."group" are NOT NULL. rep/college build the name from
-    // first+last; teams use the single "name_or_team" field.
-    const fullName=[g("first_name"),g("last_name")].filter(Boolean).join(" ");
-    const name=(cat==="teams" ? g("name_or_team") : fullName) || applying;
-    // Sport: Softball Representation → Softball; everything else defaults to Baseball
-    // (College placement covers both; applying_for keeps the exact choice for routing).
-    const sport=/softball/i.test(applying)?"Softball":"Baseball";
-    // Goals/summary text stored in bio: rep uses "goals"; college uses "study_goals".
-    const goalsText=cat==="college"?g("study_goals"):g("goals");
-    // Phone: combine the country code + number into one stored value.
-    const phone=[g("phone_code"),g("phone")].filter(Boolean).join(" ").trim();
-    const tsPhone=[g("ts_phone_code"),g("ts_phone")].filter(Boolean).join(" ").trim();
-
-    const row={
-      slug:key,
-      name,
-      "group":"Applicant",
-      sport,
-      applying_for:applying,
-      bio:goalsText||"—",
-      source:"application",
-      status:"pending",
-    };
-    // Only attach the extended fields for the categories that collect them.
-    if(cat==="rep"||cat==="college"){
-      Object.assign(row,{
-        nationality:g("nationality")||null,
-        email:g("email")||null,
-        phone:phone||null,
-        country:g("country")||null,
-        position:g("position")||null,
-        age:g("age")||null,
-        image_url,
-        resume_url,
-      });
-    }
-    if(cat==="college"){
-      Object.assign(row,{
-        english_cert_url,
-        diploma_url,
-        education_level:g("education_level")||null,
-        study_goals:g("study_goals")||null,
-      });
-    }
-    if(cat==="teams"){
-      Object.assign(row,{
-        nationality:g("ts_nationality")||null,
-        email:g("ts_email")||null,
-        phone:tsPhone||null,
-        country:g("ts_country")||null,
-        role:g("ts_role")||null,
-        looking_for:g("looking_for")||null,
-        image_url,
-      });
-    }
-
-    const {error}=await SB.from("players").insert(row);
-    if(error) throw error;
-  }catch(err){
-    console.error("Application failed",err);
-    btn.disabled=false; btn.textContent=oldLabel;
-    msg.textContent=t("f_error");msg.classList.add("show","err");msg.scrollIntoView({behavior:"smooth",block:"center"});
-    return;
-  }
-  btn.disabled=false; btn.textContent=oldLabel;
-  form.reset();goToStep(1);
-  msg.textContent=t("f_success");msg.classList.add("show");
-  msg.scrollIntoView({behavior:"smooth",block:"center"});
+document.querySelectorAll("[data-mail]").forEach(a=>{
+  const s=a.getAttribute("data-subject")||"";
+  a.href=CONTACT_MAILTO+(s?("?subject="+encodeURIComponent(s)):"");
 });
+/* Count line under the filters — reflects the CURRENT filter, and only when unlocked. */
+function updateCount(){
+  const el=document.getElementById("rpCount");
+  if(!el)return;
+  const n=document.querySelectorAll("#rosterList .pcard").length;
+  el.textContent=isUnlocked()&&n?String(n)+" "+t(n===1?"rp_one":"rp_many"):"";
+}
+const _renderRoster=renderRoster;
+renderRoster=function(){ _renderRoster.apply(this,arguments); updateCount(); };
 
-/* ===== Athlete carousel (2026-09 round 2) =====
-   The roster is a horizontal scroll-snap row; these arrows nudge it two cards at a
-   time and hide themselves at each end. Purely a scroll helper — the roster data,
-   filters and unlock gate are untouched. */
-(function(){
-  const list=document.getElementById("rosterList"),
-        prev=document.getElementById("rosPrev"), next=document.getElementById("rosNext");
-  if(!list||!prev||!next)return;
-  const cardStep=()=>{const c=list.querySelector(".pcard");return c?c.getBoundingClientRect().width+16:216;};
-  const nudge=d=>list.scrollBy({left:d*cardStep()*2,behavior:"smooth"});
-  prev.addEventListener("click",()=>nudge(-1));
-  next.addEventListener("click",()=>nudge(1));
-  function sync(){
-    // grid mode (narrow phones) or nothing to scroll -> no arrows
-    const max=list.scrollWidth-list.clientWidth-2;
-    const off=getComputedStyle(list).display!=="flex"||max<=0;
-    prev.style.visibility=(off||list.scrollLeft<=2)?"hidden":"visible";
-    next.style.visibility=(off||list.scrollLeft>=max)?"hidden":"visible";
-  }
-  list.addEventListener("scroll",sync,{passive:true});
-  addEventListener("resize",sync);
-  window.syncRosterArrows=sync;
-  sync();
-})();
-
-/* ===== Nav active-link underline =====
-   The mockup marks the current section with a short gold underline. Recomputed on
-   scroll via IntersectionObserver; read-only, affects nothing but a CSS class. */
-(function(){
-  const links=[...document.querySelectorAll(".nav-links a[href^='#']")];
-  if(!links.length||!("IntersectionObserver" in window))return;
-  const map=new Map();
-  links.forEach(a=>{ const el=document.querySelector(a.getAttribute("href")); if(el)map.set(el,a); });
-  if(!map.size)return;
-  function pick(){
-    let best=null,bestTop=Infinity;
-    map.forEach((a,el)=>{
-      const r=el.getBoundingClientRect();
-      if(r.bottom>90 && r.top<innerHeight*0.55 && r.top<bestTop){ bestTop=r.top; best=a; }
-    });
-    links.forEach(l=>l.classList.toggle("on",l===best));
-  }
-  const io=new IntersectionObserver(pick,{rootMargin:"-64px 0px -45% 0px",threshold:[0,.25,.5,1]});
-  map.forEach((a,el)=>io.observe(el));
-  addEventListener("scroll",pick,{passive:true});
-  pick();
-})();
-
-/* install prompt */
-let deferredPrompt=null;
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;document.getElementById("install").classList.add("show");});
-document.getElementById("installBtn").onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById("install").classList.remove("show");}};
-document.getElementById("installX").onclick=()=>document.getElementById("install").classList.remove("show");
-
+/* NB: SB is already declared by the extracted core block (`let lang=…, SB=null;`),
+   so it must NOT be re-declared here — doing so is a SyntaxError that kills the
+   whole script and silently leaves the page unrendered. */
 async function boot(){
   if(SUPABASE_URL&&SUPABASE_ANON_KEY){
-    try{const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
-      // The public site is anonymous by design. Don't load any signed-in session
-      // from storage — otherwise a logged-in player/scout browsing the homepage
-      // would send their JWT and RLS would return only their own row, breaking the
-      // public roster. persistSession:false keeps every request purely anon.
+    try{
+      const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
+      // Anonymous by design, exactly as the homepage does it: never adopt a stored
+      // session, or a signed-in player's JWT would narrow the roster to their own row.
       SB=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
-      // Refresh the cached master roster code FIRST (independent try), so the gate's fast
-      // synchronous path has the current value on the next interaction — and so a retired code
-      // clears the cache. Kept separate from the players fetch so a roster error can't skip it.
-      // CRITICAL: only mutate the cache when the server actually ANSWERED (no error). On a
-      // network error the RPC resolves to {data:null,error} — writing that null would WIPE the
-      // last-known-good cache and destroy the offline fallback exactly when it's needed, so we
-      // preserve the existing cache on error and only refresh/clear on a real response.
+      // Refresh the cached master code FIRST, then re-validate — this is what makes a
+      // code Sam has just changed or retired re-lock this browser on the next load.
       try{const {data:mc,error:mcErr}=await SB.rpc("get_roster_code");if(!mcErr){cacheMasterCode(mc);revalidateUnlock();}}
       catch(ex){console.warn("roster code cache refresh failed (cache preserved)",ex);}
-      // Only approved players are publicly readable (enforced by RLS too). We request
-      // just the public display columns — NOT the intake PII (age/phone/email/instagram/
-      // message) — so an approved athlete's contact details are never sent to the browser.
       const {data,error}=await SB.from("players")
         .select("id,slug,name,group,position,country,flag,heritage,born,birthplace,tier,bats,bio,teams,stats,season_stats,image_url,photo_pos_x,photo_pos_y,photo_zoom,sport,level,sort_order")
         .eq("status","approved").order("sort_order");
       if(error)throw error;
-      // Supabase stores the photo in `image_url`; the renderer reads `image`.
       if(data&&data.length)PLAYERS=data.map(p=>({...p,image:p.image_url||p.image||null}));
-      // Extra testimonials from the CMS for the "See all" list (plain strings; loc() handles them).
-      const {data:tData}=await SB.from("testimonials").select("quote,name,role,image_url,sort_order").order("sort_order");
-      if(tData&&tData.length)DB_TESTI=tData.map(x=>({q:x.quote,n:x.name,r:x.role,photo:x.image_url||null}));
     }catch(err){console.warn("Supabase load failed; using embedded roster.",err);}
   }
-  // Repo-committed photos fill in only where Supabase has none.
   PLAYERS=PLAYERS.map(p=>({...p,image:p.image||LOCAL_PHOTOS[p.slug]||null}));
-  wireServiceSignups();
-  applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();
-  applyLockState();
+  applyI18n();renderSportFilters();renderFilters();renderRoster();
+  applyLockState();updateCount();
 }
-// Show the correct application field set for the default-selected category on load.
-updateApplyFields();
-// Wire the pay buttons synchronously too: their hrefs come only from top-level
-// constants (no network), so doing this before boot()'s async import+fetch means the
-// "€49.99" roster button always has a working target even if the connection stalls —
-// previously it stayed href="#" until boot() finished (a tap-does-nothing race on slow iOS).
-/* If a player/scout is already signed in (a Supabase session is stored in this browser),
-   relabel the "Sign In" nav dropdown to "My Profile" so the nav reflects their state.
-   We only READ the stored token — the roster client stays anonymous (persistSession:false)
-   so a logged-in JWT never shrinks the public roster. applyI18n() (in boot) renders it. */
-(function reflectAuthInNav(){
-  try{
-    let raw=null;
-    for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && /^sb-.*-auth-token$/.test(k)){ raw=localStorage.getItem(k); break; } }
-    if(!raw)return;
-    const o=JSON.parse(raw), exp=o&&o.expires_at;
-    if(!(o&&o.access_token))return;
-    if(exp && exp*1000<=Date.now())return;   // session expired → leave as "Sign In"
-    const s=document.querySelector('#signin summary span[data-i18n="nav_signin"]');
-    if(s)s.setAttribute("data-i18n","nav_myprofile");
-  }catch(e){}
-})();
-wirePayButtons();
+applyI18n();applyLockState();
 boot();
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
-
-/* ---------- pull-to-refresh (installed PWA only) ----------
-   An installed PWA has no browser chrome, so it loses Safari's native pull-to-refresh.
-   This adds a custom gesture that only arms in standalone display mode and only when
-   scrolled to the very top, so it never fights normal scrolling or affects a browser tab.
-   On trigger it asks the service worker to check for a new version (the SW uses
-   skipWaiting + clients.claim, so a found update self-activates) THEN reloads — the reload
-   re-runs boot(), re-fetching the roster from Supabase (network-first), so it pulls
-   genuinely fresh data, not just a cosmetic repaint. Mirrors the admin portal's gesture. */
-(function(){
-  var standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
-  if(!standalone) return;
-
-  var THRESHOLD = 70;                 // px of pull needed to trigger a refresh
-  var scroller = document.scrollingElement || document.documentElement;
-  var startY = 0, dist = 0, pulling = false, refreshing = false;
-
-  var ind = document.createElement("div");
-  ind.id = "ptr"; ind.setAttribute("aria-hidden", "true");
-  ind.innerHTML = '<div class="ptr-spin"></div>';
-  var style = document.createElement("style");
-  style.textContent =
-    "#ptr{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;z-index:200;" +
-    "width:38px;height:38px;border-radius:50%;display:grid;place-items:center;" +
-    "background:rgba(12,33,67,.97);border:1px solid var(--gold,#d9b154);" +
-    "box-shadow:0 8px 22px rgba(0,0,0,.45);opacity:0;pointer-events:none;" +
-    "transform:translateX(-50%) translateY(-70px);transition:transform .15s ease,opacity .15s}" +
-    ".ptr-spin{width:17px;height:17px;border-radius:50%;border:2px solid rgba(217,177,84,.3);border-top-color:var(--gold,#d9b154)}" +
-    "#ptr.spin .ptr-spin{animation:ptr-rot .6s linear infinite}" +
-    "@keyframes ptr-rot{to{transform:rotate(360deg)}}";
-  document.head.appendChild(style);
-  document.body.appendChild(ind);
-
-  function reset(){ pulling = false; dist = 0; ind.classList.remove("spin"); ind.style.opacity = ""; ind.style.transform = ""; }
-
-  addEventListener("touchstart", function(e){
-    if(refreshing || e.touches.length !== 1 || scroller.scrollTop > 0) return;
-    startY = e.touches[0].clientY; pulling = true; dist = 0;
-  }, { passive: true });
-
-  addEventListener("touchmove", function(e){
-    if(!pulling || refreshing) return;
-    if(scroller.scrollTop > 0){ reset(); return; }    // user scrolled away from the top
-    dist = e.touches[0].clientY - startY;
-    if(dist <= 0){ reset(); return; }                 // pulling up, not a refresh gesture
-    ind.style.opacity = Math.min(dist / THRESHOLD, 1);
-    ind.style.transform = "translateX(-50%) translateY(" + Math.min(-70 + dist * 0.6, 10) + "px)";
-    ind.classList.toggle("spin", dist >= THRESHOLD);  // pre-spin once past the threshold
-  }, { passive: true });
-
-  addEventListener("touchend", function(){
-    if(!pulling || refreshing){ reset(); return; }
-    if(dist < THRESHOLD){ reset(); return; }
-    refreshing = true;
-    ind.classList.add("spin"); ind.style.opacity = "1";
-    ind.style.transform = "translateX(-50%) translateY(10px)";
-    Promise.resolve()
-      .then(function(){ return "serviceWorker" in navigator ? navigator.serviceWorker.getRegistration() : null; })
-      .then(function(reg){ return reg ? reg.update() : null; })   // fetch a newer sw.js if deployed
-      .catch(function(){})
-      .then(function(){ location.reload(); });                    // fresh shell + fresh roster data
-  }, { passive: true });
-})();
 </script>
 <script src="/esm-legal.js"></script>
 </body>
