@@ -57,6 +57,9 @@
   .pay-service .ps-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
   .pay-service .ps-title{font-weight:800;font-size:15px}
   .pay-service .ps-price{font-family:'Anton',sans-serif;font-size:26px;color:var(--gold);flex:0 0 auto}
+  /* PRICING TEMPORARILY HIDDEN — 2026-09 (Delaware LLC closing, operations moving to
+     Italy). The €599.99 markup below is left intact; delete this one rule to reinstate. */
+  .pay-service .ps-price{display:none}
   .pay-service ul{list-style:none;margin:0 0 6px;padding:0}
   .pay-service li{display:flex;gap:9px;align-items:flex-start;font-size:14px;color:var(--ink);padding:5px 0}
   .pay-service li::before{content:"✓";color:var(--teal-soft);font-weight:800;flex:0 0 auto}
@@ -82,7 +85,7 @@
   <!-- STEP 1 — registration form -->
   <div id="step1" class="card hide">
     <h1 class="display" data-i18n-html="te_h1">Register for <em>Tenerife</em></h1>
-    <p class="lead" data-i18n="te_lead1">Winter League 2025 · Tenerife, Spain. Fill in your details and complete your registration payment on the next step.</p>
+    <p class="lead" data-i18n="te_lead1">Winter League 2025 · Tenerife, Spain. Fill in your details and submit — ESM Sports Network will be in touch to confirm your spot.</p>
     <form id="regForm">
       <div class="field"><label for="t-name" data-i18n="te_name">Full name</label><input id="t-name" autocomplete="name" required /></div>
       <div class="grid2">
@@ -116,7 +119,7 @@
     </div>
     <ol class="pay-steps">
       <li><span class="n">1</span><span data-i18n="te_step1">ESM Sports Network reviews your registration and reaches out to you.</span></li>
-      <li><span class="n">2</span><span data-i18n="te_step2">Your spot and payment details are arranged directly with ESM.</span></li>
+      <li><span class="n">2</span><span data-i18n="te_step2">Your spot is arranged directly with ESM.</span></li>
       <li><span class="n">3</span><span data-i18n="te_step3">We'll email you with the next steps and event details.</span></li>
     </ol>
     <a class="btn btn-gold" id="tePayBtn" style="width:100%;margin-top:16px" data-mail data-subject="Tenerife Winter League" data-i18n="te_contact">Contact ESM →</a>
@@ -167,7 +170,7 @@ const DICT = {
     te_inc2:"Coaching, development and game exposure across the event",
     te_inc3:"Visibility to the scouts and coaches ESM works with",
     te_step1:"ESM Sports Network reviews your registration and reaches out to you.",
-    te_step2:"Your spot and payment details are arranged directly with ESM.",
+    te_step2:"Your spot is arranged directly with ESM.",
     te_step3:"We'll email you with the next steps and event details.",
     te_note2:"We'll be in touch to confirm your registration.",
     te_err_name:"Please enter your name.", te_err_submit:"Couldn't submit your registration: ",
@@ -189,7 +192,7 @@ const DICT = {
     te_inc2:"Entrenamiento, desarrollo y exposición en partidos durante el evento",
     te_inc3:"Visibilidad ante los scouts y entrenadores con los que trabaja ESM",
     te_step1:"ESM Sports Network revisa tu inscripción y se pone en contacto contigo.",
-    te_step2:"Tu plaza y los detalles de pago se coordinan directamente con ESM.",
+    te_step2:"Tu plaza se coordina directamente con ESM.",
     te_step3:"Te enviaremos un correo con los siguientes pasos y los detalles del evento.",
     te_note2:"Nos pondremos en contacto para confirmar tu inscripción.",
     te_err_name:"Por favor, introduce tu nombre.", te_err_submit:"No pudimos enviar tu inscripción: ",
@@ -211,7 +214,7 @@ const DICT = {
     te_inc2:"Coaching, sviluppo ed esposizione nelle partite durante l'evento",
     te_inc3:"Visibilità agli scout e agli allenatori con cui lavora ESM",
     te_step1:"ESM Sports Network esamina la tua iscrizione e ti contatta.",
-    te_step2:"Il tuo posto e i dettagli di pagamento vengono organizzati direttamente con ESM.",
+    te_step2:"Il tuo posto viene organizzato direttamente con ESM.",
     te_step3:"Ti invieremo un'email con i prossimi passi e i dettagli dell'evento.",
     te_note2:"Ti contatteremo per confermare la tua iscrizione.",
     te_err_name:"Inserisci il tuo nome.", te_err_submit:"Impossibile inviare la tua iscrizione: ",

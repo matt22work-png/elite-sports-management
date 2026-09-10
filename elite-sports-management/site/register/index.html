@@ -91,6 +91,9 @@
   .pay-service .ps-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
   .pay-service .ps-title{font-weight:800;font-size:15px}
   .pay-service .ps-price{font-family:'Anton',sans-serif;font-size:26px;color:var(--gold);flex:0 0 auto}
+  /* PRICING TEMPORARILY HIDDEN — 2026-09 (Delaware LLC closing, operations moving to
+     Italy). Backstop for the SHOW_PRICING flag below; delete both to reinstate. */
+  .pay-service .ps-price{display:none}
   .pay-service ul{list-style:none;margin:0 0 10px;padding:0}
   .pay-service li{display:flex;gap:9px;align-items:flex-start;font-size:14px;color:var(--ink);padding:5px 0}
   .pay-service li::before{content:"✓";color:var(--teal-soft);font-weight:800;flex:0 0 auto}
@@ -114,7 +117,7 @@
   <div id="step1" class="card hide">
     <div class="steps"><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
     <h1 class="display" data-i18n-html="r_s1_h">Create your <em>account</em></h1>
-    <p class="lead" data-i18n="r_s1_lead">Set up your login first — you'll complete your profile and payment on the next steps.</p>
+    <p class="lead" data-i18n="r_s1_lead">Set up your login first — you'll complete your profile on the next steps.</p>
     <form id="acctForm">
       <div class="grid2">
         <div class="field"><label for="first" data-i18n="r_first">First name</label><input id="first" autocomplete="given-name" required /></div>
@@ -197,7 +200,7 @@
     <div id="payService" class="pay-service"></div>
     <ol class="pay-steps">
       <li><span class="n">1</span><span data-i18n="r_s3_step1">ESM Sports Network reviews your registration and reaches out to you.</span></li>
-      <li><span class="n">2</span><span data-i18n="r_s3_step2">Any payment is arranged directly with ESM — there's nothing to pay on this site.</span></li>
+      <li><span class="n">2</span><span data-i18n="r_s3_step2">ESM Sports Network will follow up with you directly about the next steps.</span></li>
       <li><span class="n">3</span><span data-i18n="r_s3_step3">Once approved, simply sign in with the same email &amp; password you just created — no additional registration needed.</span></li>
     </ol>
     <a class="btn btn-gold" id="payBtn" style="width:100%;margin-top:16px" data-mail data-subject="Account registration — ESM Sports Network" data-i18n="r_contact">Contact ESM →</a>
@@ -216,6 +219,12 @@
    - scout:  €49.99 roster access   (price shown for information only).
    Prices/includes are kept per-role and resolved via t() at render time so the
    summary follows the chosen language. No payment URLs anymore. */
+/* ===== PRICING TEMPORARILY HIDDEN — 2026-09 =====
+   Sam is closing the Delaware LLC and moving operations to Italy; no pricing may be
+   displayed until the Italian entity + banking are ready. The PAY prices below and the
+   homepage tier prices are deliberately LEFT INTACT — flip this one flag back to true
+   to reinstate every price display at once. */
+const SHOW_PRICING = false;
 const PAY = {
   player: {
     price: "€129.99",
@@ -301,7 +310,7 @@ const DICT = {
   en:{
     r_kicker:"CREATE ACCOUNT", r_signout:"Sign out", r_loading:"Loading…",
     r_s1_h:'Create your <em>account</em>',
-    r_s1_lead:"Set up your login first — you'll complete your profile and payment on the next steps.",
+    r_s1_lead:"Set up your login first — you'll complete your profile on the next steps.",
     r_first:"First name", r_last:"Last name", r_email:"Email", r_password:"Password",
     r_password_hint:"At least 8 characters. You'll use this email + password to sign in after approval.",
     r_password2:"Confirm password", r_iam:"I am a…",
@@ -332,7 +341,7 @@ const DICT = {
     r_s3_h:'Activate your <em>account</em>',
     r_s3_lead:"Thank you for completing your registration. Your account has been created successfully.",
     r_s3_step1:"ESM Sports Network reviews your registration and reaches out to you.",
-    r_s3_step2:"Any payment is arranged directly with ESM — there's nothing to pay on this site.",
+    r_s3_step2:"ESM Sports Network will follow up with you directly about the next steps.",
     r_s3_step3:"Once approved, simply sign in with the same email & password you just created — no additional registration needed.",
     r_contact:"Contact ESM →",
     r_pay_now:"Pay securely",
@@ -368,7 +377,7 @@ const DICT = {
   es:{
     r_kicker:"CREAR CUENTA", r_signout:"Cerrar sesión", r_loading:"Cargando…",
     r_s1_h:'Crea tu <em>cuenta</em>',
-    r_s1_lead:"Primero configura tu acceso — completarás tu perfil y el pago en los siguientes pasos.",
+    r_s1_lead:"Primero configura tu acceso — completarás tu perfil en los siguientes pasos.",
     r_first:"Nombre", r_last:"Apellido", r_email:"Correo", r_password:"Contraseña",
     r_password_hint:"Al menos 8 caracteres. Usarás este correo + contraseña para entrar tras la aprobación.",
     r_password2:"Confirmar contraseña", r_iam:"Soy…",
@@ -399,7 +408,7 @@ const DICT = {
     r_s3_h:'Activa tu <em>cuenta</em>',
     r_s3_lead:"Gracias por completar tu registro. Tu cuenta se ha creado correctamente.",
     r_s3_step1:"ESM Sports Network revisa tu registro y se pone en contacto contigo.",
-    r_s3_step2:"Cualquier pago se coordina directamente con ESM — no hay nada que pagar en este sitio.",
+    r_s3_step2:"ESM Sports Network se pondrá en contacto contigo directamente para los siguientes pasos.",
     r_s3_step3:"Una vez aprobado, simplemente entra con el mismo correo y contraseña que acabas de crear — sin registro adicional.",
     r_contact:"Contactar a ESM →",
     r_pay_now:"Pagar de forma segura",
@@ -431,7 +440,7 @@ const DICT = {
   it:{
     r_kicker:"CREA ACCOUNT", r_signout:"Esci", r_loading:"Caricamento…",
     r_s1_h:'Crea il tuo <em>account</em>',
-    r_s1_lead:"Configura prima il tuo accesso — completerai profilo e pagamento nei passaggi successivi.",
+    r_s1_lead:"Configura prima il tuo accesso — completerai il profilo nei passaggi successivi.",
     r_first:"Nome", r_last:"Cognome", r_email:"Email", r_password:"Password",
     r_password_hint:"Almeno 8 caratteri. Userai questa email + password per accedere dopo l'approvazione.",
     r_password2:"Conferma password", r_iam:"Sono un…",
@@ -462,7 +471,7 @@ const DICT = {
     r_s3_h:'Attiva il tuo <em>account</em>',
     r_s3_lead:"Grazie per aver completato la registrazione. Il tuo account è stato creato con successo.",
     r_s3_step1:"ESM Sports Network esamina la tua registrazione e ti contatta.",
-    r_s3_step2:"Eventuali pagamenti vengono organizzati direttamente con ESM — non c'è nulla da pagare su questo sito.",
+    r_s3_step2:"ESM Sports Network ti contatterà direttamente per i passaggi successivi.",
     r_s3_step3:"Una volta approvato, accedi semplicemente con la stessa email e password appena create — nessuna registrazione aggiuntiva.",
     r_contact:"Contatta ESM →",
     r_pay_now:"Paga in sicurezza",
@@ -536,6 +545,9 @@ function renderPayStep(role){
     if (ts && ts.name)  title = `${t(cfg.titleKey)} — ${ts.name}`;
     if (ts && ts.price) price = ts.price;
   }
+  // Pricing hidden 2026-09 (see SHOW_PRICING). The tier NAME still shows, so Sam still
+  // sees which tier the athlete picked — only the amount is withheld.
+  if (!SHOW_PRICING) price = "";
   const svc = $("payService");
   const includes = (cfg.incKeys || []).map(k => t(k));
   if (includes.length){
