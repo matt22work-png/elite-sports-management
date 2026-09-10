@@ -12,7 +12,7 @@
 // ACTIVATION (ready to go live with ZERO code changes):
 //   Add ONE Edge Function secret — GMAIL_APP_PASSWORD — in the Supabase dashboard
 //   (Edge Functions → send-form-notification → Secrets), the 16-char Gmail App
-//   Password for elitesportsmanagement50@gmail.com. Nothing else needs to change:
+//   Password for esmsportsnetworkinfo@gmail.com. Nothing else needs to change:
 //   the function is already deployed and the triggers already point at it.
 //   Until that secret exists, the function logs clearly and returns 200 without
 //   sending — submissions keep saving normally.
@@ -27,14 +27,15 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 // Hardcoded Gmail sending account (also the App Password owner).
-const FROM_EMAIL = "elitesportsmanagement50@gmail.com";
+const FROM_EMAIL = "esmsportsnetworkinfo@gmail.com";
 // ⚠️ ONE-LINE SWAP POINT — where every submission notification is delivered.
-// Sam is creating a NEW dedicated inbox for form submissions; until those
-// credentials exist we use the current placeholder address. When the new inbox is
-// ready, change ONLY this constant (and, if the SENDING account changes too, set a
-// new GMAIL_APP_PASSWORD secret + update FROM_EMAIL above). All current routing
-// targets resolve here (softball was unified in on 2026-08-14; see ENGINEERING_LOG).
-const OPS_INBOX = "elitesportsmanagement50@gmail.com";
+// 2026-09: moved off the old elitesportsmanagement50@ placeholder onto the dedicated
+// business inbox below. Because the SENDING account changed too, FROM_EMAIL above was
+// changed with it and GMAIL_APP_PASSWORD MUST be re-issued for this new account — a
+// Gmail App Password is per-account, so the old secret cannot authenticate as this
+// address. All routing targets resolve here (softball was unified in on 2026-08-14;
+// see ENGINEERING_LOG), so roster/softball/college/teams all follow this constant.
+const OPS_INBOX = "esmsportsnetworkinfo@gmail.com";
 
 const GMAIL_APP_PASSWORD = Deno.env.get("GMAIL_APP_PASSWORD") ?? "";
 const FORM_NOTIFY_SECRET = Deno.env.get("FORM_NOTIFY_SECRET") ?? "";

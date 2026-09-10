@@ -16,7 +16,7 @@
 -- Triggers trg_notify_player / trg_notify_profile / trg_notify_tenerife already
 -- exist (from the earlier notify migration) and call private.notify_submission().
 --
--- Routing (all currently → elitesportsmanagement50@gmail.com; the Edge Function
+-- Routing (all currently → esmsportsnetworkinfo@gmail.com; the Edge Function
 -- labels each by "kind" in the subject line):
 --   • players  source='application'  → Baseball / Softball / College / Coaching
 --   • profiles (player or scout registration, pending approval)
@@ -26,7 +26,7 @@
 -- ┌──────────────────────────────────────────────────────────────────────────┐
 -- │ TO GO LIVE (zero code changes): add ONE Edge Function secret —            │
 -- │   GMAIL_APP_PASSWORD = <16-char Gmail App Password for                    │
--- │                        elitesportsmanagement50@gmail.com>                 │
+-- │                        esmsportsnetworkinfo@gmail.com>                 │
 -- │ in Supabase → Edge Functions → send-form-notification → Secrets.          │
 -- │ Until then the function logs "GMAIL_APP_PASSWORD not set" and returns 200 │
 -- │ without sending; submissions still save normally.                        │

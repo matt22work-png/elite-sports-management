@@ -1,4 +1,4 @@
-const CACHE = "esm-v20";
+const CACHE = "esm-v21";
 const ASSETS = ["./manifest.json",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 
