@@ -9,8 +9,8 @@ Disallow: /scout/
 Disallow: /register/
 Disallow: /tenerife/
 
-# /players/*.html are intentionally noindex (paywalled roster detail). They are
-# left crawlable on purpose so crawlers can SEE the noindex directive and keep
-# them out of the index cleanly — do NOT Disallow them here.
+# /roster/ and /players/*.html are intentionally noindex (gated roster + detail).
+# They are left crawlable on purpose so crawlers can SEE the noindex directive and
+# keep them out of the index cleanly — do NOT Disallow them here.
 
 Sitemap: https://elite-sports-management.vercel.app/sitemap.xml

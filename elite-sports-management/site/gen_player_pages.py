@@ -178,7 +178,7 @@ def render_page(p):
    who hasn't unlocked it back to the gate. Runs in <head>, before first paint.
    Keep this gate in sync with UNLOCK_KEY / revalidateUnlock() in index.html (v2). */
 (function(){{try{{
-  var u=null;try{{u=JSON.parse(localStorage.getItem("esm_roster_unlock_v2")||"null");}}catch(_){{}}var cur="";try{{cur=localStorage.getItem("esm_roster_code_v1")||"";}}catch(_){{}}if(!(u&&(u.m==="user"?!!u.h:(u.m==="master"&&!!u.c&&u.c===cur)))){{location.replace("../index.html#roster");}}
+  var u=null;try{{u=JSON.parse(localStorage.getItem("esm_roster_unlock_v2")||"null");}}catch(_){{}}var cur="";try{{cur=localStorage.getItem("esm_roster_code_v1")||"";}}catch(_){{}}if(!(u&&(u.m==="user"?!!u.h:(u.m==="master"&&!!u.c&&u.c===cur)))){{location.replace("../roster/");}}
 }}catch(e){{}}}})();
 </script>
 <link rel="manifest" href="../manifest.json" />
@@ -204,7 +204,7 @@ def render_page(p):
     <nav class="nav-links">
       <a href="../index.html#about" data-i18n="pp_nav_about">What We Do</a>
       <a href="../index.html#who" data-i18n="pp_nav_who">Who I Am</a>
-      <a href="../index.html#roster" data-i18n="pp_nav_roster">Roster</a>
+      <a href="../roster/" data-i18n="pp_nav_roster">Roster</a>
       <a href="../index.html#events" data-i18n="pp_nav_events">Events</a>
       <a href="../index.html#join" data-i18n="pp_nav_join">Join Us</a>
     </nav>
@@ -214,7 +214,7 @@ def render_page(p):
 </div></header>
 
 <main class="pp-wrap">
-  <a class="pp-back" href="../index.html#roster" data-i18n="pp_back">&larr; Back to Roster</a>
+  <a class="pp-back" href="../roster/" data-i18n="pp_back">&larr; Back to Roster</a>
 
   <div class="pp-hero">
     <div class="pp-tier-row">
