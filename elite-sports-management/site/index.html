@@ -637,8 +637,15 @@
      (not on .hero) so the photo credit, which is a child of the same figure, can paint
      above it; a scrim on .hero would sit in a higher stacking context and swallow the
      caption's left half. The img's own mask is untouched. */
+  /* 2026-09, per Sam: the opaque plateau used to run to 48% of the photo, which buried
+     the bat and both arms — the swing read as a torso. Arath's bat spans roughly 28%→55%
+     of the image and the ball sits near 20%, so pulling the plateau back to 26% brings
+     the whole swing motion into view. The photo's own mask, its width and its position
+     are all UNCHANGED, so the edge fade behaves exactly as before; this only widens the
+     window the scrim was leaving. 26% is as far as it goes before the stadium background
+     starts reading behind the headline — measured at 1366/1440/1920. */
   .hero-photo::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(90deg,var(--navy) 0 48%,rgba(8,26,51,.62) 60%,rgba(8,26,51,.12) 71%,transparent 80%)}
+    background:linear-gradient(90deg,var(--navy) 0 26%,rgba(8,26,51,.62) 40%,rgba(8,26,51,.12) 55%,transparent 68%)}
   .hero-photo figcaption{left:10px;bottom:10px;z-index:2;background:rgba(5,16,31,.82);font-size:10.5px;
     padding:5px 10px;border-radius:3px;color:rgba(255,255,255,.82);border-top-right-radius:3px}
   @media(max-width:1199.98px){.hero{min-height:0;padding:44px 0}}
