@@ -172,7 +172,7 @@ ${up(CSS)}
         <div class="gate-lock">&#128274;</div>
         <h3 data-i18n="gate_h"></h3>
         <p data-i18n="gate_p"></p>
-        <div class="gate-or" data-i18n="gate_or"></div>
+        <label class="gate-or gate-label" for="gateInput" data-i18n="gate_code_label"></label>
         <form class="gate-code" id="gateForm">
           <input id="gateInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="gate_ph" data-i18n-aria="gate_aria" />
           <button type="submit" data-i18n="gate_unlock"></button>

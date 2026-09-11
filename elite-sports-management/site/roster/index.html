@@ -401,6 +401,10 @@
   .gate-price{font-family:'Anton';font-size:42px;color:var(--gold);line-height:1}
   .gate-price small{display:block;font-family:'Hanken Grotesk';font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:8px;font-weight:700}
   .gate-or{margin:20px 0 11px;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  /* The access-code label reuses .gate-or's type treatment (and therefore the redesign's
+     light-on-navy override) so it needs no colour of its own; <label> is inline by
+     default, which would drop .gate-or's vertical margins, hence display:block. */
+  .gate-label{display:block}
   .gate-code{display:flex;gap:8px}
   .gate-code input{flex:1;min-width:0;background:rgba(6,20,42,.8);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--ink);font-size:15px;font-weight:600;letter-spacing:.05em}
   .gate-code input:focus{outline:0;border-color:var(--gold)}
@@ -1081,7 +1085,7 @@
         <div class="gate-lock">&#128274;</div>
         <h3 data-i18n="gate_h"></h3>
         <p data-i18n="gate_p"></p>
-        <div class="gate-or" data-i18n="gate_or"></div>
+        <label class="gate-or gate-label" for="gateInput" data-i18n="gate_code_label"></label>
         <form class="gate-code" id="gateForm">
           <input id="gateInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="gate_ph" data-i18n-aria="gate_aria" />
           <button type="submit" data-i18n="gate_unlock"></button>
@@ -1212,7 +1216,7 @@ const T = {
     gate_p:"Unlock every ESM athlete — full profiles, career history and playing experience.",
     gate_price_note:"1 year + 1 year free",
     gate_ph:"Code",gate_aria:"Code",
-    gate_or:"Enter your access code",gate_unlock:"Unlock",
+    gate_or:"Enter your access code",gate_code_label:"Access Code",gate_unlock:"Unlock",
     gate_need:"Need a code? Contact us →",
     gate_err:"That code isn't right. Check the code Sam sent you, or contact us.",
     gate_unlocked:"Roster unlocked — thanks for your support.",
@@ -1304,7 +1308,7 @@ const T = {
     gate_p:"Desbloquea a todos los atletas de ESM — perfiles completos, trayectoria y experiencia.",
     gate_price_note:"1 año + 1 año gratis",
     gate_ph:"Código",gate_aria:"Código",
-    gate_or:"Introduce tu código de acceso",gate_unlock:"Desbloquear",
+    gate_or:"Introduce tu código de acceso",gate_code_label:"Código de Acceso",gate_unlock:"Desbloquear",
     gate_need:"¿Necesitas un código? Contáctanos →",
     gate_err:"Ese código no es correcto. Revisa el código que te envió Sam o contáctanos.",
     gate_unlocked:"Roster desbloqueado — gracias por tu apoyo.",
@@ -1394,7 +1398,7 @@ const T = {
     gate_p:"Sblocca tutti gli atleti ESM — profili completi, carriera ed esperienza.",
     gate_price_note:"1 anno + 1 anno gratis",
     gate_ph:"Codice",gate_aria:"Codice",
-    gate_or:"Inserisci il tuo codice di accesso",gate_unlock:"Sblocca",
+    gate_or:"Inserisci il tuo codice di accesso",gate_code_label:"Codice di Accesso",gate_unlock:"Sblocca",
     gate_need:"Ti serve un codice? Contattaci →",
     gate_err:"Il codice non è corretto. Controlla il codice che ti ha inviato Sam o contattaci.",
     gate_unlocked:"Roster sbloccato — grazie del supporto.",
@@ -2015,13 +2019,12 @@ function applyLockState(){
   const open=isUnlocked();
   if(wrap)wrap.classList.toggle("is-locked",!open);
   if(note)note.classList.toggle("show",open);
-  // Homepage teaser: an unlocked browser gets a direct link, a locked or REVOKED one
-  // gets the code form back. Driven by the same isUnlocked() the grid used, so a
-  // revoked code flips this back to the form on the very next load.
+  // Homepage teaser: an unlocked browser additionally gets a one-click link to /roster/.
+  // The code form itself is ALWAYS visible (2026-09, per Sam) — it used to be swapped out
+  // for the button, so anyone who had already unlocked saw a section with no input at all.
+  // Entering a code while unlocked is harmless: it re-validates and redirects the same way.
   const openBtn=document.getElementById("rosterOpen");
-  const gateBox=document.getElementById("rosterGateBox");
   if(openBtn)openBtn.hidden=!open;
-  if(gateBox)gateBox.hidden=open;
 }
 function unlockRoster(u){
   try{localStorage.setItem(UNLOCK_KEY,JSON.stringify(u))}catch(e){}
