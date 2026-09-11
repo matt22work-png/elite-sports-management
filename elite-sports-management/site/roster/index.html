@@ -938,6 +938,16 @@
     font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
   .gate-code button:hover{background:var(--gold);color:#0f2036}
   .gate-need{color:var(--gold-soft)}
+  /* The Terms & Conditions row sits INSIDE this navy card, but .tc / .tc-more are themed
+     for the light forms (--tx-m #5c6b7f and --tx #0f2036) — i.e. navy text on a navy
+     card. Measured 3.2:1 for the label and 1.06:1 for "Read more", which is effectively
+     invisible. The card already restyles its h3 / p / gate-or / input / button / gate-need
+     for this background; the T&C row was added later and was simply missed.
+     Backgrounds are untouched — only the text colour changes, reusing the exact values
+     this same card already uses: the body-copy white for the label, and the gate-need
+     gold for the link. */
+  .gate-in .tc{color:rgba(255,255,255,.72)}
+  .gate-in .tc-more{color:var(--gold-soft)}
   .roster-wrap.is-locked::after{background:linear-gradient(180deg,rgba(244,245,247,.2),rgba(244,245,247,.75));border-radius:6px}
 
   /* ---------- footer ---------- */
