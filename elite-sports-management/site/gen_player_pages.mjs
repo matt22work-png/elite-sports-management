@@ -14,6 +14,16 @@ const OUT_DIR = path.join(SITE_DIR, "players");
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
 const idx = fs.readFileSync(path.join(SITE_DIR, "index.html"), "utf-8");
+/* READ BEFORE RE-RUNNING (2026-09, after the homepage redesign was merged to main).
+   This pulls index.html's <style> block wholesale. index.html is now the REDESIGNED,
+   light-theme homepage, but the players/*.html markup built below is still the ORIGINAL
+   dark-theme profile layout — the redesign round deliberately did not restyle athlete
+   profiles, and the redesign branch never regenerated these pages.
+   Re-running this therefore repaints 17 profile pages in a theme their markup was never
+   designed for. The committed players/*.html are the last DARK-theme build and are what
+   production serves today. Do not re-run this just to pick up an unrelated index.html
+   edit — either restyle the profile markup to match the new design system first, or
+   scope the CSS this copies. */
 const SHARED_CSS = idx.match(/<style>([\s\S]*?)<\/style>/)[1];
 const players = JSON.parse(fs.readFileSync(path.join(SITE_DIR, "players.json"), "utf-8"));
 

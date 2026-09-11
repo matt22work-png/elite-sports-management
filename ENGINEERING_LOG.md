@@ -11,6 +11,105 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Homepage redesign merged to main and shipped to production (2026-09-10)
+
+`homepage-redesign` → `main`, true merge commit (both parents kept). The branch is
+**deliberately not deleted** — it is the rollback point. Divergence was 10 commits on main
+vs 5 on the branch from merge-base `3c456ed`.
+
+**The divergence was narrower than it looked.** The branch touched only 5 files
+(`index.html`, `gen_roster_page.mjs`, `roster/index.html`, `sw.js`, the mockup JPG); main
+touched 34. They overlap on exactly 4, so all 30 main-only files — portal, scout, register,
+tenerife, privacy, terms, admin, the 17 player pages, robots, the SQL migrations and the
+Edge Function — merged clean and every piece of main-only work carried forward untouched.
+For the 4 overlapping files the branch was taken as the base (visual source of truth) and
+main's post-divergence behaviour was re-applied on top, item by item.
+
+**1 — Pricing stays hidden.** The redesign paints exactly two price strings, the €129.99 /
+€149.99 profile tiers, both in `.gate-price` — the same class main already hides. Added
+main's `.gate-price{display:none}` rule, but placed it *after* the redesign's own
+`.gate-price` colour/font overrides so it wins the cascade outright instead of relying on
+the later rule not mentioning `display`. Everything else that greps as a price is a code
+comment, a `data-tier-price` attribute read by `/register/` (which hides it behind
+`SHOW_PRICING=false`), or a dead i18n key (`pay_p`/`pay_btn`/`pay_fine`, `data-i18n`
+usage = 0 on both sides). Verified by painting: `innerText` across 9 pages × EN/ES/IT
+matches no currency pattern anywhere.
+
+**2 — ONE /roster/ page, not two.** Both sides had built one. Kept the branch's (it matches
+the new design system) and ported main's functional fixes into its generator:
+- `up(PHOTOS)` — main fixed the local-photo path; the branch's version emitted a broken
+  relative URL for the one repo-committed player photo
+- a build assertion that exactly 3 self-redirects were stripped, so a future edit to the
+  homepage gate can't silently ship a `/roster/` that redirects to itself
+- the required T&C checkbox on the gate
+- mobile side padding (`.rp-main` was overriding `.wrap`'s 22px with `padding:34px 0 60px`,
+  leaving the page flush to the screen edge below 1124px — the branch had this bug too)
+- `.rp-back` → the shared `.backlink` class, so the roster page matches every other sub-page
+- PWA icon links
+**Critically, main's generator was NOT taken wholesale.** The redesign turns `.roster` into
+a horizontal scroll-snap rail, so `/roster/` must reset `display`/`overflow`/`scroll-snap-type`
+back to a wrapping grid. The branch's fuller `#rosterList.roster` override does that; main's
+slimmer one (written when `.roster` was already a grid) would have shipped a
+horizontally-scrolling roster page. Kept the branch's.
+
+**3 — All main-only work confirmed present post-merge**, by behaviour not by grep:
+- contact split: every `mailto` on 9 pages resolves to `elitesportsmanagement50@gmail.com`;
+  zero links use the notification address. `send-form-notification` (`FROM_EMAIL` +
+  `OPS_INBOX` = `esmsportsnetworkinfo@gmail.com`) untouched, still deployed at v7.
+  The branch already used `elitesportsmanagement50` — it forked *before* `95a0eb6` switched
+  everything, so the split landed it back where the branch already had it.
+- "Scout and Teams Portal" rename — re-applied to the redesign's dictionary, all 3 languages,
+  plus `/scout/`'s own kicker
+- no magic-link on `/scout/` (password form only)
+- resume required / picture optional — re-applied to the redesign's hoisted `REQ_BY_CAT`,
+  which the step gate AND the final submit both read, so one edit covers both
+- back buttons on every sub-page; `.backlink` restated in the redesign's `--tx-m`/`--tx`
+  tokens so it reads correctly on the light theme
+- discount-code field on `/register/` — present and optional
+- T&C on all five gates
+- the `8128e75` upload fix (no `upsert`) was already on the branch — asserted, not re-applied
+
+**BUG FOUND AND FIXED — Spanish nav overflowed 390px by 16px.** Pre-existing on the redesign
+branch (the branch's own notes claimed 390 × EN/ES/IT was clean; it wasn't). `"Aplica Ahora"`
+is the longest of the three CTA labels and pushed `.nav-right` past the viewport. Attributed
+it properly first — reverting the Scout/Teams rename at runtime did not change the overflow,
+and the Sign-In menu is `position:absolute` so it can't widen the bar. Fixed in the existing
+`max-width:400px` block by tightening bar SPACING (`.nav-in`/`.nav-right` gap, `.lang button`
+and `.nav-cta` horizontal padding) rather than the type, so EN/IT are visually unchanged and
+the 44px tap targets survive.
+
+**Verification (all against the merged build, live Supabase, real headless Chrome):**
+- `validate_i18n.mjs` → 0 hard problems
+- 10 pages × EN/ES/IT × desktop 1440 + mobile 390 → 0 console errors, 0 failed requests,
+  0 horizontal overflow, 0 untranslated nodes
+- screenshots at 1366 / 1440 / 1920 / 390 × EN/ES/IT — redesign shell, hero, JOIN wizard,
+  stats and contracts bands all intact
+- application form: all 4 categories walked through all 4 steps. Picture optional (reached
+  the final step with none attached), resume required (clearing it refuses submit and jumps
+  back to the Documents step), T&C blocks with the T&C message in every category
+- `/roster/`: unlock → redirect → 27 athletes, filters, EN/ES/IT; wrong code errors without
+  redirecting; direct hit while locked is gated; locked player page bounces to `/roster/`;
+  **rotation test** — changed `roster_master_code` in the DB, reload re-locked both surfaces,
+  purged the stale unlock, rejected the old code, accepted the new one, original restored
+- one REAL end-to-end application submitted through the live flow: row 143 inserted with all
+  fields + photo + resume uploaded, then row and both storage objects deleted. DB back to
+  28 players / 27 approved, 0 strays, 10 storage policies, roster code `ESM13`
+- `sw.js` → `esm-v23` (both branches had coincidentally landed on v22)
+
+**Left alone deliberately:** `players/*.html` were NOT regenerated. `gen_player_pages.mjs`
+copies `index.html`'s whole `<style>`, which is now the light redesign, but the profile
+markup is still the original dark layout — the redesign round never restyled athlete
+profiles and the branch never rebuilt these pages. Regenerating would repaint 17 pages in a
+theme their markup was never designed for. Added a loud warning at the top of that generator.
+**Athlete profile pages therefore remain dark-themed while the homepage and /roster/ are
+light — a visible inconsistency, and the obvious next piece of design work.**
+
+**Unchanged and still outstanding:** the canonical/`og:url`/`sitemap.xml`/`robots.txt`
+references still name `elite-sports-management.vercel.app` while production serves
+`esm-sports-network.vercel.app` (which 307s from the old one). The merge touched zero domain
+references — both sides had this identically. See the previous entry.
+
+
 ### Sam's five updates: T&C audit, contact-email split, /roster/ page, back buttons, discount code (2026-09-10)
 
 Five requests, five commits on `main`: `c7ee024`, `314be5c`, `c5b25c1`, `268ca1d`, `d1ac38b`,
@@ -1342,3 +1441,316 @@ Did NOT trust prior "done" notes — re-ran everything against the LIVE site + l
 - **NEW: `GMAIL_APP_PASSWORD`** Edge secret is NOT set — so **submission/registration notification emails are not being delivered** (function no-ops gracefully). Sam may believe he's getting new-signup emails; he isn't until this secret is added. Flagging as a genuinely new item.
 
 **Regression checks:** self-registered players unaffected (untouched flow); v2 roster gate consistent on homepage + player pages; EN/ES/IT all clean; desktop vs mobile hero both fine; no console errors introduced (admin + index inline scripts pass `node --check`).
+
+---
+
+## Homepage redesign — inventory
+*(branch `homepage-redesign`, 2026-09-06. Phase 1 of the visual-redesign brief. This is the
+checklist Phase 3 verifies against — anything not listed here cannot be silently lost.)*
+
+Scope of the redesign: `site/index.html` ONLY (+ `sw.js` cache bump). `register/`, `scout/`,
+`portal/`, `admin/`, `tenerife/`, `players/*.html`, `terms.html`, `privacy/` and the page
+generators are out of scope and must not change.
+
+### A. Sections in document order (with their i18n keys)
+
+| # | Section / element | Anchor | i18n keys |
+|---|---|---|---|
+| 1 | `<header class="nav">` — logo, 6 nav links, EN/ES/IT switch, Sign In `<details>` (4 links), Apply Now CTA | — | `nav_about` `nav_who` `nav_college` `nav_roster` `nav_events` `nav_join` `nav_signin` `nav_signin_create` `nav_signin_player` `nav_signin_scout` `nav_signin_admin` `nav_cta` (+ `nav_myprofile` swapped in by JS) |
+| 2 | `<section class="hero">` — eyebrow, stacked `<h1>` (gold `<em>`), lead, 2 CTA buttons, Arath Zapien `<figure class="hero-photo">` + figcaption | `#top` | `hero_eyebrow` `hero_h1` (html) `hero_lead` `hero_btn1` `hero_btn2` |
+| 3 | `<section class="contracts">` — "50+ contracts signed" headline, sub, rule, featured José Cedeño testimonial card (`#featQuote`), top "See all testimonials" button (`#testiAllTop`, JS-shown) | — | `contracts_h2` (html) `contracts_sub` (html) `feat_role` `testi_seeall` |
+| 4 | `<div class="stats">` — 2 stat tiles: `#statAthletes` = 19, `#statCountries` = 7 (hardcoded in HTML, NOT derived from the roster) | — | `stat1` `stat2` |
+| 5 | What We Do — 5 service cards (College, Professional Leagues, Softball, Social/Branding, Representation & Development w/ 5 bullets + highlight box) | `#about` | `about_kicker` `about_h2` `about_p` `svc1_t/_d/_pay` `svc_pro_t/_d/_pay` `so_t/_d/_pay` `svc4_t/_d` `svc5_t/_d/_b1..b5/_hl_t/_hl_d` |
+| 6 | College Placement — 6 numbered rows (01–06) + CTA card (`#collegePayBtn`) | `#college` | `col_kicker` `col_h2` `col_p` `col_1`..`col_6` `col_cta_h` `col_cta_p` `col_cta_btn` |
+| 7 | Who I Am — Samuele Bruno founder card, Supabase-hosted photo, role, 2 bio paras, 8 credential pills, "Contact Him" mailto | `#who` | `who_kicker` `who_role` `who_bio` `who_bio2` `cred_italy` `cred_u18` `cred_cbl` `cred_pro` `cred_college` `cred_hastings` `cred_cod` `cred_ecc` `sam_contact` |
+| 8 | Roster — unlocked note, sport filters (`#sportFilters`), position filters (`#filters`), `.roster-wrap.is-locked` + `#rosterList` + `.gate` (lock, code form, "need a code" mailto, error) | `#roster` | `roster_kicker` `roster_h2` `roster_p` `gate_unlocked` `gate_h` `gate_p` `gate_or` `gate_ph` `gate_aria` `gate_unlock` `gate_need` `gate_err` (+ JS: `filter_*`, `card_view`, `roster_empty`, `level_*`) |
+| 9 | Events — `#eventsList`, rendered from the `EVENTS` const (2 entries: Tenerife Winter League 2026 upcoming, Tenerife 2025 Edition past+media) | `#events` | `events_kicker` `events_h2` `events_p` (+ JS: `ev_upcoming` `ev_past` `ev_register` `ev_gallery`) |
+| 10 | Testimonials — `#testiList` grid + bottom "See all" button (`#testiAll`) | `#testi` | `testi_kicker` `testi_h2` `testi_p` `testi_seeall` (+ `testi_all_h` in the modal) |
+| 11 | Create Your Profile — includes list, two price tiers (€129.99 / €149.99), T&C checkbox `#profileTc` + `#profileTcErr`, access note | `#profile` | `pg_kicker` `pg_h2` `pg_p2` `pg_h` `pg_p` `pg_i1..i4` `pg_t1_name/_desc/_btn` `pg_t2_name/_desc/_btn` `pg_price_note` `tc_label` `tc_more` `tc_required` `pg_access` |
+| 12 | Join Us — tagline, pitch, `#applyForm` (category select + 3 field sets + honeypot + T&C `#joinTc` + submit + `#formMsg`) | `#join` | `join_kicker` `join_h2` `join_p` `join_tagline` `join_pitch` `f_applying` `opt_*` `f_*` `pos_*` `tc_label` `tc_more` `f_submit` |
+| 13 | Closing band | — | `band_h2` `band_p` `band_btn` |
+| 14 | Footer — logo, © + year (`#yr`), Admin link, Instagram pill, email pill, CeasAI credit block (logo + 3 social icons) | — | `foot_rights` `admin_link` `ceasai_cta` `ceasai_ig` `ceasai_email` `ceasai_tiktok` |
+| 15 | Shared `#modal` sheet (player / event / testimonials / lightbox) + `#install` PWA prompt | — | `install_t` `install_d` `install_btn` `modal_*` |
+| 16 | Cookie banner + Privacy/Terms footer links — injected by `/esm-legal.js` (own EN/ES/IT dict, reacts to `[data-l]` clicks) | — | *(in esm-legal.js)* |
+
+**NOT on the homepage** (checked): there is no Collaborators section. The `#collab`
+cover-to-reveal card (Marianna Zumerle) was deleted on Sam's instruction in an earlier session
+(see the Collaborators entries earlier in this log) — nothing to preserve.
+
+### B. Interactive behaviours and their implementations
+
+| Behaviour | Implementation |
+|---|---|
+| i18n switching | `T` dict (en/es/it) then `t(k)` then `applyI18n()` handles `data-i18n`, `-html`, `-aria`, `-ph`; `setLang(l)` persists `esm_lang` and re-runs `renderSportFilters/renderFilters/renderRoster/renderEvents/renderTesti` |
+| Roster fetch | `boot()` dynamic `import("https://esm.sh/@supabase/supabase-js@2")`, `createClient(..., {auth:{persistSession:false,…}})`, `players` select (18 public cols) `.eq("status","approved").order("sort_order")`; maps `image_url` to `image`. Falls back to the embedded `PLAYERS` seed on error |
+| Roster gate | `UNLOCK_KEY`/`MASTER_CODE_KEY` localStorage, `getUnlock/isUnlocked/applyLockState/unlockRoster/lockRoster/revalidateUnlock`, `#gateForm` submit: `sha256Hex` vs `ROSTER_CODE_HASHES`, then cached master code, then `verify_roster_code` RPC. Master code cached by `get_roster_code()` RPC in `boot()` |
+| Roster filters | `renderSportFilters()` (All/Baseball/Softball) + `renderFilters()` (All/Pitcher/Catcher/Infielder/Outfielder/Two-Way), `posCategory(p)` tolerant matcher, `renderRoster()` |
+| Player card to page or modal | `STATIC_PLAYER_PAGES` set decides `<a href="players/slug.html">` vs `<button data-slug>` then `openModal(slug)` |
+| Player modal | `openModal()` + `seasonStatsHTML()` + `loadPublicBbref()` (uses `bbref-stats.js` / `BBREF`) |
+| Events | `renderEvents()`, `openEventModal(i)` (video reel + `GALLERY` photos), `openLightbox()` |
+| Testimonials | `renderTesti()` (featured `#featQuote` from `TESTIMONIALS[0]`, grid from `DB_TESTI` with embedded fallback), `openTestiModal()` wired to both `#testiAll` and `#testiAllTop` |
+| Profile tier CTAs | IIFE on `.pc-tier-cta`: blocks unless `#profileTc` checked, stashes `esm_reg_tier` in localStorage, then `href="register/"` |
+| Application form — category switching | `applyCat(v)` to `rep` / `college` / `teams`; `updateApplyFields()` toggles `hidden` on every `.af[data-cats]`; wired to `applyingSelect` change + called once at load |
+| Application form — service deep-links | `wireServiceSignups()` — `.svc-signup[data-svc]` presets `#applyingSelect` |
+| Application form — upload validation | `MAX_UPLOAD` 10 MB, `IMG_TYPES`, `PDF_TYPE`, `fileError(file,kind)`, `uploadApplicationFile(bucket,key,label,file)` to `application-photos` (public) / `application-docs` (private) |
+| Application form — submit | honeypot `company` + 1.5 s time trap, `#joinTc` required, `SB` required, per-category `REQ` list, `markInvalid`, uploads, row build, `SB.from("players").insert(row)` |
+| Mailto wiring | `wirePayButtons()` — every `[data-mail]` gets `CONTACT_MAILTO` + optional `data-subject`/`data-body`; `#collegePayBtn` gets `STRIPE_COLLEGE_URL || "#join"` |
+| Sign In dropdown | native `<details id="signin">` + outside-click / Escape close IIFE |
+| Auth reflection in nav | `reflectAuthInNav()` IIFE — finds an `sb-*-auth-token` in localStorage and swaps `nav_signin` for `nav_myprofile` |
+| Modal close | `[data-close]` clicks + Escape, `closeModal()` |
+| PWA install prompt | `beforeinstallprompt`, `#install` banner, `#installBtn`, `#installX` |
+| Service worker | registered on `load` from `sw.js` |
+| Pull-to-refresh | standalone-only IIFE (touchstart/move/end, 70 px threshold, `reg.update()` then reload) |
+| Cookie banner | `/esm-legal.js` — one-time dismissible notice + Privacy/Terms footer links, re-renders on `[data-l]` clicks |
+
+### C. Assets referenced
+
+| Asset | Used by |
+|---|---|
+| `logo.png` | nav brand (40 px) + footer brand (64 px) |
+| `assets/arath-zapien.jpg` | hero photo (`.hero-photo img`, dual-edge CSS mask fade, `onerror` self-hides) |
+| `ceasai-logo.jpeg` | footer CeasAI credit block |
+| `og-image.png` | `og:image` / `twitter:image` meta |
+| `icons/icon-192.png`, `icon-512.png`, `apple-touch-icon.png` | favicons + PWA (also precached by `sw.js`) |
+| `manifest.json` | PWA manifest |
+| `media/photos/jose-cedeno-thumb.jpg` | featured testimonial card `.shot` + `TESTIMONIALS[0].photo` |
+| `media/photos/twl-field-aerial-thumb.jpg`, `twl-champions-thumb.jpg` | event card images |
+| `media/photos/*.jpg` + `*-thumb.jpg` (12 in `GALLERY`) | event modal gallery + lightbox |
+| `media/video/clip-1..9.mp4` + `clip-N-poster.jpg` | event modal video reel |
+| `media/photos/jose-cedeno.jpg` | `LOCAL_PHOTOS` roster fallback photo |
+| Supabase `player-photos/founder/sam.jpeg` | `#founderPhoto` |
+| `https://flagcdn.com/<iso>.svg` | all country flags (`flagImg()`) |
+| `bbref-stats.js`, `/esm-legal.js` | external scripts |
+| Google Fonts — Anton + Hanken Grotesk | typography |
+
+### D. Phase 2 — what changed (branch `homepage-redesign`)
+
+Files touched: `site/index.html`, `site/sw.js` (cache `esm-v16` → `esm-v17`), plus this log.
+Nothing under `register/`, `scout/`, `portal/`, `admin/`, `tenerife/`, `players/`, `privacy/`,
+`terms.html` or the generators was modified. `esm-legal.js` was NOT changed — the new
+multi-column footer keeps `<footer>` as the injection target, so its Privacy · Terms row
+still appends underneath.
+
+- **Nav** — compact uppercase links / Sign In / Apply Now. Same items, same destinations.
+- **Hero** — three-zone at ≥1200px: copy (col 1) · Arath Zapien photo (col 2, spanning into
+  col 3 at 75% of that span) · JOIN card (col 3, `z-index:2` over the photo). Below 1200px
+  everything stacks: copy → photo → full-width card. Photo masks untouched (40/60 desktop,
+  18/82 stacked).
+- **JOIN panel** — the whole former `#join` section (kicker, h2, lead, tagline, pitch and the
+  application form) moved into a card beside the hero and became a 4-step form with a
+  numbered indicator. `id="join"` moved with it, so all 9 existing `href="#join"` links still
+  resolve. The old bottom section was removed (its content is not duplicated).
+  Steps: 1 category + contact · 2 athlete details · 3 documents · 4 goals + terms + submit.
+- **Roster cards** — 212px photo, position as a gold badge reordered above the name via
+  CSS `order:-1` (DOM order untouched), name, level badge, country + flagcdn flag,
+  affiliation, uppercase "view profile".
+- **Sections** — larger uppercase titles, more spacing, alternating navy bands on
+  `#college` / `#roster` / `#testi`.
+- **Testimonials** — bigger quote mark, roomier quote cards. Featured José Cedeño card and
+  both "See all testimonials" buttons unchanged.
+- **Footer** — three columns (brand + © + Admin · quick links · contact). The quick-links
+  column re-uses the six existing nav anchors and their existing i18n keys.
+- **New i18n keys (6, EN/ES/IT)** — `step_1_t`…`step_4_t`, `step_back`, `step_next`.
+  Submit reuses `f_submit`; step gating reuses `f_err_required` / `tc_required`.
+
+### E. Bugs found on `main` and fixed here
+
+1. **`[hidden]` never worked on the application form.** `updateApplyFields()` set
+   `el.hidden = true` correctly, but `.field{display:flex}` / `.af-row{display:grid}` are
+   author rules and beat the UA `[hidden]{display:none}`. Result: **every category's fields
+   rendered at once on the live homepage** — College and Teams & Scouts fields were visible
+   while "Baseball Representation" was selected. Fixed with `[hidden]{display:none!important}`.
+   (Reproduced on `main` under Playwright before changing anything.)
+2. **Public applications could not be submitted at all.** `uploadApplicationFile()` passed
+   `upsert:true`; that sends `x-upsert`, which makes Supabase Storage require an UPDATE
+   policy on `storage.objects` in addition to INSERT. `anon` has only the INSERT policies
+   (`public can upload application photos` / `...docs`), so every upload returned
+   403 `new row violates row-level security policy` and the submit handler fell into the
+   generic "something went wrong" branch. Since a photo is a required field for **every**
+   category, no application could be filed. Verified by direct anon REST calls:
+   `x-upsert: true` → 400/403, without it → 200, on both buckets. Reproduced identically on
+   `main`, so it predates the redesign. Fixed by dropping `upsert` (the upload key already
+   carries `Date.now().toString(36)`, so objects never collide). Deliberately NOT fixed by
+   granting anon UPDATE, which would loosen production RLS.
+3. **Service-card deep links never switched the field set.** `wireServiceSignups()` set
+   `sel.value` without firing `change`, so `updateApplyFields()` never ran. Now calls
+   `goToStep(1)`, which re-renders the field set for the chosen category.
+4. **Roster cards misaligned.** A player without a static profile page renders as a
+   `<button>`, and Chrome vertically centres a stretched button's content, so a card with
+   fewer lines floated its photo down. Fixed by making `.pcard` an explicit flex column.
+5. **Empty position badge.** An athlete with no `position` rendered an empty pill; now
+   hidden with `.pcard .pos:empty`.
+6. **Narrow-phone overflow at ~320px** (pre-existing: `main` scrolled to 361px, this branch
+   to 339px before the fix). Phone-code column and the long email pill now collapse.
+
+### F. Phase 3 — verification results
+
+Tooling: Playwright (Chromium 1234) against a local static server, live Supabase.
+
+| Check | Result |
+|---|---|
+| `validate_i18n.mjs` | **0 hard problems** (236 EN keys, 160 used; only pre-existing LEN-FLAG advisories). All inline scripts parse. |
+| Automated suite | **50/50 pass, 0 console errors** |
+| Roster source | Live Supabase — 27 approved players, all carrying DB ids (the embedded seed is 19 and has none) |
+| Roster gate | Locks on a fresh visit · wrong code errors and stays locked · live master code from `get_roster_code()` unlocks · `lockRoster()` re-locks · locked gate card stays inside the roster wrap at 1366 and 390 |
+| Filters | Sport filters partition the roster exactly (27 = 27 Baseball + 0 Softball) · position filter narrows (10 Pitchers of 27) |
+| Form field sets | All 4 categories × 4 steps show **exactly** the expected field list — 16 assertions |
+| Step gating | Empty step refuses to advance, shows `f_err_required`, red-borders the field (all 4 categories) |
+| Upload validation | Non-PDF resume → `f_err_pdf` · >10 MB → `f_err_size` · GIF → `f_err_img` · valid JPG accepted · a JPG uploaded as the resume blocks step 3 in the real UI |
+| T&C gating | Submit blocked with `tc_required` until `#joinTc` is checked |
+| **Real submission** | College Placement submitted end to end with photo + resume + English certificate + diploma → row id 132 landed in `public.players` (status `pending`) with every step's field mapped correctly → **deleted afterwards** (0 test rows remain; 28 players, 27 approved) |
+| i18n | EN/ES/IT switch sets `documentElement.lang`, translates step titles, Back/Next/Submit, filters, footer nav; cookie banner re-renders |
+| Other behaviours | Service-card deep link · testimonials modal · Escape close · event modal (video reel + gallery) · Sign In dropdown · `#join` anchor · hero mask fades verified byte-exact at 1366/900/390 |
+| Layout | 1366 / 1440 / 1920 / 390 × EN/ES/IT: no card↔copy overlap, no card↔headline overlap, no empty footer columns |
+| Horizontal overflow | Swept 320/344/360/390/430/768/1024/1200/1366/1440/1920 × EN/ES/IT — **none** |
+| Palette | No red anywhere; navy/gold/teal only |
+
+**Left for manual cleanup:** six ~200-byte test objects remain in Supabase Storage
+(`application-photos/zz-diag-*`, `application-photos/college-placement-mtq6ws9f/`,
+`application-docs/zz-diag-*`, `application-docs/college-placement-mtq6ws9f/`). Postgres blocks
+`delete from storage.objects` (`storage.protect_delete()`), and no service-role key is
+available locally, so they need deleting from the Supabase dashboard's Storage browser.
+The `players` row they belonged to is already deleted, so nothing references them.
+
+---
+
+## Homepage redesign — ROUND 2 · mockup diff list
+*(2026-09-07, branch `homepage-redesign`. Mockup committed at
+`site/design/homepage-mockup.jpg`, 756×1600. Compared against a 1440px full-page
+screenshot of the round-1 branch build. Written BEFORE any round-2 code change.)*
+
+**Correction carried into this round:** the round-1 instruction "keep the dark base, no
+white background" is withdrawn. The mockup is a LIGHT-theme page — white and light-gray
+(#f4f5f7) content bands with navy text. Navy survives only in the nav, hero band, athlete
+cards, the JOIN card's header block, the services card, and the footer.
+
+### Structural differences (must fix)
+
+| # | Round-1 build | Mockup |
+|---|---|---|
+| 1 | Dark navy page throughout; fixed radial-gradient `.bg-fx` behind everything | Light page. White / #f4f5f7 alternating bands, navy body text. Navy used only for nav, hero, athlete cards, services card, JOIN header, footer |
+| 2 | Single full-width column; the JOIN card sits beside the hero only, then the page goes full width | A persistent two-column shell (~68% main / ~32% rail, 24px gutter, max-width ~1280px). The rail starts level with the hero top and continues down the page as a stack of cards |
+| 3 | Right rail holds one card (JOIN) | Rail = JOIN card → "WHAT YOU RECEIVE" navy icon card → white featured-testimonial card → "Trusted by" (skipped, no content) |
+| 4 | Hero headline wraps to 6 lines in a 428px column; photo is a 614px inset in a gutter | Hero headline is 3 stacked lines; the photo is large, right-aligned, bottom-aligned to the band and bleeds behind the JOIN card. Band ≈ 560–620px |
+| 5 | JOIN card is dark navy with gold labels; the tagline + pitch sit inside step 1 | White card with a ~180px NAVY HEADER (title, one-line subtitle, step indicator), then a white form body |
+| 6 | Step indicator: small gold circles, labels beneath, inside the dark card | Larger numbered circles on navy — gold filled = active, thin outlined = inactive — joined by a thin rule, uppercase labels beneath |
+| 7 | Form: single-column fields, gold labels on navy, pill NEXT button | "1. STEP TITLE" bold uppercase heading, 2-column input grid, small uppercase dark labels above white inputs, gold required asterisks, full-width gold "NEXT STEP →" button |
+| 8 | "What We Do" = full-width 3-column grid of dark cards with descriptions, bullets and a highlight box | Compact navy rail card: centred uppercase title + a 3×2 grid of thin line icons with 1–2-word uppercase labels, separated by hairline dividers |
+| 9 | Featured José Cedeño testimonial sits inline in the full-width "50+ contracts" band | It is a white rail card: large quote mark, quote, name + role, photo at the right |
+| 10 | Section titles: teal kicker + huge white Anton headline, no rule | Uppercase Anton navy 26–30px + a 40×3px gold underline + a 13–14px subtitle, left-aligned |
+| 11 | Roster: 3-column grid of navy cards on a navy band | Light-gray band, centred title/subtitle, a horizontal scrolling ROW of navy portrait cards with round arrow buttons at each side, centred outlined CTA below |
+| 12 | Athlete card: landscape photo, gold pill position badge, rectangular flag | Portrait card, photo fading into navy, small plain uppercase position abbreviation, bold uppercase name, ROUND flag chip, affiliation, level |
+| 13 | "Who I Am": circular founder avatar + text inside one bordered dark card | Two-column "OUR MISSION" band: text left (title, paragraph, bold line, button), media right in a rounded frame with a thin navy caption bar |
+| 14 | Testimonials: grid of dark quote cards | Two-column quote items — small round photo left, quote + name + role right — then an outlined "see all" button |
+| 15 | Footer: 3 columns on navy | 4 columns (brand + socials · Quick Links · Resources · Contact) plus a thin darker copyright bar |
+| 16 | Buttons are fully-rounded pills (`border-radius:999px`) | Rectangular, radius ~3px, uppercase 11–12px/700, padding ~12px 22px |
+| 17 | Cards: radius 16–20px, navy gradient fills, gold borders | Radius ~6px, white, 1px #e5e7eb border, soft shadow |
+| 18 | Nav: gold-outlined pill CTA, pill language switcher, no active-link marker | Rectangular filled gold button, small outlined language pill, short gold underline under the active link |
+| 19 | Hero eyebrow is a bordered pill with a teal dot | A short gold rule followed by tiny letter-spaced uppercase text |
+| 20 | Stats strip: two large gold numbers, centred, no icons or dividers | A row of tiles, each a thin line icon + number + small uppercase label, separated by hairline vertical dividers |
+
+### Mockup elements deliberately NOT built (no real content behind them)
+
+Stat counters 850+/25+/180+/120+/35+ (we render our two real stats in that strip style
+instead) · "How It Works" · "Meet the Team" · "Trusted By" logo row (NCAA/NAIA/NJCAA/
+Perfect Game/PBR/WBSC are trademarks) · the €129.99 pricing block inside the JOIN card ·
+the video player and its play button/duration (no video asset — the founder photo takes
+that frame) · the mockup's per-step helper line ("Tell us who you are") · the hero's
+small-caps subline and the "BASEBALL & SOFTBALL" label above the hero buttons — we have no
+second short hero string and inventing one is out of scope.
+
+### ROUND 2 — what was built
+
+Files touched: `site/index.html`, `site/sw.js` (`esm-v17` → `esm-v18`),
+`site/design/homepage-mockup.jpg` (new), this log. Nothing else — `register/`, `scout/`,
+`portal/`, `admin/`, `tenerife/`, `players/`, `privacy/`, `terms.html`, the generators and
+`esm-legal.js` are all untouched.
+
+**Theme.** The page is now light: white and `#f4f5f7` bands with navy text. Navy survives in
+the nav, hero band, athlete cards, services card, JOIN card header, closing band and footer.
+`.bg-fx` (the old fixed dark gradient) is disabled. No red anywhere — every red in the
+mockup is rendered in `--gold`.
+
+**Shell.** A `--shell:1280px` container with a `minmax(0,1fr) 380px` grid and a 24px gutter
+(≈69/31). The hero is the first item of the main column and negative-margins/pads itself out
+to the viewport edges, so the navy band reads as full width while its copy stays in the left
+column. Because the hero and the rail are the two cells of the *same grid row*, the JOIN
+card's top edge lines up with the hero's top structurally — measured at exactly 0px offset
+at 1366/1440/1920 in all three languages, with no magic number to drift.
+Below 1200px `.col-main` becomes `display:contents` so the hero, stats strip and rail become
+siblings of one flex column, and the rail cards drop in directly below the navy hero block
+(order: hero → stats → JOIN → services → testimonial → the rest).
+Sections below the end of the rail carry `.full` and reclaim the rail's width, so the page
+never shows an empty right third.
+
+**Hero.** Gold rule + tiny letter-spaced eyebrow, stacked Anton headline with the existing
+gold phrase, lead, two rectangular buttons. The Arath Zapien photo is sized
+`min(64vw,900px)` and bottom-aligned so it fills the band's full height (its top edge is
+clipped rather than showing as a hard line) and runs 150px under the JOIN card. Its
+left/right mask fades are the untouched originals. The darkening scrim lives INSIDE the
+figure (`.hero-photo::before`), not on `.hero` — a scrim on `.hero` sits in a higher stacking
+context and swallowed the left half of the photo credit. Headline type is sized for the
+longest translation so the band is 580px in EN, ES and IT alike.
+
+**JOIN card.** White card, ~180px navy header (kicker, Anton title, one-line subtitle,
+4-step indicator with gold-filled active circle and a hairline connector), then a white form
+body opening with a "1. CATEGORY & CONTACT" heading driven by the same `step_N_t` keys as the
+indicator. Inputs are white with small uppercase labels and gold required asterisks in a
+2-column grid. Full-width gold "NEXT →" button; Back is a text link. Same four steps, same
+fields, same names, same validation — no field added, renamed or removed. The mockup's
+€129.99 block is not built.
+
+**Rail.** JOIN card → navy services card (the five existing "What We Do" services as line
+icon + uppercase title, 3 + 2 with the second row centred) → white featured José Cedeño
+testimonial (quote mark, quote, name, role, photo) carrying the "See all testimonials"
+button. "Trusted by" is not built.
+
+**Left column.** Uppercase Anton navy section titles with a 40×3px gold underline and a
+subtitle; existing kickers retained above them. "Who I Am" is laid out like the mockup's OUR
+MISSION (copy left; founder photo right in a rounded frame with a thin navy caption bar — no
+video asset exists). "Our Athletes" is a light-gray band with a centred head and a real
+horizontal scroll-snap carousel with navy arrow buttons; the athlete card is portrait, photo
+fading into navy, position abbreviation above the name (CSS `order`, DOM untouched), bold
+uppercase name, round flag chip, affiliation, level. Filter tabs and the code gate behave
+exactly as before. Testimonials became two-column quote items (round photo left).
+
+**Footer.** Four columns — brand + social icons · site links · Sign In destinations ·
+contact with line icons — then the CeasAI credit row and a darker copyright bar. The
+`esm-legal.js` Privacy · Terms row is given the same dark ground so the bottom reads as one
+bar instead of two overlapping strips.
+
+**Content ledger.** All 164 `data-i18n*` keys, all 29 form field names and all 19 hrefs that
+were in the round-1 body are still in the round-2 body (diffed programmatically before and
+after the rebuild). No new i18n keys were added in round 2.
+
+Relocated: the whole application form + Join copy into the rail card (round 1); the five
+service titles into the rail services card; the featured José testimonial from the contracts
+band into the rail; the "Who I Am" block into the mission layout.
+
+Not built, and why: the €129.99 JOIN block, "How It Works", "Meet the Team", "Trusted By",
+the 850+/25+/180+/120+/35+ counters, the video player, the mockup's per-step helper line, the
+hero small-caps subline and the "BASEBALL & SOFTBALL" label, a footer brand tagline, and the
+carousel's "VIEW MORE ATHLETES" button — none of these have real content or an existing
+string behind them.
+
+One compromise worth flagging: the services card shows icon + title only. Each service's
+description, bullets and highlight text are preserved in the DOM as `.sr-only` text (so no
+string is lost, every key still resolves, and screen readers still read them) but they are no
+longer visible. If Sam wants that copy back on screen it needs its own left-column section.
+
+### ROUND 2 — verification
+
+| Check | Result |
+|---|---|
+| `validate_i18n.mjs` | **0 hard problems** (236 EN keys, 160 used; only pre-existing LEN-FLAG advisories) |
+| Automated suite (`verify2.js`) | **66/66 pass, 0 console errors** |
+| Structure | light theme · 69/31 shell · JOIN card 0px offset from the hero top · 580px band · 3 rail cards · 5 service cells · footer 4 columns · roster is a scroll row · **no red in the computed palette** |
+| Roster | live Supabase (27 approved players, all with DB ids) · sport filters partition exactly (27 = 27 + 0) · position filter narrows (10 pitchers) · gate locks/errors/unlocks/re-locks · carousel arrow scrolls (0 → 464) |
+| Athlete card | order is position → name → country → affiliation → level · round flag chip · 3:4 portrait photo |
+| Form | all 4 categories × 4 steps show exactly the expected fields (16 assertions) · empty step refuses to advance with the error + red border in every category |
+| Uploads | non-PDF, oversize, wrong image type all rejected; valid JPG accepted |
+| Real submission | Teams and Scouts submitted end to end with a photo upload → row 133 in `public.players` (status `pending`, every step's field mapped) → **deleted** (0 test rows; 28 players, 27 approved) |
+| i18n | EN/ES/IT switch translates step titles, the step heading, Back/Next/Submit, the rail card title, service titles, section titles and the footer |
+| Layout | 1366 / 1440 / 1920 / 390 × EN/ES/IT — **no horizontal overflow anywhere**; hero band a constant 580px on desktop in all three languages |
+| Stacking | below 1200px: hero → stats → JOIN → services → testimonial → sections, verified at 390/768/1024/1199 |
+| Hero photo | mask fades byte-identical to the originals; photo credit paints above the scrim |
