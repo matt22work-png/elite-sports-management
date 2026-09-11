@@ -177,6 +177,8 @@ ${up(CSS)}
           <input id="gateInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="gate_ph" data-i18n-aria="gate_aria" />
           <button type="submit" data-i18n="gate_unlock"></button>
         </form>
+        <label class="tc gate-tc"><input type="checkbox" class="tc-check" id="rosterTc"><span data-i18n="tc_label"></span> <a class="tc-more" href="../terms.html" target="_blank" rel="noopener" data-i18n="tc_more"></a></label>
+        <div class="gate-err" id="rosterTcErr" data-i18n="tc_required"></div>
         <a class="gate-need" data-mail data-subject="Roster access code request &mdash; ESM" data-i18n="gate_need"></a>
         <div class="gate-err" id="gateErr" data-i18n="gate_err"></div>
       </div>

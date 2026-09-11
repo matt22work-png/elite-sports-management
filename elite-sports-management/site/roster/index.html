@@ -449,6 +449,9 @@
   .pc-tier .gate-price{font-size:32px}
   .pc-tier-desc{font-size:13.5px;color:#d6e1f2;line-height:1.5;flex:1}
   .pc-tier .btn{margin-top:6px;width:100%}
+  /* T&C acceptance inside the roster gate card — the card is centre-aligned, so the
+     checkbox row has to be too (the .tc base rule is left-aligned for the forms). */
+  .gate-tc{justify-content:center;margin:16px 0 0}
   .gate-err{margin-top:11px;font-size:13px;color:#ff9c9c;display:none}
   .gate-err.show{display:block}
   .unlocked-note{display:none;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--teal-soft);margin-bottom:16px;font-weight:700;letter-spacing:.03em}
@@ -532,6 +535,8 @@
           <input id="gateInput" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="gate_ph" data-i18n-aria="gate_aria" />
           <button type="submit" data-i18n="gate_unlock"></button>
         </form>
+        <label class="tc gate-tc"><input type="checkbox" class="tc-check" id="rosterTc"><span data-i18n="tc_label"></span> <a class="tc-more" href="../terms.html" target="_blank" rel="noopener" data-i18n="tc_more"></a></label>
+        <div class="gate-err" id="rosterTcErr" data-i18n="tc_required"></div>
         <a class="gate-need" data-mail data-subject="Roster access code request &mdash; ESM" data-i18n="gate_need"></a>
         <div class="gate-err" id="gateErr" data-i18n="gate_err"></div>
       </div>
@@ -1501,7 +1506,14 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
   const err=document.getElementById("gateErr");
   const val=(document.getElementById("gateInput").value||"").trim().toUpperCase();
   err.classList.remove("show");
+  const tcErr=document.getElementById("rosterTcErr");
+  if(tcErr)tcErr.classList.remove("show");
   if(!val)return;
+  // Terms & Conditions must be accepted before a code is checked — same requirement the
+  // profile-creation, application, Tenerife and account flows already enforce. Guarded on
+  // the element so the gate still works if a surface ever ships without the checkbox.
+  const rosterTc=document.getElementById("rosterTc");
+  if(rosterTc&&!rosterTc.checked){ if(tcErr)tcErr.classList.add("show"); return; }
   // 1) Per-user personal codes: SHA-256 checked offline against ROSTER_CODE_HASHES (unchanged).
   let hash="";
   try{hash=await sha256Hex(val);}
@@ -1536,6 +1548,11 @@ if(gateForm)gateForm.addEventListener("submit",async e=>{
   }catch(ex){console.warn("verify_roster_code failed",ex);}
   err.classList.add("show");
 });
+// Clear the T&C message the moment it's accepted, so the gate never keeps shouting.
+(function(){
+  const tc=document.getElementById("rosterTc"), e=document.getElementById("rosterTcErr");
+  if(tc&&e)tc.addEventListener("change",()=>{ if(tc.checked)e.classList.remove("show"); });
+})();
 // At load, re-check the stored unlock against the CACHED code (catches a code change that a
 // prior load already re-cached). boot() re-runs revalidateUnlock() once the LIVE code arrives,
 // so a change made since the last visit re-locks this browser on the very next reload.
