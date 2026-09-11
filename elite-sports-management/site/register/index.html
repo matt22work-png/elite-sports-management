@@ -175,6 +175,13 @@
       <div class="field"><label for="p-instagram" data-i18n="r_p_instagram">Instagram</label><input id="p-instagram" placeholder="@handle" /></div>
       <div class="field"><label for="p-phone" data-i18n="r_p_phone">Phone</label><div class="phone-row"><select class="phone-cc" id="p-cc" aria-label="Country dialing code"></select><input class="phone-num" id="p-phone" inputmode="tel" data-i18n-ph="r_phone_ph" placeholder="Phone number" /></div></div>
       <div class="field"><label for="p-photo" data-i18n="r_p_photo">Profile photo (optional)</label><input type="file" accept="image/*" id="p-photo" /></div>
+      <!-- Discount code. Always shown, never required, and deliberately NOT validated
+           against a code list: pricing is hidden site-wide, so there is nothing to
+           discount yet. We simply capture what the athlete types (NULL when blank) and
+           surface it to Sam in the admin panel, who honours it manually. -->
+      <div class="field"><label for="p-discount" data-i18n="r_p_discount">Discount Code (if you have one)</label>
+        <input id="p-discount" autocomplete="off" spellcheck="false" maxlength="64" data-i18n-ph="r_p_discount_ph" placeholder="Enter your code" />
+        <div class="hint" data-i18n="r_p_discount_hint">Optional — leave this blank if you don't have one.</div></div>
       <button class="btn btn-gold" type="submit" style="width:100%" data-i18n="r_save_profile">Save profile &amp; continue</button>
       <div class="msg" id="playerMsg" role="alert" aria-live="assertive"></div>
     </form>
@@ -339,6 +346,7 @@ const DICT = {
     r_p_seasonstats_hint:"Add a line per season — batting, pitching and/or fielding. Enter raw totals; we calculate AVG / OBP / SLG, ERA / WHIP and Fielding % for you. You can refine these later in your portal.",
     r_add_batting:"+ Batting season", r_add_pitching:"+ Pitching season", r_add_fielding:"+ Fielding season",
     r_p_instagram:"Instagram", r_p_phone:"Phone", r_phone_ph:"Phone number", r_cc_ph:"Select country code", r_p_photo:"Profile photo (optional)",
+    r_p_discount:"Discount Code (if you have one)", r_p_discount_ph:"Enter your code", r_p_discount_hint:"Optional — leave this blank if you don't have one.",
     r_save_profile:"Save profile & continue",
     r_s2s_h:'Your scout <em>details</em>', r_s2s_lead:"Just what we need to grant roster access.",
     r_s_photo:"Photo", r_s_photo_hint:"JPG or PNG, up to 10 MB.",
@@ -407,6 +415,7 @@ const DICT = {
     r_p_seasonstats_hint:"Añade una línea por temporada — bateo, pitcheo y/o defensa. Introduce los totales; nosotros calculamos AVG / OBP / SLG, ERA / WHIP y % de fildeo por ti. Podrás afinarlas más tarde en tu portal.",
     r_add_batting:"+ Temporada de bateo", r_add_pitching:"+ Temporada de pitcheo", r_add_fielding:"+ Temporada de defensa",
     r_p_instagram:"Instagram", r_p_phone:"Teléfono", r_phone_ph:"Número de teléfono", r_cc_ph:"Elige el código de país", r_p_photo:"Foto de perfil (opcional)",
+    r_p_discount:"Código de Descuento (si tienes uno)", r_p_discount_ph:"Introduce tu código", r_p_discount_hint:"Opcional — déjalo en blanco si no tienes ninguno.",
     r_save_profile:"Guardar perfil y continuar",
     r_s2s_h:'Tus datos de <em>scout</em>', r_s2s_lead:"Solo lo que necesitamos para darte acceso al roster.",
     r_s_photo:"Foto", r_s_photo_hint:"JPG o PNG, hasta 10 MB.",
@@ -471,6 +480,7 @@ const DICT = {
     r_p_seasonstats_hint:"Aggiungi una riga per stagione — battuta, lancio e/o difesa. Inserisci i totali grezzi; calcoliamo noi AVG / OBP / SLG, ERA / WHIP e % di difesa per te. Potrai perfezionarle più tardi nel tuo portale.",
     r_add_batting:"+ Stagione in battuta", r_add_pitching:"+ Stagione in lancio", r_add_fielding:"+ Stagione in difesa",
     r_p_instagram:"Instagram", r_p_phone:"Telefono", r_phone_ph:"Numero di telefono", r_cc_ph:"Scegli il prefisso internazionale", r_p_photo:"Foto profilo (facoltativo)",
+    r_p_discount:"Codice Sconto (se ne hai uno)", r_p_discount_ph:"Inserisci il tuo codice", r_p_discount_hint:"Facoltativo — lascialo vuoto se non ne hai uno.",
     r_save_profile:"Salva profilo e continua",
     r_s2s_h:'I tuoi dati <em>scout</em>', r_s2s_lead:"Solo ciò che ci serve per concederti l'accesso al roster.",
     r_s_photo:"Foto", r_s_photo_hint:"JPG o PNG, fino a 10 MB.",
@@ -785,6 +795,8 @@ $("playerForm").addEventListener("submit", async e => {
       instagram: $("p-instagram").value.trim() || null, phone: combinePhone("p-cc","p-phone") || null,
       teams, stats: [], season_stats: collectSeasonStats(), image_url, email: user.email,
       message: tierMsg,
+      // Optional, unvalidated, NULL when blank — Sam reviews it on the admin pending card.
+      discount_code: $("p-discount").value.trim() || null,
       owner_id: user.id, status: "pending", source: "registration",
     });
     if (error){

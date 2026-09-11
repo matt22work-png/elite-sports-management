@@ -55,6 +55,11 @@
   .crop-ctl input[type=range]{flex:1;accent-color:var(--gold)}
   .chip{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
   .chip.pending{color:var(--gold-soft)}
+  /* Discount code entered by the athlete at signup — called out on the pending card so
+     Sam sees it while deciding, not after. */
+  .p-meta.discount{color:var(--gold-soft)}
+  .p-meta.discount code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;
+    background:rgba(217,177,84,.14);border:1px solid var(--line);border-radius:6px;padding:1px 7px;letter-spacing:.06em}
   .chip.approved{color:var(--teal);border-color:rgba(46,196,182,.4)}
   .chip.rejected{color:var(--red);border-color:rgba(224,93,93,.4)}
   .chip.archived{color:var(--muted);border-color:var(--line)}
@@ -843,6 +848,7 @@ function cardPending(p){
       ${isPaidProfile ? `<span class="chip paid" title="Self-created player profile (paid account flow)">💳 Paid profile</span>` : `<span class="chip" style="opacity:.6">Applicant</span>`}
     </div>
     ${contact ? `<div class="p-meta">${contact}</div>` : ""}
+    ${p.discount_code ? `<div class="p-meta discount"><b>&#127903; Discount code:</b> <code>${esc(p.discount_code)}</code></div>` : ""}
     ${p.bio ? `<div class="p-meta"><b>Goals:</b> ${esc(p.bio)}</div>` : ""}
     ${p.study_goals ? `<div class="p-meta"><b>Study &amp; goals:</b> ${esc(p.study_goals)}</div>` : ""}
     ${p.looking_for ? `<div class="p-meta"><b>Looking for:</b> ${esc(p.looking_for)}</div>` : ""}
@@ -921,6 +927,7 @@ function cardPlayer(p){
       <div class="field"><label>Instagram</label><input class="pf-instagram" data-id="${p.id}" value="${esc(p.instagram||"")}" placeholder="@handle" aria-label="Instagram" /></div>
       <div class="field"><label>Phone</label><input class="pf-phone" data-id="${p.id}" value="${esc(p.phone||"")}" placeholder="+39 …" aria-label="Phone" /></div>
       <div class="field"><label>Email <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(contact info — does not change their login email)</span></label><input class="pf-email" data-id="${p.id}" type="email" value="${esc(p.email||"")}" placeholder="name@email.com" aria-label="Contact email" /></div>
+      <div class="field"><label>Discount code <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(what the athlete typed at signup — free text, not validated)</span></label><input class="pf-discount" data-id="${p.id}" value="${esc(p.discount_code||"")}" maxlength="64" placeholder="— none —" aria-label="Discount code" /></div>
       <div class="field"><label>Bio</label><textarea class="pf-bio" data-id="${p.id}" rows="4" placeholder="Short bio…" aria-label="Bio">${esc(p.bio||"")}</textarea></div>
       <div class="field"><label>Teams &amp; affiliations (one per line)</label><textarea class="pf-teams" data-id="${p.id}" rows="3" placeholder="Cleveland Guardians org.&#10;Dominican Summer League" aria-label="Teams and affiliations, one per line">${esc((Array.isArray(p.teams)?p.teams:[]).join("\n"))}</textarea></div>
       <div class="row-btns"><button class="btn btn-gold" data-saveprofile="${p.id}" type="button">Save profile</button></div>
@@ -1167,6 +1174,8 @@ function bindActions(){
       // Contact-info only. This is the players-table email shown to scouts; it is NOT
       // the athlete's Supabase Auth login (changing that requires an auth.users update).
       email:     box.querySelector(".pf-email").value.trim() || null,
+      // Free text, never validated. Blank clears it back to NULL.
+      discount_code: box.querySelector(".pf-discount").value.trim() || null,
       bio:       box.querySelector(".pf-bio").value.trim(),
       teams,
     };
