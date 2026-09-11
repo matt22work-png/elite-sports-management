@@ -27,7 +27,11 @@
   .tc-body{font-size:15.5px;color:#d6e1f2;white-space:pre-line}
   .muted{color:var(--muted);font-size:13.5px;margin-top:20px}
   a{color:var(--gold-soft)}
-  .back{display:inline-block;margin-top:26px;font-weight:700;color:var(--gold-soft);text-decoration:none}
+  /* ===== shared "<- Back" link — byte-identical to the rule in index.html, so every
+     sub-page and drill-down view shows the same affordance in the same place. ===== */
+  .backlink{display:inline-flex;align-items:center;gap:7px;margin-bottom:18px;font-size:11.5px;
+    font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:.2s}
+  .backlink:hover{color:var(--gold-soft)}
 </style>
 </head>
 <body>
@@ -38,6 +42,7 @@
       <button data-l="en" type="button">EN</button><button data-l="es" type="button">ES</button><button data-l="it" type="button">IT</button>
     </div>
   </header>
+  <a class="backlink" href="index.html">&larr; <span data-i18n="tc_back">Back to site</span></a>
   <div class="kicker" data-i18n="tc_kicker">Legal</div>
   <h1 data-i18n="tc_h1">Terms &amp; Conditions</h1>
 
@@ -51,7 +56,6 @@
     <p class="muted" data-i18n="tc_contact"></p>
   </div>
 
-  <a class="back" href="index.html" data-i18n="tc_back">← Back to ESM Sports Network</a>
 </div>
 
 <script>
@@ -61,19 +65,19 @@ const DICT = {
     tc_kicker:"Legal", tc_h1:"Terms & Conditions",
     tc_body:"Terms and conditions text coming soon. Please check back later, or contact us with any questions before signing up.",
     tc_contact:"Questions? Email elitesportsmanagement50@gmail.com.",
-    tc_back:"← Back to ESM Sports Network",
+    tc_back:"Back to site",
   },
   es:{
     tc_kicker:"Legal", tc_h1:"Términos y Condiciones",
     tc_body:"El texto de términos y condiciones estará disponible próximamente. Vuelve más tarde o contáctanos con cualquier duda antes de registrarte.",
     tc_contact:"¿Preguntas? Escribe a elitesportsmanagement50@gmail.com.",
-    tc_back:"← Volver a ESM Sports Network",
+    tc_back:"Volver al sitio",
   },
   it:{
     tc_kicker:"Legale", tc_h1:"Termini e Condizioni",
     tc_body:"Il testo dei termini e condizioni sarà disponibile a breve. Torna più tardi o contattaci per qualsiasi domanda prima di registrarti.",
     tc_contact:"Domande? Scrivi a elitesportsmanagement50@gmail.com.",
-    tc_back:"← Torna a ESM Sports Network",
+    tc_back:"Torna al sito",
   },
 };
 const SUPPORTED = ["en","es","it"];

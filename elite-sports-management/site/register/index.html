@@ -99,6 +99,11 @@
   .pay-service li::before{content:"✓";color:var(--teal-soft);font-weight:800;flex:0 0 auto}
   .pay-service .ps-access{font-size:13px;color:var(--gold-soft);font-weight:700;border-top:1px solid rgba(217,177,84,.15);padding-top:10px}
   @media(max-width:560px){ .wrap{padding:18px 14px 80px} .grid2,.role-pick,.sb-meta{grid-template-columns:1fr} .stat-grid{grid-template-columns:repeat(3,1fr)} .field input,.field select,.field textarea{font-size:16px} .mini input{font-size:16px} }
+  /* ===== shared "<- Back" link — byte-identical to the rule in index.html, so every
+     sub-page and drill-down view shows the same affordance in the same place. ===== */
+  .backlink{display:inline-flex;align-items:center;gap:7px;margin-bottom:18px;font-size:11.5px;
+    font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:.2s}
+  .backlink:hover{color:var(--gold-soft)}
 </style>
 </head>
 <body>
@@ -110,6 +115,7 @@
     <div class="langsw" id="langsw" role="group" aria-label="Language"><button data-l="en" type="button">EN</button><button data-l="es" type="button">ES</button><button data-l="it" type="button">IT</button></div>
     <button class="btn btn-ghost" id="signOut" style="display:none" data-i18n="r_signout">Sign out</button>
   </header>
+  <a class="backlink" href="../index.html">&larr; <span data-i18n="back_site">Back to site</span></a>
 
   <div id="booting" data-i18n="r_loading">Loading…</div>
 
@@ -312,7 +318,8 @@ function clearMsg(el){ el.classList.remove("show","ok"); }
    player portal + admin panel. ---------- */
 const DICT = {
   en:{
-    r_kicker:"CREATE ACCOUNT", r_signout:"Sign out", r_loading:"Loading…",
+    r_kicker:"CREATE ACCOUNT", r_signout:"Sign out",
+    back_site:"Back to site", r_loading:"Loading…",
     r_s1_h:'Create your <em>account</em>',
     r_s1_lead:"Set up your login first — you'll complete your profile on the next steps.",
     r_first:"First name", r_last:"Last name", r_email:"Email", r_password:"Password",
@@ -379,7 +386,8 @@ const DICT = {
     r_err_save_details:"Couldn't save your details: ",
   },
   es:{
-    r_kicker:"CREAR CUENTA", r_signout:"Cerrar sesión", r_loading:"Cargando…",
+    r_kicker:"CREAR CUENTA", r_signout:"Cerrar sesión",
+    back_site:"Volver al sitio", r_loading:"Cargando…",
     r_s1_h:'Crea tu <em>cuenta</em>',
     r_s1_lead:"Primero configura tu acceso — completarás tu perfil en los siguientes pasos.",
     r_first:"Nombre", r_last:"Apellido", r_email:"Correo", r_password:"Contraseña",
@@ -442,7 +450,8 @@ const DICT = {
     r_err_save_details:"No se pudieron guardar tus datos: ",
   },
   it:{
-    r_kicker:"CREA ACCOUNT", r_signout:"Esci", r_loading:"Caricamento…",
+    r_kicker:"CREA ACCOUNT", r_signout:"Esci",
+    back_site:"Torna al sito", r_loading:"Caricamento…",
     r_s1_h:'Crea il tuo <em>account</em>',
     r_s1_lead:"Configura prima il tuo accesso — completerai il profilo nei passaggi successivi.",
     r_first:"Nome", r_last:"Cognome", r_email:"Email", r_password:"Password",

@@ -36,7 +36,11 @@
   .disclaimer{margin-top:26px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:rgba(6,20,42,.5);color:var(--muted);font-size:13.5px}
   .muted{color:var(--muted);font-size:13.5px;margin-top:20px}
   a{color:var(--gold-soft)}
-  .back{display:inline-block;margin-top:26px;font-weight:700;color:var(--gold-soft);text-decoration:none}
+  /* ===== shared "<- Back" link — byte-identical to the rule in index.html, so every
+     sub-page and drill-down view shows the same affordance in the same place. ===== */
+  .backlink{display:inline-flex;align-items:center;gap:7px;margin-bottom:18px;font-size:11.5px;
+    font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:.2s}
+  .backlink:hover{color:var(--gold-soft)}
 </style>
 </head>
 <body>
@@ -47,6 +51,7 @@
       <button data-l="en" type="button">EN</button><button data-l="es" type="button">ES</button><button data-l="it" type="button">IT</button>
     </div>
   </header>
+  <a class="backlink" href="/index.html">&larr; <span data-i18n="pv_back">Back to site</span></a>
   <div class="kicker" data-i18n="pv_kicker">Legal</div>
   <h1 data-i18n="pv_h1">Privacy Policy</h1>
   <p class="updated" data-i18n="pv_updated">Last updated: 25 August 2026</p>
@@ -64,7 +69,6 @@
     <p class="muted" data-i18n="pv_contact"></p>
   </div>
 
-  <a class="back" href="/index.html" data-i18n="pv_back">← Back to ESM Sports Network</a>
 </div>
 
 <script>
@@ -74,7 +78,7 @@ const DICT = {
   en:{
     pv_kicker:"Legal", pv_h1:"Privacy Policy",
     pv_updated:"Last updated: 25 August 2026",
-    pv_back:"← Back to ESM Sports Network",
+    pv_back:"Back to site",
     pv_disclaimer:"This is a plain-language policy that aims to accurately describe our current data practices. It is not a substitute for advice from a qualified lawyer, and may be updated as the service evolves. If anything here is unclear, please contact us before submitting your information.",
     pv_contact:"For any privacy question — or to access, correct, or delete your data — email ESM Sports Network at elitesportsmanagement50@gmail.com.",
     pv_body:`
@@ -137,7 +141,7 @@ const DICT = {
   es:{
     pv_kicker:"Legal", pv_h1:"Política de Privacidad",
     pv_updated:"Última actualización: 25 de agosto de 2026",
-    pv_back:"← Volver a ESM Sports Network",
+    pv_back:"Volver al sitio",
     pv_disclaimer:"Esta es una política en lenguaje sencillo que busca describir con precisión nuestras prácticas de datos actuales. No sustituye el asesoramiento de un abogado cualificado y puede actualizarse a medida que el servicio evolucione. Si algo no queda claro, contáctanos antes de enviar tu información.",
     pv_contact:"Para cualquier consulta sobre privacidad — o para acceder, corregir o eliminar tus datos — escribe a ESM Sports Network a elitesportsmanagement50@gmail.com.",
     pv_body:`
@@ -200,7 +204,7 @@ const DICT = {
   it:{
     pv_kicker:"Legale", pv_h1:"Informativa sulla Privacy",
     pv_updated:"Ultimo aggiornamento: 25 agosto 2026",
-    pv_back:"← Torna a ESM Sports Network",
+    pv_back:"Torna al sito",
     pv_disclaimer:"Questa è un’informativa in linguaggio semplice che mira a descrivere accuratamente le nostre attuali pratiche sui dati. Non sostituisce la consulenza di un avvocato qualificato e può essere aggiornata con l’evolversi del servizio. Se qualcosa non è chiaro, contattaci prima di inviare le tue informazioni.",
     pv_contact:"Per qualsiasi domanda sulla privacy — o per accedere, correggere o eliminare i tuoi dati — scrivi a ESM Sports Network all’indirizzo elitesportsmanagement50@gmail.com.",
     pv_body:`

@@ -489,8 +489,9 @@
      over the whole <main> and the profile renders blank — only the nav (z-50) and
      footer (z-1) escape. Mirrors the homepage's section/footer z-index:1. */
   .pp-wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:40px 22px 90px}
-  .pp-back{display:inline-flex;align-items:center;gap:8px;color:var(--gold-soft);font-weight:700;font-size:13.5px;margin-bottom:26px}
-  .pp-back:hover{color:var(--gold)}
+  /* The shared .backlink rule comes in with index.html's <style>; this only adds the
+     extra breathing room the profile header needs above the athlete name. */
+  .pp-back{margin-bottom:26px}
 
   .pp-hero{border:1px solid var(--line);border-radius:20px;padding:34px 30px;background:radial-gradient(circle at 12% 0%,rgba(217,177,84,.10),transparent 55%),linear-gradient(180deg,var(--card),var(--navy-2));margin-bottom:26px}
   .pp-tier-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
@@ -544,7 +545,7 @@
 </div></header>
 
 <main class="pp-wrap">
-  <a class="pp-back" href="../roster/" data-i18n="pp_back">&larr; Back to Roster</a>
+  <a class="backlink pp-back" href="../roster/">&larr; <span data-i18n="pp_back">Back to Roster</span></a>
 
   <div class="pp-hero">
     <div class="pp-tier-row">
@@ -590,9 +591,9 @@
    Only chrome is translated; the athlete's entered content stays as-is. */
 (function(){
   var DICT={
-    en:{pp_nav_about:"What We Do",pp_nav_who:"Who I Am",pp_nav_roster:"Roster",pp_nav_events:"Events",pp_nav_join:"Join Us",pp_nav_cta:"Apply Now",pp_back:"← Back to Roster",pp_bio:"Bio",pp_highlights:"Career Highlights",pp_experience:"Playing Experience",pp_stats_soon:"Stats coming soon.",pp_exp_soon:"Details coming soon.",pp_birthplace:"Birthplace",pp_born:"Born",pp_bats:"Bats",pp_interested:"Interested in {name}?",pp_contact_p:"You have full roster access. Get in touch and we'll connect you with this athlete directly.",pp_contact_btn:"Contact ESM about this player",pp_rights:"All rights reserved.",pp_admin:"Admin"},
-    es:{pp_nav_about:"Qué Hacemos",pp_nav_who:"Quién Soy",pp_nav_roster:"Jugadores",pp_nav_events:"Eventos",pp_nav_join:"Únete",pp_nav_cta:"Aplica Ahora",pp_back:"← Volver a Jugadores",pp_bio:"Bio",pp_highlights:"Momentos Destacados",pp_experience:"Experiencia Deportiva",pp_stats_soon:"Estadísticas próximamente.",pp_exp_soon:"Detalles próximamente.",pp_birthplace:"Lugar de nacimiento",pp_born:"Nacimiento",pp_bats:"Batea",pp_interested:"¿Te interesa {name}?",pp_contact_p:"Tienes acceso completo al roster. Ponte en contacto y te conectamos directamente con este atleta.",pp_contact_btn:"Contacta con ESM sobre este jugador",pp_rights:"Todos los derechos reservados.",pp_admin:"Admin"},
-    it:{pp_nav_about:"Cosa Facciamo",pp_nav_who:"Chi Sono",pp_nav_roster:"Roster",pp_nav_events:"Eventi",pp_nav_join:"Unisciti",pp_nav_cta:"Candidati",pp_back:"← Torna al Roster",pp_bio:"Bio",pp_highlights:"Momenti Salienti",pp_experience:"Esperienza Sportiva",pp_stats_soon:"Statistiche in arrivo.",pp_exp_soon:"Dettagli in arrivo.",pp_birthplace:"Luogo di nascita",pp_born:"Nascita",pp_bats:"Batte",pp_interested:"Ti interessa {name}?",pp_contact_p:"Hai accesso completo al roster. Mettiti in contatto e ti collegheremo direttamente con questo atleta.",pp_contact_btn:"Contatta ESM per questo giocatore",pp_rights:"Tutti i diritti riservati.",pp_admin:"Admin"}
+    en:{pp_nav_about:"What We Do",pp_nav_who:"Who I Am",pp_nav_roster:"Roster",pp_nav_events:"Events",pp_nav_join:"Join Us",pp_nav_cta:"Apply Now",pp_back:"Back to Roster",pp_bio:"Bio",pp_highlights:"Career Highlights",pp_experience:"Playing Experience",pp_stats_soon:"Stats coming soon.",pp_exp_soon:"Details coming soon.",pp_birthplace:"Birthplace",pp_born:"Born",pp_bats:"Bats",pp_interested:"Interested in {name}?",pp_contact_p:"You have full roster access. Get in touch and we'll connect you with this athlete directly.",pp_contact_btn:"Contact ESM about this player",pp_rights:"All rights reserved.",pp_admin:"Admin"},
+    es:{pp_nav_about:"Qué Hacemos",pp_nav_who:"Quién Soy",pp_nav_roster:"Jugadores",pp_nav_events:"Eventos",pp_nav_join:"Únete",pp_nav_cta:"Aplica Ahora",pp_back:"Volver a Jugadores",pp_bio:"Bio",pp_highlights:"Momentos Destacados",pp_experience:"Experiencia Deportiva",pp_stats_soon:"Estadísticas próximamente.",pp_exp_soon:"Detalles próximamente.",pp_birthplace:"Lugar de nacimiento",pp_born:"Nacimiento",pp_bats:"Batea",pp_interested:"¿Te interesa {name}?",pp_contact_p:"Tienes acceso completo al roster. Ponte en contacto y te conectamos directamente con este atleta.",pp_contact_btn:"Contacta con ESM sobre este jugador",pp_rights:"Todos los derechos reservados.",pp_admin:"Admin"},
+    it:{pp_nav_about:"Cosa Facciamo",pp_nav_who:"Chi Sono",pp_nav_roster:"Roster",pp_nav_events:"Eventi",pp_nav_join:"Unisciti",pp_nav_cta:"Candidati",pp_back:"Torna al Roster",pp_bio:"Bio",pp_highlights:"Momenti Salienti",pp_experience:"Esperienza Sportiva",pp_stats_soon:"Statistiche in arrivo.",pp_exp_soon:"Dettagli in arrivo.",pp_birthplace:"Luogo di nascita",pp_born:"Nascita",pp_bats:"Batte",pp_interested:"Ti interessa {name}?",pp_contact_p:"Hai accesso completo al roster. Mettiti in contatto e ti collegheremo direttamente con questo atleta.",pp_contact_btn:"Contatta ESM per questo giocatore",pp_rights:"Tutti i diritti riservati.",pp_admin:"Admin"}
   };
   var SUP=["en","es","it"];
   var lang=(function(){try{var l=localStorage.getItem("esm_lang");return SUP.indexOf(l)>=0?l:"en";}catch(e){return "en";}})();

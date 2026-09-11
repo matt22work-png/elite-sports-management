@@ -73,6 +73,11 @@
   .ss-table tbody tr:last-child td{border-bottom:0}
   .ss-table tbody td{color:#d6e1f2}
   @media(max-width:560px){ input{font-size:16px} .wrap{padding:18px 14px 80px} }
+  /* ===== shared "<- Back" link — byte-identical to the rule in index.html, so every
+     sub-page and drill-down view shows the same affordance in the same place. ===== */
+  .backlink{display:inline-flex;align-items:center;gap:7px;margin-bottom:18px;font-size:11.5px;
+    font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:.2s}
+  .backlink:hover{color:var(--gold-soft)}
 </style>
 </head>
 <body>
@@ -88,6 +93,7 @@
     <div class="langsw" id="langsw" role="group" aria-label="Language"><button data-l="en" type="button">EN</button><button data-l="es" type="button">ES</button><button data-l="it" type="button">IT</button></div>
     <button class="btn btn-ghost" id="signOut" style="display:none" data-i18n="p_signout">Sign out</button>
   </header>
+  <a class="backlink" href="../index.html">&larr; <span data-i18n="back_site">Back to site</span></a>
 
   <div id="booting" class="card" style="max-width:420px;margin:8vh auto;text-align:center;color:var(--muted)" data-i18n="p_checking">Checking session…</div>
 
@@ -163,7 +169,8 @@ function flagImg(iso, alt){ return iso ? `<img class="pflag" src="https://flagcd
    shared site-wide via the `esm_lang` localStorage key (the homepage writes it too). */
 const DICT = {
   en:{
-    p_kicker:"PLAYER PORTAL", p_signout:"Sign out", p_checking:"Checking session…",
+    p_kicker:"PLAYER PORTAL", p_signout:"Sign out",
+    back_site:"Back to site", p_checking:"Checking session…",
     p_login_h:'Player <em style="color:var(--gold);font-style:normal">Portal</em>',
     p_login_note:"Sign in with the email & password you created at registration.",
     p_email:"Email", p_password:"Password", p_signin:"Sign in", p_forgot:"Forgot your password?",
@@ -202,7 +209,8 @@ const DICT = {
     p_batting:"Batting", p_pitching:"Pitching", p_fielding:"Fielding",
   },
   es:{
-    p_kicker:"PORTAL JUGADOR", p_signout:"Cerrar sesión", p_checking:"Verificando sesión…",
+    p_kicker:"PORTAL JUGADOR", p_signout:"Cerrar sesión",
+    back_site:"Volver al sitio", p_checking:"Verificando sesión…",
     p_login_h:'Portal <em style="color:var(--gold);font-style:normal">Jugador</em>',
     p_login_note:"Entra con el correo y la contraseña que creaste al registrarte.",
     p_email:"Correo", p_password:"Contraseña", p_signin:"Entrar", p_forgot:"¿Olvidaste tu contraseña?",
@@ -241,7 +249,8 @@ const DICT = {
     p_batting:"Bateo", p_pitching:"Pitcheo", p_fielding:"Defensa",
   },
   it:{
-    p_kicker:"PORTALE GIOCATORE", p_signout:"Esci", p_checking:"Verifica sessione…",
+    p_kicker:"PORTALE GIOCATORE", p_signout:"Esci",
+    back_site:"Torna al sito", p_checking:"Verifica sessione…",
     p_login_h:'Portale <em style="color:var(--gold);font-style:normal">Giocatore</em>',
     p_login_note:"Accedi con l'email e la password create in fase di registrazione.",
     p_email:"Email", p_password:"Password", p_signin:"Accedi", p_forgot:"Password dimenticata?",
