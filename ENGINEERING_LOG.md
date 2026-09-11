@@ -11,6 +11,96 @@ Supabase project: `sbexwyvsgqayxrsrlrpm` (Elite Sports Management). No-build van
 
 ## Completed
 
+### Sam's five updates: T&C audit, contact-email split, /roster/ page, back buttons, discount code (2026-09-10)
+
+Five requests, five commits on `main`: `c7ee024`, `314be5c`, `c5b25c1`, `268ca1d`, `d1ac38b`,
+plus `sw.js` → `esm-v22`. Everything validated against LIVE Supabase in real headless Chrome
+(puppeteer-core + a local static server serving the working tree), not just read in source.
+
+**1 — T&C checkboxes (`d1ac38b`). Audited first, before changing anything. No regression found.**
+The four flows that already had one all still work, verified live on prod: profile-creation
+tiers (`#profileTc` — blocks the tier CTA, shows the message, releases on tick), the homepage
+application form (`#joinTc`), `/register/` account creation (`#acctTc`), and `/tenerife/`
+(`#teTc`, trilingual message confirmed). The pricing-hide (`1791ade`) and portal-rename
+(`0eb3df2`) commits touched **zero** T&C lines.
+- **The roster gate never had one** — `6dc55c8` says so outright: *"Roster gate is now just
+  code entry (no purchase), so T&C there is N/A."* Added now because Sam asked for it, but as
+  a NEW requirement, not a restoration. Checked *before* the code is validated, so an
+  unaccepted submit says "accept the Terms" instead of falsely claiming the code is wrong, and
+  writes nothing to `localStorage`.
+- **"Representation & Development" has no submission step at all.** Its `svc5_pay` CTA was
+  removed on 2026-08-15 (`9d8a61f`) — a day *before* T&C acceptance existed. Signing up for
+  representation goes through the application form, which does enforce T&C. **Flagged for Sam,
+  not invented:** say if that card should get its sign-up link back.
+
+**2 — Contact-email split (`c7ee024`). A correction of `95a0eb6`, not a revert of it.**
+Two addresses, two jobs:
+- `elitesportsmanagement50@gmail.com` — **direct correspondence**, everywhere a human is told
+  to email ESM: `CONTACT_EMAIL` in index/portal/scout/register/tenerife (drives every
+  `[data-mail]` CTA), footer pill, founder card, JSON-LD org email, the 17 player pages **and
+  both generators**, privacy (15 occurrences) and terms (3), EN/ES/IT.
+- `esmsportsnetworkinfo@gmail.com` — **automated notifications only**. `send-form-notification`
+  (`FROM_EMAIL` + `OPS_INBOX`) and `supabase-gmail-notify.sql` are byte-identical, untouched,
+  no redeploy. `FROM_EMAIL` doubles as the SMTP auth username, so changing it would break the
+  `GMAIL_APP_PASSWORD` binding.
+- Replaced the five stale *"PLACEHOLDER — swap in Sam's new email"* comments with an explicit
+  note of the split at each constant, so this doesn't get unified a third time.
+- **Flagged:** privacy + terms name the data-controller contact. They now point at the human
+  inbox, which is the right read of "anywhere a user is told to email ESM directly" — but
+  they're legal documents, so Sam should confirm.
+
+**3 — Roster moved to `/roster/` (`314be5c`).** Ported from `homepage-redesign` and adapted to
+main's pre-redesign markup. New `gen_roster_page.mjs` **extracts** the `<style>` block, the `T`
+dictionary, the `PLAYERS` fallback, the card renderer, the modal and the whole gate straight out
+of `index.html` — one source of truth, the two pages can't drift. Boundaries resolve by anchor
+text, never line numbers; the script throws rather than write a broken page. **Re-run
+`node gen_roster_page.mjs` after touching any of those blocks.** The homepage `#roster` is now a
+teaser: same code form, redirects to `/roster/` on success; an already-unlocked browser gets a
+direct button, a revoked one gets the form back (both driven by the same `isUnlocked()`).
+Gate JS is moved *verbatim* — the only edit is the redirect line, which the generator strips
+from the `/roster/` copy and refuses to build if all 3 aren't found.
+`players/*.html` head-gate + both "Roster" links retargeted to `../roster/`.
+- Validated: locked homepage leaks nothing; wrong code errors without redirecting; valid code →
+  `/roster/` with 27 cards + working filters, EN/ES/IT; direct hit on `/roster/` while locked is
+  gated with the form right there; locked player page bounces to `/roster/`.
+- **Rotation test done for real:** changed `app_settings.roster_master_code` in the DB → reload
+  re-locked BOTH surfaces, purged the stale unlock, refreshed the cache, rejected the old code,
+  accepted the new one. Original code (`ESM13`) restored and re-verified.
+
+**4 — Back buttons (`c5b25c1`).** One `.backlink` rule — 11.5px/800/uppercase/letterspaced,
+top-left above the page title — on every non-homepage page. Added to portal, scout, register,
+tenerife, admin. Standardised on privacy + terms (bottom-of-page link **moved** to the top and
+restyled, not duplicated; orphaned `.back` rule deleted). `players/*.html` `.pp-back` now reuses
+`.backlink`. The arrow lives in the markup, not in the translation string, so it can't drift.
+Verified: exactly one back link per page, byte-identical computed styling, correct destinations,
+clicks actually navigate, all three languages, no 390px overflow.
+
+**5 — Discount code (`268ca1d`).** Optional free-text *"Discount Code (if you have one)"* on
+`/register/` step 2 → `players.discount_code` (`supabase-discount-code.sql`, applied as
+`add_player_discount_code`). Not validated against a code list — pricing is hidden, so there's
+nothing to discount yet; Sam honours it manually from the admin panel (highlighted row on the
+pending card + editable field in the player editor). **No grants were needed and that's the
+point:** `authenticated` holds TABLE-level select/insert/update, while `anon` reads only an
+explicit column list since `supabase-harden-players-columns.sql` — so a new column is private by
+default. Confirmed live: anon REST read of `discount_code` → `42501 permission denied`.
+Two throwaway signups proved `MALAVE20` → stored, blank → `NULL`; both deleted afterwards
+(28 players / 27 approved, 0 strays). Placeholder is a neutral "Enter your code", not a real
+ambassador code.
+- **Flagged:** `send-form-notification` still builds its email from the older column list, so
+  the code shows in admin but not in the notification email. That needs an edge-function
+  redeploy — and the function is a no-op today anyway (`GMAIL_APP_PASSWORD` still unset).
+
+**Whole-site sweep after all five:** 10 pages × EN/ES/IT × desktop (1440) + mobile (390) →
+**0 console errors, 0 failed requests, 0 horizontal overflow, 0 untranslated nodes**, and all
+**five** T&C gates block with a message. `validate_i18n.mjs`: 0 hard problems.
+
+**Pre-existing, NOT introduced — confirmed identical on prod the same day:** 1 of the 27
+approved rows ("Jose Miguel", group `Player`, empty position) has no recognisable position so it
+only appears under "All"; and none of the live slugs match `STATIC_PLAYER_PAGES`, so every
+roster card opens the in-page modal rather than one of the 17 static `players/*.html` pages —
+those are effectively orphaned from the live roster and may be worth a separate look.
+
+
 ### Full ownership review + roster position-filter fix (2026-08-19, session 2)
 
 **Autonomous end-to-end review of the whole project against LIVE prod (Supabase + Vercel), using
