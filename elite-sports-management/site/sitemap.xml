@@ -3,8 +3,8 @@
      (paywalled) and are deliberately excluded; admin/portal are private apps. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://elite-sports-management.vercel.app/</loc>
-    <lastmod>2026-07-31</lastmod>
+    <loc>https://esm-sports-network.vercel.app/</loc>
+    <lastmod>2026-09-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

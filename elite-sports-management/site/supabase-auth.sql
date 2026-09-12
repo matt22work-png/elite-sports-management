@@ -78,8 +78,8 @@ create policy "admin delete players" on players for delete to authenticated
 -- Auth → URL Configuration → Redirect URLs — add BOTH of these, or the magic
 -- link will bounce people to localhost and the login will appear broken:
 --
---   https://elite-sports-management.vercel.app/admin/
---   https://elite-sports-management.vercel.app/portal/
+--   https://esm-sports-network.vercel.app/admin/
+--   https://esm-sports-network.vercel.app/portal/
 --
 -- Auth → Providers → Email — make sure "Enable Email provider" is ON.
 -- Magic links need nothing else; you do NOT need to set a password for Samuele,

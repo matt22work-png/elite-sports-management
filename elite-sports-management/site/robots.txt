@@ -1,4 +1,4 @@
-# ESM Sports Network — https://elite-sports-management.vercel.app
+# ESM Sports Network — https://esm-sports-network.vercel.app
 User-agent: *
 Allow: /
 
@@ -13,4 +13,4 @@ Disallow: /tenerife/
 # They are left crawlable on purpose so crawlers can SEE the noindex directive and
 # keep them out of the index cleanly — do NOT Disallow them here.
 
-Sitemap: https://elite-sports-management.vercel.app/sitemap.xml
+Sitemap: https://esm-sports-network.vercel.app/sitemap.xml
