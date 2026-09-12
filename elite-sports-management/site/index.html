@@ -337,7 +337,16 @@
   .close{position:absolute;top:16px;right:16px;z-index:3;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(6,20,42,.7);color:var(--ink);font-size:18px;cursor:pointer;display:grid;place-items:center}
   .close:hover{border-color:var(--gold);color:var(--gold)}
 
-  .install{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;justify-content:center;padding:0 16px 16px}
+  /* Install prompt: a compact corner toast, NOT a full-width bottom bar.
+     It is anchored bottom-LEFT on desktop so it can never sit over the right-rail
+     JOIN form (the reported complaint was it covering the Apply form's controls),
+     and it never shares the screen with the cookie notice (the JS holds it back until
+     that is accepted), so the two fixed bars can neither overlap nor eat a quarter of
+     a phone viewport between them. While it is on screen <html> carries
+     .has-install-toast, which pads the page bottom by the toast's height so no
+     content is left permanently parked underneath it. */
+  .install{position:fixed;left:16px;right:auto;bottom:16px;
+    z-index:60;display:none;justify-content:flex-start;padding:0;max-width:380px}
   .install.show{display:flex}
   .install .box{display:flex;align-items:center;gap:14px;background:rgba(12,33,67,.96);border:1px solid var(--gold);border-radius:14px;padding:12px 14px;backdrop-filter:blur(8px);max-width:520px;width:100%}
   .install .box b{font-size:14px}.install .box span{font-size:12.5px;color:var(--muted);display:block}
@@ -353,8 +362,14 @@
 
   /* ===== mobile / PWA polish ===== */
   *{-webkit-tap-highlight-color:transparent}
-  .install{padding-bottom:calc(16px + env(safe-area-inset-bottom))}      /* clear the iOS home indicator */
+  /* Clear the iOS home indicator. The toast is positioned by `bottom`, not padding. */
+  .install{bottom:calc(16px + env(safe-area-inset-bottom))}
   footer{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+  /* Reserve the toast's height at the end of the page so nothing sits permanently
+     under it. Only applied while the toast is actually on screen. */
+  html.has-install-toast body{padding-bottom:var(--install-h,110px)}
+  /* Phones have no room for a corner: span the width, minus a margin each side. */
+  @media(max-width:560px){.install{left:12px;right:12px;max-width:none}}
   @media(max-width:560px){
     .wrap{padding:0 16px}
     /* 16px form controls stop iOS from auto-zooming on focus */
@@ -3256,11 +3271,84 @@ form.addEventListener("submit",async e=>{
   pick();
 })();
 
-/* install prompt */
+/* install prompt
+   Chrome re-fires beforeinstallprompt on every load until the app is installed, so
+   dismissing the toast used to last exactly one page view. Dismissal now persists in
+   localStorage and re-prompts after 30 days. The site's other dismissal flag
+   (esm_cookie_consent) is a permanent "1" with no expiry; a permanent opt-out is too
+   blunt for an install nudge, so this one stores the timestamp and ages out.
+   Positioning: the toast is measured on show so it can stack above the cookie notice
+   and pad the page bottom — see the .install CSS. */
+const INSTALL_SNOOZE_KEY="esm_install_dismissed",INSTALL_SNOOZE_DAYS=30;
+function installSnoozed(){try{const v=+localStorage.getItem(INSTALL_SNOOZE_KEY);return !!v&&(Date.now()-v)<INSTALL_SNOOZE_DAYS*864e5;}catch(e){return false;}}
+/* .esml-banner is position:fixed, so offsetParent is ALWAYS null on it — testing that
+   reports every cookie bar as hidden. Measure the rect instead. */
+function cookieBarVisible(){
+  const ck=document.querySelector(".esml-banner");
+  if(!ck)return false;
+  return ck.getBoundingClientRect().height>0&&getComputedStyle(ck).display!=="none";
+}
+function layoutInstall(){
+  const n=document.getElementById("install");
+  if(!n.classList.contains("show"))return;
+  document.documentElement.style.setProperty("--install-h",Math.ceil(n.getBoundingClientRect().height)+32+"px");
+}
+function showInstall(){
+  installPending=false;
+  document.getElementById("install").classList.add("show");
+  document.documentElement.classList.add("has-install-toast");
+  layoutInstall();
+}
+function hideInstall(){
+  document.getElementById("install").classList.remove("show");
+  document.documentElement.classList.remove("has-install-toast");
+}
+/* Two stacked bars own far too much of a phone screen (measured: 169px of a 664px
+   viewport), and lifting the toast above the cookie notice just moved it on top of the
+   hero headline instead. So only one bottom bar is ever on screen: while the cookie
+   notice is up the install toast waits, and it appears once that is accepted. */
+let installPending=false;
+function installBlocked(){
+  if(cookieBarVisible())return true;
+  /* Desktop anchors the toast bottom-LEFT, clear of the right-rail form, so it has
+     nothing left to collide with. A phone has no such spare corner — the toast spans
+     the width — so there it yields to the two things it was reported to cover:
+       · the hero, whose copy runs to the bottom of the viewport on first load
+         (measured 5116px² over the "View the Roster" link on a 375px screen), and
+       · the Apply form, whose Next button it was intercepting clicks on.
+     Outside those it sits over ordinary body text, and one tap retires it for 30 days. */
+  if(window.innerWidth<=560){
+    if(window.scrollY<window.innerHeight*0.6)return true;
+    const jp=document.querySelector(".joinpanel");
+    if(jp){const r=jp.getBoundingClientRect();if(r.bottom>0&&r.top<window.innerHeight)return true;}
+  }
+  return false;
+}
+/* Single source of truth: re-evaluated on scroll, so the toast steps aside when the
+   form scrolls into view and comes back once it leaves. */
+function syncInstall(){
+  if(installSnoozed())return;
+  const shown=document.getElementById("install").classList.contains("show");
+  if(!installPending&&!shown)return;
+  if(installBlocked()){if(shown){hideInstall();installPending=true;}}
+  else if(!shown)showInstall();
+}
+function maybeShowInstall(){
+  if(installSnoozed())return;
+  installPending=true;
+  syncInstall();
+}
 let deferredPrompt=null;
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;document.getElementById("install").classList.add("show");});
-document.getElementById("installBtn").onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById("install").classList.remove("show");}};
-document.getElementById("installX").onclick=()=>document.getElementById("install").classList.remove("show");
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;maybeShowInstall();});
+document.getElementById("installBtn").onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;hideInstall();}};
+document.getElementById("installX").onclick=()=>{try{localStorage.setItem(INSTALL_SNOOZE_KEY,String(Date.now()));}catch(e){}installPending=false;hideInstall();};
+window.addEventListener("resize",layoutInstall);
+window.addEventListener("scroll",syncInstall,{passive:true});
+/* The cookie notice is dismissed by a click inside it; once it's gone, take our turn. */
+document.addEventListener("click",e=>{
+  if(!e.target.closest(".esml-banner"))return;
+  setTimeout(()=>{syncInstall();layoutInstall();},0);
+},true);
 
 async function boot(){
   if(SUPABASE_URL&&SUPABASE_ANON_KEY){
