@@ -2822,6 +2822,33 @@ function syncStepNav(){
 }
 /* Show only the blocks whose step is current AND whose data-cats includes the selected
    category, and clear any stale validation highlight. */
+/* ===== Per-category Terms & Conditions target (2026-09) ==========================
+   The T&C are NOT the same document for every application category, so the one static
+   "Read more" link this form used to carry was wrong: it showed every applicant the same
+   page regardless of what they were actually agreeing to.
+
+   applyCat() collapses the four dropdown values into three keys, and "rep" is exactly
+   Baseball Representation + Softball Representation — which is precisely the scope of the
+   document from Sam's lawyer, so no extra mapping is needed.
+
+   college / teams -> terms-pending.html, an explicit "these terms are being finalised"
+   page. They deliberately do NOT get the Baseball/Softball document: it does not cover
+   those services, and showing it would misrepresent what the applicant is accepting.
+
+   ⚠️ rep is STILL POINTING AT THE GENERAL PLACEHOLDER. The Baseball/Softball document
+   text has not been supplied yet. When it lands, create terms-baseball-softball.html and
+   change the ONE line below — nothing else in this file needs to move. */
+const TERMS_BY_CAT = {
+  rep:     "terms.html",            // <-- swap to "terms-baseball-softball.html" when the document arrives
+  college: "terms-pending.html",
+  teams:   "terms-pending.html",
+};
+function syncTermsLink(cat){
+  // The link lives in the same <label> as the #joinTc checkbox; scoped that way so the
+  // other T&C links on this page (roster gate, profile tiers) are never touched.
+  const link=document.getElementById("joinTc")?.closest("label")?.querySelector(".tc-more");
+  if(link) link.href = TERMS_BY_CAT[cat] || "terms.html";
+}
 function updateApplyFields(){
   const cat=applyCat(applyingSelect.value);
   form.querySelectorAll("[data-step]").forEach(el=>{
@@ -2830,6 +2857,7 @@ function updateApplyFields(){
   // Defensive: a category block without a step (none today) still respects the category gate.
   form.querySelectorAll(".af:not([data-step])").forEach(el=>{ el.hidden=!inCat(el,cat); });
   form.querySelectorAll(".invalid").forEach(el=>el.classList.remove("invalid"));
+  syncTermsLink(cat);
   renderSteps();
   syncStepNav();
 }

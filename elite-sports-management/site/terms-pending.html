@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Terms & Conditions — ESM Sports Network</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+<link rel="shortcut icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="theme-color" content="#081a33" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{--navy-2:#06142a;--gold:#d9b154;--gold-soft:#e7c878;--ink:#eaf0fa;--muted:#9fb1cc;--line:rgba(217,177,84,.22);--card:#0c2143}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--navy-2);color:var(--ink);line-height:1.65}
+  .wrap{max-width:760px;margin:0 auto;padding:26px 18px 90px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  header img{height:38px;width:auto}
+  .kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  h1{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:.02em;font-size:clamp(28px,6vw,44px);margin:14px 0 6px}
+  .langsw{margin-left:auto;display:flex;gap:6px}
+  .langsw button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;font-weight:700;cursor:pointer;font-family:inherit}
+  .langsw button.on{background:var(--gold);color:#05101f;border-color:var(--gold)}
+  .card{border:1px solid var(--line);border-radius:18px;padding:26px 24px;background:linear-gradient(180deg,var(--card),var(--navy-2));margin-top:22px}
+  .tc-body{font-size:15.5px;color:#d6e1f2;white-space:pre-line}
+  .muted{color:var(--muted);font-size:13.5px;margin-top:20px}
+  a{color:var(--gold-soft)}
+  /* Names the services this page covers, so it is never mistaken for the site-wide terms. */
+  .scope{display:inline-block;margin-top:10px;font-size:12px;font-weight:800;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--gold-soft);border:1px solid var(--line);
+    border-radius:999px;padding:6px 13px}
+  /* ===== shared "<- Back" link — byte-identical to the rule in index.html, so every
+     sub-page and drill-down view shows the same affordance in the same place. ===== */
+  .backlink{display:inline-flex;align-items:center;gap:7px;margin-bottom:18px;font-size:11.5px;
+    font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:.2s}
+  .backlink:hover{color:var(--gold-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="index.html"><img src="logo.png" alt="ESM Sports Network" /></a>
+    <div class="langsw" id="langsw" role="group" aria-label="Language">
+      <button data-l="en" type="button">EN</button><button data-l="es" type="button">ES</button><button data-l="it" type="button">IT</button>
+    </div>
+  </header>
+  <a class="backlink" href="index.html">&larr; <span data-i18n="tp_back">Back to site</span></a>
+  <div class="kicker" data-i18n="tp_kicker">Legal</div>
+  <h1 data-i18n="tp_h1">Terms &amp; Conditions</h1>
+  <div class="scope" data-i18n="tp_scope">College Placement · Teams &amp; Scouts</div>
+
+  <div class="card">
+    <!-- Deliberately NOT the Baseball/Softball Representation document. Those terms are a
+         separate, signed document that does not cover these two services; showing it here
+         would misrepresent what a College Placement or Teams & Scouts applicant is
+         agreeing to. When Sam's lawyer provides terms for these services, give each one
+         its own page and repoint TERMS_BY_CAT in index.html. -->
+    <div class="tc-body" data-i18n="tp_body"></div>
+    <p class="muted"><span data-i18n="tp_contact"></span> <a href="mailto:elitesportsmanagement50@gmail.com">elitesportsmanagement50@gmail.com</a>.</p>
+  </div>
+
+</div>
+
+<script>
+/* Trilingual, sharing the site-wide `esm_lang` localStorage key. */
+const DICT = {
+  en:{
+    tp_kicker:"Legal", tp_h1:"Terms & Conditions",
+    tp_scope:"College Placement · Teams & Scouts",
+    tp_body:"Terms and conditions for this service are being finalized. Please contact ESM Sports Network with any questions before signing up.",
+    tp_contact:"Questions? Email",
+    tp_back:"Back to site",
+  },
+  es:{
+    tp_kicker:"Legal", tp_h1:"Términos y Condiciones",
+    tp_scope:"Colocación en College · Equipos y Scouts",
+    tp_body:"Los términos y condiciones de este servicio se están finalizando. Ponte en contacto con ESM Sports Network si tienes cualquier duda antes de registrarte.",
+    tp_contact:"¿Preguntas? Escribe a",
+    tp_back:"Volver al sitio",
+  },
+  it:{
+    tp_kicker:"Legale", tp_h1:"Termini e Condizioni",
+    tp_scope:"Collocamento College · Squadre e Scout",
+    tp_body:"I termini e condizioni per questo servizio sono in fase di finalizzazione. Contatta ESM Sports Network per qualsiasi domanda prima di registrarti.",
+    tp_contact:"Domande? Scrivi a",
+    tp_back:"Torna al sito",
+  },
+};
+const SUPPORTED = ["en","es","it"];
+let lang = (()=>{ try{ const l = localStorage.getItem("esm_lang"); return SUPPORTED.includes(l)?l:"en"; }catch(e){ return "en"; } })();
+const t = k => (DICT[lang]&&DICT[lang][k]) || DICT.en[k] || k;
+function apply(){
+  document.documentElement.lang = lang;
+  document.title = t("tp_h1") + " — ESM Sports Network";
+  document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.getAttribute("data-i18n")));
+  document.querySelectorAll("#langsw button").forEach(b => b.classList.toggle("on", b.dataset.l === lang));
+}
+document.querySelectorAll("#langsw button").forEach(b => b.onclick = () => {
+  lang = b.dataset.l; try{ localStorage.setItem("esm_lang", lang); }catch(e){} apply();
+});
+apply();
+</script>
+<script src="/esm-legal.js"></script>
+</body>
+</html>
