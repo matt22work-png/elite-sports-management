@@ -337,6 +337,11 @@
   .close{position:absolute;top:16px;right:16px;z-index:3;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(6,20,42,.7);color:var(--ink);font-size:18px;cursor:pointer;display:grid;place-items:center}
   .close:hover{border-color:var(--gold);color:var(--gold)}
 
+  /* Paired with the pre-paint script in <head>: hold the inline English hero copy
+     invisible for ES/IT visitors until applyI18n() swaps in their language. */
+  html.i18n-pending .hero-copy [data-i18n],
+  html.i18n-pending .hero-copy [data-i18n-html]{visibility:hidden}
+
   /* Install prompt: a compact corner toast, NOT a full-width bottom bar.
      It is anchored bottom-LEFT on desktop so it can never sit over the right-rail
      JOIN form (the reported complaint was it covering the Apply form's controls),
@@ -362,7 +367,8 @@
 
   /* ===== mobile / PWA polish ===== */
   *{-webkit-tap-highlight-color:transparent}
-  /* Clear the iOS home indicator. The toast is positioned by `bottom`, not padding. */
+  /* Clear the iOS home indicator. The toast is positioned by `bottom`, not padding,
+     so the safe-area inset belongs in the offset alongside the cookie-bar height. */
   .install{bottom:calc(16px + env(safe-area-inset-bottom))}
   footer{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
   /* Reserve the toast's height at the end of the page so nothing sits permanently
@@ -1175,6 +1181,14 @@
     .nav-cta{text-transform:none;letter-spacing:.01em;font-size:11px;padding:8px 10px}
   }
 </style>
+<!-- The hero copy now ships its English text inline so it paints immediately instead of
+     waiting on applyI18n(). For a visitor whose stored language is ES or IT that would
+     mean a visible English flash before the translation lands, which is worse than what
+     they have today. So: mark those visitors before first paint and let the CSS hold the
+     hero copy invisible (not display:none — the space stays reserved, so no layout
+     shift) until applyI18n() runs and clears the flag. EN visitors, and anyone with no
+     stored preference, are unaffected and get the instant paint. -->
+<script>try{var _l=localStorage.getItem("esm_lang");if(_l==="es"||_l==="it")document.documentElement.classList.add("i18n-pending");}catch(e){}</script>
 </head>
 <body>
 <div class="bg-fx"></div>
@@ -1227,17 +1241,26 @@
 
 <section class="hero">
   <figure class="hero-photo">
+    <!-- width/height are the file's intrinsic 1280x854. They set the aspect ratio the
+         browser reserves before the bytes arrive, which is what kills the reflow when
+         the photo is in flow (stacked mobile layout). CSS still sizes it. -->
     <img src="assets/arath-zapien.jpg" alt="Arath Zapien, North Central Missouri Pirates"
+         width="1280" height="854"
          loading="eager" fetchpriority="high" decoding="async" onerror="this.closest('figure').style.display='none'" />
     <figcaption>Arath Zapien, North Central Missouri Pirates.</figcaption>
   </figure>
   <div class="hero-copy">
-    <span class="eyebrow"><i></i> <span data-i18n="hero_eyebrow"></span></span>
-    <h1 class="display" data-i18n-html="hero_h1"></h1>
-    <p class="lead" data-i18n="hero_lead"></p>
+    <!-- The hero copy carries its English text inline as a fallback, the same pattern
+         /register/ and /tenerife/ already use for their leads. applyI18n() overwrites
+         these unconditionally, so ES/IT still win — but the headline no longer waits
+         for the main script to run before it paints (it was ~1.2s blank on desktop,
+         ~2.8s on a throttled phone), and non-JS consumers finally see the H1. -->
+    <span class="eyebrow"><i></i> <span data-i18n="hero_eyebrow">Athlete Representation · Worldwide</span></span>
+    <h1 class="display" data-i18n-html="hero_h1">We get baseball and softball athletes <em>seen, signed and developed</em>.</h1>
+    <p class="lead" data-i18n="hero_lead">ESM Sports Network guides baseball and softball athletes from the young to the pro ranks — across college, indy ball, winter league, Europe and Australia.</p>
     <div class="hero-btns">
-      <a class="btn btn-gold" href="#roster" data-i18n="hero_btn1"></a>
-      <a class="btn btn-ghost" href="#join" data-i18n="hero_btn2"></a>
+      <a class="btn btn-gold" href="#roster" data-i18n="hero_btn1">View the Roster</a>
+      <a class="btn btn-ghost" href="#join" data-i18n="hero_btn2">Register Here</a>
     </div>
   </div>
 </section>
@@ -2464,6 +2487,8 @@ function applyI18n(){
   document.querySelectorAll("#lang button").forEach(b=>b.classList.toggle("on",b.dataset.l===lang));
   // The step heading is written imperatively (not via data-i18n), so refresh it here too.
   if(typeof renderSteps==="function")renderSteps();
+  // Translated copy is in place — reveal the hero for ES/IT visitors (see <head>).
+  document.documentElement.classList.remove("i18n-pending");
 }
 function setLang(l){lang=l;try{localStorage.setItem("esm_lang",l);}catch(e){}applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();}
 
@@ -3387,6 +3412,12 @@ async function boot(){
   applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();
   applyLockState();
 }
+/* Translate the static chrome immediately. boot() also calls applyI18n(), but only
+   after awaiting Supabase, which left ES/IT copy waiting ~1.2s on a network round-trip
+   it does not depend on. Running it here paints translated text right away (and is what
+   clears .i18n-pending, so the hero can never stay hidden if that request stalls).
+   applyI18n() is idempotent — boot()'s later call still refreshes data-driven strings. */
+applyI18n();
 // Show the correct application field set for the default-selected category on load.
 updateApplyFields();
 // Wire the pay buttons synchronously too: their hrefs come only from top-level
