@@ -546,8 +546,12 @@
     /* The rail is the second cell of the grid's first row, so with align-items:start
        its top already sits level with the hero's top. No offset to keep in sync. */
     .col-rail{position:relative;z-index:5;display:flex;flex-direction:column;gap:16px}
-    /* hero bleeds right, underneath the rail, and left to the viewport edge */
-    .col-main > .hero{
+    /* Hero AND the stats strip bleed right, underneath the rail, and left to the
+       viewport edge. The stats strip used to take only the left bleed (see the
+       shared rule further down), so its navy band stopped at the main column's
+       right edge and left a white strip between the band and the JOIN card.
+       Padding-right reserves the rail's width so the tiles stay out from under it. */
+    .col-main > .hero,.col-main > .stats{
       margin-right:calc(-1 * (var(--rail) + var(--gutter) + var(--shell-inset)));
       padding-right:calc(var(--rail) + var(--gutter) + var(--shell-inset))}
     /* Everything below the end of the rail reclaims the rail's width, so the page
@@ -1122,6 +1126,10 @@
   /* ---------- modal / install keep the dark treatment ---------- */
   .sheet{border-radius:6px}
   .install .box{border-radius:5px}
+  /* The light theme repaints body text navy (--tx), but the install box keeps its dark
+     navy ground — so the title inherited navy-on-navy and was all but unreadable.
+     State it white explicitly; the sub-label keeps its existing muted treatment. */
+  .install .box b{color:#fff}
   .install button{border-radius:3px;font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
 
   /* ---------- narrow phones ---------- */
