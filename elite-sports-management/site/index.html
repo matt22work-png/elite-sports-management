@@ -617,6 +617,22 @@
   .hero{position:relative;overflow:hidden;color:#fff;display:flex;align-items:center;
     background:linear-gradient(180deg,#0c2444,var(--navy-2));
     padding:54px 0;min-height:var(--hero-h)}
+  /* TOP-EDGE FADE, ANCHORED TO THE HERO — not to the photo.
+     The figure is bottom-aligned and taller than the hero at most desktop widths, so
+     overflow:hidden clips its top BEFORE the image's own top ramp has finished. How much
+     gets clipped changes with the viewport (~7px at 1440, ~55px at 1024), so a fade
+     measured from the image's top can't land at zero on the clip line at every width —
+     measured residuals of 10 at 1440 and 28 at 1024, i.e. the clip line itself had become
+     the hard edge.
+     This is anchored to the hero instead, so it always ends exactly where the hero does.
+     It paints #0c2444 — the literal first stop of .hero's own background gradient — so at
+     the clip line the colour is the backdrop by definition, at any width. Faded with an
+     explicit rgba(12,36,68,0) rather than `transparent`, because `transparent` is
+     rgba(0,0,0,0) and interpolating to it darkens the middle of the ramp.
+     z-index 1 keeps it above the photo (0) and below .hero-copy (2); the JOIN panel is
+     not a child of .hero, so it is untouched. */
+  .hero::after{content:"";position:absolute;left:0;right:0;top:0;height:84px;z-index:1;
+    pointer-events:none;background:linear-gradient(180deg,#0c2444 0,rgba(12,36,68,0) 100%)}
   .hero-copy{max-width:600px;position:relative;z-index:2}
   /* Photo: large, bottom-aligned to the band, right edge running under the JOIN card.
      BREATHING ROOM (2026-09): the figure used to run 150px under the card, and its
@@ -633,9 +649,38 @@
      JOIN card starts at ~88% — so both edges visibly dissolve into the navy instead
      of being clipped. The opaque plateau (30%→64%) is kept wide and centred on the
      batter so the extra fade costs no subject brightness. */
+  /* ===== FOUR-SIDE EDGE BLEND (2026-09) =====================================
+     The photo used to read as a hard rectangular box: only the left and right edges
+     were faded, so the top met the nav and the bottom met the stats band as clean
+     horizontal cuts (measured: a ~222-unit single-pixel colour jump at the bottom).
+
+     Two mask layers composited with `intersect`: the horizontal one is the EXISTING
+     fade, byte-for-byte, so how much of the swing shows is unchanged; the vertical one
+     is new. Masking (rather than painting a navy overlay) is what makes this seamless,
+     because .hero's background is a VERTICAL GRADIENT — linear-gradient(180deg,#0c2444,
+     var(--navy-2)) — not a flat colour. A single matched colour can only be correct at
+     one height; making the pixels transparent is correct at every height, on any
+     viewport, with no value to keep in sync.
+
+     Vertical stops are in PIXELS, not %, so the fade distance stays constant instead of
+     stretching with the photo's height. They are sized around the subject, measured off
+     the render at 1440: the helmet starts ~86px below the photo's top edge and the rear
+     shoe ends ~69px above the bottom, so 62px / 66px ramps dissolve the stadium backdrop
+     and the infield dirt without ghosting the player. Both ramps are eased (three stops
+     rather than a straight line) because a linear alpha ramp off bright dirt shows a
+     faint band; the eased curve lands under the ~2/255 step where banding becomes
+     visible. */
   .hero-photo img{width:100%;height:auto;display:block;
-    -webkit-mask-image:linear-gradient(to right,transparent 0,#000 30%,#000 64%,transparent 82%);
-    mask-image:linear-gradient(to right,transparent 0,#000 30%,#000 64%,transparent 82%)}
+    -webkit-mask-image:
+      linear-gradient(to right,transparent 0,#000 30%,#000 64%,transparent 82%),
+      linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 22px,rgba(0,0,0,.82) 42px,#000 62px,
+        #000 calc(100% - 66px),rgba(0,0,0,.82) calc(100% - 44px),rgba(0,0,0,.4) calc(100% - 23px),transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-image:
+      linear-gradient(to right,transparent 0,#000 30%,#000 64%,transparent 82%),
+      linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 22px,rgba(0,0,0,.82) 42px,#000 62px,
+        #000 calc(100% - 66px),rgba(0,0,0,.82) calc(100% - 44px),rgba(0,0,0,.4) calc(100% - 23px),transparent 100%);
+    mask-composite:intersect}
   /* Dark scrim over the photo's left side — what the mockup does — so the headline
      always sits on navy and the photo can still be large. It lives INSIDE the figure
      (not on .hero) so the photo credit, which is a child of the same figure, can paint
@@ -648,8 +693,19 @@
      are all UNCHANGED, so the edge fade behaves exactly as before; this only widens the
      window the scrim was leaving. 26% is as far as it goes before the stadium background
      starts reading behind the headline — measured at 1366/1440/1920. */
+  /* SEAM FIX (2026-09): this scrim used to paint a FLAT var(--navy) #081a33 over its
+     opaque region. .hero's background is a vertical gradient #0c2444 -> #06142a, so a
+     flat fill can only match it at one height — it was a soft-edged navy rectangle
+     sitting on a gradient, drifting ~6 units away from the backdrop at the top and
+     bottom of the figure. It now paints .hero's OWN gradient and gets its left-to-right
+     shape from a mask instead of from the colour stops, so the opaque region is exactly
+     the backdrop colour at every height and cannot seam. The horizontal shape — the 26%
+     plateau that keeps the headline on navy while showing the full swing — is unchanged;
+     only the colour model is. */
   .hero-photo::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(90deg,var(--navy) 0 26%,rgba(8,26,51,.62) 40%,rgba(8,26,51,.12) 55%,transparent 68%)}
+    background:linear-gradient(180deg,#0c2444,var(--navy-2));
+    -webkit-mask-image:linear-gradient(90deg,#000 0 26%,rgba(0,0,0,.62) 40%,rgba(0,0,0,.12) 55%,transparent 68%);
+    mask-image:linear-gradient(90deg,#000 0 26%,rgba(0,0,0,.62) 40%,rgba(0,0,0,.12) 55%,transparent 68%)}
   .hero-photo figcaption{left:10px;bottom:10px;z-index:2;background:rgba(5,16,31,.82);font-size:10.5px;
     padding:5px 10px;border-radius:3px;color:rgba(255,255,255,.82);border-top-right-radius:3px}
   @media(max-width:1199.98px){.hero{min-height:0;padding:44px 0}}
@@ -667,9 +723,21 @@
        over the photo. */
     .hero-photo{position:relative;right:auto;width:100%;max-width:none;
       margin:0 calc(-1 * var(--shell-inset)) 26px;transform:none}
+    /* Same four-side treatment on phones. The figure is a full-bleed band in normal flow
+       here, so the top meets the nav and the bottom meets the eyebrow — both were hard
+       cuts too. Shorter ramps (42px / 46px) because the photo is much shorter at this
+       width; the horizontal fade is the existing one, unchanged. */
     .hero-photo img{
-      -webkit-mask-image:linear-gradient(to right,transparent 0,#000 16%,#000 84%,transparent 100%);
-      mask-image:linear-gradient(to right,transparent 0,#000 16%,#000 84%,transparent 100%)}
+      -webkit-mask-image:
+        linear-gradient(to right,transparent 0,#000 16%,#000 84%,transparent 100%),
+        linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 15px,rgba(0,0,0,.82) 29px,#000 42px,
+          #000 calc(100% - 46px),rgba(0,0,0,.82) calc(100% - 31px),rgba(0,0,0,.4) calc(100% - 16px),transparent 100%);
+      -webkit-mask-composite:source-in;
+      mask-image:
+        linear-gradient(to right,transparent 0,#000 16%,#000 84%,transparent 100%),
+        linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 15px,rgba(0,0,0,.82) 29px,#000 42px,
+          #000 calc(100% - 46px),rgba(0,0,0,.82) calc(100% - 31px),rgba(0,0,0,.4) calc(100% - 16px),transparent 100%);
+      mask-composite:intersect}
     .hero-photo::before{background:linear-gradient(90deg,rgba(8,26,51,.5) 0,transparent 30%,transparent 70%,rgba(8,26,51,.5) 100%)}
     .hero-photo figcaption{left:calc(var(--shell-inset) + 4px);bottom:8px}
     .hero-btns{flex-wrap:wrap}
