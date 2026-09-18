@@ -1150,7 +1150,12 @@
   .foot-bar{background:rgba(0,0,0,.22);padding:14px 0 8px}
   .foot-bar-in{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
   .foot-bar .muted{color:rgba(255,255,255,.5);font-size:12px;margin:0}
-  .foot-bar .foot-admin{margin:0;font-size:11px;color:rgba(255,255,255,.32)}
+  /* The footer "Admin" link was the one remaining navy-on-navy spot on the site: this rule
+     set rgba(255,255,255,.32) but did NOT reset the opacity:.6 it inherits from the base
+     .foot-admin rule, so the two multiplied to an effective alpha of ~.19 — a dark blue-grey
+     (#565f6c) sitting on the #061428 footer bar at 2.9:1, i.e. unreadable. White text, same
+     background, and opacity pinned to 1 so nothing compounds it again. */
+  .foot-bar .foot-admin{margin:0;font-size:11px;color:#fff;opacity:1}
   .foot-bar .foot-admin:hover{color:var(--gold-soft)}
   /* esm-legal.js appends its Privacy · Terms row as the last child of <footer>. Give it
      the same darker ground as .foot-bar so the copyright line and the legal links read as
