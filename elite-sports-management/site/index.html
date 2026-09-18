@@ -688,8 +688,10 @@
     width:min(62vw,880px);max-width:none;margin:0;transform:none;z-index:0}
   /* Stronger edge fade, per Sam. Fully transparent by 82% of the image width — the
      JOIN card starts at ~88% — so both edges visibly dissolve into the navy instead
-     of being clipped. The opaque plateau (30%→64%) is kept wide and centred on the
-     batter so the extra fade costs no subject brightness. */
+     of being clipped. The opaque plateau now starts at 12% (was 30%) so the bat and the
+     pitched ball, which sit at roughly 20-30% of the frame, fall inside the opaque region
+     instead of being dissolved by the fade. See the scrim note below for why moving this
+     stop on its own changed nothing. */
   /* ===== FOUR-SIDE EDGE BLEND (2026-09) =====================================
      The photo used to read as a hard rectangular box: only the left and right edges
      were faded, so the top met the nav and the bottom met the stats band as clean
@@ -713,12 +715,12 @@
      visible. */
   .hero-photo img{width:100%;height:auto;display:block;
     -webkit-mask-image:
-      linear-gradient(to right,transparent 0,#000 30%,#000 64%,transparent 82%),
+      linear-gradient(to right,transparent 0,#000 12%,#000 64%,transparent 82%),
       linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 22px,rgba(0,0,0,.82) 42px,#000 62px,
         #000 calc(100% - 66px),rgba(0,0,0,.82) calc(100% - 44px),rgba(0,0,0,.4) calc(100% - 23px),transparent 100%);
     -webkit-mask-composite:source-in;
     mask-image:
-      linear-gradient(to right,transparent 0,#000 30%,#000 64%,transparent 82%),
+      linear-gradient(to right,transparent 0,#000 12%,#000 64%,transparent 82%),
       linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 22px,rgba(0,0,0,.82) 42px,#000 62px,
         #000 calc(100% - 66px),rgba(0,0,0,.82) calc(100% - 44px),rgba(0,0,0,.4) calc(100% - 23px),transparent 100%);
     mask-composite:intersect}
@@ -729,11 +731,19 @@
      caption's left half. The img's own mask is untouched. */
   /* 2026-09, per Sam: the opaque plateau used to run to 48% of the photo, which buried
      the bat and both arms — the swing read as a torso. Arath's bat spans roughly 28%→55%
-     of the image and the ball sits near 20%, so pulling the plateau back to 26% brings
-     the whole swing motion into view. The photo's own mask, its width and its position
-     are all UNCHANGED, so the edge fade behaves exactly as before; this only widens the
-     window the scrim was leaving. 26% is as far as it goes before the stadium background
-     starts reading behind the headline — measured at 1366/1440/1920. */
+     of the image and the ball sits near 20%. The plateau was pulled back to 26%, and now
+     to 16%, to show more of the left side of the swing.
+
+     THIS scrim — not the image's own mask — governs how much of the left side is visible.
+     Verified by experiment: moving the image mask's left ramp from 30% to 18% on its own
+     changed the rendered hero by nothing at all, because the scrim was still fully opaque
+     out to 26% and simply painted over everything the mask had just revealed. So both
+     stops move together (image mask 12%, scrim 16%).
+
+     Headline safety re-measured at 1200/1280/1366/1440/1600/1920 by sampling the rendered
+     pixels behind the copy: the h1 holds 16.5:1 and the lead ~12.9:1, unchanged from the
+     26% version, because the copy only runs to ~36-42% of the photo where the scrim is
+     still heavy. The photo's width, position and four-side edge fade are untouched. */
   /* SEAM FIX (2026-09): this scrim used to paint a FLAT var(--navy) #081a33 over its
      opaque region. .hero's background is a vertical gradient #0c2444 -> #06142a, so a
      flat fill can only match it at one height — it was a soft-edged navy rectangle
@@ -745,8 +755,8 @@
      only the colour model is. */
   .hero-photo::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
     background:linear-gradient(180deg,#0c2444,var(--navy-2));
-    -webkit-mask-image:linear-gradient(90deg,#000 0 26%,rgba(0,0,0,.62) 40%,rgba(0,0,0,.12) 55%,transparent 68%);
-    mask-image:linear-gradient(90deg,#000 0 26%,rgba(0,0,0,.62) 40%,rgba(0,0,0,.12) 55%,transparent 68%)}
+    -webkit-mask-image:linear-gradient(90deg,#000 0 16%,rgba(0,0,0,.62) 30%,rgba(0,0,0,.12) 48%,transparent 64%);
+    mask-image:linear-gradient(90deg,#000 0 16%,rgba(0,0,0,.62) 30%,rgba(0,0,0,.12) 48%,transparent 64%)}
   .hero-photo figcaption{left:10px;bottom:10px;z-index:2;background:rgba(5,16,31,.82);font-size:10.5px;
     padding:5px 10px;border-radius:3px;color:rgba(255,255,255,.82);border-top-right-radius:3px}
   @media(max-width:1199.98px){.hero{min-height:0;padding:44px 0}}
