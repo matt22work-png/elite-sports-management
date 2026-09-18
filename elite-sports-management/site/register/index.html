@@ -876,6 +876,29 @@ async function ensureProfile(){
   return created;
 }
 
+/* Kick off the consent-PDF Edge Function for the row this user just created.
+   Everything here is best-effort and silent: it looks the row up by owner_id rather
+   than reading the id back from the INSERT, so the existing insert path (and its
+   23505 handling) is completely untouched. Any failure is logged and dropped. */
+function queueConsentPdf(ownerId){
+  (async () => {
+    try {
+      const { data: row } = await SB.from("players")
+        .select("id").eq("owner_id", ownerId)
+        .order("id", { ascending: false }).limit(1).maybeSingle();
+      if (!row?.id) return;
+      const { data: sess } = await SB.auth.getSession();
+      const token = sess?.session?.access_token;
+      if (!token) return;
+      await fetch(`${SUPABASE_URL}/functions/v1/generate-consent-pdf`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, apikey: SUPABASE_ANON_KEY },
+        body: JSON.stringify({ player_id: row.id }),
+      });
+    } catch (err){ console.warn("consent PDF generation skipped", err); }
+  })();
+}
+
 /* ---------- step 2 (player): create the roster row ---------- */
 /* ===== Date of birth -> age bracket -> which consent block is required ==========
    The brackets are the ones the Baseball/Softball Representation document sets for
@@ -1036,6 +1059,12 @@ $("playerForm").addEventListener("submit", async e => {
       if (error.code === "23505"){ showPay("player"); return; }
       throw error;
     }
+    // Auto-fill the Baseball/Softball consent form for this athlete, render it to a PDF
+    // and email it to Sam. Deliberately fire-and-forget and fully swallowed: the profile
+    // is already saved, so a PDF or SMTP hiccup must never cost the athlete their
+    // registration or hold up the confirmation step. The Edge Function is idempotent
+    // enough to re-run by hand from the admin side if it ever misses.
+    queueConsentPdf(user.id);
     showPay("player");
   } catch (err){
     msg($("playerMsg"), t("r_err_save_profile") + (err?.message || err));
