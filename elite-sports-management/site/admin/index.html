@@ -58,6 +58,10 @@
   /* Discount code entered by the athlete at signup — called out on the pending card so
      Sam sees it while deciding, not after. */
   .p-meta.discount{color:var(--gold-soft)}
+  /* DOB + parent/guardian consent block on the pending card. */
+  .p-meta.guardian{border-left:2px solid var(--line);padding-left:11px}
+  .p-meta.guardian b{color:var(--ink)}
+  .chip.minor{background:rgba(217,177,84,.16);color:var(--gold-soft);border-color:rgba(217,177,84,.4)}
   .p-meta.discount code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;
     background:rgba(217,177,84,.14);border:1px solid var(--line);border-radius:6px;padding:1px 7px;letter-spacing:.06em}
   .chip.approved{color:var(--teal);border-color:rgba(46,196,182,.4)}
@@ -818,6 +822,44 @@ function pendingStatsHTML(p){
 // `application-docs` bucket, so each button mints a short-lived signed URL on click
 // (see openDoc / bindActions). The headshot lives in the PUBLIC application-photos
 // bucket and is already shown as the card avatar; we add a "View photo" link too.
+/* Date of birth + parent/guardian consent, shown on the pending card so Sam can see at a
+   glance whether an athlete is a minor and, if so, who signs for them. The brackets match
+   the Baseball/Softball terms document (s.23 18+, s.24 14-17, s.25 under 14) and the
+   /register/ step that collects them. Renders nothing at all for a row with no DOB, so
+   every pre-existing applicant card looks exactly as it did. */
+function guardianAge(dob){
+  if(!dob) return null;
+  const d=new Date(dob+"T00:00:00"); if(isNaN(d)) return null;
+  const n=new Date(); let a=n.getFullYear()-d.getFullYear();
+  const m=n.getMonth()-d.getMonth();
+  if(m<0||(m===0&&n.getDate()<d.getDate())) a--;
+  return a;
+}
+function guardianHTML(p){
+  if(!p.date_of_birth) return "";
+  const age=guardianAge(p.date_of_birth);
+  const minor = age!==null && age<18;
+  const both  = age!==null && age<14;
+  const person=(f,l,em,ph)=>{
+    const nm=[f,l].filter(Boolean).join(" ").trim();
+    if(!nm && !em && !ph) return "";
+    const bits=[nm?esc(nm):null, em?`<a href="mailto:${esc(em)}">${esc(em)}</a>`:null, ph?esc(ph):null].filter(Boolean);
+    return bits.join(" &nbsp;·&nbsp; ");
+  };
+  const g1=person(p.guardian1_first_name,p.guardian1_last_name,p.guardian1_email,p.guardian1_phone);
+  const g2=person(p.guardian2_first_name,p.guardian2_last_name,p.guardian2_email,p.guardian2_phone);
+  const rel=p.guardian_relation==="guardian"?"Legal guardian":"Parent";
+  const badge = !minor
+    ? `<span class="chip" style="opacity:.7">18+ · consents alone</span>`
+    : `<span class="chip minor">${both?"Under 14 · both parents required":"Minor 14-17 · guardian required"}</span>`;
+  return `<div class="p-meta guardian">
+    <div><b>&#127874; Date of birth:</b> ${esc(p.date_of_birth)}${age!==null?` <span style="color:var(--muted)">(age ${age})</span>`:""} ${badge}</div>
+    ${minor&&g1?`<div style="margin-top:6px"><b>${both?"Parent 1":rel}:</b> ${g1}</div>`:""}
+    ${both&&g2?`<div style="margin-top:4px"><b>Parent 2:</b> ${g2}</div>`:""}
+    ${minor&&!g1?`<div style="margin-top:6px;color:var(--red,#e0645a)"><b>&#9888; Minor with no guardian details on file.</b></div>`:""}
+    ${p.guardian_notes?`<div style="margin-top:6px"><b>Notes:</b> ${esc(p.guardian_notes)}</div>`:""}
+  </div>`;
+}
 function pendingFilesHTML(p){
   const btns = [
     p.image_url        ? `<a class="btn btn-ghost" href="${esc(p.image_url)}" target="_blank" rel="noopener">🖼 Photo</a>` : null,
@@ -849,6 +891,7 @@ function cardPending(p){
     </div>
     ${contact ? `<div class="p-meta">${contact}</div>` : ""}
     ${p.discount_code ? `<div class="p-meta discount"><b>&#127903; Discount code:</b> <code>${esc(p.discount_code)}</code></div>` : ""}
+    ${guardianHTML(p)}
     ${p.bio ? `<div class="p-meta"><b>Goals:</b> ${esc(p.bio)}</div>` : ""}
     ${p.study_goals ? `<div class="p-meta"><b>Study &amp; goals:</b> ${esc(p.study_goals)}</div>` : ""}
     ${p.looking_for ? `<div class="p-meta"><b>Looking for:</b> ${esc(p.looking_for)}</div>` : ""}

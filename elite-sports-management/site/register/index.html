@@ -48,6 +48,20 @@
   .field input:focus,.field select:focus,.field textarea:focus{outline:0;border-color:var(--gold)}
   .field textarea{resize:vertical}
   .field .hint{font-size:12px;color:var(--muted);margin-top:5px}
+  /* ---------- parent / guardian consent block (minors only) ----------
+     Visually grouped so it reads as one consent section rather than more profile
+     fields, and so it is obvious which inputs belong to the second parent. */
+  #guardianBlock{margin:4px 0 18px;padding:16px 16px 4px;border:1px solid var(--line);
+    border-radius:14px;background:rgba(6,20,42,.45)}
+  .gd-head{margin-bottom:14px}
+  .gd-title{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;
+    letter-spacing:.03em;font-size:17px;color:var(--gold-soft)}
+  .gd-head .hint{font-size:12.5px;color:var(--muted);line-height:1.5}
+  .gd-person + .gd-person{margin-top:6px;padding-top:14px;border-top:1px solid var(--line)}
+  .gd-person-h{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:10px}
+  #guardianBlock .hint{font-size:12px;color:var(--muted)}
+  @media(max-width:520px){ #guardianBlock .grid2{grid-template-columns:1fr} }
   .phone-row{display:flex;gap:8px}
   .phone-row .phone-cc{flex:0 0 auto;width:auto;max-width:142px}
   .phone-row .phone-num{flex:1;min-width:0}
@@ -156,7 +170,66 @@
       <div class="field"><label for="p-sport" data-i18n="r_p_sport">Sport</label><select id="p-sport"><option>Baseball</option><option>Softball</option></select></div>
       <div class="grid2">
         <div class="field"><label for="p-country" data-i18n="r_p_country">Country</label><input id="p-country" data-i18n-ph="r_p_country_ph" placeholder="e.g. Italy" /></div>
-        <div class="field"><label for="p-age" data-i18n="r_p_age">Age</label><input id="p-age" inputmode="numeric" data-i18n-ph="r_p_age_ph" placeholder="e.g. 21" /></div>
+        <!-- Date of birth replaces the old free-text Age box. The Baseball/Softball terms
+             document keys its consent rules to the athlete's age (18+ / 14-17 / under 14),
+             so we need a real date, not a typed number, to decide which block to show.
+             players.age is still written — derived from this date — so the roster, the
+             player pages and the admin list keep working unchanged. -->
+        <div class="field"><label for="p-dob" data-i18n="r_p_dob">Date of birth</label>
+          <input type="date" id="p-dob" required />
+          <div class="hint" id="p-age-note" data-age-note hidden></div></div>
+      </div>
+
+      <!-- ===== Parent / guardian consent (minors only) ==============================
+           Hidden entirely for an athlete who is 18 or over. Revealed by syncGuardian()
+           the moment the date of birth implies a minor, following the thresholds the
+           terms document sets for itself:
+             14-17    (s.24) one parent OR legal guardian, signing alongside the athlete
+             under 14 (s.25) BOTH parents exercising parental responsibility
+           Hidden fields stay in the DOM but are ignored by the submit handler, which
+           reads only the bracket that is actually current. -->
+      <div id="guardianBlock" hidden>
+        <div class="gd-head">
+          <div class="gd-title" id="gd-title" data-i18n="r_gd_title">Parent / guardian</div>
+          <p class="hint" id="gd-note" style="margin:6px 0 0"></p>
+        </div>
+
+        <div class="gd-person">
+          <div class="gd-person-h" id="gd1-h" data-i18n="r_gd1_h">Parent / guardian</div>
+          <div class="grid2">
+            <div class="field"><label for="p-gd1-first" data-i18n="r_gd_first">First name</label><input id="p-gd1-first" autocomplete="off" /></div>
+            <div class="field"><label for="p-gd1-last" data-i18n="r_gd_last">Last name</label><input id="p-gd1-last" autocomplete="off" /></div>
+          </div>
+          <div class="field" id="gd-rel-wrap"><label for="p-gd-rel" data-i18n="r_gd_rel">Capacity</label>
+            <select id="p-gd-rel">
+              <option value="parent" data-i18n="r_gd_rel_parent">Parent</option>
+              <option value="guardian" data-i18n="r_gd_rel_guardian">Legal guardian</option>
+            </select></div>
+          <div class="grid2">
+            <div class="field"><label for="p-gd1-email" data-i18n="r_gd_email">Email</label><input type="email" id="p-gd1-email" autocomplete="off" /></div>
+            <div class="field"><label for="p-gd1-phone" data-i18n="r_gd_phone">Phone</label><input id="p-gd1-phone" inputmode="tel" autocomplete="off" /></div>
+          </div>
+          <div class="hint" data-i18n="r_gd_contact_hint">Give at least one of email or phone so ESM can reach them.</div>
+        </div>
+
+        <!-- Second parent — under-14 only (terms s.25). -->
+        <div class="gd-person" id="guardian2Block" hidden>
+          <div class="gd-person-h" data-i18n="r_gd2_h">Second parent</div>
+          <div class="grid2">
+            <div class="field"><label for="p-gd2-first" data-i18n="r_gd_first">First name</label><input id="p-gd2-first" autocomplete="off" /></div>
+            <div class="field"><label for="p-gd2-last" data-i18n="r_gd_last">Last name</label><input id="p-gd2-last" autocomplete="off" /></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label for="p-gd2-email" data-i18n="r_gd_email">Email</label><input type="email" id="p-gd2-email" autocomplete="off" /></div>
+            <div class="field"><label for="p-gd2-phone" data-i18n="r_gd_phone">Phone</label><input id="p-gd2-phone" inputmode="tel" autocomplete="off" /></div>
+          </div>
+        </div>
+
+        <!-- Free-text catch-all. Never required, never public — Sam reads it on the
+             admin card alongside the rest of the intake. -->
+        <div class="field"><label for="p-gd-notes" data-i18n="r_gd_notes">Information / notes (optional)</label>
+          <textarea id="p-gd-notes" rows="3" maxlength="2000" data-i18n-ph="r_gd_notes_ph" placeholder="Anything else ESM should know…"></textarea>
+          <div class="hint" data-i18n="r_gd_notes_hint">Optional — leave blank if there's nothing to add.</div></div>
       </div>
       <div class="field"><label for="p-bio" data-i18n="r_p_bio">Short bio</label><textarea id="p-bio" rows="4" data-i18n-ph="r_p_bio_ph" placeholder="Tell your story — background, achievements, goals…"></textarea></div>
       <div class="field"><label for="p-teams" data-i18n="r_p_teams">Teams &amp; affiliations (one per line)</label><textarea id="p-teams" rows="3" data-i18n-ph="r_p_teams_ph" placeholder="Cleveland Guardians org.&#10;Dominican Summer League"></textarea></div>
@@ -391,6 +464,24 @@ const DICT = {
     r_err_session:"Your session expired — please sign in again.",
     r_err_img:"Please upload a JPG or PNG image.", r_err_size:"That file is too large (max 10 MB).",
     r_err_save_profile:"Couldn't save your profile: ",
+    r_p_dob:"Date of birth", r_p_age_is:"Age: {n}",
+    r_gd_title:"Parent / guardian",
+    r_gd_title_1417:"Parent or guardian consent",
+    r_gd_title_u14:"Parental consent — both parents",
+    r_gd_note_1417:"This athlete is under 18, so a parent or legal guardian signs alongside them. Please give their details so ESM can contact them.",
+    r_gd_note_u14:"This athlete is under 14. For online and social-media use the terms require the consent of BOTH parents exercising parental responsibility, so please give details for each.",
+    r_gd1_h:"Parent / legal guardian",
+    r_gd1_h_u14:"Parent 1",
+    r_gd2_h:"Parent 2",
+    r_gd_first:"First name", r_gd_last:"Last name", r_gd_email:"Email", r_gd_phone:"Phone",
+    r_gd_rel:"Capacity", r_gd_rel_parent:"Parent", r_gd_rel_guardian:"Legal guardian",
+    r_gd_contact_hint:"Give at least one of email or phone so ESM can reach them.",
+    r_gd_notes:"Information / notes (optional)", r_gd_notes_ph:"Anything else ESM should know…",
+    r_gd_notes_hint:"Optional — leave blank if there's nothing to add.",
+    r_err_dob:"Please enter a valid date of birth.",
+    r_err_guardian:"Add the parent or guardian's first name, last name and at least one contact (email or phone).",
+    r_err_guardian2:"Under 14 both parents are required — add the second parent's first name, last name and at least one contact.",
+
     r_err_save_details:"Couldn't save your details: ",
   },
   es:{
@@ -456,6 +547,24 @@ const DICT = {
     r_err_session:"Tu sesión expiró — vuelve a iniciar sesión.",
     r_err_img:"Sube una imagen JPG o PNG.", r_err_size:"Ese archivo es demasiado grande (máx. 10 MB).",
     r_err_save_profile:"No se pudo guardar tu perfil: ",
+    r_p_dob:"Fecha de nacimiento", r_p_age_is:"Edad: {n}",
+    r_gd_title:"Padre/madre o tutor",
+    r_gd_title_1417:"Consentimiento del padre/madre o tutor",
+    r_gd_title_u14:"Consentimiento parental — ambos progenitores",
+    r_gd_note_1417:"Este atleta es menor de 18 años, por lo que un progenitor o tutor legal firma junto a él. Indica sus datos para que ESM pueda contactarle.",
+    r_gd_note_u14:"Este atleta es menor de 14 años. Para el uso en línea y en redes sociales los términos exigen el consentimiento de AMBOS progenitores que ejercen la responsabilidad parental, así que indica los datos de cada uno.",
+    r_gd1_h:"Progenitor / tutor legal",
+    r_gd1_h_u14:"Progenitor 1",
+    r_gd2_h:"Progenitor 2",
+    r_gd_first:"Nombre", r_gd_last:"Apellidos", r_gd_email:"Correo electrónico", r_gd_phone:"Teléfono",
+    r_gd_rel:"Calidad", r_gd_rel_parent:"Progenitor", r_gd_rel_guardian:"Tutor legal",
+    r_gd_contact_hint:"Indica al menos un correo o un teléfono para que ESM pueda contactar.",
+    r_gd_notes:"Información / notas (opcional)", r_gd_notes_ph:"Cualquier otra cosa que ESM deba saber…",
+    r_gd_notes_hint:"Opcional — déjalo en blanco si no hay nada que añadir.",
+    r_err_dob:"Introduce una fecha de nacimiento válida.",
+    r_err_guardian:"Añade el nombre y los apellidos del progenitor o tutor y al menos un contacto (correo o teléfono).",
+    r_err_guardian2:"Para menores de 14 años se requieren ambos progenitores — añade el nombre, los apellidos y al menos un contacto del segundo progenitor.",
+
     r_err_save_details:"No se pudieron guardar tus datos: ",
   },
   it:{
@@ -521,6 +630,24 @@ const DICT = {
     r_err_session:"La tua sessione è scaduta — accedi di nuovo.",
     r_err_img:"Carica un'immagine JPG o PNG.", r_err_size:"Il file è troppo grande (max 10 MB).",
     r_err_save_profile:"Impossibile salvare il tuo profilo: ",
+    r_p_dob:"Data di nascita", r_p_age_is:"Età: {n}",
+    r_gd_title:"Genitore / tutore",
+    r_gd_title_1417:"Consenso del genitore o tutore",
+    r_gd_title_u14:"Consenso genitoriale — entrambi i genitori",
+    r_gd_note_1417:"Questo atleta è minorenne, quindi un genitore o tutore legale firma insieme a lui. Inserisci i suoi dati così ESM può contattarlo.",
+    r_gd_note_u14:"Questo atleta ha meno di 14 anni. Per la pubblicazione online e sui social i termini richiedono il consenso di ENTRAMBI i genitori esercenti la responsabilità genitoriale: inserisci i dati di entrambi.",
+    r_gd1_h:"Genitore / tutore legale",
+    r_gd1_h_u14:"Genitore 1",
+    r_gd2_h:"Genitore 2",
+    r_gd_first:"Nome", r_gd_last:"Cognome", r_gd_email:"E-mail", r_gd_phone:"Telefono",
+    r_gd_rel:"Qualifica", r_gd_rel_parent:"Genitore", r_gd_rel_guardian:"Tutore legale",
+    r_gd_contact_hint:"Indica almeno un'e-mail o un telefono così ESM può mettersi in contatto.",
+    r_gd_notes:"Informazioni / note (facoltativo)", r_gd_notes_ph:"Qualsiasi altra cosa che ESM dovrebbe sapere…",
+    r_gd_notes_hint:"Facoltativo — lascia vuoto se non c'è nulla da aggiungere.",
+    r_err_dob:"Inserisci una data di nascita valida.",
+    r_err_guardian:"Aggiungi nome e cognome del genitore o tutore e almeno un contatto (e-mail o telefono).",
+    r_err_guardian2:"Sotto i 14 anni servono entrambi i genitori — aggiungi nome, cognome e almeno un contatto del secondo genitore.",
+
     r_err_save_details:"Impossibile salvare i tuoi dati: ",
   },
 };
@@ -546,6 +673,9 @@ function setLang(l){
   // Re-label the labels/placeholders inside any season-stat blocks already added,
   // then re-render the current dynamic view (the payment service card).
   relabelStatBlocks();
+  // The guardian block's title, note and "Parent 1" heading are set from JS per age
+  // bracket, so applyStatic() can't reach them — re-derive them in the new language.
+  if (typeof syncGuardian === "function") syncGuardian();
   if (CUR.view === "pay") renderPayStep(CUR.role);
 }
 document.querySelectorAll("#langsw button").forEach(b => b.onclick = () => setLang(b.dataset.l));
@@ -747,9 +877,105 @@ async function ensureProfile(){
 }
 
 /* ---------- step 2 (player): create the roster row ---------- */
+/* ===== Date of birth -> age bracket -> which consent block is required ==========
+   The brackets are the ones the Baseball/Softball Representation document sets for
+   itself (terms-baseball-softball.html s.23 / s.24 / s.25):
+     18+        athlete consents alone           -> no guardian block at all
+     14 to 17   one parent OR legal guardian     -> guardian 1 + capacity
+     under 14   BOTH parents                     -> guardian 1 + guardian 2
+
+   ageFromDob() counts whole years the way a birthday does (month/day aware), so a
+   17-year-old the day before their 18th birthday is still treated as a minor. */
+function ageFromDob(iso){
+  if (!iso) return null;
+  const d = new Date(iso + "T00:00:00");
+  if (isNaN(d)) return null;
+  const now = new Date();
+  let a = now.getFullYear() - d.getFullYear();
+  const m = now.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) a--;
+  return a;
+}
+function guardianTier(age){
+  if (age === null || age >= 18) return "none";
+  return age < 14 ? "both" : "one";
+}
+function syncGuardian(){
+  const age  = ageFromDob($("p-dob").value);
+  const tier = guardianTier(age);
+  const note = $("p-age-note");
+  if (age === null || age < 0){ note.hidden = true; }
+  else { note.hidden = false; note.textContent = t("r_p_age_is").replace("{n}", String(age)); }
+
+  $("guardianBlock").hidden = (tier === "none");
+  $("guardian2Block").hidden = (tier !== "both");
+  // Under 14 the document requires two PARENTS specifically, so the parent/legal-guardian
+  // choice only applies to the 14-17 bracket.
+  $("gd-rel-wrap").hidden = (tier !== "one");
+  if (tier !== "none"){
+    $("gd-title").textContent = t(tier === "both" ? "r_gd_title_u14" : "r_gd_title_1417");
+    $("gd-note").textContent  = t(tier === "both" ? "r_gd_note_u14"  : "r_gd_note_1417");
+    $("gd1-h").textContent    = t(tier === "both" ? "r_gd1_h_u14"    : "r_gd1_h");
+  }
+}
+$("p-dob").addEventListener("change", syncGuardian);
+$("p-dob").addEventListener("input",  syncGuardian);
+
+/* Returns null when valid, or a translated error string. Mirrors syncGuardian()'s
+   tiers so the visible fields and the enforced fields can never drift apart. */
+function validateGuardian(){
+  const dob = $("p-dob").value;
+  const age = ageFromDob(dob);
+  if (!dob || age === null) return t("r_err_dob");
+  if (age < 0 || age > 120) return t("r_err_dob");
+  const tier = guardianTier(age);
+  if (tier === "none") return null;
+  const need = (f,l,em,ph) => {
+    if (!$(f).value.trim() || !$(l).value.trim()) return false;
+    return !!($(em).value.trim() || $(ph).value.trim());
+  };
+  if (!need("p-gd1-first","p-gd1-last","p-gd1-email","p-gd1-phone")) return t("r_err_guardian");
+  if (tier === "both" && !need("p-gd2-first","p-gd2-last","p-gd2-email","p-gd2-phone")) return t("r_err_guardian2");
+  return null;
+}
+
+/* The guardian columns to write. Only the bracket that actually applies is sent —
+   an adult writes NULLs, a 14-17 athlete writes guardian 1 only, and the second
+   parent's columns stay NULL unless the under-14 block was the one on screen. That
+   way a visitor who types a DOB, fills the block, then corrects the DOB upward can
+   never leave stale guardian data attached to an adult's record. */
+function guardianPayload(){
+  const tier = guardianTier(ageFromDob($("p-dob").value));
+  const v = id => $(id).value.trim() || null;
+  const base = {
+    guardian_relation:null,
+    guardian1_first_name:null, guardian1_last_name:null, guardian1_email:null, guardian1_phone:null,
+    guardian2_first_name:null, guardian2_last_name:null, guardian2_email:null, guardian2_phone:null,
+    guardian_notes:null,
+  };
+  if (tier === "none") return base;
+  Object.assign(base, {
+    // Under 14 the document names two PARENTS, so the capacity choice is 14-17 only.
+    guardian_relation: tier === "one" ? ($("p-gd-rel").value || "parent") : "parent",
+    guardian1_first_name:v("p-gd1-first"), guardian1_last_name:v("p-gd1-last"),
+    guardian1_email:v("p-gd1-email"),      guardian1_phone:v("p-gd1-phone"),
+    guardian_notes:v("p-gd-notes"),
+  });
+  if (tier === "both") Object.assign(base, {
+    guardian2_first_name:v("p-gd2-first"), guardian2_last_name:v("p-gd2-last"),
+    guardian2_email:v("p-gd2-email"),      guardian2_phone:v("p-gd2-phone"),
+  });
+  return base;
+}
+
 $("playerForm").addEventListener("submit", async e => {
   e.preventDefault();
   clearMsg($("playerMsg"));
+  // Age/consent gate runs before anything is uploaded or inserted.
+  {
+    const gErr = validateGuardian();
+    if (gErr){ msg($("playerMsg"), gErr); return; }
+  }
   const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
   try {
     const { data: sess } = await SB.auth.getSession();
@@ -791,7 +1017,13 @@ $("playerForm").addEventListener("submit", async e => {
       name: fullName, "group": position || "Player", position,
       sport: $("p-sport").value, country: $("p-country").value.trim() || null,
       flag: FLAGS[$("p-country").value.trim()] || null,
-      age: $("p-age").value.trim() || null, bio: $("p-bio").value.trim(),
+      // players.age is derived from the date of birth rather than typed, so the roster,
+      // the player pages and the admin list keep the column they already read while the
+      // consent rules key off a real date. Stored as text to match the existing column.
+      date_of_birth: $("p-dob").value || null,
+      age: (() => { const a = ageFromDob($("p-dob").value); return a === null ? null : String(a); })(),
+      ...guardianPayload(),
+      bio: $("p-bio").value.trim(),
       instagram: $("p-instagram").value.trim() || null, phone: combinePhone("p-cc","p-phone") || null,
       teams, stats: [], season_stats: collectSeasonStats(), image_url, email: user.email,
       message: tierMsg,
