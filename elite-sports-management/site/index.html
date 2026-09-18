@@ -1260,7 +1260,16 @@
     <p class="lead" data-i18n="hero_lead">ESM Sports Network guides baseball and softball athletes from the young to the pro ranks — across college, indy ball, winter league, Europe and Australia.</p>
     <div class="hero-btns">
       <a class="btn btn-gold" href="#roster" data-i18n="hero_btn1">View the Roster</a>
-      <a class="btn btn-ghost" href="#join" data-i18n="hero_btn2">Register Here</a>
+      <!-- "Register Here" / "Registrati Qui" points at the ACCOUNT-CREATION flow, not at
+           the in-page application form. It used to be href="#join", which on desktop was a
+           dead click: from ≥1200px the JOIN panel lives in the right rail, whose top edge is
+           level with the hero's top, so `#join` resolves to y≈0 and the browser "scrolls"
+           from the top of the page to the top of the page. The URL gained a #join and
+           nothing moved — indistinguishable from a broken button. (`#roster`, further down
+           the main column, scrolled fine, which is why only this one looked dead.)
+           /register/ is the right destination anyway: this is the sign-up CTA, and the
+           application form already has its own APPLY NOW entry points. -->
+      <a class="btn btn-ghost" href="register/" data-i18n="hero_btn2">Register Here</a>
     </div>
   </div>
 </section>
@@ -2951,11 +2960,15 @@ function syncStepNav(){
    page. They deliberately do NOT get the Baseball/Softball document: it does not cover
    those services, and showing it would misrepresent what the applicant is accepting.
 
-   ⚠️ rep is STILL POINTING AT THE GENERAL PLACEHOLDER. The Baseball/Softball document
-   text has not been supplied yet. When it lands, create terms-baseball-softball.html and
-   change the ONE line below — nothing else in this file needs to move. */
+   rep -> terms-baseball-softball.html, the real document from Sam's lawyer (Italian
+   original + EN/ES convenience translations). ONLY this category points at it.
+
+   NOTE: this map governs the #joinTc link on the application form and nothing else. The
+   other T&C checkboxes on the site (roster gate here and on /roster/, the profile-creation
+   tiers, /register/, /tenerife/) are not category-specific and stay on the general
+   terms.html placeholder — do not repoint them without Sam's say-so. */
 const TERMS_BY_CAT = {
-  rep:     "terms.html",            // <-- swap to "terms-baseball-softball.html" when the document arrives
+  rep:     "terms-baseball-softball.html",
   college: "terms-pending.html",
   teams:   "terms-pending.html",
 };
