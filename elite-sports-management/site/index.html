@@ -71,6 +71,14 @@
   :root{--navy:#081a33;--navy-2:#06142a;--navy-3:#0d2547;--gold:#d9b154;--gold-soft:#e7c878;--teal:#3a9aa6;--teal-soft:#5fb8c2;--ink:#eaf0fa;--muted:#9fb1cc;--line:rgba(217,177,84,.22);--card:#0c2143}
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
+  /* Anchor targets have to clear the sticky header (header.nav, height 64px). Without
+     this a nav click lands the section flush at viewport y=0, so the top 64px of the
+     section — which is exactly where its kicker and <h2> sit — is painted *behind* the
+     bar. The page had scrolled to the right place, but the heading you were looking for
+     was hidden and the first thing visible was the body copy (or, for a short section,
+     the next section's heading), which reads as "it scrolled to the wrong section".
+     #join was already correct because .joinpanel carries its own scroll-margin-top. */
+  section[id]{scroll-margin-top:78px}
   body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--navy-2);color:var(--ink);line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
   .display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em;line-height:.92;text-transform:uppercase}
   a{color:inherit;text-decoration:none}
