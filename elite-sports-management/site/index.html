@@ -108,7 +108,15 @@
   .signin-menu{position:absolute;right:0;top:calc(100% + 10px);min-width:190px;display:flex;flex-direction:column;gap:2px;background:rgba(6,20,42,.98);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 14px 34px rgba(0,0,0,.45);z-index:60}
   .signin-menu a{color:var(--muted);font-size:14px;font-weight:600;padding:10px 12px;border-radius:8px;transition:.15s;white-space:nowrap}
   .signin-menu a:hover,.signin-menu a:focus-visible{background:rgba(217,177,84,.12);color:var(--gold-soft)}
-  @media(max-width:860px){.nav-links{display:none}}
+  /* The section links drop out of the bar once brand + links + language + Sign In + CTA
+     stop fitting. That threshold was 860px, which was measured in English only: the
+     Spanish and Italian labels are longer, so between ~861px and ~1000px the bar ran off
+     the viewport and the whole page scrolled sideways (measured: ES +104px at 880px,
+     +12px at 960px; IT +49px at 880px). Tightening the gaps could not recover 104px, so
+     the links now collapse at 1000px instead — the same behaviour the bar already had
+     below 860px, just triggered early enough for every language. The section anchors stay
+     reachable from the footer nav. */
+  @media(max-width:1000px){.nav-links{display:none}}
   /* Small phones: with the nav links gone, the header holds brand + language +
      Sign In + Apply. Tighten spacing/padding so it never overflows down to ~320px. */
   @media(max-width:560px){
@@ -1177,8 +1185,40 @@
     .lang button{padding-left:8px;padding-right:8px}
     .nav-cta{padding:9px 10px;letter-spacing:.04em}
   }
-  @media(max-width:344px){
-    .nav-cta{text-transform:none;letter-spacing:.01em;font-size:11px;padding:8px 10px}
+  /* The compact CTA used to start at 344px, which left 345-374px overflowing in Spanish
+     (measured +12px at 350px) — the bar dropped its tightest rule exactly where the
+     longest CTA label still needed it. It now starts at 374px and squeezes the whole
+     right-hand cluster, not just the CTA, so brand + language + Sign In + CTA fit at
+     320px in all three languages. Vertical padding is untouched, so the 44px tap targets
+     set in the max-width:900px block survive. */
+  @media(max-width:374px){
+    .nav-in{gap:6px}
+    .nav-right{gap:6px}
+    .logo-img{height:30px}
+    .lang{padding:2px}
+    .lang button{padding-left:5px;padding-right:5px;font-size:10.5px}
+    .signin>summary{font-size:10px;letter-spacing:.03em;padding-left:0;padding-right:0;gap:3px}
+    .nav-cta{text-transform:none;letter-spacing:.01em;font-size:10.5px;padding:8px 9px}
+  }
+  /* ===== stats strip: stop the tiles forcing a horizontal scroll under 390px =====
+     .stats-in is a flex row of two `flex:0 0 auto` tiles, so each tile sized to its
+     max-content width and the label — "ATHLETES REPRESENTED" in EN — never wrapped.
+     Measured overflow on the homepage: EN +54px at 320px and still +14px at 360px,
+     ES +35px, IT +12px. The row simply could not fit and the whole page scrolled
+     sideways.
+
+     Below 390px the tiles now WRAP and each takes a full row (flex-basis:100%), so the
+     label wraps inside the tile instead of pushing the row wider than the viewport.
+     The divider rotates with them: the vertical border-right that separated two
+     side-by-side tiles becomes a horizontal border-bottom between two stacked ones.
+
+     Scoped to max-width:389.98px so the >=390px layout — where the two tiles sit side
+     by side and already fit in all three languages — is byte-for-byte unchanged. */
+  @media(max-width:389.98px){
+    .stats-in{flex-wrap:wrap}
+    .stat{flex:1 1 100%;padding:14px 16px;gap:10px;
+      border-right:0;border-bottom:1px solid rgba(255,255,255,.1)}
+    .stat:last-child{border-bottom:0}
   }
 </style>
 <!-- The hero copy now ships its English text inline so it paints immediately instead of
