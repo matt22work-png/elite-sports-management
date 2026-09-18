@@ -25,7 +25,12 @@
   .langsw button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;font-weight:700;cursor:pointer;font-family:inherit}
   .langsw button.on{background:var(--gold);color:#05101f;border-color:var(--gold)}
   .card{border:1px solid var(--line);border-radius:18px;padding:26px 24px;background:linear-gradient(180deg,var(--card),var(--navy-2));margin-top:22px}
-  .priv{font-size:15.5px;color:#d6e1f2}
+  /* The policy names elitesportsmanagement50@gmail.com inline several times. At 320px that
+     one unbreakable 33-character token is wider than the paragraph box, which pushed the
+     whole page 4px sideways (measured: p.scrollWidth 281 vs clientWidth 234). Long words
+     now wrap instead of forcing a horizontal scroll; nothing else about the type changes. */
+  .priv{font-size:15.5px;color:#d6e1f2;overflow-wrap:break-word}
+  .priv a,.muted{overflow-wrap:break-word}
   .priv .lead{font-size:16px;color:#e7edf7}
   .priv h2{font-size:17px;color:var(--gold-soft);margin:30px 0 10px;font-weight:800;letter-spacing:.01em}
   .priv h2:first-of-type{margin-top:22px}
