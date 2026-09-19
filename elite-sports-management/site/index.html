@@ -1842,12 +1842,55 @@ const CLIPS = [1,2,3,4,5,6,7,8,9];
 const LOCAL_PHOTOS = { "jose-cedeno":"media/photos/jose-cedeno.jpg" };
 
 /* ===== EVENTS ===== */
+/* Every visitor-facing string here is an {en,es,it} object and is rendered through
+   loc(), the same helper the testimonials use. Before this, these were plain English
+   strings printed with esc() directly, so the Events section stayed in English no
+   matter which language was selected — the one visibly untranslated block on the page.
+
+   `date` stays a raw ISO string: fmtDate() already localises it via
+   toLocaleDateString(lang). `icon`, `image` and `reg_url` are not copy.
+
+   loc() accepts a plain string too, so a field can be de-translated later by replacing
+   the object with a string without touching the renderer. */
 const EVENTS = [
   // Upcoming registration (item 14) — no inline gallery; the card links straight to /tenerife/.
-  { title:"Tenerife Winter League 2026", date:"2026-12-08", loc:"Tenerife, Spain", status:"upcoming", icon:"🏝️", image:"media/photos/twl-field-aerial-thumb.jpg", blurb:"Adult division winter league on the coast of Tenerife, Spain — Dec 8–15, 2026. Includes tournament entry, hotel with meals, transport to the seaside field, official jersey and cap, laundry service, and a showcase in front of MLB and college scouts. Registration is open; the first 20 players to sign up get a bonus surprise.", tags:"⚾ Adult Division  ·  🔭 MLB & College Scouts  ·  🎁 First 20 get a bonus", reg_url:"tenerife/" },
+  {
+    // Official league name — identical in all three languages, kept as an object so the
+    // shape of every event field is consistent for whoever edits this next.
+    title:{ en:"Tenerife Winter League 2026", es:"Tenerife Winter League 2026", it:"Tenerife Winter League 2026" },
+    date:"2026-12-08",
+    loc:{ en:"Tenerife, Spain", es:"Tenerife, España", it:"Tenerife, Spagna" },
+    status:"upcoming", icon:"🏝️", image:"media/photos/twl-field-aerial-thumb.jpg",
+    blurb:{
+      en:"Adult division winter league on the coast of Tenerife, Spain — Dec 8–15, 2026. Includes tournament entry, hotel with meals, transport to the seaside field, official jersey and cap, laundry service, and a showcase in front of MLB and college scouts. Registration is open; the first 20 players to sign up get a bonus surprise.",
+      es:"Liga de invierno de división adulta en la costa de Tenerife, España — del 8 al 15 de diciembre de 2026. Incluye inscripción al torneo, hotel con comidas, transporte al campo junto al mar, camiseta y gorra oficiales, servicio de lavandería y un showcase ante scouts de MLB y de colleges. Las inscripciones están abiertas; los primeros 20 jugadores en apuntarse reciben una sorpresa.",
+      it:"Winter league di divisione adulta sulla costa di Tenerife, Spagna — dall'8 al 15 dicembre 2026. Include iscrizione al torneo, hotel con pasti, trasporto al campo sul mare, maglia e cappellino ufficiali, servizio lavanderia e uno showcase davanti a scout MLB e dei college. Le iscrizioni sono aperte; i primi 20 giocatori che si iscrivono ricevono una sorpresa.",
+    },
+    tags:{
+      en:"⚾ Adult Division  ·  🔭 MLB & College Scouts  ·  🎁 First 20 get a bonus",
+      es:"⚾ División Adulta  ·  🔭 Scouts de MLB y Colleges  ·  🎁 Sorpresa para los primeros 20",
+      it:"⚾ Divisione Adulta  ·  🔭 Scout MLB e College  ·  🎁 Sorpresa per i primi 20",
+    },
+    reg_url:"tenerife/",
+  },
   // Past edition gallery (item 13) — clicking opens a dedicated modal titled "Tenerife 2025 Edition"
   // with the video reel + photo gallery (not shown inline on the main page).
-  { title:"Tenerife 2025 Edition", date:"2025-12-13", loc:"Tenerife, Spain", status:"past", media:true, icon:"🏝️", image:"media/photos/twl-champions-thumb.jpg", blurb:"Photos and video from our 2025 Tenerife Winter League edition — champions, all-stars and life on the seaside field.", tags:"🏆 Champions  ·  ⭐ All-Stars  ·  🎥 Highlights" }
+  {
+    title:{ en:"Tenerife 2025 Edition", es:"Edición Tenerife 2025", it:"Edizione Tenerife 2025" },
+    date:"2025-12-13",
+    loc:{ en:"Tenerife, Spain", es:"Tenerife, España", it:"Tenerife, Spagna" },
+    status:"past", media:true, icon:"🏝️", image:"media/photos/twl-champions-thumb.jpg",
+    blurb:{
+      en:"Photos and video from our 2025 Tenerife Winter League edition — champions, all-stars and life on the seaside field.",
+      es:"Fotos y vídeos de nuestra edición 2025 de la Tenerife Winter League — campeones, all-stars y la vida en el campo junto al mar.",
+      it:"Foto e video della nostra edizione 2025 della Tenerife Winter League — campioni, all-star e la vita sul campo in riva al mare.",
+    },
+    tags:{
+      en:"🏆 Champions  ·  ⭐ All-Stars  ·  🎥 Highlights",
+      es:"🏆 Campeones  ·  ⭐ All-Stars  ·  🎥 Highlights",
+      it:"🏆 Campioni  ·  ⭐ All-Star  ·  🎥 Highlights",
+    },
+  },
 ];
 
 /* ===== TESTIMONIALS =====
@@ -2608,13 +2651,13 @@ function renderEvents(){
   const order={upcoming:0,past:1};
   EV_VIEW=[...EVENTS].sort((a,b)=>(order[a.status]-order[b.status])||a.date.localeCompare(b.date));
   document.getElementById("eventsList").innerHTML=EV_VIEW.map((e,i)=>`
-    <div class="ev-card${e.media?' has-media':''}"${e.media?` data-ev="${i}" role="button" tabindex="0" aria-label="${esc(e.title)}"`:""}><div class="ev-img" style="${bgImg(e.image)}">
+    <div class="ev-card${e.media?' has-media':''}"${e.media?` data-ev="${i}" role="button" tabindex="0" aria-label="${esc(loc(e.title))}"`:""}><div class="ev-img" style="${bgImg(e.image)}">
       <span class="ev-status ${e.status==='upcoming'?'up':'past'}">${e.status==='upcoming'?t("ev_upcoming"):t("ev_past")}</span>
       ${e.image?"":(e.icon||"⚾")}</div>
-      <div class="ev-body"><h3 class="display">${esc(e.title)}</h3>
-        <div class="ev-meta"><span>📅 ${fmtDate(e.date)}</span><span>📍 ${esc(e.loc)}</span></div>
-        <p>${esc(e.blurb)}</p>
-        ${e.tags?`<div class="ev-tags">${esc(e.tags)}</div>`:""}
+      <div class="ev-body"><h3 class="display">${esc(loc(e.title))}</h3>
+        <div class="ev-meta"><span>📅 ${fmtDate(e.date)}</span><span>📍 ${esc(loc(e.loc))}</span></div>
+        <p>${esc(loc(e.blurb))}</p>
+        ${e.tags?`<div class="ev-tags">${esc(loc(e.tags))}</div>`:""}
         <div class="ev-actions">
           ${e.media?`<button type="button" class="ev-link ev-media-btn" data-ev="${i}">${t("ev_gallery")} \u2192</button>`:""}
           ${e.reg_url?`<a class="ev-link" href="${esc(e.reg_url)}">${t("ev_register")} \u2192</a>`:""}
@@ -2642,14 +2685,14 @@ function openEventModal(i){
       <div class="gal">${GALLERY.map(g=>`<button type="button" data-full="media/photos/${g.f}.jpg" data-cap="${g.c}"><img src="media/photos/${g.f}-thumb.jpg" alt="${g.c}" loading="lazy" decoding="async" /></button>`).join("")}</div>`:"";
   document.getElementById("sheetContent").innerHTML=`
     <div class="sh-top"><span class="sh-mono" style="${bgImg(e.image)}">${e.image?"":(e.icon||"\u26be")}</span>
-      <div><h3 class="display">${esc(e.title)}</h3>
+      <div><h3 class="display">${esc(loc(e.title))}</h3>
       <div class="sh-pos">\ud83d\udcc5 ${fmtDate(e.date)}</div>
-      <div class="sh-meta">\ud83d\udccd ${esc(e.loc)}</div></div></div>
+      <div class="sh-meta">\ud83d\udccd ${esc(loc(e.loc))}</div></div></div>
     <div class="sh-body">
-      <p class="bio">${esc(e.blurb)}</p>
-      ${e.tags?`<div class="ev-tags" style="margin:-10px 0 24px">${esc(e.tags)}</div>`:""}
+      <p class="bio">${esc(loc(e.blurb))}</p>
+      ${e.tags?`<div class="ev-tags" style="margin:-10px 0 24px">${esc(loc(e.tags))}</div>`:""}
       ${media}
-      ${(e.reg_url||e.email)?`<div style="margin-top:28px"><a class="btn btn-gold" href="${e.reg_url?esc(e.reg_url):("mailto:"+e.email+"?subject="+encodeURIComponent(e.title+" \u2014 Registration"))}">${t("ev_register")} \u2192</a></div>`:""}
+      ${(e.reg_url||e.email)?`<div style="margin-top:28px"><a class="btn btn-gold" href="${e.reg_url?esc(e.reg_url):("mailto:"+e.email+"?subject="+encodeURIComponent(loc(e.title)+" \u2014 Registration"))}">${t("ev_register")} \u2192</a></div>`:""}
     </div>`;
   document.querySelectorAll("#sheetContent .gal button").forEach(b=>b.onclick=()=>openLightbox(b.dataset.full,b.dataset.cap));
   document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";

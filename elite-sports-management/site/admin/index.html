@@ -84,7 +84,19 @@
   .p-meta b{color:var(--ink)}
   .row-btns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
   .row-btns .btn{flex:1;min-width:120px}
-  .editor{display:none;margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+  .editor{display:none;border-top:1px solid var(--line);padding-top:16px;margin-top:16px}
+  /* Groups the EN/ES/IT inputs for one translatable field so the three boxes read as one
+     thing rather than three unrelated fields. */
+  .i18n-group{margin:0 0 16px;padding:12px 13px 2px;border:1px solid var(--line);border-radius:10px;
+    background:rgba(255,255,255,.02)}
+  .i18n-head{font-size:11.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:10px}
+  .i18n-hint{font-size:12px;color:var(--muted);margin-top:5px}
+  /* Which languages a row actually has text for, shown on the collapsed card. */
+  .lang-chips{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle}
+  .lang-chips span{font-size:10px;font-weight:800;letter-spacing:.06em;border-radius:999px;
+    padding:2px 7px;border:1px solid var(--line);color:var(--muted)}
+  .lang-chips span.on{background:var(--gold);color:#0b1f3a;border-color:var(--gold)}
   .editor.open{display:block}
   .stat-row{display:grid;grid-template-columns:1fr 1fr 40px;gap:8px;margin-bottom:8px}
   .stat-row button{border:1px solid rgba(224,93,93,.5);background:transparent;color:var(--red);border-radius:10px;font-size:16px;cursor:pointer}
@@ -233,9 +245,20 @@
       <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">Testimonials on the homepage — the lower “What People Say” grid and the “See all” list. (The featured José Cedeño quote at the very top is separate.) Add a name, role, the quote, an optional photo, and a display order. Changes are <b style="color:var(--ink)">live immediately</b>.</p>
       <button class="btn btn-gold" type="button" id="tsAddToggle">+ Add testimonial</button>
       <div class="editor" id="tsAddEditor">
-        <div class="field"><label for="ts-name">Name</label><input id="ts-name" placeholder="e.g. José Cedeño" /></div>
-        <div class="field"><label for="ts-role">Role / subtitle</label><input id="ts-role" placeholder="e.g. Former Cleveland Indians organization" /></div>
-        <div class="field"><label for="ts-quote">Quote *</label><textarea id="ts-quote" rows="4" placeholder="What they said…"></textarea></div>
+        <div class="field"><label for="ts-name">Name</label><input id="ts-name" placeholder="e.g. José Cedeño" />
+          <div class="i18n-hint">The name is shown as-is in every language — it isn't translated.</div></div>
+        <div class="i18n-group">
+          <div class="i18n-head">Role / subtitle</div>
+          <div class="field"><label for="ts-role-en">English</label><input id="ts-role-en" placeholder="e.g. Former Cleveland Indians organization" /></div>
+          <div class="field"><label for="ts-role-es">Español</label><input id="ts-role-es" placeholder="Leave blank to fall back to English" /></div>
+          <div class="field"><label for="ts-role-it">Italiano</label><input id="ts-role-it" placeholder="Leave blank to fall back to English" /></div>
+        </div>
+        <div class="i18n-group">
+          <div class="i18n-head">Quote <span style="color:var(--gold-soft)">*</span></div>
+          <div class="field"><label for="ts-quote-en">English *</label><textarea id="ts-quote-en" rows="4" placeholder="What they said…"></textarea></div>
+          <div class="field"><label for="ts-quote-es">Español</label><textarea id="ts-quote-es" rows="4" placeholder="Leave blank to fall back to English"></textarea></div>
+          <div class="field"><label for="ts-quote-it">Italiano</label><textarea id="ts-quote-it" rows="4" placeholder="Leave blank to fall back to English"></textarea></div>
+        </div>
         <div class="field"><label for="ts-order">Display order (lower shows first)</label><input id="ts-order" type="number" value="0" /></div>
         <div class="field"><label for="ts-photo">Photo (optional)</label><input type="file" accept="image/*" id="ts-photo" /></div>
         <div class="row-btns"><button class="btn btn-gold" type="button" id="ts-save">Add testimonial</button></div>
@@ -481,18 +504,60 @@ async function loadTestimonials(){
 // is replaced with a real one.
 const PLACEHOLDER_TESTI_NAMES = new Set(["esm athlete","parent"]);
 const isPlaceholderTesti = x => PLACEHOLDER_TESTI_NAMES.has((x.name||"").trim().toLowerCase());
+
+/* ===== Trilingual quote/role =================================================
+   testimonials.quote and .role are jsonb holding {en,es,it} (see
+   supabase-testimonials-i18n.sql). supabase-js hands them back as real objects,
+   which is what lets the homepage's loc() pick a language.
+
+   A row can still legitimately hold a bare string — that's the pre-migration shape
+   and loc() renders it in every language — so everything below reads through
+   tl()/tlAll() rather than touching the value directly. Without that, a legacy row
+   would print "[object Object]" in this panel. */
+const TS_LANGS = [["en","English"],["es","Español"],["it","Italiano"]];
+// One language out of a translatable value, with the same fallback order as loc().
+const tl = (v, l) => (v && typeof v === "object")
+  ? (v[l] || "")
+  : (l === "en" ? (v || "") : "");
+// What the homepage would actually show for this language (fallback included).
+const tlShown = (v, l) => (v && typeof v === "object")
+  ? (v[l] || v.en || Object.values(v).find(Boolean) || "")
+  : (v || "");
+// Which languages have their own text, for the chips on the collapsed card.
+const tlAll = v => TS_LANGS.map(([l]) => [l, !!tl(v, l)]);
+// Build the jsonb value to store. English is required; blank es/it are omitted so
+// loc() falls back rather than rendering an empty quote.
+function tlPack(en, es, it){
+  const o = { en: (en||"").trim() };
+  if ((es||"").trim()) o.es = es.trim();
+  if ((it||"").trim()) o.it = it.trim();
+  return o;
+}
+function langChips(v){
+  return `<span class="lang-chips">${tlAll(v).map(([l,on]) =>
+    `<span class="${on?"on":""}" title="${on?l.toUpperCase()+" text supplied":"No "+l.toUpperCase()+" text — falls back to English"}">${l.toUpperCase()}</span>`).join("")}</span>`;
+}
 function cardTestimonial(x){
   const ph = isPlaceholderTesti(x)
     ? ` <span style="font-size:11px;font-weight:800;letter-spacing:.05em;color:#0b1f3a;background:var(--gold);border-radius:999px;padding:2px 9px;vertical-align:middle">PLACEHOLDER</span>` : "";
   return `<div class="card" data-ts="${x.id}" style="margin-top:12px${isPlaceholderTesti(x)?";border-color:var(--gold)":""}">
     <div class="p-head">${x.image_url?`<span class="avatar" style="background-image:url('${esc(x.image_url)}')"></span>`:`<span class="avatar">${esc(initials(x.name||"?"))}</span>`}
       <div style="flex:1"><h3 class="display" style="font-size:18px">${esc(x.name||"(no name)")}${ph}</h3>
-        <div class="p-meta">${esc(x.role||"")}${x.role?" · ":""}order ${x.sort_order??0}</div></div></div>
-    <div class="acct-meta" style="white-space:pre-wrap">“${esc(x.quote||"")}”</div>
+        <div class="p-meta">${esc(tlShown(x.role,"en"))}${tlShown(x.role,"en")?" · ":""}order ${x.sort_order??0}${langChips(x.quote)}</div></div></div>
+    <div class="acct-meta" style="white-space:pre-wrap">“${esc(tlShown(x.quote,"en"))}”</div>
     <div class="editor" id="tsed-${x.id}">
-      <div class="field"><label>Name</label><input data-tsf="name" data-id="${x.id}" value="${esc(x.name||"")}" /></div>
-      <div class="field"><label>Role / subtitle</label><input data-tsf="role" data-id="${x.id}" value="${esc(x.role||"")}" /></div>
-      <div class="field"><label>Quote *</label><textarea data-tsf="quote" data-id="${x.id}" rows="4">${esc(x.quote||"")}</textarea></div>
+      <div class="field"><label>Name</label><input data-tsf="name" data-id="${x.id}" value="${esc(x.name||"")}" />
+        <div class="i18n-hint">Shown as-is in every language — not translated.</div></div>
+      <div class="i18n-group">
+        <div class="i18n-head">Role / subtitle</div>
+        ${TS_LANGS.map(([l,label])=>`<div class="field"><label>${label}${l==="en"?"":" <span style=\"color:var(--muted);font-weight:600\">(blank = use English)</span>"}</label>
+          <input data-tsf="role-${l}" data-id="${x.id}" value="${esc(tl(x.role,l))}" /></div>`).join("")}
+      </div>
+      <div class="i18n-group">
+        <div class="i18n-head">Quote <span style="color:var(--gold-soft)">*</span></div>
+        ${TS_LANGS.map(([l,label])=>`<div class="field"><label>${label}${l==="en"?" *":" <span style=\"color:var(--muted);font-weight:600\">(blank = use English)</span>"}</label>
+          <textarea data-tsf="quote-${l}" data-id="${x.id}" rows="4">${esc(tl(x.quote,l))}</textarea></div>`).join("")}
+      </div>
       <div class="field"><label>Display order</label><input type="number" data-tsf="sort_order" data-id="${x.id}" value="${x.sort_order??0}" /></div>
       <div class="field"><label>Replace photo</label><input type="file" accept="image/*" data-tsphoto="${x.id}" /></div>
       <div class="row-btns"><button class="btn btn-gold" data-tssave="${x.id}">Save changes</button></div>
@@ -523,10 +588,16 @@ function bindTestimonialActions(){
   document.querySelectorAll("[data-tssave]").forEach(b => b.onclick = async () => {
     const id = +b.dataset.tssave;
     const val = f => document.querySelector(`[data-tsf="${f}"][data-id="${id}"]`);
-    const quote = val("quote").value.trim();
-    if (!quote){ toast("Quote is required", true); return; }
-    const patch = { name: val("name").value.trim()||null, role: val("role").value.trim()||null, quote,
-                    sort_order: parseInt(val("sort_order").value,10)||0 };
+    const v = f => (val(f)?.value ?? "").trim();
+    // English is the fallback every other language resolves to, so it's the required one.
+    if (!v("quote-en")){ toast("An English quote is required", true); return; }
+    const roleHasAny = TS_LANGS.some(([l]) => v("role-"+l));
+    const patch = {
+      name: v("name") || null,
+      role: roleHasAny ? tlPack(v("role-en"), v("role-es"), v("role-it")) : null,
+      quote: tlPack(v("quote-en"), v("quote-es"), v("quote-it")),
+      sort_order: parseInt(val("sort_order").value,10)||0,
+    };
     b.disabled = true;
     const { error } = await SB.from("testimonials").update(patch).eq("id", id);
     b.disabled = false;
@@ -551,9 +622,14 @@ function bindTestimonialActions(){
 $("tsAddToggle").onclick = () => $("tsAddEditor").classList.toggle("open");
 $("ts-save").onclick = async () => {
   const msg = $("ts-msg"); msg.classList.remove("show");
-  const quote = $("ts-quote").value.trim();
-  if (!quote){ msg.textContent = "Quote is required."; msg.classList.add("show"); $("ts-quote").focus(); return; }
-  const name = $("ts-name").value.trim()||null, role = $("ts-role").value.trim()||null, sort_order = parseInt($("ts-order").value,10)||0;
+  const g = id => ($(id)?.value ?? "").trim();
+  // English is the fallback every other language resolves to, so it's the required one.
+  if (!g("ts-quote-en")){ msg.textContent = "An English quote is required."; msg.classList.add("show"); $("ts-quote-en").focus(); return; }
+  const quote = tlPack(g("ts-quote-en"), g("ts-quote-es"), g("ts-quote-it"));
+  const roleHasAny = ["ts-role-en","ts-role-es","ts-role-it"].some(g);
+  const name = g("ts-name")||null;
+  const role = roleHasAny ? tlPack(g("ts-role-en"), g("ts-role-es"), g("ts-role-it")) : null;
+  const sort_order = parseInt($("ts-order").value,10)||0;
   const btn = $("ts-save"); btn.disabled = true;
   let image_url = null;
   const file = $("ts-photo").files?.[0];
@@ -569,7 +645,9 @@ $("ts-save").onclick = async () => {
   btn.disabled = false;
   if (error){ msg.textContent = "Save failed: " + error.message; msg.classList.add("show"); return; }
   toast("Testimonial added ✓");
-  ["ts-name","ts-role","ts-quote"].forEach(id => $(id).value = ""); $("ts-order").value = "0"; $("ts-photo").value = "";
+  ["ts-name","ts-role-en","ts-role-es","ts-role-it","ts-quote-en","ts-quote-es","ts-quote-it"]
+    .forEach(id => { if ($(id)) $(id).value = ""; });
+  $("ts-order").value = "0"; $("ts-photo").value = "";
   $("tsAddEditor").classList.remove("open");
   loadTestimonials();
 };
