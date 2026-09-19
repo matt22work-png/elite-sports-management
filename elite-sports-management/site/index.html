@@ -1827,8 +1827,14 @@ function cacheMasterCode(v){
    strings left in the Events section. The caption is also the <img alt>, so translating it
    localises the accessible name as well as the visible text.
 
-   `f` is the filename stem (twl-*.jpg / twl-*-thumb.jpg) and is never displayed. */
-const GALLERY = [
+   `f` is the filename stem (twl-*.jpg / twl-*-thumb.jpg) and is never displayed.
+
+   FALLBACK ONLY as of the Events CMS. Events and their galleries now live in Supabase
+   (public.events + public.events_gallery). This array is what the page shows when that
+   fetch fails or returns nothing, so the Events section can never come up empty or
+   broken — see loadEvents(). Keep it in sync-ish with the DB only as a safety net; the
+   DB is the source of truth Sam edits. */
+const GALLERY_FALLBACK = [
   {f:"twl-field-aerial",  c:{en:"The seaside field — Tenerife",      es:"El campo junto al mar — Tenerife",   it:"Il campo sul mare — Tenerife"}},
   {f:"twl-champions",     c:{en:"Champions — Tenerife Winter League",es:"Campeones — Tenerife Winter League", it:"Campioni — Tenerife Winter League"}},
   {f:"twl-allstars-team", c:{en:"All-Stars — Tenerife",              es:"All-Stars — Tenerife",               it:"All-Star — Tenerife"}},
@@ -1857,8 +1863,13 @@ const LOCAL_PHOTOS = { "jose-cedeno":"media/photos/jose-cedeno.jpg" };
    toLocaleDateString(lang). `icon`, `image` and `reg_url` are not copy.
 
    loc() accepts a plain string too, so a field can be de-translated later by replacing
-   the object with a string without touching the renderer. */
-const EVENTS = [
+   the object with a string without touching the renderer.
+
+   FALLBACK ONLY as of the Events CMS — see the note on GALLERY_FALLBACK. loadEvents()
+   replaces EVENTS with the Supabase rows when they load; this array is what renders if
+   that fetch fails, so the section degrades to the last known-good content rather than
+   to an empty band. */
+const EVENTS_FALLBACK = [
   // Upcoming registration (item 14) — no inline gallery; the card links straight to /tenerife/.
   {
     // Official league name — identical in all three languages, kept as an object so the
@@ -1898,6 +1909,75 @@ const EVENTS = [
     },
   },
 ];
+
+/* ===== Events: live data, with the arrays above as the safety net ==============
+   Galleries are now PER EVENT (events_gallery.event_id) instead of one global array,
+   so a second event with photos no longer silently shows the first one's. The
+   fallback keeps the old behaviour by attaching GALLERY_FALLBACK to whichever
+   fallback event carries media:true.
+
+   EVENTS is `let`: loadEvents() swaps in the Supabase rows on success and leaves the
+   fallback in place on failure, so renderEvents() has valid data either way and never
+   has to care which it got. EVENTS_SOURCE records which, purely for diagnostics. */
+let EVENTS = EVENTS_FALLBACK.map(e => ({ ...e, gallery: e.media ? GALLERY_FALLBACK : [] }));
+let EVENTS_SOURCE = "fallback";
+
+/* Map a DB row pair (events + events_gallery) onto the shape renderEvents() already
+   uses. Anything translatable is passed through untouched — it is already an {en,es,it}
+   object and loc() handles it at render time. */
+function mapEventRows(rows, galleryRows){
+  const byEvent = new Map();
+  (galleryRows || []).forEach(g => {
+    if (!byEvent.has(g.event_id)) byEvent.set(g.event_id, []);
+    byEvent.get(g.event_id).push({ f: g.filename, c: g.captions });
+  });
+  return rows.map(r => ({
+    id: r.id,
+    title: r.title,
+    date: r.event_date,
+    date_label: r.date_label || null,
+    loc: r.location,
+    status: r.status === "past" ? "past" : "upcoming",
+    media: !!r.media,
+    icon: r.icon || "⚾",
+    image: r.image_url || null,
+    blurb: r.blurb,
+    tags: r.tags || null,
+    reg_url: r.reg_url || null,
+    email: r.contact_email || null,
+    gallery: byEvent.get(r.id) || [],
+  }));
+}
+
+/* Never throws and never leaves the section empty: on any failure the fallback that
+   EVENTS was initialised with simply stays.
+
+   Called AFTER boot() has already painted the fallback, and it re-renders itself when
+   real data arrives. That ordering matters: supabase-js retries a failed request three
+   times with backoff, so awaiting this before the first paint left the Events band empty
+   for several seconds on a flaky or offline connection — measured while developing the
+   fallback. Painting first and upgrading in place means the section is never blank. */
+async function loadEvents(){
+  if (!SB) return;
+  try {
+    const [{ data: evRows, error: evErr }, { data: galRows }] = await Promise.all([
+      SB.from("events").select("id,title,event_date,date_label,location,status,blurb,tags,image_url,icon,reg_url,contact_email,media,published,sort_order")
+        .eq("published", true).order("sort_order"),
+      SB.from("events_gallery").select("event_id,filename,captions,sort_order").order("sort_order"),
+    ]);
+    if (evErr) throw evErr;
+    if (evRows && evRows.length){
+      EVENTS = mapEventRows(evRows, galRows || []);
+      EVENTS_SOURCE = "supabase";
+      renderEvents();   // swap the fallback out for the live rows, in place
+    }
+    // Zero published rows is a legitimate state (Sam unpublished everything), but showing
+    // an empty band would look broken, so the fallback stays and says so in the console.
+    else console.warn("Events: Supabase returned no published rows — keeping the built-in fallback.");
+  } catch(err){
+    console.warn("Events: Supabase load failed — keeping the built-in fallback.", err);
+  }
+}
 
 /* ===== TESTIMONIALS =====
    José's words are quoted in his own Spanish under q.es; q.en / q.it are
@@ -2652,6 +2732,14 @@ function renderRoster(){
   // only lists approved athletes, which undercounts who's actually represented.
 }
 function fmtDate(d){try{return new Date(d+"T00:00").toLocaleDateString(lang,{day:"numeric",month:"short",year:"numeric"})}catch(e){return d}}
+/* What to print for an event's date. An admin-supplied trilingual date_label wins — it
+   exists for ranges a single date can't express ("Dec 8–15, 2026") — otherwise the real
+   event_date is formatted per language by fmtDate(). Sorting always uses event_date, so
+   a label can never reorder the list. */
+function evDate(e){
+  const lbl = loc(e.date_label);
+  return lbl || fmtDate(e.date);
+}
 let EV_VIEW=[];
 function renderEvents(){
   const order={upcoming:0,past:1};
@@ -2661,7 +2749,7 @@ function renderEvents(){
       <span class="ev-status ${e.status==='upcoming'?'up':'past'}">${e.status==='upcoming'?t("ev_upcoming"):t("ev_past")}</span>
       ${e.image?"":(e.icon||"⚾")}</div>
       <div class="ev-body"><h3 class="display">${esc(loc(e.title))}</h3>
-        <div class="ev-meta"><span>📅 ${fmtDate(e.date)}</span><span>📍 ${esc(loc(e.loc))}</span></div>
+        <div class="ev-meta"><span>📅 ${esc(evDate(e))}</span><span>📍 ${esc(loc(e.loc))}</span></div>
         <p>${esc(loc(e.blurb))}</p>
         ${e.tags?`<div class="ev-tags">${esc(loc(e.tags))}</div>`:""}
         <div class="ev-actions">
@@ -2688,11 +2776,11 @@ function openEventModal(i){
       <div class="sub-label">${t("media_video_label")}</div>
       <div class="reel">${CLIPS.map(n=>`<video src="media/video/clip-${n}.mp4" poster="media/video/clip-${n}-poster.jpg" controls playsinline preload="none"></video>`).join("")}</div>
       <div class="sub-label">${t("media_photo_label")}</div>
-      <div class="gal">${GALLERY.map(g=>{const cap=esc(loc(g.c));return `<button type="button" data-full="media/photos/${g.f}.jpg" data-cap="${cap}"><img src="media/photos/${g.f}-thumb.jpg" alt="${cap}" loading="lazy" decoding="async" /></button>`;}).join("")}</div>`:"";
+      <div class="gal">${(e.gallery||[]).map(g=>{const cap=esc(loc(g.c));return `<button type="button" data-full="media/photos/${g.f}.jpg" data-cap="${cap}"><img src="media/photos/${g.f}-thumb.jpg" alt="${cap}" loading="lazy" decoding="async" /></button>`;}).join("")}</div>`:"";
   document.getElementById("sheetContent").innerHTML=`
     <div class="sh-top"><span class="sh-mono" style="${bgImg(e.image)}">${e.image?"":(e.icon||"\u26be")}</span>
       <div><h3 class="display">${esc(loc(e.title))}</h3>
-      <div class="sh-pos">\ud83d\udcc5 ${fmtDate(e.date)}</div>
+      <div class="sh-pos">\ud83d\udcc5 ${esc(evDate(e))}</div>
       <div class="sh-meta">\ud83d\udccd ${esc(loc(e.loc))}</div></div></div>
     <div class="sh-body">
       <p class="bio">${esc(loc(e.blurb))}</p>
@@ -3541,6 +3629,11 @@ async function boot(){
   wireServiceSignups();
   applyI18n();renderSportFilters();renderFilters();renderRoster();renderEvents();renderTesti();
   applyLockState();
+  // Events last, and deliberately NOT awaited: renderEvents() above has already painted
+  // the built-in fallback, so the section is populated from the first frame. loadEvents()
+  // re-renders in place if and when the live rows arrive. Awaiting it here would make a
+  // flaky connection hold the whole section blank while supabase-js retries.
+  loadEvents();
 }
 /* Translate the static chrome immediately. boot() also calls applyI18n(), but only
    after awaiting Supabase, which left ES/IT copy waiting ~1.2s on a network round-trip
