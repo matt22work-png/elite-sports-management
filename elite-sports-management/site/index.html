@@ -1822,19 +1822,25 @@ function cacheMasterCode(v){
 }
 
 /* ===== Media (Tenerife Winter League) ===== */
+/* Photo-gallery captions for the Tenerife event modal. `c` is an {en,es,it} object read
+   through loc(), matching EVENTS and the testimonials — these were the last English-only
+   strings left in the Events section. The caption is also the <img alt>, so translating it
+   localises the accessible name as well as the visible text.
+
+   `f` is the filename stem (twl-*.jpg / twl-*-thumb.jpg) and is never displayed. */
 const GALLERY = [
-  {f:"twl-field-aerial",  c:"The seaside field — Tenerife"},
-  {f:"twl-champions",     c:"Champions — Tenerife Winter League"},
-  {f:"twl-allstars-team", c:"All-Stars — Tenerife"},
-  {f:"twl-trophy-pair",   c:"Trophy night"},
-  {f:"twl-medal",         c:"Medal ceremony"},
-  {f:"twl-huddle-2",      c:"Pregame huddle"},
-  {f:"twl-mound-visit",   c:"Mound visit"},
-  {f:"twl-on-deck",       c:"On deck"},
-  {f:"twl-teammates",     c:"Teammates"},
-  {f:"twl-infield",       c:"Infield talk"},
-  {f:"twl-batter-13",     c:"At the plate"},
-  {f:"twl-huddle-1",      c:"Team meeting"}
+  {f:"twl-field-aerial",  c:{en:"The seaside field — Tenerife",      es:"El campo junto al mar — Tenerife",   it:"Il campo sul mare — Tenerife"}},
+  {f:"twl-champions",     c:{en:"Champions — Tenerife Winter League",es:"Campeones — Tenerife Winter League", it:"Campioni — Tenerife Winter League"}},
+  {f:"twl-allstars-team", c:{en:"All-Stars — Tenerife",              es:"All-Stars — Tenerife",               it:"All-Star — Tenerife"}},
+  {f:"twl-trophy-pair",   c:{en:"Trophy night",                      es:"Noche de trofeos",                   it:"Serata dei trofei"}},
+  {f:"twl-medal",         c:{en:"Medal ceremony",                    es:"Entrega de medallas",                it:"Cerimonia delle medaglie"}},
+  {f:"twl-huddle-2",      c:{en:"Pregame huddle",                    es:"Charla antes del partido",           it:"Riunione pre-partita"}},
+  {f:"twl-mound-visit",   c:{en:"Mound visit",                       es:"Visita al montículo",                it:"Visita al monte di lancio"}},
+  {f:"twl-on-deck",       c:{en:"On deck",                           es:"En espera de batear",                it:"In attesa del turno di battuta"}},
+  {f:"twl-teammates",     c:{en:"Teammates",                         es:"Compañeros de equipo",               it:"Compagni di squadra"}},
+  {f:"twl-infield",       c:{en:"Infield talk",                      es:"Charla en el cuadro interior",       it:"Chiacchierata nell'interno campo"}},
+  {f:"twl-batter-13",     c:{en:"At the plate",                      es:"En el plato",                        it:"Alla battuta"}},
+  {f:"twl-huddle-1",      c:{en:"Team meeting",                      es:"Reunión de equipo",                  it:"Riunione di squadra"}}
 ];
 const CLIPS = [1,2,3,4,5,6,7,8,9];
 
@@ -2682,7 +2688,7 @@ function openEventModal(i){
       <div class="sub-label">${t("media_video_label")}</div>
       <div class="reel">${CLIPS.map(n=>`<video src="media/video/clip-${n}.mp4" poster="media/video/clip-${n}-poster.jpg" controls playsinline preload="none"></video>`).join("")}</div>
       <div class="sub-label">${t("media_photo_label")}</div>
-      <div class="gal">${GALLERY.map(g=>`<button type="button" data-full="media/photos/${g.f}.jpg" data-cap="${g.c}"><img src="media/photos/${g.f}-thumb.jpg" alt="${g.c}" loading="lazy" decoding="async" /></button>`).join("")}</div>`:"";
+      <div class="gal">${GALLERY.map(g=>{const cap=esc(loc(g.c));return `<button type="button" data-full="media/photos/${g.f}.jpg" data-cap="${cap}"><img src="media/photos/${g.f}-thumb.jpg" alt="${cap}" loading="lazy" decoding="async" /></button>`;}).join("")}</div>`:"";
   document.getElementById("sheetContent").innerHTML=`
     <div class="sh-top"><span class="sh-mono" style="${bgImg(e.image)}">${e.image?"":(e.icon||"\u26be")}</span>
       <div><h3 class="display">${esc(loc(e.title))}</h3>
@@ -2754,8 +2760,13 @@ document.getElementById("testiAll").onclick=openTestiModal;
 
 /* ===== media lightbox (opened from the event detail modal's photo gallery) ===== */
 function openLightbox(src,cap){
+  // `cap` arrives from button.dataset.cap, which the browser has already decoded back to
+  // the raw caption, so it has to be re-escaped before going into markup — otherwise a
+  // caption containing a quote or an angle bracket would break the attribute. Captions are
+  // translated now (see GALLERY), so this is no longer a fixed set of plain English words.
+  const c=esc(cap);
   document.getElementById("sheetContent").innerHTML=
-    `<div class="lightbox"><img src="${src}" alt="${cap}" /><p style="color:var(--muted);font-size:13.5px;margin-top:12px;text-align:center">${cap}</p></div>`;
+    `<div class="lightbox"><img src="${esc(src)}" alt="${c}" /><p style="color:var(--muted);font-size:13.5px;margin-top:12px;text-align:center">${c}</p></div>`;
   document.getElementById("modal").classList.add("open");document.body.style.overflow="hidden";
 }
 /* Render self-entered per-season stats as batting/pitching/fielding tables.
