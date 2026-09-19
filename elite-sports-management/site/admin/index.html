@@ -62,6 +62,19 @@
   .p-meta.guardian{border-left:2px solid var(--line);padding-left:11px}
   .p-meta.guardian b{color:var(--ink)}
   .chip.minor{background:rgba(217,177,84,.16);color:var(--gold-soft);border-color:rgba(217,177,84,.4)}
+  /* ---------- event gallery rows (nested inside an event's editor) ---------- */
+  .gal-block{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+  .gal-row{margin:0 0 12px;padding:12px 13px 4px;border:1px solid var(--line);border-radius:10px;
+    background:rgba(255,255,255,.02)}
+  .gal-row-top{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+  .gal-row-top .gal-file{flex:1;min-width:0}
+  .gal-row-btns{display:flex;gap:6px;flex:none}
+  .btn.mini{padding:6px 10px;font-size:12px;line-height:1.1}
+  .gal-caps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .gal-caps .field{margin-bottom:8px}
+  .gal-add{display:flex;gap:8px;align-items:center;margin-top:10px}
+  .gal-add input{flex:1;min-width:0}
+  @media(max-width:700px){ .gal-caps{grid-template-columns:1fr} }
   .p-meta.discount code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;
     background:rgba(217,177,84,.14);border:1px solid var(--line);border-radius:6px;padding:1px 7px;letter-spacing:.06em}
   .chip.approved{color:var(--teal);border-color:rgba(46,196,182,.4)}
@@ -240,6 +253,58 @@
     <div class="kicker">Tenerife registrants<span class="count" id="tenCount">0</span></div>
     <div id="tenList"></div>
 
+    <div class="kicker">Events</div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">The Events section on the homepage. Each event can carry a photo gallery — add the photos to <code>media/photos/</code> in the repo first, then reference each one here by its <b style="color:var(--ink)">filename stem</b> (e.g. <code>twl-medal</code> for <code>twl-medal.jpg</code> + <code>twl-medal-thumb.jpg</code>). Leave a Spanish or Italian box blank and the homepage falls back to English. Changes are <b style="color:var(--ink)">live immediately</b>.</p>
+      <button class="btn btn-gold" type="button" id="evAddToggle">+ Add event</button>
+      <div class="editor" id="evAddEditor">
+        <div class="i18n-group">
+          <div class="i18n-head">Title <span style="color:var(--gold-soft)">*</span></div>
+          <div class="field"><label for="ev-title-en">English *</label><input id="ev-title-en" placeholder="e.g. Tenerife Winter League 2026" /></div>
+          <div class="field"><label for="ev-title-es">Español</label><input id="ev-title-es" placeholder="Leave blank to fall back to English" /></div>
+          <div class="field"><label for="ev-title-it">Italiano</label><input id="ev-title-it" placeholder="Leave blank to fall back to English" /></div>
+        </div>
+        <div class="i18n-group">
+          <div class="i18n-head">Location</div>
+          <div class="field"><label for="ev-loc-en">English</label><input id="ev-loc-en" placeholder="e.g. Tenerife, Spain" /></div>
+          <div class="field"><label for="ev-loc-es">Español</label><input id="ev-loc-es" /></div>
+          <div class="field"><label for="ev-loc-it">Italiano</label><input id="ev-loc-it" /></div>
+        </div>
+        <div class="i18n-group">
+          <div class="i18n-head">Description</div>
+          <div class="field"><label for="ev-blurb-en">English</label><textarea id="ev-blurb-en" rows="4"></textarea></div>
+          <div class="field"><label for="ev-blurb-es">Español</label><textarea id="ev-blurb-es" rows="4"></textarea></div>
+          <div class="field"><label for="ev-blurb-it">Italiano</label><textarea id="ev-blurb-it" rows="4"></textarea></div>
+        </div>
+        <div class="i18n-group">
+          <div class="i18n-head">Tags line</div>
+          <div class="field"><label for="ev-tags-en">English</label><input id="ev-tags-en" placeholder="⚾ Adult Division  ·  🔭 MLB &amp; College Scouts" /></div>
+          <div class="field"><label for="ev-tags-es">Español</label><input id="ev-tags-es" /></div>
+          <div class="field"><label for="ev-tags-it">Italiano</label><input id="ev-tags-it" /></div>
+        </div>
+        <div class="field"><label for="ev-date">Date *</label><input id="ev-date" type="date" />
+          <div class="i18n-hint">Sorted on, and printed in the visitor's language automatically. Use the override below only for something a single date can't express.</div></div>
+        <div class="i18n-group">
+          <div class="i18n-head">Printed date override (optional)</div>
+          <div class="field"><label for="ev-datelabel-en">English</label><input id="ev-datelabel-en" placeholder="e.g. Dec 8–15, 2026" /></div>
+          <div class="field"><label for="ev-datelabel-es">Español</label><input id="ev-datelabel-es" /></div>
+          <div class="field"><label for="ev-datelabel-it">Italiano</label><input id="ev-datelabel-it" /></div>
+        </div>
+        <div class="field"><label for="ev-status">Status</label>
+          <select id="ev-status"><option value="upcoming">Upcoming</option><option value="past">Past</option></select></div>
+        <div class="field"><label for="ev-icon">Icon (emoji, shown when there is no image)</label><input id="ev-icon" placeholder="🏝️" maxlength="8" /></div>
+        <div class="field"><label for="ev-image">Card image path</label><input id="ev-image" placeholder="media/photos/twl-champions-thumb.jpg" /></div>
+        <div class="field"><label for="ev-regurl">Register link (URL or path)</label><input id="ev-regurl" placeholder="tenerife/" /></div>
+        <div class="field"><label for="ev-email">…or a contact email instead</label><input id="ev-email" type="email" placeholder="Leave blank if using a link" /></div>
+        <div class="field"><label><input type="checkbox" id="ev-media" style="width:auto;margin-right:8px" />Has a photo/video gallery</label>
+          <div class="i18n-hint">Tick this to give the event a gallery. Add the photos after saving, from the event's own editor.</div></div>
+        <div class="field"><label for="ev-order">Display order (lower shows first)</label><input id="ev-order" type="number" value="0" /></div>
+        <div class="row-btns"><button class="btn btn-gold" type="button" id="ev-save">Add event</button></div>
+        <div class="msg err" id="ev-msg" role="alert" aria-live="assertive"></div>
+      </div>
+      <div id="evList" style="margin-top:14px"></div>
+    </div>
+
     <div class="kicker">Testimonials</div>
     <div class="card">
       <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">Testimonials on the homepage — the lower “What People Say” grid and the “See all” list. (The featured José Cedeño quote at the very top is separate.) Add a name, role, the quote, an optional photo, and a display order. Changes are <b style="color:var(--ink)">live immediately</b>.</p>
@@ -415,7 +480,243 @@ async function load(){
   loadAccounts();
   loadTenerife();
   loadTestimonials();
+  loadEvents();
 }
+
+/* ===== Events + their galleries ==============================================
+   public.events holds trilingual jsonb title/location/blurb/tags (+ date_label) and
+   public.events_gallery holds one row per photo, so gallery rows can be added, removed
+   and reordered independently. Both are read on the homepage through loc(), which is
+   why blank ES/IT are dropped on save rather than stored empty — an empty string would
+   win over the English fallback and render a blank line to a Spanish visitor.
+
+   Reuses the trilingual helpers written for testimonials: tl/tlShown/tlPack/langChips. */
+let EVENTS_ADMIN = [], EV_GALLERY = {};
+async function loadEvents(){
+  const [{ data: evs, error: eErr }, { data: gal, error: gErr }] = await Promise.all([
+    SB.from("events").select("*").order("sort_order"),
+    SB.from("events_gallery").select("*").order("sort_order"),
+  ]);
+  if (eErr){ $("evList").innerHTML = `<div class="card empty">Couldn't load events: ${esc(eErr.message)}</div>`; return; }
+  if (gErr) toast("Gallery load failed: " + gErr.message, true);
+  EVENTS_ADMIN = evs || [];
+  EV_GALLERY = {};
+  (gal || []).forEach(g => { (EV_GALLERY[g.event_id] ||= []).push(g); });
+  renderEventsAdmin();
+}
+
+// One gallery photo row inside an event's editor.
+function galleryRowHTML(g){
+  return `<div class="gal-row" data-galrow="${g.id}">
+    <div class="gal-row-top">
+      <input class="gal-file" data-galf="filename" data-gid="${g.id}" value="${esc(g.filename||"")}" placeholder="filename stem, e.g. twl-medal" />
+      <div class="gal-row-btns">
+        <button class="btn btn-ghost mini" data-galup="${g.id}" title="Move up">↑</button>
+        <button class="btn btn-ghost mini" data-galdown="${g.id}" title="Move down">↓</button>
+        <button class="btn btn-red mini" data-galdel="${g.id}" title="Delete photo">🗑</button>
+      </div>
+    </div>
+    <div class="gal-caps">
+      ${TS_LANGS.map(([l,label])=>`<div class="field"><label>${label}${l==="en"?"":" <span style=\"color:var(--muted);font-weight:600\">(blank = EN)</span>"}</label>
+        <input data-galf="cap-${l}" data-gid="${g.id}" value="${esc(tl(g.captions,l))}" /></div>`).join("")}
+    </div>
+    <div class="row-btns"><button class="btn btn-gold mini" data-galsave="${g.id}">Save photo</button></div>
+  </div>`;
+}
+
+function cardEvent(e){
+  const gal = EV_GALLERY[e.id] || [];
+  const when = e.date_label ? tlShown(e.date_label,"en") : (e.event_date || "—");
+  return `<div class="card" data-ev="${e.id}" style="margin-top:12px">
+    <div class="p-head">
+      <span class="avatar" ${e.image_url?`style="background-image:url('${esc(e.image_url)}')"`:""}>${e.image_url?"":esc(e.icon||"⚾")}</span>
+      <div style="flex:1">
+        <h3 class="display" style="font-size:18px">${esc(tlShown(e.title,"en")||"(untitled)")}${langChips(e.title)}</h3>
+        <div class="p-meta">${esc(when)} · ${esc(tlShown(e.location,"en")||"—")} · order ${e.sort_order??0}
+          <span class="chip ${e.status==="past"?"":"paid"}">${e.status==="past"?"Past":"Upcoming"}</span>
+          ${e.media?`<span class="chip minor">Gallery · ${gal.length} photo${gal.length===1?"":"s"}</span>`:""}
+          ${e.published===false?`<span class="chip" style="opacity:.7">Hidden</span>`:""}</div>
+      </div>
+    </div>
+    <div class="acct-meta">${esc((tlShown(e.blurb,"en")||"").slice(0,180))}${(tlShown(e.blurb,"en")||"").length>180?"…":""}</div>
+
+    <div class="editor" id="eved-${e.id}">
+      ${[["title","Title *","input"],["location","Location","input"],["blurb","Description","textarea"],["tags","Tags line","input"],["date_label","Printed date override (optional)","input"]]
+        .map(([f,label,tag])=>`<div class="i18n-group"><div class="i18n-head">${label}</div>
+          ${TS_LANGS.map(([l,ln])=>`<div class="field"><label>${ln}${l==="en"?"":" <span style=\"color:var(--muted);font-weight:600\">(blank = EN)</span>"}</label>
+            ${tag==="textarea"
+              ? `<textarea data-evf="${f}-${l}" data-id="${e.id}" rows="4">${esc(tl(e[f],l))}</textarea>`
+              : `<input data-evf="${f}-${l}" data-id="${e.id}" value="${esc(tl(e[f],l))}" />`}</div>`).join("")}
+        </div>`).join("")}
+      <div class="field"><label>Date *</label><input type="date" data-evf="event_date" data-id="${e.id}" value="${esc(e.event_date||"")}" /></div>
+      <div class="field"><label>Status</label><select data-evf="status" data-id="${e.id}">
+        <option value="upcoming"${e.status!=="past"?" selected":""}>Upcoming</option>
+        <option value="past"${e.status==="past"?" selected":""}>Past</option></select></div>
+      <div class="field"><label>Icon</label><input data-evf="icon" data-id="${e.id}" value="${esc(e.icon||"")}" maxlength="8" /></div>
+      <div class="field"><label>Card image path</label><input data-evf="image_url" data-id="${e.id}" value="${esc(e.image_url||"")}" /></div>
+      <div class="field"><label>Register link</label><input data-evf="reg_url" data-id="${e.id}" value="${esc(e.reg_url||"")}" /></div>
+      <div class="field"><label>…or contact email</label><input data-evf="contact_email" data-id="${e.id}" value="${esc(e.contact_email||"")}" /></div>
+      <div class="field"><label><input type="checkbox" data-evf="media" data-id="${e.id}" style="width:auto;margin-right:8px"${e.media?" checked":""} />Has a photo/video gallery</label></div>
+      <div class="field"><label><input type="checkbox" data-evf="published" data-id="${e.id}" style="width:auto;margin-right:8px"${e.published!==false?" checked":""} />Published (visible on the homepage)</label></div>
+      <div class="field"><label>Display order</label><input type="number" data-evf="sort_order" data-id="${e.id}" value="${e.sort_order??0}" /></div>
+      <div class="row-btns"><button class="btn btn-gold" data-evsave="${e.id}">Save changes</button></div>
+
+      <div class="gal-block">
+        <div class="i18n-head" style="margin-bottom:8px">Gallery photos${e.media?"":" — tick “Has a photo/video gallery” above and save to show these on the site"}</div>
+        <div id="galwrap-${e.id}">${gal.length?gal.map(galleryRowHTML).join(""):`<div class="p-meta">No photos yet.</div>`}</div>
+        <div class="gal-add">
+          <input id="galnew-${e.id}" placeholder="New photo filename stem, e.g. twl-medal" />
+          <button class="btn btn-ghost mini" data-galadd="${e.id}">+ Add photo</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row-btns">
+      <button class="btn btn-ghost" data-evedit="${e.id}">✏️ Edit</button>
+      <button class="btn btn-red" data-evdel="${e.id}">🗑 Delete</button>
+    </div>
+  </div>`;
+}
+
+function renderEventsAdmin(){
+  $("evList").innerHTML = EVENTS_ADMIN.length
+    ? EVENTS_ADMIN.map(cardEvent).join("")
+    : `<div class="card empty">No events yet — add one above. (The homepage is showing its built-in fallback until one exists.)</div>`;
+  bindEventActions();
+}
+
+// Collect the per-language inputs for one event field into a jsonb value, or null when
+// every language is blank — null lets loc() fall through instead of printing "".
+function evPack(id, field){
+  const v = l => (document.querySelector(`[data-evf="${field}-${l}"][data-id="${id}"]`)?.value ?? "").trim();
+  return TS_LANGS.some(([l]) => v(l)) ? tlPack(v("en"), v("es"), v("it")) : null;
+}
+
+function bindEventActions(){
+  document.querySelectorAll("[data-evedit]").forEach(b => b.onclick = () => $("eved-"+b.dataset.evedit)?.classList.toggle("open"));
+
+  document.querySelectorAll("[data-evdel]").forEach(b => b.onclick = async () => {
+    const id = +b.dataset.evdel;
+    const n = (EV_GALLERY[id]||[]).length;
+    if (!confirm(`Delete this event${n?` and its ${n} gallery photo${n===1?"":"s"}`:""}? This can't be undone.`)) return;
+    b.disabled = true;
+    // events_gallery has ON DELETE CASCADE, so the photos go with the event.
+    const { error } = await SB.from("events").delete().eq("id", id);
+    b.disabled = false;
+    if (error){ toast("Delete failed: " + error.message, true); return; }
+    toast("Event deleted"); loadEvents();
+  });
+
+  document.querySelectorAll("[data-evsave]").forEach(b => b.onclick = async () => {
+    const id = +b.dataset.evsave;
+    const el = f => document.querySelector(`[data-evf="${f}"][data-id="${id}"]`);
+    const raw = f => (el(f)?.value ?? "").trim();
+    const title = evPack(id, "title");
+    if (!title?.en){ toast("An English title is required", true); return; }
+    if (!raw("event_date")){ toast("A date is required", true); return; }
+    const patch = {
+      title, location: evPack(id,"location"), blurb: evPack(id,"blurb"),
+      tags: evPack(id,"tags"), date_label: evPack(id,"date_label"),
+      event_date: raw("event_date"),
+      status: raw("status") === "past" ? "past" : "upcoming",
+      icon: raw("icon") || null, image_url: raw("image_url") || null,
+      reg_url: raw("reg_url") || null, contact_email: raw("contact_email") || null,
+      media: !!el("media")?.checked, published: !!el("published")?.checked,
+      sort_order: parseInt(raw("sort_order"), 10) || 0,
+    };
+    b.disabled = true;
+    const { error } = await SB.from("events").update(patch).eq("id", id);
+    b.disabled = false;
+    if (error){ toast("Save failed: " + error.message, true); return; }
+    toast("Event saved ✓"); loadEvents();
+  });
+
+  // ---- gallery rows ----
+  document.querySelectorAll("[data-galadd]").forEach(b => b.onclick = async () => {
+    const eid = +b.dataset.galadd;
+    const inp = $("galnew-"+eid);
+    const filename = (inp.value || "").trim().replace(/\.(jpe?g|png|webp)$/i, "");
+    if (!filename){ toast("Enter the photo's filename stem", true); inp.focus(); return; }
+    const next = (EV_GALLERY[eid] || []).reduce((m,g) => Math.max(m, g.sort_order ?? 0), -1) + 1;
+    b.disabled = true;
+    const { error } = await SB.from("events_gallery").insert({ event_id: eid, filename, captions: {}, sort_order: next });
+    b.disabled = false;
+    if (error){ toast("Couldn't add photo: " + error.message, true); return; }
+    inp.value = ""; toast("Photo added ✓"); loadEvents();
+  });
+
+  document.querySelectorAll("[data-galsave]").forEach(b => b.onclick = async () => {
+    const gid = +b.dataset.galsave;
+    const v = f => (document.querySelector(`[data-galf="${f}"][data-gid="${gid}"]`)?.value ?? "").trim();
+    const filename = v("filename").replace(/\.(jpe?g|png|webp)$/i, "");
+    if (!filename){ toast("A filename stem is required", true); return; }
+    const caps = TS_LANGS.some(([l]) => v("cap-"+l)) ? tlPack(v("cap-en"), v("cap-es"), v("cap-it")) : {};
+    b.disabled = true;
+    const { error } = await SB.from("events_gallery").update({ filename, captions: caps }).eq("id", gid);
+    b.disabled = false;
+    if (error){ toast("Save failed: " + error.message, true); return; }
+    toast("Photo saved ✓"); loadEvents();
+  });
+
+  document.querySelectorAll("[data-galdel]").forEach(b => b.onclick = async () => {
+    if (!confirm("Remove this photo from the gallery?")) return;
+    b.disabled = true;
+    const { error } = await SB.from("events_gallery").delete().eq("id", +b.dataset.galdel);
+    b.disabled = false;
+    if (error){ toast("Delete failed: " + error.message, true); return; }
+    toast("Photo removed"); loadEvents();
+  });
+
+  // Reorder by swapping sort_order with the neighbour, so the values stay dense and
+  // the homepage's ORDER BY sort_order needs no special casing.
+  const move = async (gid, dir) => {
+    const eid = Object.keys(EV_GALLERY).find(k => (EV_GALLERY[k]||[]).some(g => g.id === gid));
+    const list = (EV_GALLERY[eid] || []).slice().sort((a,b)=>(a.sort_order??0)-(b.sort_order??0));
+    const i = list.findIndex(g => g.id === gid);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= list.length) return;
+    const a = list[i], c = list[j];
+    const [{ error: e1 }, { error: e2 }] = await Promise.all([
+      SB.from("events_gallery").update({ sort_order: c.sort_order }).eq("id", a.id),
+      SB.from("events_gallery").update({ sort_order: a.sort_order }).eq("id", c.id),
+    ]);
+    if (e1 || e2){ toast("Reorder failed: " + (e1||e2).message, true); return; }
+    loadEvents();
+  };
+  document.querySelectorAll("[data-galup]").forEach(b => b.onclick = () => move(+b.dataset.galup, -1));
+  document.querySelectorAll("[data-galdown]").forEach(b => b.onclick = () => move(+b.dataset.galdown, +1));
+}
+
+$("evAddToggle").onclick = () => $("evAddEditor").classList.toggle("open");
+$("ev-save").onclick = async () => {
+  const msg = $("ev-msg"); msg.classList.remove("show");
+  const g = id => ($(id)?.value ?? "").trim();
+  const pack = f => ["en","es","it"].some(l => g(`ev-${f}-${l}`))
+    ? tlPack(g(`ev-${f}-en`), g(`ev-${f}-es`), g(`ev-${f}-it`)) : null;
+  if (!g("ev-title-en")){ msg.textContent = "An English title is required."; msg.classList.add("show"); $("ev-title-en").focus(); return; }
+  if (!g("ev-date")){ msg.textContent = "A date is required."; msg.classList.add("show"); $("ev-date").focus(); return; }
+  const btn = $("ev-save"); btn.disabled = true;
+  const { error } = await SB.from("events").insert({
+    title: pack("title"), location: pack("loc"), blurb: pack("blurb"),
+    tags: pack("tags"), date_label: pack("datelabel"),
+    event_date: g("ev-date"),
+    status: g("ev-status") === "past" ? "past" : "upcoming",
+    icon: g("ev-icon") || null, image_url: g("ev-image") || null,
+    reg_url: g("ev-regurl") || null, contact_email: g("ev-email") || null,
+    media: !!$("ev-media").checked, published: true,
+    sort_order: parseInt(g("ev-order"), 10) || 0,
+  });
+  btn.disabled = false;
+  if (error){ msg.textContent = "Save failed: " + error.message; msg.classList.add("show"); return; }
+  toast("Event added ✓");
+  ["ev-title-en","ev-title-es","ev-title-it","ev-loc-en","ev-loc-es","ev-loc-it",
+   "ev-blurb-en","ev-blurb-es","ev-blurb-it","ev-tags-en","ev-tags-es","ev-tags-it",
+   "ev-datelabel-en","ev-datelabel-es","ev-datelabel-it","ev-date","ev-icon","ev-image",
+   "ev-regurl","ev-email"].forEach(id => { if ($(id)) $(id).value = ""; });
+  $("ev-order").value = "0"; $("ev-media").checked = false; $("ev-status").value = "upcoming";
+  $("evAddEditor").classList.remove("open");
+  loadEvents();
+};
 
 /* ---------- Tenerife Winter League registrants ---------- */
 let TENERIFE = [];
